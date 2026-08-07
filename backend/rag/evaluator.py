@@ -37,11 +37,10 @@ def call_gemini_llm(prompt: str) -> str:
     config = types.GenerateContentConfig(
         system_instruction=SYSTEM_INSTRUCTION,
         response_mime_type="application/json",
-        temperature=0.2,
-        max_output_tokens=2048
+        temperature=0.2
     )
 
-    models_to_try = [GEMINI_MODEL, "gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-3.1-pro-preview"]
+    models_to_try = [GEMINI_MODEL, "gemini-2.0-flash", "gemini-1.5-flash"]
     # Eliminar duplicados preservando orden
     seen = set()
     unique_models = [m for m in models_to_try if not (m in seen or seen.add(m))]
@@ -81,9 +80,45 @@ def call_gemini_llm(prompt: str) -> str:
         "retroalimentacion_general": "Buen análisis clínico inicial. Recuerda verificar las dosis exactas recomendadas por el Ministerio de Salud Pública."
     })
 
+def _repair_truncated_json(text: str) -> str:
+    """
+    Intenta reparar un JSON truncado cerrando strings, arrays y objetos abiertos.
+    Útil cuando max_output_tokens corta la respuesta de Gemini a mitad del texto.
+    """
+    # Cerrar string abierto si el texto termina dentro de uno
+    if text.count('"') % 2 != 0:
+        text += '"'
+    # Cerrar arrays y objetos abiertos (conteo de apertura vs cierre)
+    open_brackets = text.count('[') - text.count(']')
+    open_braces = text.count('{') - text.count('}')
+    # Cerrar primero los arrays más internos, luego los objetos
+    text += ']' * max(0, open_brackets)
+    text += '}' * max(0, open_braces)
+    return text
+
+
+def _normalize_cita_normativa(data: dict) -> dict:
+    """Normaliza el campo cita_normativa a la estructura esperada por Pydantic."""
+    if "cita_normativa" not in data:
+        return data
+    cn = data["cita_normativa"]
+    if isinstance(cn, str):
+        data["cita_normativa"] = {
+            "guia": "GPC MSP Ecuador",
+            "seccion": "Sección Oficial",
+            "pagina": 1,
+            "texto_relevante": cn
+        }
+    elif isinstance(cn, dict):
+        if "texto_relevante" not in cn or not cn["texto_relevante"]:
+            cn["texto_relevante"] = cn.get("texto") or cn.get("cita") or cn.get("fragmento") or "Norma MSP Ecuador"
+    return data
+
+
 def parse_and_validate_llm_json(raw_text: str) -> EvaluationResult:
     """
     Limpia defensivamente y valida mediante Pydantic el JSON devuelto por Gemini.
+    Si el JSON está truncado, intenta repararlo antes de fallar.
     """
     cleaned = raw_text.strip()
     if cleaned.startswith("```"):
@@ -91,22 +126,22 @@ def parse_and_validate_llm_json(raw_text: str) -> EvaluationResult:
         cleaned = re.sub(r"\n?```$", "", cleaned)
     cleaned = cleaned.strip()
 
+    # Intento 1: parseo directo
     try:
         data = json.loads(cleaned)
-        if "cita_normativa" in data:
-            if isinstance(data["cita_normativa"], str):
-                data["cita_normativa"] = {
-                    "guia": "GPC MSP Ecuador",
-                    "seccion": "Sección Oficial",
-                    "pagina": 1,
-                    "texto_relevante": data["cita_normativa"]
-                }
-            elif isinstance(data["cita_normativa"], dict):
-                cn = data["cita_normativa"]
-                if "texto_relevante" not in cn or not cn["texto_relevante"]:
-                    cn["texto_relevante"] = cn.get("texto") or cn.get("cita") or cn.get("fragmento") or "Norma MSP Ecuador"
+        data = _normalize_cita_normativa(data)
         return EvaluationResult(**data)
-    except (json.JSONDecodeError, Exception) as e:
+    except json.JSONDecodeError as e:
+        print(f"[PARSER] JSON inválido ({e}), intentando reparación por truncamiento...", flush=True)
+
+    # Intento 2: reparar truncamiento y reintentar
+    try:
+        repaired = _repair_truncated_json(cleaned)
+        data = json.loads(repaired)
+        data = _normalize_cita_normativa(data)
+        print("[PARSER] JSON reparado exitosamente tras truncamiento.", flush=True)
+        return EvaluationResult(**data)
+    except Exception as e:
         raise ValueError(f"Fallo al parsear o validar la respuesta de Gemini a JSON: {e}. Raw: {raw_text[:200]}")
 
 def evaluate_clinical_reasoning(caso: ClinicalCaseSchema, respuesta_estudiante: str, chunk: Dict[str, Any]) -> EvaluationResult:
