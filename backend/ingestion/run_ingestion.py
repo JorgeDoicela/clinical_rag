@@ -35,6 +35,20 @@ SEED_CHUNKS = [
         "pagina": 12,
         "seccion": "Manejo Activo del Código Rojo por Atonía Uterina",
         "texto": "La atonía uterina (Tono de la regla de las 4T) es la causa de hasta el 80% de las hemorragias posparto inmediatas. Manejo inmediato: 1. Masaje uterino bimanual externo e interno continuo. 2. Administración de Uterotónicos de primera línea: Oxitocina 10 UI IM o 5 UI IV en bolo lento, seguido de infusión IV (20 UI en 500 ml de solución cristalode a 125 ml/hora). De segunda línea: Ergometrina 0.2 mg IM (contraindicada en hipertensión/preeclampsia) y/o Misoprostol 800 mcg vía sublingual o rectal. Administración temprana de Ácido Tranexámico 1 g IV en los primeros 10 minutos."
+    },
+    {
+        "chunk_id": "neumonia_chunk_001",
+        "guia_fuente": "neumonia",
+        "pagina": 15,
+        "seccion": "Diagnóstico, Severidad (CURB-65) y Tratamiento de Neumonía Adquirida en la Comunidad",
+        "texto": "Neumonía Adquirida en la Comunidad (NAC): Criterios diagnósticos clínicos (fiebre, tos expectorante, estertores crepitantes, soplo tubárico) y consolidación radiológica en imagen de tórax. Escala de severidad CURB-65: C (Confusión), U (Urea > 19 mg/dL), R (FR >= 30 rpm), B (PA sistólica < 90 o diastólica <= 60 mmHg), 65 (Edad >= 65 años). Puntuación 0-1: Manejo ambulatorio (Amoxicilina 1g VO c/8h o Azitromicina 500mg VO c/24h). Puntuación >= 2: Criterio de hospitalización. Tratamiento hospitalario empírico: Ampicilina/Sulbactam 1.5g-3g IV c/6h o Ceftriaxona 1g-2g IV c/24h + Claritromicina 500mg VO/IV c/12h."
+    },
+    {
+        "chunk_id": "ehirn_chunk_001",
+        "guia_fuente": "gpc_ehirn2019",
+        "pagina": 10,
+        "seccion": "Diagnóstico, Clasificación y Tratamiento de la Enfermedad Hemorrágica del Recién Nacido (EHIRN)",
+        "texto": "Enfermedad Hemorrágica del Recién Nacido (EHIRN) por deficiencia de Vitamina K. Clasificación por edad: Temprana (0-24 horas, secundaria a fármacos maternos), Clásica (1-7 días, sangrado umbilical, gastrointestinal o cutáneo en RNT sin profilaxis), Tardía (2-12 semanas hasta 6 meses, frecuentemente asociada a lactancia materna exclusiva sin profilaxis, alta incidencia de sangrado intracraneal). Tratamiento de urgencia: Fitomenadiona (Vitamina K1) 1 mg a 2 mg IV lento o SC (evitar IM si hay coagulopatía grave). En sangrado mayor o riesgo vital: administrar Concentrado de Complejo Protrombínico (CCP) 25-50 UI/kg IV o Plasma Fresco Congelado (PFC) 10-15 mL/kg IV."
     }
 ]
 
@@ -43,7 +57,7 @@ def run_ingestion_pipeline():
     raw_dir.mkdir(parents=True, exist_ok=True)
     pdf_files = list(raw_dir.glob("*.pdf"))
 
-    all_chunks = []
+    all_chunks = list(SEED_CHUNKS)
     if pdf_files:
         print(f"Encontrados {len(pdf_files)} PDFs en {raw_dir}. Procesando...")
         for pdf_file in pdf_files:
@@ -51,9 +65,9 @@ def run_ingestion_pipeline():
             pages = extract_text_by_page(pdf_file)
             chunks = chunk_by_section(pages, guia_id=guia_id)
             all_chunks.extend(chunks)
-        print(f"Total de chunks extraídos de PDFs: {len(all_chunks)}")
+        print(f"Total de chunks a indexar (PDFs + Sembrados): {len(all_chunks)}")
     else:
-        print("No se encontraron PDFs en raw_pdfs/. Indexando chunks sembrados de respaldo para inicialización rápida...")
+        print("No se encontraron PDFs en raw_pdfs/. Indexando chunks sembrados de respaldo...")
         all_chunks = SEED_CHUNKS
 
     collection = build_vector_db(all_chunks)

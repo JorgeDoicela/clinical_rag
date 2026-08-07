@@ -28,7 +28,7 @@ def build_vector_db(chunks: List[Dict[str, Any]], persist_path: str = CHROMA_PER
 
     embeddings = model.encode(texts, show_progress_bar=True).tolist()
 
-    collection.add(
+    collection.upsert(
         ids=ids,
         embeddings=embeddings,
         documents=texts,
