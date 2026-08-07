@@ -1,7 +1,7 @@
 import React from 'react';
-import { CheckCircle2, AlertTriangle, BookOpen, Award, RefreshCw } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, BookOpen, Award, RefreshCw, User, FileImage } from 'lucide-react';
 
-export default function FeedbackCard({ result, onReset }) {
+export default function FeedbackCard({ result, studentAnswer, studentImage, onReset }) {
   if (!result) return null;
 
   const { score, score_max = 10, aciertos = [], omisiones = [], cita_normativa, retroalimentacion_general } = result;
@@ -19,6 +19,30 @@ export default function FeedbackCard({ result, onReset }) {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* Razonamiento Registrado del Estudiante */}
+      {studentAnswer && (
+        <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 shadow-xs space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-700">
+              <User className="w-4 h-4 text-sky-600 shrink-0" />
+              <span>Tu Razonamiento Clínico Registrado</span>
+            </div>
+            <span className="text-[10px] font-mono text-slate-500 font-semibold uppercase bg-slate-200/60 px-2 py-0.5 rounded-md">
+              Respuesta del Alumno
+            </span>
+          </div>
+          <div className="bg-white p-4 rounded-xl border border-slate-200/80 text-xs sm:text-sm text-slate-800 leading-relaxed font-normal whitespace-pre-wrap">
+            {studentAnswer}
+          </div>
+          {studentImage && (
+            <div className="flex items-center gap-2 text-xs text-slate-600 pt-1 font-medium">
+              <FileImage className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+              <span>Adjunto multimodal: {studentImage.name || 'Imagen cargada'}</span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Header con Score */}
       <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-xs relative overflow-hidden">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -127,3 +151,4 @@ export default function FeedbackCard({ result, onReset }) {
     </div>
   );
 }
+

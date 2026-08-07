@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, CheckCircle2 } from 'lucide-react';
+import { Loader2, CheckCircle2, BookOpen, Lightbulb, ShieldCheck, Activity } from 'lucide-react';
 
 const STEPS = [
   "Buscando evidencias en la GPC del MSP Ecuador...",
@@ -8,9 +8,33 @@ const STEPS = [
   "Sintetizando informe de retroalimentación formativa..."
 ];
 
+const CLINICAL_PEARLS = [
+  {
+    tag: "Normativa GPC MSP",
+    icon: BookOpen,
+    text: "Las Guías de Práctica Clínica del MSP Ecuador priorizan evidencias tipo A mediante sistema GRADE para orientar decisiones terapéuticas críticas."
+  },
+  {
+    tag: "Motor RAG Multimodal",
+    icon: Activity,
+    text: "El sistema vectoriza el caso y recupera fragmentos exactos de la norma nacional para contrastar el diagnóstico y plan del estudiante."
+  },
+  {
+    tag: "Metodología SOAP",
+    icon: Lightbulb,
+    text: "Se evalúa la concatenación lógica entre la anamnesis (Subjetivo), hallazgos (Objetivo), juicio (Análisis) y tratamiento (Plan)."
+  },
+  {
+    tag: "Ponderación Formativa",
+    icon: ShieldCheck,
+    text: "La identificación temprana de signos de alarma e intervenciones iniciales oportunas constituyen el núcleo del puntaje formativo."
+  }
+];
+
 export default function EvaluationGameLoader({ hasImage }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(10);
+  const [pearlIndex, setPearlIndex] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -29,6 +53,16 @@ export default function EvaluationGameLoader({ hasImage }) {
     else if (progress < 85) setCurrentStep(2);
     else setCurrentStep(3);
   }, [progress]);
+
+  useEffect(() => {
+    const pearlTimer = setInterval(() => {
+      setPearlIndex((prev) => (prev + 1) % CLINICAL_PEARLS.length);
+    }, 4000);
+    return () => clearInterval(pearlTimer);
+  }, []);
+
+  const currentPearl = CLINICAL_PEARLS[pearlIndex];
+  const PearlIcon = currentPearl.icon;
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
@@ -100,7 +134,23 @@ export default function EvaluationGameLoader({ hasImage }) {
           })}
         </div>
 
+        {/* Cápsula Formativa GPC / Datos Extras (Rotativo) */}
+        <div className="border-t border-slate-100 pt-4">
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex items-start gap-3 transition-all duration-300">
+            <PearlIcon className="w-4 h-4 text-sky-600 mt-0.5 shrink-0" />
+            <div className="space-y-0.5">
+              <span className="text-[10px] font-mono font-semibold tracking-wider text-indigo-600 uppercase">
+                {currentPearl.tag}
+              </span>
+              <p className="text-xs text-slate-600 leading-snug">
+                {currentPearl.text}
+              </p>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );
 }
+

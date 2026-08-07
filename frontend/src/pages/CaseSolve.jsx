@@ -188,7 +188,12 @@ export default function CaseSolve() {
           </div>
         </form>
       ) : (
-        <FeedbackCard result={resultado} onReset={() => setResultado(null)} />
+        <FeedbackCard
+          result={resultado}
+          studentAnswer={respuesta}
+          studentImage={imagen}
+          onReset={() => setResultado(null)}
+        />
       )}
     </div>
   );
