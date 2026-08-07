@@ -4,7 +4,8 @@
       "id": "case_dengue_01",
       "guia_asociada": "dengue",
       "titulo": "Paciente febril con signos de alarma por Dengue",
-      "enunciado": "Paciente femenina de 24 años de edad, procedente de Guayaquil, acude por presentar fiebre elevada de 3 días de evolución, dolor retroocular intenso, mialgias y artralgias. Desde hace 12 horas presenta dolor abdominal continuo e intenso, vómitos persistentes (4 en 6 horas) y somnolencia. Examen físico: PA 90/60 mmHg, FC 112 bpm, llenado capilar 3 segundos, petequias en extremidades inferiores. Laboratorio: Hematocrito 48% (elevado respecto al basal), Plaquetas 65.000/mm³.",
+      "imagen_url": "/static/images/dengue_hemograma.png",
+      "enunciado": "Paciente femenina de 24 años de edad, procedente de Guayaquil, acude por presentar fiebre elevada de 3 días de evolución, dolor retroocular intenso, mialgias y artralgias. Desde hace 12 horas presenta dolor abdominal continuo e intenso, vómitos persistentes (4 en 6 horas) y somnolencia. Examen físico: PA 90/60 mmHg, FC 112 bpm, llenado capilar 3 segundos, petequias en extremidades inferiores. Se adjunta el informe del hemograma de laboratorio.",
       "pregunta": "Clasifique la severidad del caso según la GPC del MSP Ecuador y describa la conducta terapéutica inmediata (esquema de reposición de líquidos, monitoreo y criterios de hospitalización).",
       "nivel_esperado": "pregrado_avanzado",
       "fragmento_gpc_ideal_id": "dengue_chunk_004"
@@ -35,6 +36,16 @@
       "pregunta": "Aplique el protocolo del Código Rojo / Hemorragia Posparto de la GPC del MSP Ecuador: mencione la causa probable (regla de las 4T), la primera maniobra no farmacológica y los medicamentos uterotónicos de primera línea con sus dosis.",
       "nivel_esperado": "pregrado_avanzado",
       "fragmento_gpc_ideal_id": "hemorragia_chunk_001"
+    },
+    {
+      "id": "case_neumonia_01",
+      "guia_asociada": "neumonia",
+      "titulo": "Neumonía Adquirida en la Comunidad (NAC) y Criterios de Severidad Radiológica",
+      "imagen_url": "/static/images/neumonia_rx.png",
+      "enunciado": "Paciente masculino de 48 años de edad, sin antecedentes patológicos de importancia, acude al centro de salud por fiebre de 38.8 °C de 4 días de evolución, tos productiva con expectoración herrumbrosa y dolor torácico de tipo pleurítico en hemitórax derecho. Examen físico: FR 28 rpm, FC 105 bpm, SatO2 91% al aire ambiente. A la auscultación se perciben estertores crepitantes y soplo tubárico en base pulmonar derecha. Se realiza radiografía de tórax (PA) que se adjunta al caso.",
+      "pregunta": "Interprete los hallazgos radiológicos en la imagen adjunta, clasifique la severidad del paciente según la escala CURB-65 recomendada por la GPC del MSP Ecuador y determine el nivel de atención (ambulatorio vs hospitalario) y esquema antibiótico empírico inicial.",
+      "nivel_esperado": "pregrado_avanzado",
+      "fragmento_gpc_ideal_id": "neumonia_chunk_001"
     }
   ]
 }

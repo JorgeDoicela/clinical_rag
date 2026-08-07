@@ -25,5 +25,7 @@ class ClinicalCaseSchema(BaseModel):
     titulo: str
     enunciado: str
     pregunta: str
+    imagen_url: Optional[str] = None
     nivel_esperado: Optional[str] = "pregrado_avanzado"
     fragmento_gpc_ideal_id: Optional[str] = None
+

@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+import os
+
 from routers.cases import router as cases_router
 from routers.evaluation import router as evaluation_router
 
@@ -16,6 +19,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Servir imágenes estáticas de los casos clínicos
+images_dir = os.path.join(os.path.dirname(__file__), "cases_data", "images")
+os.makedirs(images_dir, exist_ok=True)
+app.mount("/static/images", StaticFiles(directory=images_dir), name="static_images")
 
 app.include_router(cases_router)
 app.include_router(evaluation_router)

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchCaseById, evaluateResponse } from '../api/client';
-import { ArrowLeft, Send, Loader2, BookOpen, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Send, Loader2, BookOpen, AlertCircle, FileImage, Maximize2 } from 'lucide-react';
 import FeedbackCard from '../components/FeedbackCard';
 import ImageUploadZone from '../components/ImageUploadZone';
 
@@ -95,6 +95,27 @@ export default function CaseSolve() {
 
         <div className="space-y-4 text-slate-700 leading-relaxed text-sm sm:text-base bg-slate-50 p-5 rounded-xl border border-slate-200">
           <p>{caso.enunciado}</p>
+
+          {caso.imagen_url && (
+            <div className="mt-4 pt-4 border-t border-slate-200/80 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                  <FileImage className="w-4 h-4 text-sky-600" />
+                  <span>Informe / Imagen Médica Adjunta</span>
+                </span>
+                <span className="text-xs text-sky-600 font-medium bg-sky-50 px-2.5 py-1 rounded-md border border-sky-100">
+                  Multimodal Active
+                </span>
+              </div>
+              <div className="relative group rounded-xl overflow-hidden border border-slate-300 bg-white shadow-sm max-w-xl mx-auto">
+                <img
+                  src={`http://localhost:8000${caso.imagen_url}`}
+                  alt="Imagen Médica del Caso Clínico"
+                  className="w-full h-auto object-contain max-h-96 rounded-xl hover:scale-[1.01] transition-transform duration-200"
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="space-y-2 border-l-4 border-l-sky-600 pl-4 py-1">

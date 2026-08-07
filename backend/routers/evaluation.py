@@ -25,13 +25,27 @@ async def evaluate_response(
     if not respuesta_estudiante.strip():
         raise HTTPException(status_code=400, detail="La respuesta del estudiante no puede estar vacía.")
 
-    # Leer imagen si fue adjuntada
+    # Leer imagen si fue adjuntada por el usuario o si el caso clínico tiene una imagen preconfigurada
     imagen_bytes = None
-    imagen_mime = "image/jpeg"
+    imagen_mime = "image/png"
+
     if imagen and imagen.filename:
         imagen_bytes = await imagen.read()
-        imagen_mime = imagen.content_type or "image/jpeg"
-        print(f"[ROUTER] Imagen recibida: {imagen.filename} ({imagen_mime}, {len(imagen_bytes)} bytes)", flush=True)
+        imagen_mime = imagen.content_type or "image/png"
+        print(f"[ROUTER] Imagen subida por usuario recibida: {imagen.filename} ({imagen_mime}, {len(imagen_bytes)} bytes)", flush=True)
+    elif caso.imagen_url:
+        import os
+        # Convertir URL estática en ruta de archivo física local (/static/images/dengue_hemograma.png -> cases_data/images/dengue_hemograma.png)
+        rel_path = caso.imagen_url.replace("/static/images/", "")
+        local_img_path = os.path.join(os.path.dirname(__file__), "..", "cases_data", "images", rel_path)
+        if os.path.exists(local_img_path):
+            with open(local_img_path, "rb") as f:
+                imagen_bytes = f.read()
+            if local_img_path.lower().endswith(".jpg") or local_img_path.lower().endswith(".jpeg"):
+                imagen_mime = "image/jpeg"
+            else:
+                imagen_mime = "image/png"
+            print(f"[ROUTER] Cargando imagen preconfigurada del caso clínico: {local_img_path} ({len(imagen_bytes)} bytes)", flush=True)
 
     try:
         chunk = retrieve_relevant_chunk(
