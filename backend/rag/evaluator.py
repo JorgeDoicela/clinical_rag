@@ -41,7 +41,18 @@ def call_gemini_llm(prompt: str, imagen_bytes: Optional[bytes] = None, imagen_mi
         temperature=0.2
     )
 
-    models_to_try = [GEMINI_MODEL, "gemini-3.5-flash", "gemini-3.6-flash", "gemini-3.5-flash-lite"]
+    models_to_try = [
+        GEMINI_MODEL,
+        "gemini-3.5-flash",
+        "gemini-3.6-flash",
+        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-3-flash-preview",
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-lite",
+        "gemini-2.0-flash",
+        "gemini-flash-latest"
+    ]
     # Eliminar duplicados preservando orden
     seen = set()
     unique_models = [m for m in models_to_try if not (m in seen or seen.add(m))]
