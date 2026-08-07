@@ -7,8 +7,10 @@ def build_vector_db(chunks: List[Dict[str, Any]], persist_path: str = CHROMA_PER
     """
     Genera embeddings multilingües locales y los almacena en ChromaDB de forma persistente.
     """
-    model = SentenceTransformer(EMBEDDING_MODEL_NAME)
-    client = chromadb.PersistentClient(path=persist_path)
+    from rag.retriever import get_embedding_model, get_chroma_client
+
+    model = get_embedding_model()
+    client = get_chroma_client(persist_path)
 
     collection = client.get_or_create_collection(
         name="gpc_msp",

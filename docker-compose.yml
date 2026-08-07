@@ -1,11 +1,10 @@
-version: "3.9"
+name: clinical_rag_v2
 
 services:
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: ateneo_backend
     ports:
       - "8000:8000"
     volumes:
@@ -18,7 +17,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: ateneo_frontend
     ports:
       - "5173:5173"
     volumes:

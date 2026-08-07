@@ -4,6 +4,7 @@ from sentence_transformers import SentenceTransformer
 from config import CHROMA_PERSIST_PATH, EMBEDDING_MODEL_NAME
 
 _MODEL_CACHE = None
+_CHROMA_CLIENT = None
 
 def get_embedding_model() -> SentenceTransformer:
     global _MODEL_CACHE
@@ -13,6 +14,15 @@ def get_embedding_model() -> SentenceTransformer:
         print("[RAG] Modelo de embeddings listo.", flush=True)
     return _MODEL_CACHE
 
+def get_chroma_client(persist_path: str = CHROMA_PERSIST_PATH) -> chromadb.PersistentClient:
+    global _CHROMA_CLIENT
+    if _CHROMA_CLIENT is None:
+        _CHROMA_CLIENT = chromadb.PersistentClient(
+            path=persist_path,
+            settings=chromadb.config.Settings(anonymized_telemetry=False)
+        )
+    return _CHROMA_CLIENT
+
 def retrieve_relevant_chunk(query: str, guia_filtro: Optional[str] = None, top_k: int = 1) -> Dict[str, Any]:
     """
     Recupera el fragmento de Guía de Práctica Clínica más relevante desde ChromaDB.
@@ -20,10 +30,7 @@ def retrieve_relevant_chunk(query: str, guia_filtro: Optional[str] = None, top_k
     """
     print(f"[RAG] Buscando en ChromaDB para guía '{guia_filtro}'...", flush=True)
     model = get_embedding_model()
-    client = chromadb.PersistentClient(
-        path=CHROMA_PERSIST_PATH,
-        settings=chromadb.config.Settings(anonymized_telemetry=False)
-    )
+    client = get_chroma_client()
 
     try:
         collection = client.get_collection("gpc_msp")
