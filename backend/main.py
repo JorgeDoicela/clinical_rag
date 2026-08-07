@@ -37,11 +37,15 @@ app.include_router(evaluation_router)
 @app.on_event("startup")
 async def startup_event():
     print("[STARTUP] Servidor FastAPI de Ateneo iniciado correctamente.", flush=True)
-    try:
-        from rag.retriever import get_embedding_model
-        get_embedding_model()
-    except Exception as e:
-        print(f"[STARTUP] Error al precargar modelo de embeddings: {e}", flush=True)
+    # Precargar el modelo en segundo plano asíncrono para no bloquear la disponibilidad de la API
+    import asyncio
+    def _preload():
+        try:
+            from rag.retriever import get_embedding_model
+            get_embedding_model()
+        except Exception as e:
+            print(f"[STARTUP] Error al precargar modelo: {e}", flush=True)
+    asyncio.create_task(asyncio.to_thread(_preload))
 
 @app.get("/health", tags=["Health"])
 async def health_check():

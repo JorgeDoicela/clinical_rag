@@ -46,6 +46,24 @@
       "pregunta": "Interprete los hallazgos radiológicos en la imagen adjunta, clasifique la severidad del paciente según la escala CURB-65 recomendada por la GPC del MSP Ecuador y determine el nivel de atención (ambulatorio vs hospitalario) y esquema antibiótico empírico inicial.",
       "nivel_esperado": "pregrado_avanzado",
       "fragmento_gpc_ideal_id": "neumonia_chunk_001"
+    },
+    {
+      "id": "case_ehirn_01",
+      "guia_asociada": "gpc_ehirn2019",
+      "titulo": "Recién Nacido con Sangrado Umbilical y Trastorno de Coagulación (EHIRN Clásica)",
+      "imagen_url": "/static/images/ehirn_coagulograma.png",
+      "enunciado": "Recién nacido masculino de 3 días de vida, nacido de parto fortuito en domicilio sin profilaxis neonatal de Vitamina K al nacer. La madre lo ingresa a emergencias por presentar sangrado continuo en napa a nivel del muñón umbilical de 6 horas de evolución, sumado a equimosis en zonas de presión. Al examen físico: pálido, hipotónico moderado; PA 62/36 mmHg, FC 148 bpm, FR 44 rpm. Se adjunta el informe del laboratorio de hemostasia y coagulación sanguínea neonatal realizado a su ingreso.",
+      "pregunta": "Analice el reporte de laboratorio adjunto, clasifique el tipo de Enfermedad Hemorrágica del Recién Nacido (EHIRN) según la edad de presentación (temprana, clásica o tardía) de acuerdo con la GPC del MSP Ecuador y prescriba el esquema completo de tratamiento de urgencia (dosis de fitomenadiona/vitamina K1, vía de administración y concentrado de complejo protrombínico/plasma si hay sangrado mayor).",
+      "nivel_esperado": "pregrado_avanzado"
+    },
+    {
+      "id": "case_ehirn_02",
+      "guia_asociada": "gpc_ehirn2019",
+      "titulo": "Lactante Menor con Sangrado Intracraneal por Deficiencia Tardía de Vitamina K",
+      "imagen_url": "/static/images/ehirn_coagulograma.png",
+      "enunciado": "Lactante menor de 45 días de vida, alimentado exclusivamente con leche materna, sin antecedentes de administración de profilaxis intramuscular con Vitamina K al nacimiento por negativa de los padres. Acude por vómitos en escopetazo, letargo, fontanela anterior abombada y convulsiones focales de 2 horas de evolución. Al examen físico se aprecia palidez generalizada intensa y rechazo al alimento. Laboratorio: TP y TTPa no coagulables (> 120s), Plaquetas 280,000/uL.",
+      "pregunta": "Identifique la forma de presentación de la EHIRN (temprana vs clásica vs tardía), explique los factores de riesgo asociados (lactancia materna exclusiva y falta de profilaxis) y fundamente las medidas neurocríticas inmediatas y de reposición de factores dependientes de Vitamina K indicadas en la GPC del MSP Ecuador.",
+      "nivel_esperado": "pregrado_avanzado"
     }
   ]
 }

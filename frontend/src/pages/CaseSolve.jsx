@@ -4,6 +4,7 @@ import { fetchCaseById, evaluateResponse } from '../api/client';
 import { ArrowLeft, Send, Loader2, BookOpen, AlertCircle, FileImage, Maximize2 } from 'lucide-react';
 import FeedbackCard from '../components/FeedbackCard';
 import ImageUploadZone from '../components/ImageUploadZone';
+import EvaluationGameLoader from '../components/EvaluationGameLoader';
 
 export default function CaseSolve() {
   const { id } = useParams();
@@ -71,6 +72,13 @@ export default function CaseSolve() {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto animate-fade-in">
+      {evaluating && (
+        <EvaluationGameLoader
+          guiaCodigo={caso?.guia_asociada}
+          hasImage={!!(imagen || caso?.imagen_url)}
+        />
+      )}
+
       {/* Botón de regreso */}
       <button
         onClick={() => navigate('/')}
