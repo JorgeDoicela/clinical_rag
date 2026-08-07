@@ -1,0 +1,40 @@
+{
+  "cases": [
+    {
+      "id": "case_dengue_01",
+      "guia_asociada": "dengue",
+      "titulo": "Paciente febril con signos de alarma por Dengue",
+      "enunciado": "Paciente femenina de 24 años de edad, procedente de Guayaquil, acude por presentar fiebre elevada de 3 días de evolución, dolor retroocular intenso, mialgias y artralgias. Desde hace 12 horas presenta dolor abdominal continuo e intenso, vómitos persistentes (4 en 6 horas) y somnolencia. Examen físico: PA 90/60 mmHg, FC 112 bpm, llenado capilar 3 segundos, petequias en extremidades inferiores. Laboratorio: Hematocrito 48% (elevado respecto al basal), Plaquetas 65.000/mm³.",
+      "pregunta": "Clasifique la severidad del caso según la GPC del MSP Ecuador y describa la conducta terapéutica inmediata (esquema de reposición de líquidos, monitoreo y criterios de hospitalización).",
+      "nivel_esperado": "pregrado_avanzado",
+      "fragmento_gpc_ideal_id": "dengue_chunk_004"
+    },
+    {
+      "id": "case_preeclampsia_01",
+      "guia_asociada": "preeclampsia",
+      "titulo": "Gestante con Trastorno Hipertensivo y Signos de Criterio de Severidad",
+      "enunciado": "Gestante de 32 semanas por FUM, 28 años de edad, acude al servicio de urgencias por cefalea holocraneana intensa de inicio reciente, fosfenos y epigastralgia en barra. Examen físico: PA 165/110 mmHg tomada en dos ocasiones separadas por 15 minutos. Reflexos osteotendinosos +++/++++. EGO: Proteinuria cualitativa con tirilla de +++.",
+      "pregunta": "Identifique el diagnóstico específico según la GPC del MSP, establezca el manejo farmacológico inmediato para la prevención de eclampsia (dosis de ataque y mantenimiento) y la conducta antihipertensiva de emergencia.",
+      "nivel_esperado": "pregrado_avanzado",
+      "fragmento_gpc_ideal_id": "preeclampsia_chunk_002"
+    },
+    {
+      "id": "case_diabetes_01",
+      "guia_asociada": "diabetes_t2",
+      "titulo": "Paciente con Diabetes Mellitus Tipo 2 y descontrol glucémico inicial",
+      "enunciado": "Paciente masculino de 52 años, diagnóstico reciente de Diabetes Mellitus Tipo 2, IMC 31.5 kg/m². Acude a control tras 3 meses de cambios en el estilo de vida. Laboratorio actual: HbA1c 8.8%, Glucemia en ayunas 185 mg/dL, Función renal (eGFR) 85 ml/min/1.73m², sin proteinuria.",
+      "pregunta": "Determine si el paciente cumple meta terapéutica y proponga el esquema de tratamiento farmacológico inicial (monoterapia o terapia dual) acorde a la GPC del MSP Ecuador.",
+      "nivel_esperado": "pregrado_intermedio",
+      "fragmento_gpc_ideal_id": "diabetes_chunk_005"
+    },
+    {
+      "id": "case_hemorragia_01",
+      "guia_asociada": "hemorragia_posparto",
+      "titulo": "Hemorragia Posparto Inmediata por Atonía Uterina",
+      "enunciado": "Paciente de 22 años, primigesta, finaliza parto vaginal hace 20 minutos tras un trabajo de parto prolongado. Presenta sangrado transvaginal activo rutilante estimado en 800 ml. Al examen físico: útero flácido, supraumbilical, sin contracción evidente tras alumbramiento. PA 85/50 mmHg, FC 125 bpm.",
+      "pregunta": "Aplique el protocolo del Código Rojo / Hemorragia Posparto de la GPC del MSP Ecuador: mencione la causa probable (regla de las 4T), la primera maniobra no farmacológica y los medicamentos uterotónicos de primera línea con sus dosis.",
+      "nivel_esperado": "pregrado_avanzado",
+      "fragmento_gpc_ideal_id": "hemorragia_chunk_001"
+    }
+  ]
+}

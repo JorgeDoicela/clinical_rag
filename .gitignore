@@ -1,0 +1,37 @@
+# Secrets & Environment Files
+.env
+*.env
+**/.env
+**/*.env
+**/*.env.*
+!.env.example
+
+# Python & Virtual Envs
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+**/.venv/
+venv/
+**/venv/
+ENV/
+
+# Data & ChromaDB
+backend/data/chroma_db/
+backend/data/processed/
+backend/data/raw_pdfs/*.pdf
+!backend/data/raw_pdfs/.gitkeep
+
+# Node / Frontend
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+.dist/
+*.local
+
+# Environment & IDE
+.vscode/
+.idea/
+.DS_Store

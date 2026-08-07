@@ -1,0 +1,94 @@
+{
+  "casos_prueba": [
+    {
+      "id": "test_01",
+      "guia_asociada": "dengue",
+      "respuesta_simulada": "Paciente con Dengue con signos de alarma. Se debe hospitalizar e iniciar reposición de líquidos intravenosos con Lactato Ringer a 7 ml/kg/h en las primeras 2 horas y monitorear hematocrito.",
+      "fragmento_gpc_ideal_id": "dengue_chunk_004"
+    },
+    {
+      "id": "test_02",
+      "guia_asociada": "dengue",
+      "respuesta_simulada": "Dengue grave con shock hipovolémico. Dar paracetamol oral e indicar reposo ambulatorio con abundantes sueros orales.",
+      "fragmento_gpc_ideal_id": "dengue_chunk_004"
+    },
+    {
+      "id": "test_03",
+      "guia_asociada": "preeclampsia",
+      "respuesta_simulada": "Preeclampsia severa. Administrar Sulfato de Magnesio 4g IV en 20 minutos como dosis de ataque y 1g/h de mantenimiento. Controlar PA con Labetalol o Nifedipino.",
+      "fragmento_gpc_ideal_id": "preeclampsia_chunk_002"
+    },
+    {
+      "id": "test_04",
+      "guia_asociada": "preeclampsia",
+      "respuesta_simulada": "Cefalea y visión borrosa en embarazada con PA 170/110. Indicar reposo en casa y control en 1 semana con examen de orina.",
+      "fragmento_gpc_ideal_id": "preeclampsia_chunk_002"
+    },
+    {
+      "id": "test_05",
+      "guia_asociada": "diabetes_t2",
+      "respuesta_simulada": "Diabetes tipo 2 con HbA1c 8.8%. Iniciar Metformina 500mg día e incrementar según tolerancia. Evaluar terapia dual por HbA1c elevada.",
+      "fragmento_gpc_ideal_id": "diabetes_chunk_005"
+    },
+    {
+      "id": "test_06",
+      "guia_asociada": "diabetes_t2",
+      "respuesta_simulada": "Iniciar insulina glargina 40 unidades inmediatamente como primera línea para diabetes no controlada sin evaluar metformina.",
+      "fragmento_gpc_ideal_id": "diabetes_chunk_005"
+    },
+    {
+      "id": "test_07",
+      "guia_asociada": "hemorragia_posparto",
+      "respuesta_simulada": "Atonía uterina en código rojo. Realizar masaje uterino bimanual continuo e inyectar Oxitocina 10 UI IM / 5 UI IV en bolo lento y infusión IV.",
+      "fragmento_gpc_ideal_id": "hemorragia_chunk_001"
+    },
+    {
+      "id": "test_08",
+      "guia_asociada": "hemorragia_posparto",
+      "respuesta_simulada": "Hemorragia por laceración cervical. Indicar hielo local y esperar resolución espontánea sin masaje uterino ni uterotónicos.",
+      "fragmento_gpc_ideal_id": "hemorragia_chunk_001"
+    },
+    {
+      "id": "test_09",
+      "guia_asociada": "dengue",
+      "respuesta_simulada": "Dolor abdominal continuo y vómitos en paciente febril de zona endémica. Iniciar hidratación IV rápida con solución salina y vigilar diuresis.",
+      "fragmento_gpc_ideal_id": "dengue_chunk_004"
+    },
+    {
+      "id": "test_10",
+      "guia_asociada": "preeclampsia",
+      "respuesta_simulada": "Emergencia hipertensiva en gestante de 34 semanas. Dar Sulfato de Magnesio de impregnación y mantenimiento para profilaxis eclampsia.",
+      "fragmento_gpc_ideal_id": "preeclampsia_chunk_002"
+    },
+    {
+      "id": "test_11",
+      "guia_asociada": "diabetes_t2",
+      "respuesta_simulada": "Pacientes con glicemia en ayunas elevada. Dieta sola sin fármacos por 1 año a pesar de HbA1c > 8.5%.",
+      "fragmento_gpc_ideal_id": "diabetes_chunk_005"
+    },
+    {
+      "id": "test_12",
+      "guia_asociada": "hemorragia_posparto",
+      "respuesta_simulada": "Sangrado abundante posparto por atonia. Usar Ergometrina 0.2mg o Misoprostol 800mcg sublingual junto a masaje uterino bimanual.",
+      "fragmento_gpc_ideal_id": "hemorragia_chunk_001"
+    },
+    {
+      "id": "test_13",
+      "guia_asociada": "dengue",
+      "respuesta_simulada": "Fiebre y sangrado de mucosas. Prescribir ibuprofeno o aspirina para controlar el dolor y la fiebre.",
+      "fragmento_gpc_ideal_id": "dengue_chunk_004"
+    },
+    {
+      "id": "test_14",
+      "guia_asociada": "preeclampsia",
+      "respuesta_simulada": "Gestante con crisis hipertensiva. Usar nifedipino 10mg VO o labetalol IV como antihipertensivo de rápida acción.",
+      "fragmento_gpc_ideal_id": "preeclampsia_chunk_002"
+    },
+    {
+      "id": "test_15",
+      "guia_asociada": "hemorragia_posparto",
+      "respuesta_simulada": "Código rojo obstétrico por sangrado posparto. Administrar Ácido Tranexámico 1g IV dentro de los primeros minutos.",
+      "fragmento_gpc_ideal_id": "hemorragia_chunk_001"
+    }
+  ]
+}
