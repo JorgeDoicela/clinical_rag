@@ -84,7 +84,7 @@ export default function CaseSolve() {
       <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
           <div>
-            <span className="px-3 py-1 rounded-md bg-sky-50 text-sky-700 text-xs font-mono font-semibold uppercase tracking-wider border border-sky-200">
+            <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[10px] font-mono font-semibold uppercase tracking-wider border border-slate-200/60">
               GPC {caso.guia_asociada} (MSP Ecuador)
             </span>
             <h1 className="text-xl sm:text-2xl font-display font-extrabold text-slate-900 mt-2">
@@ -103,11 +103,11 @@ export default function CaseSolve() {
                   <FileImage className="w-4 h-4 text-sky-600" />
                   <span>Informe / Imagen Médica Adjunta</span>
                 </span>
-                <span className="text-xs text-sky-600 font-medium bg-sky-50 px-2.5 py-1 rounded-md border border-sky-100">
-                  Multimodal Active
+                <span className="text-[11px] font-semibold text-slate-500">
+                  Soporte Multimodal
                 </span>
               </div>
-              <div className="relative group rounded-xl overflow-hidden border border-slate-300 bg-white shadow-sm max-w-xl mx-auto">
+              <div className="relative group rounded-xl overflow-hidden border border-slate-300 bg-white shadow-xs max-w-xl mx-auto">
                 <img
                   src={`http://localhost:8000${caso.imagen_url}`}
                   alt="Imagen Médica del Caso Clínico"
@@ -118,9 +118,9 @@ export default function CaseSolve() {
           )}
         </div>
 
-        <div className="space-y-2 border-l-4 border-l-sky-600 pl-4 py-1">
-          <h3 className="text-xs font-bold text-sky-700 uppercase tracking-wider flex items-center gap-1.5">
-            <BookOpen className="w-4 h-4" />
+        <div className="space-y-1.5 py-1">
+          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+            <BookOpen className="w-4 h-4 text-sky-600" />
             <span>Instrucción / Pregunta Médica</span>
           </h3>
           <p className="text-sm sm:text-base font-semibold text-slate-900">
@@ -131,18 +131,18 @@ export default function CaseSolve() {
 
       {/* Formulario de Respuesta o Vista de Resultado */}
       {!resultado ? (
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
           <div className="space-y-2">
-            <label className="block text-sm font-bold text-slate-900">
+            <label className="block text-xs font-bold text-slate-900 uppercase tracking-wider">
               Tu Razonamiento Diagnóstico y Terapéutico
             </label>
             <textarea
-              rows={7}
+              rows={6}
               value={respuesta}
               onChange={(e) => setRespuesta(e.target.value)}
               placeholder="Detalla tu diagnóstico de presunción, criterios de severidad y el tratamiento inmediato a seguir..."
               disabled={evaluating}
-              className="w-full bg-slate-50 border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 rounded-xl p-4 text-sm text-slate-900 placeholder-slate-400 resize-y transition-all disabled:opacity-50"
+              className="w-full bg-slate-50 border border-slate-200 focus:bg-white focus:outline-none focus:border-sky-600 focus:ring-1 focus:ring-sky-600 rounded-xl p-4 text-xs sm:text-sm text-slate-900 placeholder-slate-400 resize-y transition-all disabled:opacity-50"
             />
           </div>
 
@@ -153,8 +153,8 @@ export default function CaseSolve() {
           />
 
           {error && (
-            <div className="flex items-center gap-2 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm">
-              <AlertCircle className="w-5 h-5 shrink-0 text-rose-600" />
+            <div className="flex items-center gap-2 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
               <span>{error}</span>
             </div>
           )}
@@ -163,11 +163,11 @@ export default function CaseSolve() {
             <button
               type="submit"
               disabled={evaluating || !respuesta.trim()}
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-sky-600 hover:bg-sky-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-display font-semibold text-sm transition-all shadow-md shadow-sky-600/10"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-400 text-white font-semibold text-xs sm:text-sm transition-colors shadow-xs"
             >
               {evaluating ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   <span>{imagen ? 'Evaluando con RAG + Imagen...' : 'Evaluando con RAG (MSP)...'}</span>
                 </>
               ) : (

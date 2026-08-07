@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchCases } from '../api/client';
-import { Stethoscope, ArrowRight, AlertCircle, FileText, CheckCircle } from 'lucide-react';
+import { Stethoscope, ArrowRight, AlertCircle, FileText } from 'lucide-react';
 
 export default function CaseList() {
   const [cases, setCases] = useState([]);
@@ -22,62 +22,60 @@ export default function CaseList() {
   }, []);
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      {/* Banner Encabezado Clínico Minimalista */}
-      <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm relative overflow-hidden">
-        <div className="max-w-3xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-sky-700 text-xs font-semibold">
-            <Stethoscope className="w-3.5 h-3.5 text-sky-600" />
-            <span>Evaluación del Razonamiento Clínico</span>
-          </div>
-          <h1 className="text-3xl font-display font-extrabold text-slate-900 tracking-tight">
-            Casos Clínicos de Simulación
-          </h1>
-          <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-            Analiza el cuadro clínico del paciente y redacta tu razonamiento diagnóstico y esquema terapéutico. El sistema comparará tu respuesta contra la norma oficial del Ministerio de Salud Pública del Ecuador (MSP).
-          </p>
+    <div className="space-y-6">
+      {/* Encabezado Principal Clínico Minimalista */}
+      <div className="pb-4 border-b border-slate-200">
+        <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-1">
+          <Stethoscope className="w-4 h-4 text-sky-600" />
+          <span>Evaluación del Razonamiento Clínico</span>
         </div>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          Casos Clínicos de Simulación
+        </h1>
+        <p className="text-xs text-slate-500 mt-0.5 max-w-2xl">
+          Analiza el cuadro clínico del paciente y redacta tu razonamiento diagnóstico. El sistema comparará tu respuesta contra la norma oficial del Ministerio de Salud Pública del Ecuador (MSP).
+        </p>
       </div>
 
       {/* Listado de Casos */}
       <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-display font-bold text-slate-900 flex items-center gap-2">
-            <FileText className="w-5 h-5 text-sky-600" />
-            <span>Casos Disponibles ({cases.length})</span>
-          </h2>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <FileText className="w-4 h-4 text-slate-500" />
+            <h2 className="text-sm font-bold text-slate-900">Casos Disponibles ({cases.length})</h2>
+          </div>
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[1, 2, 3, 4].map(n => (
-              <div key={n} className="bg-white rounded-2xl p-6 h-44 animate-pulse border border-slate-200"></div>
+              <div key={n} className="bg-white rounded-2xl p-6 h-44 animate-pulse border border-slate-200 shadow-xs"></div>
             ))}
           </div>
         ) : error ? (
-          <div className="bg-rose-50 rounded-2xl p-6 border border-rose-200 text-rose-700 flex items-center gap-3">
-            <AlertCircle className="w-6 h-6 shrink-0 text-rose-600" />
-            <p className="text-sm font-medium">{error}</p>
+          <div className="bg-rose-50 rounded-2xl p-4 border border-rose-200 text-rose-700 flex items-center gap-3 text-xs">
+            <AlertCircle className="w-5 h-5 shrink-0 text-rose-600" />
+            <p className="font-medium">{error}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {cases.map(item => (
               <div
                 key={item.id}
                 onClick={() => navigate(`/case/${item.id}`)}
-                className="clinical-card clinical-card-hover rounded-2xl p-6 cursor-pointer flex flex-col justify-between group"
+                className="bg-white border border-slate-200 hover:border-slate-300 rounded-2xl p-5 cursor-pointer flex flex-col justify-between group transition-colors shadow-xs"
               >
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 text-slate-700 font-mono text-xs font-semibold uppercase tracking-wider">
+                    <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200/60 text-slate-700 font-mono text-[10px] font-semibold uppercase tracking-wider">
                       GPC {item.guia_asociada}
                     </span>
-                    <span className="text-xs font-semibold text-slate-500 capitalize bg-slate-50 px-2 py-0.5 rounded border border-slate-100">
+                    <span className="text-[11px] font-medium text-slate-400 capitalize">
                       {item.nivel_esperado?.replace('_', ' ')}
                     </span>
                   </div>
 
-                  <h3 className="text-base font-display font-bold text-slate-900 group-hover:text-sky-600 transition-colors">
+                  <h3 className="text-sm font-bold text-slate-900 group-hover:text-sky-600 transition-colors">
                     {item.titulo}
                   </h3>
 
@@ -86,9 +84,9 @@ export default function CaseList() {
                   </p>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-sky-600 group-hover:translate-x-1 transition-transform">
+                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-900 group-hover:text-sky-600 transition-colors">
                   <span>Evaluar razonamiento</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </div>
             ))}

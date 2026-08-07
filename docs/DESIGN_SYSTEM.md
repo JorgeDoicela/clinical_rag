@@ -9,8 +9,9 @@ Este documento define la guía oficial de estilo visual, tokens de diseño y reg
 El diseño de Ateneo evoca una **estación de trabajo hospitalaria moderna**:
 - **Confianza Médica:** Uso de colores fríos y limpios con alto contraste para lectura prolongada de casos clínicos.
 - **Cero Distracciones:** Prohibición estricta de emojis en cualquier vista del sistema.
-- **Iconografía Sutil:** Uso exclusivo de iconos vectoriales SVG limpios (`lucide-react`) de tamaño reducido y únicamente cuando cumplan una función clara.
+- **Iconografía Sutil y Plana:** Uso exclusivo de iconos vectoriales SVG limpios (`lucide-react`) sin cajas, contenedores o bordes artificiales que los rodeen. Los iconos se presentan planos y directos.
 - **Disposición Antiapilamiento (UX/UI):** Diseños en pantalla dividida (*Split-Screen*) o cuadrículas compactas para evitar desplazamientos verticales innecesarios.
+- **Sobriedad Cromática:** Prohibición de la saturación visual. No exagerar ni abusar de colores secundarios (verdes, morados, etc.) en elementos de la interfaz. La estructura debe ser neutra (`slate`) y limpia, reservando los colores únicamente para badges de rol o indicadores funcionales.
 
 ---
 
@@ -52,13 +53,18 @@ El diseño de Ateneo evoca una **estación de trabajo hospitalaria moderna**:
 
 ## 4. Patrones de Layout y UX/UI
 
-1. **Pantalla Dividida (Split-Screen) en Autenticación:**
-   - Panel izquierdo con gradiente oscuro profesional (`from-slate-900 via-sky-950 to-slate-900`) e información institucional.
-   - Panel derecho blanco focalizado en el formulario con selecciones de rol en un solo clic (*Pill-Tabs*).
+1. **Autenticación Ultra-Minimalista:**
+   - Tarjeta central sobria (`max-w-md bg-white border border-slate-200 shadow-sm rounded-2xl`).
+   - Sin degradados complejos ni fondos oscuros recargados.
+   - Pila de selección de rol con control segmentado sutil (*Segmented Pill Tabs* neutros).
 2. **Navbar Minimalista:**
    - Ocultar botones redundantes cuando el usuario ya se encuentra en la vista correspondiente.
    - Badge del rol activo visible de forma permanente cuando el usuario está autenticado.
 3. **Geometría de Tarjetas:**
    - Radio de curvatura: `rounded-2xl` (16px).
-   - Bordes finos: `border border-slate-200`.
+   - Bordes finos y uniformes: `border border-slate-200` (Queda prohibido el uso de franjas o líneas gruesas laterales de color como `border-l-4` o `border-l-2`).
    - Sombras leves: `shadow-xs` / `shadow-sm`.
+4. **Disciplina Cromática y Uso Sobrio de Acentos:**
+   - **Evitar la saturación visual estructural:** Queda prohibido recargar fondos generales, encabezados de página o botones principales con degradados estridentes.
+   - **Color Funcional de Retroalimentación:** Los colores de acento se reservan explícitamente para la evaluación médica: **Verde Esmeralda** (Aciertos / Correcto), **Ámbar Formativo** (Omisiones / Aspectos a mejorar) y **Azul Cobalto** (Citas normativas MSP y Puntaje), garantizando que el usuario distinga de inmediato si su razonamiento es correcto o requiere ajustes.
+

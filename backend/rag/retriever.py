@@ -21,7 +21,7 @@ def retrieve_relevant_chunk(query: str, guia_filtro: Optional[str] = None, top_k
     print(f"[RAG] Buscando en ChromaDB para guía '{guia_filtro}'...", flush=True)
     model = get_embedding_model()
     client = chromadb.PersistentClient(path=CHROMA_PERSIST_PATH)
-    
+
     try:
         collection = client.get_collection("gpc_msp")
     except Exception:

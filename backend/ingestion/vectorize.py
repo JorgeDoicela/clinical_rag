@@ -9,7 +9,7 @@ def build_vector_db(chunks: List[Dict[str, Any]], persist_path: str = CHROMA_PER
     """
     model = SentenceTransformer(EMBEDDING_MODEL_NAME)
     client = chromadb.PersistentClient(path=persist_path)
-    
+
     collection = client.get_or_create_collection(
         name="gpc_msp",
         metadata={"hnsw:space": "cosine"}

@@ -22,31 +22,29 @@ function Navbar() {
     <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-xs">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Logo & Marca */}
-        <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 group-hover:bg-sky-100 transition-colors">
-            <HeartPulse className="w-5 h-5" />
-          </div>
-          <div>
+        <Link to="/" className="flex items-center gap-2 group">
+          <HeartPulse className="w-6 h-6 text-sky-600 group-hover:scale-105 transition-transform" />
+          <div className="flex items-baseline gap-2">
             <span className="font-display font-extrabold text-xl tracking-tight text-slate-900">
               ATENEO
             </span>
-            <span className="hidden sm:inline-block ml-2.5 text-xs font-semibold text-sky-700 bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200/80">
+            <span className="hidden sm:inline-block text-xs font-medium text-slate-500">
               RAG Clínico MSP
             </span>
           </div>
         </Link>
 
         {/* Links por Rol & Usuario Info */}
-        <div className="flex items-center gap-3 text-xs font-semibold text-slate-600">
+        <div className="flex items-center gap-4 text-xs font-semibold text-slate-600">
           {user ? (
             <>
               {/* Acceso a Paneles por Rol */}
               {user.rol === 'administrador' && (
                 <Link
                   to="/admin"
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-50 border border-purple-200 text-purple-700 hover:bg-purple-100 transition-colors"
+                  className="hidden sm:flex items-center gap-1.5 text-slate-600 hover:text-slate-900 transition-colors"
                 >
-                  <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
+                  <ShieldCheck className="w-4 h-4 text-slate-500" />
                   <span>Panel Admin</span>
                 </Link>
               )}
@@ -54,21 +52,21 @@ function Navbar() {
               {(user.rol === 'docente' || user.rol === 'administrador') && (
                 <Link
                   to="/teacher"
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 transition-colors"
+                  className="hidden sm:flex items-center gap-1.5 text-slate-600 hover:text-slate-900 transition-colors"
                 >
-                  <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <UserCheck className="w-4 h-4 text-slate-500" />
                   <span>Panel Docente</span>
                 </Link>
               )}
 
-              {/* Badge del Rol Activo */}
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-full text-slate-800">
-                {user.rol === 'administrador' && <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />}
-                {user.rol === 'docente' && <UserCheck className="w-3.5 h-3.5 text-emerald-600" />}
-                {user.rol === 'alumno' && <GraduationCap className="w-3.5 h-3.5 text-sky-600" />}
-                <span className="truncate max-w-[120px] font-bold sm:max-w-none">{user.nombre}</span>
-                <span className="hidden md:inline uppercase text-[10px] bg-slate-200 px-2 py-0.5 rounded text-slate-700 font-extrabold">
-                  {user.rol}
+              {/* Rol Activo */}
+              <div className="flex items-center gap-1.5 text-slate-700 font-medium">
+                {user.rol === 'administrador' && <ShieldCheck className="w-4 h-4 text-slate-500" />}
+                {user.rol === 'docente' && <UserCheck className="w-4 h-4 text-slate-500" />}
+                {user.rol === 'alumno' && <GraduationCap className="w-4 h-4 text-slate-500" />}
+                <span className="font-bold">{user.nombre}</span>
+                <span className="hidden md:inline uppercase text-[10px] text-slate-400 font-bold">
+                  ({user.rol})
                 </span>
               </div>
 
@@ -76,14 +74,14 @@ function Navbar() {
               <button
                 onClick={handleLogout}
                 title="Cerrar Sesión"
-                className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
+                className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors"
               >
                 <LogOut className="w-4 h-4" />
               </button>
             </>
           ) : (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sky-50 border border-sky-200 text-sky-700 text-xs font-semibold">
-              <Activity className="w-3.5 h-3.5 text-sky-600" />
+            <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+              <Activity className="w-4 h-4 text-sky-600" />
               <span>Evaluación Médica RAG</span>
             </div>
           )}
