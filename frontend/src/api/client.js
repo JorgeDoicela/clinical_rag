@@ -16,16 +16,23 @@ export async function fetchCaseById(caseId) {
   return res.json();
 }
 
-export async function evaluateResponse(caseId, respuestaEstudiante) {
+/**
+ * Envía la respuesta del estudiante al backend usando multipart/form-data.
+ * Soporta imagen clínica opcional (File object).
+ */
+export async function evaluateResponse(caseId, respuestaEstudiante, imagen = null) {
+  const formData = new FormData();
+  formData.append('case_id', caseId);
+  formData.append('respuesta_estudiante', respuestaEstudiante);
+
+  if (imagen) {
+    formData.append('imagen', imagen, imagen.name);
+  }
+
   const res = await fetch(`${API_URL}/api/evaluate`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      case_id: caseId,
-      respuesta_estudiante: respuestaEstudiante,
-    }),
+    body: formData,
+    // No establecer Content-Type: el navegador lo pone automáticamente con el boundary correcto
   });
 
   if (!res.ok) {

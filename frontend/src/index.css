@@ -85,3 +85,206 @@
   font-weight: 600;
   border-radius: 0.5rem;
 }
+
+/* ==========================================================================
+   IMAGE UPLOAD ZONE — Componente de carga de imagen clínica
+   ========================================================================== */
+
+.image-upload-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.image-drop-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2rem 1.5rem;
+  border: 2px dashed #cbd5e1;
+  border-radius: 0.875rem;
+  background-color: #f8fafc;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-align: center;
+  outline: none;
+}
+
+.image-drop-zone:hover:not(.image-drop-zone--disabled) {
+  border-color: #38bdf8;
+  background-color: #f0f9ff;
+}
+
+.image-drop-zone:focus-visible {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+.image-drop-zone--active {
+  border-color: #0284c7;
+  background-color: #e0f2fe;
+  transform: scale(1.01);
+}
+
+.image-drop-zone--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.image-drop-icon-wrap {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+  background-color: #e0f2fe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.image-drop-zone:hover:not(.image-drop-zone--disabled) .image-drop-icon-wrap {
+  transform: scale(1.08);
+}
+
+.image-drop-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #0284c7;
+}
+
+.image-drop-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #334155;
+  margin: 0;
+}
+
+.image-drop-subtitle {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Preview card cuando hay imagen seleccionada */
+.image-preview-card {
+  position: relative;
+  border: 1px solid #bae6fd;
+  border-radius: 0.875rem;
+  background-color: #f0f9ff;
+  overflow: hidden;
+  animation: fadeInUp 0.25s ease-out;
+}
+
+.image-preview-thumb {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  display: block;
+  border-radius: 0.75rem 0.75rem 0 0;
+}
+
+.image-preview-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #bae6fd;
+}
+
+.image-preview-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #0284c7;
+  flex-shrink: 0;
+}
+
+.image-preview-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.image-preview-filename {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.image-preview-size {
+  font-size: 0.6875rem;
+  color: #64748b;
+}
+
+.image-preview-clear {
+  position: absolute;
+  top: 0.625rem;
+  right: 0.625rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background-color: rgba(15, 23, 42, 0.6);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+  backdrop-filter: blur(4px);
+}
+
+.image-preview-clear:hover {
+  background-color: rgba(190, 18, 60, 0.85);
+}
+
+.image-preview-badge {
+  padding: 0.5rem 1rem;
+  background-color: #e0f2fe;
+  border-top: 1px solid #bae6fd;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #0369a1;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.image-preview-badge span {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+/* Error de validación */
+.image-upload-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.625rem;
+  background-color: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #be123c;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  animation: fadeInUp 0.2s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

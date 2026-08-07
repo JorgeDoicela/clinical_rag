@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { fetchCaseById, evaluateResponse } from '../api/client';
 import { ArrowLeft, Send, Loader2, BookOpen, AlertCircle } from 'lucide-react';
 import FeedbackCard from '../components/FeedbackCard';
+import ImageUploadZone from '../components/ImageUploadZone';
 
 export default function CaseSolve() {
   const { id } = useParams();
@@ -10,6 +11,7 @@ export default function CaseSolve() {
 
   const [caso, setCaso] = useState(null);
   const [respuesta, setRespuesta] = useState('');
+  const [imagen, setImagen] = useState(null);
   const [loading, setLoading] = useState(true);
   const [evaluating, setEvaluating] = useState(false);
   const [error, setError] = useState(null);
@@ -35,7 +37,7 @@ export default function CaseSolve() {
     setError(null);
 
     try {
-      const res = await evaluateResponse(id, respuesta);
+      const res = await evaluateResponse(id, respuesta, imagen);
       setResultado(res);
     } catch (err) {
       setError(err.message);
@@ -123,6 +125,12 @@ export default function CaseSolve() {
             />
           </div>
 
+          <ImageUploadZone
+            imagen={imagen}
+            onImageChange={setImagen}
+            disabled={evaluating}
+          />
+
           {error && (
             <div className="flex items-center gap-2 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm">
               <AlertCircle className="w-5 h-5 shrink-0 text-rose-600" />
@@ -139,7 +147,7 @@ export default function CaseSolve() {
               {evaluating ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Evaluando con RAG (MSP)...</span>
+                  <span>{imagen ? 'Evaluando con RAG + Imagen...' : 'Evaluando con RAG (MSP)...'}</span>
                 </>
               ) : (
                 <>

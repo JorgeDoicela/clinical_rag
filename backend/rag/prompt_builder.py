@@ -14,10 +14,22 @@ REGLAS DE EVALUACIÓN Y FORMATO:
 7. Escribe una 'retroalimentacion_general' sintética (2-3 oraciones).
 8. Basa la evaluación EXCLUSIVAMENTE en el fragmento de la guía proporcionado."""
 
-def build_prompt(caso: ClinicalCaseSchema, respuesta_estudiante: str, chunk: Dict[str, Any]) -> str:
+def build_prompt(caso: ClinicalCaseSchema, respuesta_estudiante: str, chunk: Dict[str, Any], tiene_imagen: bool = False) -> str:
     """
     Construye el prompt completo para ser procesado por el modelo Gemini.
+    Si tiene_imagen es True, agrega instrucciones para analizar la imagen clínica adjunta.
     """
+    instruccion_imagen = ""
+    if tiene_imagen:
+        instruccion_imagen = """
+
+IMAGEN CLÍNICA ADJUNTA:
+El estudiante ha proporcionado una imagen clínica (puede ser un hemograma, radiografía, foto de lesión, ECG u otro estudio).
+Analiza la imagen e intégrala en tu evaluación:
+- Verifica si la interpretación que hace el estudiante de la imagen es correcta según la GPC.
+- Si la imagen aporta evidencia adicional (valores anormales, hallazgos clínicos), inclúyla en los 'aciertos' u 'omisiones' según corresponda.
+- Menciona la imagen explícitamente en la 'retroalimentacion_general'."""
+
     return f"""CASO CLÍNICO:
 Título: {caso.titulo}
 Enunciado: {caso.enunciado}
@@ -34,6 +46,6 @@ Sección: {chunk.get('seccion', 'General')}
 Página: {chunk.get('pagina', 'N/A')}
 Texto Normativo Oficial:
 "{chunk.get('texto', '')}"
-
+{instruccion_imagen}
 Evalúa el razonamiento clínico del estudiante comparándolo directamente contra la norma oficial del MSP proporcionada.
 """
