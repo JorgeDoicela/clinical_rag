@@ -1,10 +1,26 @@
 import React from 'react';
-import { CheckCircle2, AlertTriangle, BookOpen, Award, RefreshCw, User, FileImage } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, BookOpen, Award, RefreshCw, User, FileImage, Target, Stethoscope, Pill, ShieldAlert, Activity } from 'lucide-react';
+import SkillRadarChart from './SkillRadarChart';
+
+const EJES_CONFIG = [
+  { key: 'diagnóstico', label: 'Diagnóstico', icon: Stethoscope, badge: 'bg-sky-50 text-sky-800 border-sky-200' },
+  { key: 'tratamiento', label: 'Tratamiento', icon: Pill, badge: 'bg-rose-50 text-rose-800 border-rose-200' },
+  { key: 'prevención', label: 'Prevención', icon: ShieldAlert, badge: 'bg-purple-50 text-purple-800 border-purple-200' },
+  { key: 'seguimiento', label: 'Seguimiento', icon: Activity, badge: 'bg-emerald-50 text-emerald-800 border-emerald-200' },
+];
 
 export default function FeedbackCard({ result, studentAnswer, studentImage, onReset }) {
   if (!result) return null;
 
-  const { score, score_max = 10, aciertos = [], omisiones = [], cita_normativa, retroalimentacion_general } = result;
+  const {
+    score,
+    score_max = 10,
+    aciertos = [],
+    omisiones = [],
+    competencias_deficientes = [],
+    cita_normativa,
+    retroalimentacion_general
+  } = result;
 
   const scorePercentage = Math.round((score / score_max) * 100);
   
@@ -16,6 +32,61 @@ export default function FeedbackCard({ result, studentAnswer, studentImage, onRe
   } else {
     scoreBadgeColor = 'bg-emerald-100 text-emerald-800 border-emerald-300';
   }
+
+  // Agrupar competencias deficientes y calcular puntaje/estado por eje clínico
+  const competenciasPorEje = EJES_CONFIG.map(ejeConfig => {
+    const items = competencias_deficientes.filter(item => {
+      if (!item || !item.eje) return false;
+      const ejeNormalizado = item.eje.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const keyNormalizada = ejeConfig.key.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      return ejeNormalizado.includes(keyNormalizada);
+    });
+
+    const tieneDeficiencias = items.length > 0;
+    let axisScore = 0;
+    let estadoLabel = '';
+    let estadoBadgeClass = '';
+
+    if (scorePercentage === 0) {
+      axisScore = 0;
+      if (tieneDeficiencias) {
+        estadoLabel = `${items.length} brecha(s)`;
+        estadoBadgeClass = 'bg-rose-100 text-rose-800 border-rose-200';
+      } else {
+        estadoLabel = 'No Demostrado';
+        estadoBadgeClass = 'bg-slate-100 text-slate-700 border-slate-200';
+      }
+    } else {
+      if (tieneDeficiencias) {
+        axisScore = Math.max(15, Math.min(scorePercentage, 100 - items.length * 25));
+        estadoLabel = `${items.length} brecha(s)`;
+        estadoBadgeClass = 'bg-amber-100 text-amber-800 border-amber-200';
+      } else {
+        if (scorePercentage >= 80) {
+          axisScore = Math.min(100, Math.max(scorePercentage, 92));
+          estadoLabel = 'Consolidado';
+          estadoBadgeClass = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+        } else if (scorePercentage >= 50) {
+          axisScore = Math.min(85, Math.max(scorePercentage, 70));
+          estadoLabel = 'Competente';
+          estadoBadgeClass = 'bg-sky-100 text-sky-800 border-sky-200';
+        } else {
+          axisScore = scorePercentage;
+          estadoLabel = 'No Abordado';
+          estadoBadgeClass = 'bg-amber-50 text-amber-800 border-amber-200';
+        }
+      }
+    }
+
+    return {
+      ...ejeConfig,
+      items,
+      score: axisScore,
+      estadoLabel,
+      estadoBadgeClass,
+      tieneDeficiencias
+    };
+  });
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -65,6 +136,72 @@ export default function FeedbackCard({ result, studentAnswer, studentImage, onRe
         <p className="mt-4 text-slate-700 leading-relaxed text-xs sm:text-sm border-t border-slate-100 pt-4 font-normal">
           {retroalimentacion_general}
         </p>
+      </div>
+
+      {/* Gráfico Interactivo de Radar de Habilidades (4 Ejes) */}
+      <SkillRadarChart competenciasPorEje={competenciasPorEje} />
+
+      {/* Mapa de Competencias por GPC (Ejes Clínicos) */}
+      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="flex items-center gap-2">
+            <Target className="w-5 h-5 text-sky-600 shrink-0" />
+            <h3 className="text-base font-bold text-slate-900">Mapa de Competencias por GPC (Ejes Clínicos)</h3>
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full border border-slate-200">
+            Analítica de Desempeño
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 pt-1">
+          {competenciasPorEje.map(eje => {
+            const Icon = eje.icon;
+
+            return (
+              <div
+                key={eje.key}
+                className={`p-4 rounded-xl border transition-all flex flex-col justify-between min-w-0 overflow-hidden ${
+                  eje.tieneDeficiencias
+                    ? 'bg-slate-50/80 border-slate-200/90'
+                    : scorePercentage < 50
+                    ? 'bg-slate-50/50 border-slate-200/70'
+                    : 'bg-emerald-50/30 border-emerald-200/60'
+                }`}
+              >
+                <div className="space-y-3 min-w-0">
+                  <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-slate-200/50 pb-2 min-w-0">
+                    <div className="flex items-center gap-1.5 min-w-0 shrink">
+                      <Icon className="w-4 h-4 text-slate-700 shrink-0" />
+                      <span className="font-bold text-xs text-slate-900 truncate">{eje.label}</span>
+                    </div>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border shrink-0 whitespace-nowrap ${eje.estadoBadgeClass}`}>
+                      {eje.estadoLabel}
+                    </span>
+                  </div>
+
+                  {eje.tieneDeficiencias ? (
+                    <ul className="space-y-2 text-[11px] text-slate-700 min-w-0">
+                      {eje.items.map((item, idx) => (
+                        <li key={idx} className="bg-white p-2.5 rounded-lg border border-slate-200/70 shadow-2xs leading-snug font-medium flex items-start gap-1.5 min-w-0">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0"></span>
+                          <span className="min-w-0 break-words">{item.descripcion}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : scorePercentage < 50 ? (
+                    <p className="text-[11px] text-slate-600 font-medium bg-white/70 p-2.5 rounded-lg border border-slate-200/50 min-w-0 break-words">
+                      No se aportó evidencia o razonamiento clínico suficiente en este eje para su evaluación.
+                    </p>
+                  ) : (
+                    <p className="text-[11px] text-emerald-800 font-medium bg-white/70 p-2.5 rounded-lg border border-emerald-200/50 min-w-0 break-words">
+                      Demuestra dominio alineado a la GPC oficial en este eje.
+                    </p>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Aciertos u Omisiones en Grid 2 Columnas */}
@@ -151,4 +288,5 @@ export default function FeedbackCard({ result, studentAnswer, studentImage, onRe
     </div>
   );
 }
+
 

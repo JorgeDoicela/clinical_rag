@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useNavigate, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import CaseList from './pages/CaseList';
@@ -7,11 +7,13 @@ import CaseSolve from './pages/CaseSolve';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
+import AteneoRoom from './pages/AteneoRoom';
 import { Activity, ShieldCheck, HeartPulse, LogOut, User, GraduationCap, UserCheck, Lock } from 'lucide-react';
 
 function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
@@ -38,8 +40,8 @@ function Navbar() {
         <div className="flex items-center gap-4 text-xs font-semibold text-slate-600">
           {user ? (
             <>
-              {/* Acceso a Paneles por Rol */}
-              {user.rol === 'administrador' && (
+              {/* Acceso a Paneles por Rol (Ocultar botones redundantes si ya está en la vista) */}
+              {user.rol === 'administrador' && location.pathname !== '/admin' && (
                 <Link
                   to="/admin"
                   className="hidden sm:flex items-center gap-1.5 text-slate-600 hover:text-slate-900 transition-colors"
@@ -49,7 +51,7 @@ function Navbar() {
                 </Link>
               )}
 
-              {(user.rol === 'docente' || user.rol === 'administrador') && (
+              {(user.rol === 'docente' || user.rol === 'administrador') && location.pathname !== '/teacher' && (
                 <Link
                   to="/teacher"
                   className="hidden sm:flex items-center gap-1.5 text-slate-600 hover:text-slate-900 transition-colors"
@@ -59,15 +61,27 @@ function Navbar() {
                 </Link>
               )}
 
-              {/* Rol Activo */}
-              <div className="flex items-center gap-1.5 text-slate-700 font-medium">
-                {user.rol === 'administrador' && <ShieldCheck className="w-4 h-4 text-slate-500" />}
-                {user.rol === 'docente' && <UserCheck className="w-4 h-4 text-slate-500" />}
-                {user.rol === 'alumno' && <GraduationCap className="w-4 h-4 text-slate-500" />}
-                <span className="font-bold">{user.nombre}</span>
-                <span className="hidden md:inline uppercase text-[10px] text-slate-400 font-bold">
-                  ({user.rol})
-                </span>
+              {/* Rol Activo y Nombre */}
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-slate-900">{user.nombre}</span>
+                {user.rol === 'alumno' && (
+                  <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[10px] font-bold bg-sky-50 text-sky-800 border-sky-200 uppercase tracking-wider">
+                    <GraduationCap className="w-3.5 h-3.5 text-sky-600" />
+                    <span>Alumno</span>
+                  </span>
+                )}
+                {user.rol === 'docente' && (
+                  <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[10px] font-bold bg-emerald-50 text-emerald-800 border-emerald-200 uppercase tracking-wider">
+                    <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Docente</span>
+                  </span>
+                )}
+                {user.rol === 'administrador' && (
+                  <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[10px] font-bold bg-purple-50 text-purple-800 border-purple-200 uppercase tracking-wider">
+                    <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
+                    <span>Admin</span>
+                  </span>
+                )}
               </div>
 
               {/* Botón Logout */}
@@ -137,6 +151,20 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+
+              <Route path="/ateneo" element={<Navigate to="/" replace />} />
+
+              <Route
+                path="/ateneo/:roomCode"
+                element={
+                  <ProtectedRoute allowedRoles={['alumno', 'docente', 'administrador']}>
+                    <AteneoRoom />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Ruta comodín para capturar URLs no existentes y evitar pantallas en blanco */}
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
 

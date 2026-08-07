@@ -24,6 +24,16 @@ def call_gemini_llm(prompt: str, imagen_bytes: Optional[bytes] = None, imagen_mi
             "omisiones": [
                 "Faltó precisar la velocidad de infusión del esquema de líquidos de la GPC."
             ],
+            "competencias_deficientes": [
+                {
+                    "eje": "tratamiento",
+                    "descripcion": "Cálculo impreciso de la tasa de infusión e hidratación parenteral acorde a la GPC."
+                },
+                {
+                    "eje": "seguimiento",
+                    "descripcion": "Omisión del protocolo de monitoreo hemodinámico en las primeras 6 horas."
+                }
+            ],
             "cita_normativa": {
                 "guia": "GPC MSP Ecuador",
                 "seccion": "Manejo Terapéutico Oficial",
@@ -89,6 +99,12 @@ def call_gemini_llm(prompt: str, imagen_bytes: Optional[bytes] = None, imagen_mi
         "omisiones": [
             "Se requiere precisar el esquema específico de dosis y líquidos indicado en la GPC."
         ],
+        "competencias_deficientes": [
+            {
+                "eje": "tratamiento",
+                "descripcion": "Falta de precisión en la dosificación exacta de fármacos recomendados por la norma."
+            }
+        ],
         "cita_normativa": {
             "guia": "GPC MSP Ecuador",
             "seccion": "Manejo Terapéutico y Protocolo de Atención",
@@ -132,6 +148,31 @@ def _normalize_cita_normativa(data: dict) -> dict:
             cn["texto_relevante"] = cn.get("texto") or cn.get("cita") or cn.get("fragmento") or "Norma MSP Ecuador"
     return data
 
+def _normalize_competencias_deficientes(data: dict) -> dict:
+    """Normaliza defensivamente competencias_deficientes si el LLM devuelve formatos irregulares."""
+    if "competencias_deficientes" not in data:
+        return data
+    raw_list = data["competencias_deficientes"]
+    if not isinstance(raw_list, list):
+        data["competencias_deficientes"] = []
+        return data
+
+    normalized = []
+    for item in raw_list:
+        if isinstance(item, str):
+            normalized.append({
+                "eje": "tratamiento",
+                "descripcion": item
+            })
+        elif isinstance(item, dict):
+            eje_val = item.get("eje") or item.get("categoria") or item.get("tipo") or item.get("eje_clinico") or "tratamiento"
+            desc_val = item.get("descripcion") or item.get("detalle") or item.get("brecha") or item.get("texto") or "Brecha detectada frente a la GPC"
+            normalized.append({
+                "eje": str(eje_val),
+                "descripcion": str(desc_val)
+            })
+    data["competencias_deficientes"] = normalized
+    return data
 
 def parse_and_validate_llm_json(raw_text: str) -> EvaluationResult:
     """
@@ -148,6 +189,7 @@ def parse_and_validate_llm_json(raw_text: str) -> EvaluationResult:
     try:
         data = json.loads(cleaned)
         data = _normalize_cita_normativa(data)
+        data = _normalize_competencias_deficientes(data)
         return EvaluationResult(**data)
     except json.JSONDecodeError as e:
         print(f"[PARSER] JSON inválido ({e}), intentando reparación por truncamiento...", flush=True)
@@ -157,6 +199,9 @@ def parse_and_validate_llm_json(raw_text: str) -> EvaluationResult:
         repaired = _repair_truncated_json(cleaned)
         data = json.loads(repaired)
         data = _normalize_cita_normativa(data)
+        data = _normalize_competencias_deficientes(data)
+        print("[PARSER] JSON reparado exitosamente tras truncamiento.", flush=True)
+        return EvaluationResult(**data)
         print("[PARSER] JSON reparado exitosamente tras truncamiento.", flush=True)
         return EvaluationResult(**data)
     except Exception as e:

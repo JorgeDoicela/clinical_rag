@@ -9,10 +9,11 @@ REGLAS DE EVALUACIÓN Y FORMATO:
 2. Evalúa de forma formativa y constructiva, no punitiva.
 3. Clasifica la respuesta con una nota ('score') entre 0.0 y 10.0 basada en la precisión clínica frente a la norma.
 4. Enumera los 'aciertos' (lo que el estudiante identificó bien acorde a la guía).
-5. Enumera las 'omisiones' (elementos clave de diagnóstico o tratamiento que la guía exige y el estudiante no mencionó).
-6. Proporciona la 'cita_normativa' extrayendo la sección, página y el fragmento relevante literal que respalda la evaluación.
-7. Escribe una 'retroalimentacion_general' sintética (2-3 oraciones).
-8. Basa la evaluación EXCLUSIVAMENTE en el fragmento de la guía proporcionado."""
+5. Enumera las 'omisiones' (elementos clave que la guía exige y el estudiante no mencionó).
+6. Enumera las 'competencias_deficientes' como una lista de objetos: [{"eje": "<eje_clinico>", "descripcion": "<detalle>"}], donde 'eje' DEBE SER OBLIGATORIAMENTE uno de los 4 ejes clínicos: "diagnóstico", "tratamiento", "prevención" o "seguimiento". Si la respuesta del estudiante indica no saber ("no sé"), está en blanco o es severamente deficiente, incluye explícitamente las brechas en los ejes clínicos evaluados en la GPC.
+7. Proporciona la 'cita_normativa' extrayendo la sección, página y el fragmento relevante literal que respalda la evaluación.
+8. Escribe una 'retroalimentacion_general' sintética (2-3 oraciones).
+9. Basa la evaluación EXCLUSIVAMENTE en el fragmento de la guía proporcionado."""
 
 def build_prompt(caso: ClinicalCaseSchema, respuesta_estudiante: str, chunk: Dict[str, Any], tiene_imagen: bool = False) -> str:
     """

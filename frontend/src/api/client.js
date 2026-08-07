@@ -1,6 +1,6 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-function getAuthHeaders(headers = {}) {
+export function getAuthHeaders(headers = {}) {
   const token = localStorage.getItem('ateneo_token');
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;

@@ -6,6 +6,8 @@ import os
 from routers.cases import router as cases_router
 from routers.evaluation import router as evaluation_router
 from routers.auth import router as auth_router
+from routers.history import router as history_router
+from routers.collaboration import router as collaboration_router
 
 app = FastAPI(
     title="Ateneo API - Evaluación del Razonamiento Clínico mediante RAG",
@@ -32,6 +34,8 @@ app.mount("/static/images", StaticFiles(directory=images_dir), name="static_imag
 app.include_router(auth_router, prefix="/api")
 app.include_router(cases_router)
 app.include_router(evaluation_router)
+app.include_router(history_router)
+app.include_router(collaboration_router)
 
 
 @app.on_event("startup")

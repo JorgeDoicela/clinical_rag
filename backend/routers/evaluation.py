@@ -63,6 +63,22 @@ async def evaluate_response(
             imagen_bytes=imagen_bytes,
             imagen_mime=imagen_mime
         )
+
+        # Guardar automáticamente la evaluación en el historial SQLite
+        try:
+            from models.history_db import save_evaluation_record
+            save_evaluation_record(
+                user_id="usr_alumno_001",
+                user_email="alumno@ateneo.edu.ec",
+                case_id=case_id,
+                guia_asociada=caso.guia_asociada,
+                case_title=caso.titulo,
+                eval_result=resultado.dict()
+            )
+            print(f"[ROUTER] Evaluación guardada en base de datos para caso '{case_id}'", flush=True)
+        except Exception as db_err:
+            print(f"[ROUTER] Error secundario al guardar historial en DB: {db_err}", flush=True)
+
         return resultado
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error durante el procesamiento del LLM: {str(e)}")
