@@ -9,7 +9,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./backend/data:/app/data
+      - ./backend:/app
     env_file:
       - ./backend/.env
     restart: unless-stopped
@@ -21,6 +21,9 @@ services:
     container_name: ateneo_frontend
     ports:
       - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     depends_on:
       - backend
     environment:

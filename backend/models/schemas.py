@@ -2,10 +2,10 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 
 class CitaNormativa(BaseModel):
-    guia: str = Field(..., description="Nombre de la Guía de Práctica Clínica del MSP Ecuador")
-    seccion: str = Field(..., description="Sección o capítulo relevante dentro de la norma")
-    pagina: Optional[int] = Field(None, description="Número de página de la norma si está disponible")
-    texto_relevante: str = Field(..., description="Cita textual o fragmento normativo exacto de respaldo")
+    guia: str = Field(default="GPC MSP Ecuador", description="Nombre de la Guía de Práctica Clínica del MSP Ecuador")
+    seccion: str = Field(default="General", description="Sección o capítulo relevante dentro de la norma")
+    pagina: Optional[int] = Field(default=None, description="Número de página de la norma si está disponible")
+    texto_relevante: str = Field(default="Normativa oficial del Ministerio de Salud Pública.", description="Cita textual o fragmento normativo exacto de respaldo")
 
 class EvaluationResult(BaseModel):
     score: float = Field(..., ge=0, le=10, description="Puntuación cualitativa/cuantitativa entre 0 y 10")

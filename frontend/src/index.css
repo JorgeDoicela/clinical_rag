@@ -2,25 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ==========================================================================
+   SISTEMA DE DISEÑO CLÍNICO Y TOKENS DE ESTILO (ATENEO UI)
+   ========================================================================== */
+
+:root {
+  /* Paleta Base y Superficies */
+  --bg-app: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f1f5f9;
+  
+  /* Bordes y Sombras */
+  --border-subtle: #e2e8f0;
+  --border-focus: #38bdf8;
+  --shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.03), 0 1px 2px -1px rgba(15, 23, 42, 0.03);
+  --shadow-hover: 0 10px 25px -5px rgba(14, 165, 233, 0.08), 0 8px 10px -6px rgba(14, 165, 233, 0.04);
+  
+  /* Tipografía y Colores de Texto */
+  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  
+  /* Identidad Médica y Acentos */
+  --primary-medical: #0284c7;
+  --primary-medical-hover: #0369a1;
+  --primary-medical-bg: #f0f9ff;
+  --primary-medical-border: #bae6fd;
+  
+  /* Estados de Evaluación Formativa */
+  --status-success-text: #15803d;
+  --status-success-bg: #f0fdf4;
+  --status-success-border: #bbf7d0;
+  
+  --status-warning-text: #b45309;
+  --status-warning-bg: #fffbeb;
+  --status-warning-border: #fde68a;
+  
+  --status-danger-text: #be123c;
+  --status-danger-bg: #fff1f2;
+  --status-danger-border: #fecdd3;
+}
+
 @layer base {
   body {
-    @apply bg-slate-950 text-slate-100 min-h-screen antialiased;
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
   }
 }
 
-.glass-card {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+/* Componentes de Estilo Reutilizables */
+.clinical-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-card);
+  border-radius: 1rem;
+  transition: all 0.2s ease-in-out;
 }
 
-.glass-card-hover {
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+.clinical-card-hover {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.glass-card-hover:hover {
-  background: rgba(30, 41, 59, 0.85);
-  border-color: rgba(20, 184, 166, 0.3);
+.clinical-card-hover:hover {
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-hover);
   transform: translateY(-2px);
-  box-shadow: 0 12px 24px -10px rgba(13, 148, 136, 0.15);
+}
+
+.badge-medical {
+  background-color: var(--primary-medical-bg);
+  color: var(--primary-medical);
+  border: 1px solid var(--primary-medical-border);
+  font-weight: 600;
+  border-radius: 0.5rem;
 }

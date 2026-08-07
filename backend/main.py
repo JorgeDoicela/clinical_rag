@@ -20,6 +20,10 @@ app.add_middleware(
 app.include_router(cases_router)
 app.include_router(evaluation_router)
 
+@app.on_event("startup")
+async def startup_event():
+    print("[STARTUP] Servidor FastAPI de Ateneo iniciado correctamente.", flush=True)
+
 @app.get("/health", tags=["Health"])
 async def health_check():
     return {"status": "ok", "project": "Ateneo", "version": "1.0.0"}

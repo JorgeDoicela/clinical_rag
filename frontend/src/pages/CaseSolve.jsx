@@ -47,19 +47,19 @@ export default function CaseSolve() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-4">
-        <Loader2 className="w-8 h-8 text-teal-400 animate-spin" />
-        <p className="text-sm text-slate-400">Cargando caso clínico...</p>
+        <Loader2 className="w-8 h-8 text-sky-600 animate-spin" />
+        <p className="text-sm font-medium text-slate-600">Cargando datos del caso clínico...</p>
       </div>
     );
   }
 
   if (error && !caso) {
     return (
-      <div className="glass-card rounded-2xl p-6 border-rose-500/30 text-rose-400 space-y-4">
-        <p>{error}</p>
+      <div className="bg-rose-50 rounded-2xl p-6 border border-rose-200 text-rose-700 space-y-4">
+        <p className="text-sm font-medium">{error}</p>
         <button
           onClick={() => navigate('/')}
-          className="px-4 py-2 bg-slate-800 text-slate-200 rounded-xl text-xs font-semibold"
+          className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-semibold hover:bg-slate-800 transition-colors"
         >
           Volver a la lista
         </button>
@@ -72,35 +72,35 @@ export default function CaseSolve() {
       {/* Botón de regreso */}
       <button
         onClick={() => navigate('/')}
-        className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors"
+        className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
-        <span>Volver al listado de casos</span>
+        <span>Volver a la lista de casos</span>
       </button>
 
       {/* Enunciado del Caso */}
-      <div className="glass-card rounded-3xl p-6 sm:p-8 space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
+      <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
           <div>
-            <span className="px-3 py-1 rounded-lg bg-teal-500/10 text-teal-300 text-xs font-mono font-medium uppercase tracking-wider">
+            <span className="px-3 py-1 rounded-md bg-sky-50 text-sky-700 text-xs font-mono font-semibold uppercase tracking-wider border border-sky-200">
               GPC {caso.guia_asociada} (MSP Ecuador)
             </span>
-            <h1 className="text-xl sm:text-2xl font-display font-bold text-white mt-2">
+            <h1 className="text-xl sm:text-2xl font-display font-extrabold text-slate-900 mt-2">
               {caso.titulo}
             </h1>
           </div>
         </div>
 
-        <div className="space-y-4 text-slate-200 leading-relaxed text-sm sm:text-base bg-slate-900/60 p-5 rounded-2xl border border-slate-800/60">
+        <div className="space-y-4 text-slate-700 leading-relaxed text-sm sm:text-base bg-slate-50 p-5 rounded-xl border border-slate-200">
           <p>{caso.enunciado}</p>
         </div>
 
-        <div className="space-y-2 border-l-4 border-l-teal-500 pl-4 py-1">
-          <h3 className="text-xs font-semibold text-teal-400 uppercase tracking-wider flex items-center gap-1.5">
+        <div className="space-y-2 border-l-4 border-l-sky-600 pl-4 py-1">
+          <h3 className="text-xs font-bold text-sky-700 uppercase tracking-wider flex items-center gap-1.5">
             <BookOpen className="w-4 h-4" />
-            <span>Instrucción / Pregunta</span>
+            <span>Instrucción / Pregunta Médica</span>
           </h3>
-          <p className="text-sm sm:text-base font-medium text-white">
+          <p className="text-sm sm:text-base font-semibold text-slate-900">
             {caso.pregunta}
           </p>
         </div>
@@ -108,24 +108,24 @@ export default function CaseSolve() {
 
       {/* Formulario de Respuesta o Vista de Resultado */}
       {!resultado ? (
-        <form onSubmit={handleSubmit} className="glass-card rounded-3xl p-6 sm:p-8 space-y-6">
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
           <div className="space-y-2">
-            <label className="block text-sm font-semibold text-slate-200">
+            <label className="block text-sm font-bold text-slate-900">
               Tu Razonamiento Diagnóstico y Terapéutico
             </label>
             <textarea
               rows={7}
               value={respuesta}
               onChange={(e) => setRespuesta(e.target.value)}
-              placeholder="Escribe en detalle tu impresión diagnóstica, severidad del cuadro y la conducta terapéutica inmediata que aplicarías según la GPC..."
+              placeholder="Detalla tu diagnóstico de presunción, criterios de severidad y el tratamiento inmediato a seguir..."
               disabled={evaluating}
-              className="w-full bg-slate-950/80 border border-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-2xl p-4 text-sm text-slate-100 placeholder-slate-500 resize-y transition-all disabled:opacity-50"
+              className="w-full bg-slate-50 border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 rounded-xl p-4 text-sm text-slate-900 placeholder-slate-400 resize-y transition-all disabled:opacity-50"
             />
           </div>
 
           {error && (
-            <div className="flex items-center gap-2 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm">
-              <AlertCircle className="w-5 h-5 shrink-0" />
+            <div className="flex items-center gap-2 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm">
+              <AlertCircle className="w-5 h-5 shrink-0 text-rose-600" />
               <span>{error}</span>
             </div>
           )}
@@ -134,7 +134,7 @@ export default function CaseSolve() {
             <button
               type="submit"
               disabled={evaluating || !respuesta.trim()}
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-teal-600 hover:bg-teal-500 disabled:bg-slate-800 disabled:text-slate-500 text-white font-display font-semibold text-sm transition-all shadow-lg shadow-teal-950/50"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-sky-600 hover:bg-sky-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-display font-semibold text-sm transition-all shadow-md shadow-sky-600/10"
             >
               {evaluating ? (
                 <>

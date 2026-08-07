@@ -8,7 +8,9 @@ _MODEL_CACHE = None
 def get_embedding_model() -> SentenceTransformer:
     global _MODEL_CACHE
     if _MODEL_CACHE is None:
+        print("[RAG] Cargando modelo de embeddings local (paraphrase-multilingual-mpnet-base-v2)...", flush=True)
         _MODEL_CACHE = SentenceTransformer(EMBEDDING_MODEL_NAME)
+        print("[RAG] Modelo de embeddings listo.", flush=True)
     return _MODEL_CACHE
 
 def retrieve_relevant_chunk(query: str, guia_filtro: Optional[str] = None, top_k: int = 1) -> Dict[str, Any]:
@@ -16,13 +18,14 @@ def retrieve_relevant_chunk(query: str, guia_filtro: Optional[str] = None, top_k
     Recupera el fragmento de Guía de Práctica Clínica más relevante desde ChromaDB.
     Aplica filtro por guia_fuente si se especifica.
     """
+    print(f"[RAG] Buscando en ChromaDB para guía '{guia_filtro}'...", flush=True)
     model = get_embedding_model()
     client = chromadb.PersistentClient(path=CHROMA_PERSIST_PATH)
     
     try:
         collection = client.get_collection("gpc_msp")
     except Exception:
-        # Fallback si la colección no ha sido creada aún
+        print("[RAG] Colección no encontrada. Ejecutando pipeline de ingesta de respaldo...", flush=True)
         from ingestion.run_ingestion import run_ingestion_pipeline
         run_ingestion_pipeline()
         collection = client.get_collection("gpc_msp")
