@@ -5,6 +5,7 @@ import os
 
 from routers.cases import router as cases_router
 from routers.evaluation import router as evaluation_router
+from routers.auth import router as auth_router
 
 app = FastAPI(
     title="Ateneo API - Evaluación del Razonamiento Clínico mediante RAG",
@@ -12,9 +13,12 @@ app = FastAPI(
     version="1.0.0"
 )
 
+allowed_origins_raw = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173")
+allowed_origins = [origin.strip() for origin in allowed_origins_raw.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -25,8 +29,10 @@ images_dir = os.path.join(os.path.dirname(__file__), "cases_data", "images")
 os.makedirs(images_dir, exist_ok=True)
 app.mount("/static/images", StaticFiles(directory=images_dir), name="static_images")
 
+app.include_router(auth_router, prefix="/api")
 app.include_router(cases_router)
 app.include_router(evaluation_router)
+
 
 @app.on_event("startup")
 async def startup_event():

@@ -29,3 +29,34 @@ class ClinicalCaseSchema(BaseModel):
     nivel_esperado: Optional[str] = "pregrado_avanzado"
     fragmento_gpc_ideal_id: Optional[str] = None
 
+from enum import Enum
+
+class UserRole(str, Enum):
+    ADMINISTRADOR = "administrador"
+    DOCENTE = "docente"
+    ALUMNO = "alumno"
+
+class User(BaseModel):
+    id: str
+    email: str
+    nombre: str
+    rol: UserRole
+    hashed_password: str
+    activo: bool = True
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+class UserResponse(BaseModel):
+    id: str
+    email: str
+    nombre: str
+    rol: UserRole
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserResponse
+
+
