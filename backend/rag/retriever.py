@@ -9,7 +9,7 @@ _CHROMA_CLIENT = None
 def get_embedding_model() -> SentenceTransformer:
     global _MODEL_CACHE
     if _MODEL_CACHE is None:
-        print("[RAG] Cargando modelo de embeddings local (paraphrase-multilingual-mpnet-base-v2)...", flush=True)
+        print(f"[RAG] Cargando modelo de embeddings local ({EMBEDDING_MODEL_NAME})...", flush=True)
         _MODEL_CACHE = SentenceTransformer(EMBEDDING_MODEL_NAME)
         print("[RAG] Modelo de embeddings listo.", flush=True)
     return _MODEL_CACHE

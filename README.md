@@ -5,7 +5,7 @@
 ## Arquitectura Técnica
 
 - **Backend:** FastAPI (Python 3.11), Pydantic v2, ChromaDB (Vector Store local).
-- **Embeddings:** `paraphrase-multilingual-mpnet-base-v2` (SentenceTransformers).
+- **Embeddings:** `BAAI/bge-m3` (SentenceTransformers, soporte multi-idioma de hasta 8192 tokens).
 - **LLM Evaluador:** Google Gemini API (`google-genai` / `gemini-2.5-flash`) con salida JSON estructurada forzada.
 - **Frontend / PWA:** React + Vite, Vanilla/Tailwind CSS, `vite-plugin-pwa`.
 

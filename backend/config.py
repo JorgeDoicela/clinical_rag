@@ -13,4 +13,9 @@ CHROMA_PERSIST_PATH = str(BASE_DIR / os.getenv("CHROMA_PERSIST_PATH", "./data/ch
 RAW_PDFS_PATH = str(BASE_DIR / os.getenv("RAW_PDFS_PATH", "./data/raw_pdfs"))
 CASES_FILE_PATH = str(BASE_DIR / os.getenv("CASES_FILE_PATH", "./cases_data/cases.json"))
 
-EMBEDDING_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
+FINE_TUNED_PATH = BASE_DIR / "data" / "ateneo-bge-m3-ecuador"
+if FINE_TUNED_PATH.exists() and (FINE_TUNED_PATH / "config.json").exists():
+    EMBEDDING_MODEL_NAME = str(FINE_TUNED_PATH)
+else:
+    EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME", "BAAI/bge-m3")
+

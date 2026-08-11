@@ -2,8 +2,8 @@
   "total_casos": 15,
   "precision_retrieval_porcentaje": 100.0,
   "tasa_exito_json_porcentaje": 100.0,
-  "latencia_promedio_segundos": 5.8,
-  "latencia_mediana_segundos": 6.14,
+  "latencia_promedio_segundos": 12.88,
+  "latencia_mediana_segundos": 11.62,
   "detalles": [
     {
       "test_id": "test_01",
@@ -12,8 +12,8 @@
       "retrieved_chunk_id": "dengue_chunk_004",
       "expected_chunk_id": "dengue_chunk_004",
       "json_valido": true,
-      "score": 8.5,
-      "latencia_segundos": 12.967
+      "score": 9.0,
+      "latencia_segundos": 13.757
     },
     {
       "test_id": "test_02",
@@ -22,8 +22,8 @@
       "retrieved_chunk_id": "dengue_chunk_004",
       "expected_chunk_id": "dengue_chunk_004",
       "json_valido": true,
-      "score": 1.0,
-      "latencia_segundos": 6.447
+      "score": 1.5,
+      "latencia_segundos": 10.396
     },
     {
       "test_id": "test_03",
@@ -32,8 +32,8 @@
       "retrieved_chunk_id": "preeclampsia_chunk_002",
       "expected_chunk_id": "preeclampsia_chunk_002",
       "json_valido": true,
-      "score": 8.5,
-      "latencia_segundos": 6.145
+      "score": 8.0,
+      "latencia_segundos": 14.546
     },
     {
       "test_id": "test_04",
@@ -42,8 +42,8 @@
       "retrieved_chunk_id": "preeclampsia_chunk_002",
       "expected_chunk_id": "preeclampsia_chunk_002",
       "json_valido": true,
-      "score": 1.0,
-      "latencia_segundos": 6.414
+      "score": 1.5,
+      "latencia_segundos": 11.831
     },
     {
       "test_id": "test_05",
@@ -53,7 +53,7 @@
       "expected_chunk_id": "diabetes_chunk_005",
       "json_valido": true,
       "score": 8.5,
-      "latencia_segundos": 5.717
+      "latencia_segundos": 11.62
     },
     {
       "test_id": "test_06",
@@ -62,8 +62,8 @@
       "retrieved_chunk_id": "diabetes_chunk_005",
       "expected_chunk_id": "diabetes_chunk_005",
       "json_valido": true,
-      "score": 7.5,
-      "latencia_segundos": 1.643
+      "score": 1.0,
+      "latencia_segundos": 12.546
     },
     {
       "test_id": "test_07",
@@ -72,8 +72,8 @@
       "retrieved_chunk_id": "hemorragia_chunk_001",
       "expected_chunk_id": "hemorragia_chunk_001",
       "json_valido": true,
-      "score": 7.5,
-      "latencia_segundos": 1.548
+      "score": 7.0,
+      "latencia_segundos": 9.063
     },
     {
       "test_id": "test_08",
@@ -83,7 +83,7 @@
       "expected_chunk_id": "hemorragia_chunk_001",
       "json_valido": true,
       "score": 0.0,
-      "latencia_segundos": 6.354
+      "latencia_segundos": 7.979
     },
     {
       "test_id": "test_09",
@@ -92,8 +92,8 @@
       "retrieved_chunk_id": "dengue_chunk_004",
       "expected_chunk_id": "dengue_chunk_004",
       "json_valido": true,
-      "score": 6.5,
-      "latencia_segundos": 5.768
+      "score": 7.0,
+      "latencia_segundos": 8.72
     },
     {
       "test_id": "test_10",
@@ -102,8 +102,8 @@
       "retrieved_chunk_id": "preeclampsia_chunk_002",
       "expected_chunk_id": "preeclampsia_chunk_002",
       "json_valido": true,
-      "score": 6.0,
-      "latencia_segundos": 4.915
+      "score": 5.0,
+      "latencia_segundos": 14.836
     },
     {
       "test_id": "test_11",
@@ -112,8 +112,8 @@
       "retrieved_chunk_id": "diabetes_chunk_005",
       "expected_chunk_id": "diabetes_chunk_005",
       "json_valido": true,
-      "score": 1.5,
-      "latencia_segundos": 6.619
+      "score": 1.0,
+      "latencia_segundos": 11.413
     },
     {
       "test_id": "test_12",
@@ -123,7 +123,7 @@
       "expected_chunk_id": "hemorragia_chunk_001",
       "json_valido": true,
       "score": 6.0,
-      "latencia_segundos": 4.168
+      "latencia_segundos": 10.588
     },
     {
       "test_id": "test_13",
@@ -133,7 +133,7 @@
       "expected_chunk_id": "dengue_chunk_004",
       "json_valido": true,
       "score": 2.0,
-      "latencia_segundos": 8.465
+      "latencia_segundos": 9.385
     },
     {
       "test_id": "test_14",
@@ -142,8 +142,8 @@
       "retrieved_chunk_id": "preeclampsia_chunk_002",
       "expected_chunk_id": "preeclampsia_chunk_002",
       "json_valido": true,
-      "score": 7.5,
-      "latencia_segundos": 1.915
+      "score": 7.0,
+      "latencia_segundos": 31.886
     },
     {
       "test_id": "test_15",
@@ -152,8 +152,8 @@
       "retrieved_chunk_id": "hemorragia_chunk_001",
       "expected_chunk_id": "hemorragia_chunk_001",
       "json_valido": true,
-      "score": 5.5,
-      "latencia_segundos": 7.917
+      "score": 4.5,
+      "latencia_segundos": 14.611
     }
   ]
 }

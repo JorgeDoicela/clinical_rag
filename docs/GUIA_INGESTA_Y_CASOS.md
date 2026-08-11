@@ -49,7 +49,7 @@ python ingestion/run_ingestion.py
 ### Proceso interno realizado por el script
 1. Extrae el texto plano pagina por pagina usando `pypdf`.
 2. Segmenta el texto en fragmentos (*chunks*) por secciones clinicas especificas.
-3. Genera representaciones vectoriales utilizando el modelo `sentence-transformers/paraphrase-multilingual-mpnet-base-v2`.
+3. Genera representaciones vectoriales utilizando el modelo `BAAI/bge-m3`.
 4. Indexa los vectores en la coleccion de ChromaDB con metadatos asociados (`guia_fuente`, `pagina`, `seccion`).
 
 ---
