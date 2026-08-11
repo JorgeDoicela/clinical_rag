@@ -94,17 +94,45 @@ Si el caso incluye imagenes (ej. electrocardiogramas, radiografias, hemogramas):
 
 ---
 
-## 5. Portabilidad y Despliegue en Nuevos Servidores (AWS / Produccion)
+## 5. Requisitos de Virtualización y Configuración de Docker para Fine-Tuning
 
-No es necesario mover manualmente el directorio de la base de datos `backend/data/chroma_db/` entre maquinas o servidores.
+### 5.1 Requisitos en Windows (WSL2)
+Para ejecutar el entorno en un equipo Windows de forma 100% aislada (sin instalar Python ni dependencias en la máquina anfitrión):
+1. **Virtualización en Firmware:** Asegurar que la virtualización Intel VT-x / AMD-V esté habilitada en el BIOS.
+2. **Plataforma de Máquina Virtual:** Habilitar la característica opcional de Windows ejecutando en PowerShell como Administrador:
+   ```powershell
+   wsl --install --no-distribution
+   ```
+3. **Docker Desktop:** Iniciar Docker Desktop asegurando el uso del motor WSL2 Backend.
 
-### Procedimiento recomendado para despliegue:
-1. Incluir en el repositorio los archivos PDF fuente dentro de `backend/data/raw_pdfs/`.
-2. Al desplegar en la nueva maquina o servidor, ejecutar el comando de ingesta durante el aprovisionamiento o construccion de la imagen Docker:
-```bash
-docker compose exec backend python ingestion/run_ingestion.py
+### 5.2 Configuración de Recursos y GPU en `docker-compose.yml`
+Para permitir el uso de la GPU NVIDIA del anfitrión (con compatibilidad CUDA 12.x) y evitar errores de falta de memoria (OOM Killer):
+
+```yaml
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        limits:
+          memory: 14G      # Límite de memoria suficiente para Fine-Tuning sin colapso
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]   # Passthrough directo de la GPU NVIDIA al contenedor
 ```
-3. El motor generara la base de datos vectorial ChromaDB localmente en el servidor destino.
+
+### 5.3 Comandos para Generación de Dataset y Fine-Tuning en Docker
+```bash
+# 1. Generar el dataset de tripletas clínicas (Query, Positivo, Negativo)
+docker compose exec backend python ingestion/create_ft_dataset.py
+
+# 2. Ejecutar el Fine-Tuning del modelo BAAI/bge-m3 dentro del contenedor
+docker compose exec backend python ingestion/train_fine_tuning.py
+```
 
 ---
 
@@ -117,3 +145,4 @@ Despues de realizar los pasos anteriores:
 curl http://localhost:8000/api/cases
 ```
 2. Realizar la prueba de evaluacion enviando la respuesta del estudiante a `/api/evaluate`.
+

@@ -91,12 +91,17 @@ Una vez ajustado el modelo, se aplica cuantización dinámica a enteros de 8 bit
 * **Reducción de Memoria:** De ~2.2 GB a ~550 MB.
 * **Aceleración de Latencia:** Reducción del tiempo de respuesta en búsquedas vectoriales a < 40 ms por consulta.
 
+### 5.4 Requisitos de Aceleración y Dependencias
+* **PyTorch & CUDA:** Requiere `torch >= 2.6.0` (para compatibilidad de seguridad CVE-2025-32434 en deserialización de checkpoints) y soporte de aceleración CUDA 12.x para GPUs NVIDIA.
+* **Aislamiento en Docker:** Ejecución mediante soporte de dispositivos GPU en `docker-compose.yml` (`driver: nvidia`, `capabilities: [gpu]`) y límite asignado de 14 GB de RAM.
+
 ---
 
 ## 6. Configuración de Archivos del Proyecto
 
-* **Configuración Global:** [backend/config.py](file:///home/jorge/Proyectos/clinical_rag/backend/config.py)
-* **Motor de Búsqueda:** [backend/rag/retriever.py](file:///home/jorge/Proyectos/clinical_rag/backend/rag/retriever.py)
-* **Script de Ingesta:** [backend/ingestion/run_ingestion.py](file:///home/jorge/Proyectos/clinical_rag/backend/ingestion/run_ingestion.py)
-* **Generación de Dataset FT:** [backend/ingestion/create_ft_dataset.py](file:///home/jorge/Proyectos/clinical_rag/backend/ingestion/create_ft_dataset.py)
-* **Suite de Métricas:** [backend/tests/run_metrics.py](file:///home/jorge/Proyectos/clinical_rag/backend/tests/run_metrics.py)
+* **Configuración Global:** [config.py](file:///c:/Users/HUNTER-PC/Downloads/clinical_rag/backend/config.py)
+* **Motor de Búsqueda:** [retriever.py](file:///c:/Users/HUNTER-PC/Downloads/clinical_rag/backend/rag/retriever.py)
+* **Script de Ingesta:** [run_ingestion.py](file:///c:/Users/HUNTER-PC/Downloads/clinical_rag/backend/ingestion/run_ingestion.py)
+* **Generación de Dataset FT:** [create_ft_dataset.py](file:///c:/Users/HUNTER-PC/Downloads/clinical_rag/backend/ingestion/create_ft_dataset.py)
+* **Entrenamiento FT:** [train_fine_tuning.py](file:///c:/Users/HUNTER-PC/Downloads/clinical_rag/backend/ingestion/train_fine_tuning.py)
+* **Suite de Métricas:** [run_metrics.py](file:///c:/Users/HUNTER-PC/Downloads/clinical_rag/backend/tests/run_metrics.py)

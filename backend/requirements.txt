@@ -11,4 +11,5 @@ pyjwt==2.13.0
 passlib[bcrypt]==1.7.4
 datasets>=3.0.0
 accelerate>=1.0.0
+torch>=2.6.0
 
