@@ -125,14 +125,14 @@ services:
               capabilities: [gpu]   # Passthrough directo de la GPU NVIDIA al contenedor
 ```
 
-### 5.3 Comandos para Generación de Dataset y Fine-Tuning en Docker
-```bash
-# 1. Generar el dataset de tripletas clínicas (Query, Positivo, Negativo)
-docker compose exec backend python ingestion/create_ft_dataset.py
+### 5.4 Fine-Tuning Acelerado en la Nube (Google Colab / Kaggle)
+Si se prefiere no recargar la máquina local, el Fine-Tuning puede ejecutarse en la nube en **menos de 5 minutos** usando una GPU T4/V100/A100 gratuita en Google Colab:
 
-# 2. Ejecutar el Fine-Tuning del modelo BAAI/bge-m3 dentro del contenedor
-docker compose exec backend python ingestion/train_fine_tuning.py
-```
+1. Subir el cuaderno [colab_fine_tuning.ipynb](file:///c:/Users/HUNTER-PC/Downloads/clinical_rag/backend/ingestion/colab_fine_tuning.ipynb) a [Google Colab](https://colab.research.google.com/).
+2. Seleccionar el tipo de entorno de ejecución en Colab: **GPU T4**.
+3. Subir el archivo de datos generado `backend/data/ft_dataset.json` (2.4 MB).
+4. Ejecutar todas las celdas del cuaderno.
+5. Descargar el archivo comprimido resultante `ateneo-bge-m3-ecuador.zip` y descomprimirlo en `backend/data/ateneo-bge-m3-ecuador/`.
 
 ---
 
