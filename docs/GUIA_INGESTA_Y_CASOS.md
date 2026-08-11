@@ -178,8 +178,8 @@ def calculate_room_analytics(room: Dict[str, Any]) -> Dict[str, Any]:
     ]
 
     nivel_consenso = (
-        "Alto Consenso Alineado a la GPC" if promedio >= 8.0 
-        else ("Consenso Medio en Evaluación" if promedio >= 6.5 
+        "Alto Consenso Alineado a la GPC" if promedio >= 8.0
+        else ("Consenso Medio en Evaluación" if promedio >= 6.5
         else "Brecha Colectiva Crítica Detectada")
     )
     return {

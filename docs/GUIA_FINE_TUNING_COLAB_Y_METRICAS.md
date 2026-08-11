@@ -6,9 +6,9 @@ Este documento especifica la metodología de entrenamiento supervisado del model
 
 ## 1. Justificación Técnica de Aceleración en GPU Cloud
 
-El modelo recuperador `BAAI/bge-m3` cuenta con ~560 millones de parámetros y proyecta secuencias de texto en un espacio latente denso de 1,024 dimensiones. 
+El modelo recuperador `BAAI/bge-m3` cuenta con ~560 millones de parámetros y proyecta secuencias de texto en un espacio latente denso de 1,024 dimensiones.
 
-Durante el entrenamiento supervisado con la función de pérdida *Multiple Negatives Ranking Loss (MNRL)*, el cálculo de gradientes y la actualización de estados del optimizador AdamW procesan tripletas de secuencias compuestas por la consulta del caso clínico ($q$), el fragmento positivo normativo ($p^+$) y el fragmento negativo de distracción ($p^-$). 
+Durante el entrenamiento supervisado con la función de pérdida *Multiple Negatives Ranking Loss (MNRL)*, el cálculo de gradientes y la actualización de estados del optimizador AdamW procesan tripletas de secuencias compuestas por la consulta del caso clínico ($q$), el fragmento positivo normativo ($p^+$) y el fragmento negativo de distracción ($p^-$).
 
 El procesamiento simultáneo de estas 3 secuencias en llamadas hacia atrás (*backpropagation*) requiere más de **10 a 14 GB de memoria de video (VRAM)** en precisión FP32. Por esta razón, las tarjetas gráficas locales de $\le 6\text{ GB}$ VRAM presentan desbordamiento fatal de memoria (`CUDA Out of Memory`).
 
