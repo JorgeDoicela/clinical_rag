@@ -12,7 +12,7 @@ def train_bge_m3_fine_tuning(
     output_dir: str = "./data/ateneo-bge-m3-ecuador",
     epochs: int = 3,
     batch_size: int = 2,
-    max_seq_length: int = 1024
+    max_seq_length: int = 512
 ):
     """
     Ejecuta el entrenamiento profesional (Fine-Tuning de Grado Científico) del modelo BAAI/bge-m3

@@ -20,7 +20,8 @@ ENV/
 # Data & ChromaDB
 backend/data/chroma_db/
 backend/data/processed/
-backend/data/ateneo-bge-m3-ecuador/
+backend/data/ateneo-bge-m3-ecuador/*
+!backend/data/ateneo-bge-m3-ecuador/.gitkeep
 backend/checkpoints/
 backend/data/raw_pdfs/*.pdf
 !backend/data/raw_pdfs/.gitkeep

@@ -1,148 +1,154 @@
-# Guia de Ingesta de Documentos y Adicion de Casos Clinicos
+# Especificación Técnica de Ingesta, Casos Clínicos, API REST y Persistencia SQL
 
-Este documento detalla el procedimiento tecnico para incorporar nuevas Guias de Practica Clinica (GPC) en formato PDF al motor RAG, como registrar nuevos casos clinicos simulados en el sistema Ateneo y las consideraciones para despliegue en nuevos servidores.
-
----
-
-## 1. Arquitectura de Datos
-
-El sistema gestiona dos fuentes principales de datos:
-
-1. **Base de Conocimiento RAG (ChromaDB):**
-   - Directorio de PDFs fuente: `backend/data/raw_pdfs/`
-   - Directorio de persistencia vectorial: `backend/data/chroma_db/`
-
-2. **Casos Clinicos Simulados:**
-   - Archivo JSON de casos: `backend/cases_data/cases.json`
-   - Directorio de imagenes estaticas: `backend/cases_data/images/`
+Este documento especifica la estructura de datos, el protocolo de ingesta de documentos PDF, la especificación de endpoints de la API REST, la arquitectura de persistencia en SQLite y los algoritmos de analítica en tiempo real del sistema **Ateneo**.
 
 ---
 
-## 2. Incorporacion de Guias de Practica Clinica (PDF)
+## 1. Arquitectura de Persistencia de Datos
 
-### Paso 1: Almacenar los archivos PDF
-Colocar los documentos PDF de las guias clinicas oficiales en la carpeta `backend/data/raw_pdfs/`.
+El sistema gestiona la información a través de tres capas de almacenamiento:
 
-Ejemplo:
 ```text
-backend/data/raw_pdfs/gpc_ehirn2019.pdf
-backend/data/raw_pdfs/hipertension.pdf
+                                  CAPAS DE ALMACENAMIENTO
+┌────────────────────────────────┐ ┌────────────────────────────────┐ ┌────────────────────────────────┐
+│   ChromaDB (Vector Store)      │ │     SQLite3 (history.db)       │ │     JSON Estructurado          │
+├────────────────────────────────┤ ├────────────────────────────────┤ ├────────────────────────────────┤
+│ Colección: `gpc_msp`           │ │ Tabla: `evaluation_history`    │ │ `cases.json` (Casos simulados) │
+│ Vectores: 1024 dimensiones     │ │ Tabla: `ateneo_rooms`          │ │ `images/` (Recursos gráficos)  │
+│ Distancia: Coseno              │ │ Historial y analítica B2B      │ │ Dataset FT (`ft_dataset.json`) │
+└────────────────────────────────┘ └────────────────────────────────┘ └────────────────────────────────┘
 ```
-
-### Paso 2: Ejecutar el proceso de ingesta y vectorizacion
-
-#### Opcion A: Entorno Docker
-Si el sistema esta ejecutandose via Docker Compose, ejecutar la ingesta dentro del contenedor activo:
-
-```bash
-docker compose exec backend python ingestion/run_ingestion.py
-```
-
-#### Opcion B: Entorno Python local (Virtualenv)
-Navegar al directorio `backend` y ejecutar el script de ingesta:
-
-```bash
-cd backend
-python ingestion/run_ingestion.py
-```
-
-### Proceso interno realizado por el script
-1. Extrae el texto plano pagina por pagina usando `pypdf`.
-2. Segmenta el texto en fragmentos (*chunks*) por secciones clinicas especificas.
-3. Genera representaciones vectoriales utilizando el modelo `BAAI/bge-m3`.
-4. Indexa los vectores en la coleccion de ChromaDB con metadatos asociados (`guia_fuente`, `pagina`, `seccion`).
 
 ---
 
-## 3. Registro de Nuevos Casos Clinicos
+## 2. Definición del Esquema JSON de Casos Clínicos
 
-Para definir un nuevo caso clinico que utilice las guias ingresadas, se debe actualizar el archivo `backend/cases_data/cases.json`.
-
-### Estructura del objeto JSON
-
-Añadir una nueva entrada dentro del arreglo `"cases"`:
+Los casos clínicos simulados se gestionan en `backend/cases_data/cases.json` mediante el objeto Pydantic `ClinicalCaseSchema`:
 
 ```json
 {
-  "id": "case_ehirn_01",
-  "guia_asociada": "gpc_ehirn2019",
-  "titulo": "Recién Nacido con Sangrado Umbilical por Deficiencia de Vitamina K (EHIRN)",
-  "enunciado": "Recién nacido masculino de 3 días de vida, nacido de parto fortuito en domicilio sin control prenatal previo. La madre acude a emergencias pediátricas por presentar sangrado continuo en napa a nivel del muñón umbilical desde hace 6 horas, además de petequias aisladas y equimosis en sitios de venopunción. Examen físico: activo, pálido; PA 60/35 mmHg, FC 145 bpm, FR 42 rpm. Exámenes de laboratorio: TP y TTPa marcadamente prolongados, Fibrinógeno normal, Plaquetas 230,000/mm³.",
-  "pregunta": "Establezca la sospecha diagnóstica según la GPC del MSP Ecuador (EHIRN / Enfermedad Hemorrágica por Deficiencia de Vitamina K), clasifique el cuadro clínico según el tiempo de presentación (temprana, clásica o tardía) e indique el esquema de tratamiento inmediato y dosis de Vitamina K requerida.",
-  "nivel_esperado": "pregrado_avanzado"
+  "id": "case_dengue_01",
+  "guia_asociada": "dengue",
+  "titulo": "Paciente febril con signos de alarma por Dengue",
+  "enunciado": "Paciente femenino de 24 años acude por cuadro febril de 4 días de evolución...",
+  "pregunta": "Clasifique la severidad del caso según la GPC del MSP Ecuador y describa la conducta terapéutica inmediata.",
+  "nivel_esperado": "pregrado_avanzado",
+  "imagen_url": "/static/images/dengue_hemograma.png",
+  "fragmento_gpc_ideal_id": "dengue_chunk_004"
 }
 ```
 
-### Campos requeridos y especificaciones
-- `id`: Identificador unico en formato string (ejemplo: `case_ehirn_01`).
-- `guia_asociada`: Nombre base del archivo PDF o codigo que identifica la guia en ChromaDB (ejemplo: `gpc_ehirn2019`).
-- `titulo`: Titulo descriptivo del caso clinico.
-- `enunciado`: Descripcion completa de la historia clinica, anamnesis, examen fisico y laboratorio.
-- `pregunta`: Pregunta clinica de evaluacion dirigida al estudiante.
-- `nivel_esperado`: Nivel de dificultad (`pregrado_intermedio`, `pregrado_avanzado`).
-- `imagen_url` *(opcional)*: Ruta estatica si incluye recurso grafico (`/static/images/nombre_imagen.png`).
-- `fragmento_gpc_ideal_id` *(opcional)*: ID del fragmento de referencia principal.
+### Especificación de Campos
+* `id` *(string, obligatorio)*: Identificador único del caso.
+* `guia_asociada` *(string, obligatorio)*: Código identificador de la guía clínica en ChromaDB (`guia_fuente`).
+* `titulo` *(string, obligatorio)*: Nombre descriptivo del caso.
+* `enunciado` *(string, obligatorio)*: Descripción de la historia clínica, signos vitales y datos de laboratorio.
+* `pregunta` *(string, obligatorio)*: Pregunta evaluativa dirigida al usuario.
+* `nivel_esperado` *(string, opcional)*: Nivel académico (`pregrado_intermedio`, `pregrado_avanzado`). Default: `pregrado_avanzado`.
+* `imagen_url` *(string, opcional)*: Ruta relativa para servir archivos estáticos (`/static/images/nombre.png`).
+* `fragmento_gpc_ideal_id` *(string, opcional)*: Identificador de referencia para pruebas de benchmark.
 
 ---
 
-## 4. Administracion de Imagenes de Soporte Diagnostico
+## 3. Especificación de la API REST
 
-Si el caso incluye imagenes (ej. electrocardiogramas, radiografias, hemogramas):
+### 3.1 Autenticación (`/auth`)
+* `POST /auth/login`: Autentica usuarios preconfigurados (`admin@ateneo.edu.ec`, `docente@ateneo.edu.ec`, `alumno@ateneo.edu.ec`) y genera un token JWT de sesión.
+* `GET /auth/me`: Retorna los datos del usuario autenticado actual.
+* `GET /auth/users`: Retorna el catálogo de usuarios (Requiere rol `administrador`).
 
-1. Copiar el archivo de imagen (`.png`, `.jpg`, `.jpeg`) en el directorio `backend/cases_data/images/`.
-2. Asignar el valor `/static/images/<nombre_imagen>.<ext>` al campo `imagen_url` en el objeto del caso dentro de `cases.json`.
+### 3.2 Casos Clínicos (`/api/cases`)
+* `GET /api/cases`: Retorna la lista completa de casos clínicos activos.
+* `GET /api/cases/{case_id}`: Retorna los detalles de un caso clínico específico.
+
+### 3.3 Evaluación RAG (`/api/evaluate`)
+* `POST /api/evaluate`: Recibe `case_id` (Form), `respuesta_estudiante` (Form) y opcionalmente `imagen` (UploadFile).
+  1. Recupera el chunk relevante desde ChromaDB (`retrieve_relevant_chunk`).
+  2. Procesa la respuesta e imagen clínica en Gemini API (`evaluate_clinical_reasoning`).
+  3. Almacena automáticamente el resultado en `evaluation_history` de SQLite.
+  4. Retorna el objeto estructurado `EvaluationResult`.
+
+### 3.4 Historial y Analítica (`/api/history`)
+* `GET /api/history`: Retorna el historial cronológico de evaluaciones de un estudiante.
+* `GET /api/history/trends`: Genera las métricas de tendencias individuales, radar de competencias por eje y patrones de omisión frecuentes.
+* `GET /api/history/coordinator-analytics`: Genera el reporte institucional B2B para coordinadores académicas (porcentaje de falla colectiva por módulo GPC).
+
+### 3.5 Ateneo de Sala Colaborativo (`/api/ateneo`)
+* `POST /api/ateneo/create`: Docente crea una sala sincrónica (Genera `room_code` único de 6 caracteres).
+* `POST /api/ateneo/join`: Estudiante o docente se une a una sala existente.
+* `GET /api/ateneo/room/{room_code}`: Retorna el estado en tiempo real de la sala y la analítica de consenso.
+* `POST /api/ateneo/room/{room_code}/status`: Cambia la fase de la sala (`espera` $\rightarrow$ `resolucion` $\rightarrow$ `discusion` $\rightarrow$ `finalizado`).
+* `POST /api/ateneo/room/{room_code}/submit`: Envía la respuesta de un estudiante en la sala, ejecuta la evaluación RAG y actualiza la analítica de consenso.
 
 ---
 
-## 5. Requisitos de Virtualización y Configuración de Docker para Fine-Tuning
+## 4. Esquema de Base de Datos SQLite3 (`history.db`)
 
-### 5.1 Requisitos en Windows (WSL2)
-Para ejecutar el entorno en un equipo Windows de forma 100% aislada (sin instalar Python ni dependencias en la máquina anfitrión):
-1. **Virtualización en Firmware:** Asegurar que la virtualización Intel VT-x / AMD-V esté habilitada en el BIOS.
-2. **Plataforma de Máquina Virtual:** Habilitar la característica opcional de Windows ejecutando en PowerShell como Administrador:
-   ```powershell
-   wsl --install --no-distribution
-   ```
-3. **Docker Desktop:** Iniciar Docker Desktop asegurando el uso del motor WSL2 Backend.
-
-### 5.2 Configuración de Recursos y GPU en `docker-compose.yml`
-Para permitir el uso de la GPU NVIDIA del anfitrión (con compatibilidad CUDA 12.x) y evitar errores de falta de memoria (OOM Killer):
-
-```yaml
-services:
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    deploy:
-      resources:
-        limits:
-          memory: 14G      # Límite de memoria suficiente para Fine-Tuning sin colapso
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]   # Passthrough directo de la GPU NVIDIA al contenedor
+### 4.1 Tabla `evaluation_history`
+```sql
+CREATE TABLE IF NOT EXISTS evaluation_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,
+    user_email TEXT NOT NULL,
+    case_id TEXT NOT NULL,
+    guia_asociada TEXT NOT NULL,
+    case_title TEXT NOT NULL,
+    score REAL NOT NULL,
+    score_max INTEGER NOT NULL DEFAULT 10,
+    aciertos_json TEXT NOT NULL,
+    omisiones_json TEXT NOT NULL,
+    competencias_json TEXT NOT NULL,
+    cita_normativa_json TEXT NOT NULL,
+    retroalimentacion_general TEXT NOT NULL,
+    timestamp TEXT NOT NULL
+);
 ```
 
-### 5.4 Fine-Tuning Acelerado en la Nube (Google Colab / Kaggle)
-Si se prefiere no recargar la máquina local, el Fine-Tuning puede ejecutarse en la nube en **menos de 5 minutos** usando una GPU T4/V100/A100 gratuita en Google Colab:
-
-1. Subir el cuaderno [colab_fine_tuning.ipynb](file:///c:/Users/HUNTER-PC/Downloads/clinical_rag/backend/ingestion/colab_fine_tuning.ipynb) a [Google Colab](https://colab.research.google.com/).
-2. Seleccionar el tipo de entorno de ejecución en Colab: **GPU T4**.
-3. Subir el archivo de datos generado `backend/data/ft_dataset.json` (2.4 MB).
-4. Ejecutar todas las celdas del cuaderno.
-5. Descargar el archivo comprimido resultante `ateneo-bge-m3-ecuador.zip` y descomprimirlo en `backend/data/ateneo-bge-m3-ecuador/`.
+### 4.2 Tabla `ateneo_rooms`
+```sql
+CREATE TABLE IF NOT EXISTS ateneo_rooms (
+    room_code TEXT PRIMARY KEY,
+    case_id TEXT NOT NULL,
+    docente_id TEXT NOT NULL,
+    docente_nombre TEXT NOT NULL,
+    estado TEXT NOT NULL,
+    data_json TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+```
 
 ---
 
-## 6. Verificacion del Funcionamiento
+## 5. Algoritmo de Analítica de Consenso Colectivo
 
-Despues de realizar los pasos anteriores:
+El módulo `models/room_session.py` calcula la analítica de grupo para las salas colaborativas:
 
-1. Verificar la disponibilidad de los casos haciendo una peticion HTTP GET:
-```bash
-curl http://localhost:8000/api/cases
+```python
+def calculate_room_analytics(room: Dict[str, Any]) -> Dict[str, Any]:
+    participantes = list((room.get("participantes") or {}).values())
+    respondidos = [p for p in participantes if p.get("respondido") and p.get("resultado_evaluacion")]
+
+    if not respondidos:
+        return {
+            "promedio_sala": 0.0,
+            "total_respondidos": 0,
+            "nivel_consenso": "Sin entregas aún",
+            "top_brechas_sala": []
+        }
+
+    scores = [p["resultado_evaluacion"].get("score", 0) for p in respondidos]
+    promedio = round(sum(scores) / len(scores), 1)
+
+    nivel_consenso = (
+        "Alto Consenso Alineado a la GPC" if promedio >= 8.0 
+        else ("Consenso Medio en Evaluación" if promedio >= 6.5 
+        else "Brecha Colectiva Crítica Detectada")
+    )
+    return {
+        "promedio_sala": promedio,
+        "total_respondidos": len(respondidos),
+        "total_conectados": len(participantes),
+        "nivel_consenso": nivel_consenso,
+        "top_brechas_sala": top_brechas
+    }
 ```
-2. Realizar la prueba de evaluacion enviando la respuesta del estudiante a `/api/evaluate`.
-
