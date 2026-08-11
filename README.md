@@ -1,183 +1,215 @@
-# Ateneo: Plataforma de Evaluación del Razonamiento Clínico mediante RAG y GPC del MSP Ecuador
+# Ateneo: Plataforma de Evaluación del Razonamiento Clínico mediante RAG y Guías de Práctica Clínica del MSP Ecuador
 
-**Ateneo** es una plataforma de software diseñada para la evaluación formativa y cuantitativa del razonamiento clínico (diagnóstico, terapéutico, preventivo y de seguimiento) en estudiantes de ciencias de la salud. El sistema contrasta de forma automatizada las respuestas en lenguaje natural contra el cuerpo normativo de las Guías de Práctica Clínica (GPC) del Ministerio de Salud Pública (MSP) del Ecuador, utilizando una arquitectura de Recuperación Aumentada por Generación (RAG) en dos etapas y un modelo recuperador supervisado mediante Fine-Tuning.
+**Ateneo** es un sistema de software de nivel de producción diseñado para la evaluación formativa y cuantitativa del razonamiento clínico (diagnóstico, terapéutico, preventivo y de seguimiento) en estudiantes de ciencias de la salud. La plataforma contrasta de forma automatizada las respuestas en lenguaje natural expresadas libremente por los usuarios contra el cuerpo normativo de las Guías de Práctica Clínica (GPC) del Ministerio de Salud Pública (MSP) del Ecuador.
+
+El sistema integra una arquitectura de Recuperación Aumentada por Generación (RAG) en dos etapas, utilizando un modelo recuperador denso supervisado mediante Fine-Tuning por Tripletas (*Multiple Negatives Ranking Loss*) y un Modelo de Lenguaje de Gran Escala (LLM) multimodal forzado a producir respuestas estructuradas en sintaxis JSON estricta mediante validación Pydantic.
 
 ---
 
-## 1. Especificaciones Técnicas del Sistema
+## 1. Especificaciones Técnicas y Stack Tecnológico
 
 | Componente | Tecnología / Librería | Versión | Función en el Sistema |
 | :--- | :--- | :--- | :--- |
-| **Backend Core** | FastAPI / Python | `0.115.6` / `3.11` | API REST, enrutamiento, controladores y middlewares. |
-| **Validación de Datos** | Pydantic | `2.10.4` | Esquemas de entrada/salida, tipado estricto y normalizadores. |
-| **Base Vectorial** | ChromaDB | `0.6.3` | Almacenamiento persistente de vectores densos con distancia coseno. |
-| **Embeddings Base** | `BAAI/bge-m3` | `SentenceTransformers 3.3.1` | Encoder denso de 1024 dimensiones y 8,192 tokens de contexto. |
-| **Modelo Fine-Tuned** | `ateneo-bge-m3-ecuador` | Local / Custom | Modelo ajustado con 480 tripletas clínicas del MSP Ecuador. |
-| **Evaluador LLM** | Google Gemini API | `google-genai 0.1.0+` | Invocación multimodal (`gemini-3.5-flash` / `gemini-2.5-flash`). |
-| **Persistencia SQL** | SQLite3 | Native | Historial de evaluaciones, analítica B2B y salas colaborativas. |
-| **Seguridad / Auth** | PyJWT / Passlib | `2.13.0` / `1.7.4` | Autenticación JWT (HS256) y hashing PBKDF2/bcrypt. |
-| **Frontend UI** | React / Vite | `18.3.1` / `6.0.5` | SPA/PWA con enrutamiento de React Router v6. |
-| **Estilos & Iconos** | Tailwind CSS / Lucide | `3.4.17` / `0.469.0` | Sistema de diseño minimalista e iconografía vectorial plana. |
+| **Backend Core** | FastAPI / Python | `0.115.6` / `3.11` | API REST asíncrona, enrutamiento, controladores de endpoint y middlewares de seguridad. |
+| **Validación de Datos** | Pydantic | `2.10.4` | Definición de esquemas de datos de entrada/salida, tipado estricto y normalizadores defensivos. |
+| **Base Vectorial** | ChromaDB | `0.6.3` | Almacenamiento persistente de vectores densos con búsqueda por similitud de distancia coseno. |
+| **Embeddings Base** | `BAAI/bge-m3` | `SentenceTransformers 3.3.1` | Encoder denso bidireccional de 1,024 dimensiones con ventana contextual de 8,192 tokens. |
+| **Modelo Fine-Tuned** | `ateneo-bge-m3-ecuador` | Local / Custom | Modelo ajustado mediante pérdida MNRL sobre 480 tripletas clínicas de GPCs del MSP Ecuador. |
+| **Evaluador LLM** | Google Gemini API | `google-genai 0.1.0+` | Invocación multimodal autorregresiva (`gemini-3.5-flash` / `gemini-2.5-flash`) con `response_mime_type="application/json"`. |
+| **Persistencia Relacional** | SQLite3 | Native | Almacenamiento transaccional de historial de evaluaciones, analítica B2B y salas de Ateneo sincrónicas. |
+| **Seguridad & Auth** | PyJWT / Passlib | `2.13.0` / `1.7.4` | Autenticación basada en JWT (algoritmo HS256) y hashing de contraseñas mediante PBKDF2/bcrypt. |
+| **Frontend UI** | React / Vite | `18.3.1` / `6.0.5` | Single Page Application (SPA) y Progressive Web App (PWA) con React Router DOM v6. |
+| **Estilos & Iconos** | Tailwind CSS / Lucide | `3.4.17` / `0.469.0` | Sistema de diseño de alta precisión con paleta de colores fríos e iconografía vectorial plana. |
+| **Visualización Gráfica** | Recharts | `2.15.0` | Gráficos de radar de competencias, tendencias temporales y distribución analítica de cohortes. |
 
 ---
 
-## 2. Estructura de Directorios del Proyecto
+## 2. Estructura Completa del Repositorio
 
 ```text
 clinical_rag/
 ├── backend/
-│   ├── auth/              # Autenticación JWT, verificación de hash y roles RBAC (security.py)
-│   ├── cases_data/        # Definición de casos clínicos (cases.json) e imágenes estáticas (images/)
-│   ├── data/              # Base de datos SQLite (history.db), ChromaDB y pesos del modelo ajustado
-│   ├── ingestion/         # Extracción PDF, chunker, creación de dataset y scripts de fine-tuning
-│   ├── models/            # Esquemas Pydantic (schemas.py), modelos de casos, historial y salas
-│   ├── rag/               # Motor recuperador (retriever.py), constructor de prompts y evaluador LLM
-│   ├── routers/           # Controladores API REST (auth, cases, evaluation, history, collaboration)
-│   ├── tests/             # Suite de métricas automatizadas (run_metrics.py y test_cases_fixture.json)
-│   ├── config.py          # Configuración de variables de entorno y resolución de modelos
-│   ├── main.py            # Inicialización de FastAPI, CORS, rutas estáticas y eventos de startup
-│   └── requirements.txt   # Dependencias de Python fijadas
-├── docs/                  # Documentación técnica y científica del proyecto
-│   ├── ARQUITECTURA_RAG_Y_FINE_TUNING.md
-│   ├── DESIGN_SYSTEM.md
-│   ├── GUIA_FINE_TUNING_COLAB_Y_METRICAS.md
-│   └── GUIA_INGESTA_Y_CASOS.md
-├── frontend/              # Aplicación cliente React + Vite (PWA)
+│   ├── auth/
+│   │   └── security.py          # Autenticación JWT (HS256), hashing PBKDF2/bcrypt y control RBAC
+│   ├── cases_data/
+│   │   ├── cases.json           # Banco de casos clínicos simulados y metadatos de nivel esperado
+│   │   └── images/              # Recursos gráficos estáticos (radiografías, hemogramas, ECG, etc.)
+│   ├── data/
+│   │   ├── ateneo-bge-m3-ecuador/ # Pesos compilados del modelo de embeddings ajustado (1024 dims)
+│   │   ├── chroma_db/           # Base de datos vectorial persistente ChromaDB (colección gpc_msp)
+│   │   ├── history.db           # Base relacional SQLite (evaluaciones guardadas y salas de Ateneo)
+│   │   ├── ft_dataset.json      # Dataset de entrenamiento con 480 tripletas clínicas (Query, Pos, Neg)
+│   │   └── raw_pdfs/            # Archivos PDF normativos oficiales de las GPC del MSP Ecuador
+│   ├── ingestion/
+│   │   ├── pdf_extractor.py     # Extracción de texto plano conservando número de página (pypdf)
+│   │   ├── chunker.py           # Segmentación contextual de máx. 1,000 caracteres sensible a secciones
+│   │   ├── vectorize.py         # Generación de embeddings e indexación vectorial en ChromaDB
+│   │   ├── run_ingestion.py     # Pipeline principal de ingesta masiva y chunks sembrados de respaldo
+│   │   ├── create_ft_dataset.py # Algoritmo de generación de tripletas supervisadas para Fine-Tuning
+│   │   ├── train_fine_tuning.py # Script de entrenamiento local mediante SentenceTransformers y MNRL
+│   │   └── colab_fine_tuning.ipynb # Notebook Jupyter para entrenamiento supervisado en GPU Cloud T4
+│   ├── models/
+│   │   ├── schemas.py           # Modelos Pydantic (EvaluationResult, CitaNormativa, UserRole, etc.)
+│   │   ├── clinical_case.py     # Gestor de lectura e instanciación de casos clínicos desde JSON
+│   │   ├── history_db.py        # DAO para persistencia relacional en SQLite y algoritmos de analítica
+│   │   └── room_session.py      # Gestor de salas sincrónicas colaborativas y analítica de consenso
+│   ├── rag/
+│   │   ├── retriever.py         # Motor de búsqueda vectorial denso con filtrado por guía y fallback
+│   │   ├── prompt_builder.py    # Constructor de prompts estructurados y directivas multimodales
+│   │   └── evaluator.py         # Cliente Gemini API, fallback defensivo y algoritmo de reparación de JSON
+│   ├── routers/
+│   │   ├── auth.py              # Endpoints de inicio de sesión, verificación de token y catálogo de usuarios
+│   │   ├── cases.py             # Endpoints de consulta de casos clínicos activos
+│   │   ├── evaluation.py        # Endpoint de evaluación RAG (soporta texto e imágenes multipart/form-data)
+│   │   ├── history.py           # Endpoints de historial del estudiante y analítica de cohorte B2B
+│   │   └── collaboration.py     # Endpoints de gestión y participación en salas de Ateneo sincrónicas
+│   ├── tests/
+│   │   ├── test_cases_fixture.json # Banco de 15 casos de prueba anotados con fragmento ideal
+│   │   ├── run_metrics.py       # Runner de benchmark automatizado (Hit@1, validez JSON, latencia)
+│   │   └── resultados_metricas.json # Reporte cuantitativo de salida del benchmark
+│   ├── config.py                # Variables de entorno y resolución dinámica del modelo local
+│   ├── main.py                  # Inicialización FastAPI, middleware CORS y precalentamiento asíncrono
+│   ├── requirements.txt         # Lista estricta de dependencias Python
+│   └── Dockerfile               # Configuración de contenedor Python 3.11-slim con PyTorch
+├── docs/                        # Documentación técnica y académica detallada
+│   ├── ARQUITECTURA_RAG_Y_FINE_TUNING.md # Especificación del RAG en 2 etapas, Transformer y MNRL
+│   ├── DESIGN_SYSTEM.md         # Tokens de diseño visual, arquitectura UI/UX y configuración PWA
+│   ├── GUIA_FINE_TUNING_COLAB_Y_METRICAS.md # Guía de entrenamiento en GPU T4 y benchmark empírico
+│   ├── GUIA_INGESTA_Y_CASOS.md  # Especificación de esquemas Pydantic, API REST y SQLite
+│   ├── METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md # Protocolo de reproducibilidad y métricas
+│   ├── DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md # Análisis crítico, limitaciones y líneas de desarrollo
+│   └── PUBLICACION_Y_PRESENTACION_CONGRESO.md # Síntesis de hallazgos y guion de presentación ejecutiva
+├── frontend/                    # Aplicación cliente React + Vite (SPA/PWA)
+│   ├── public/                  # Favicon y assets estáticos de la PWA
 │   ├── src/
-│   │   ├── api/           # Cliente HTTP Axios/Fetch (client.js)
-│   │   ├── components/    # Componentes reutilizables de feedback, gráficas y loaders
-│   │   ├── context/       # Estado global de autenticación (AuthContext.jsx)
-│   │   ├── pages/         # Vistas de la aplicación (Login, CaseList, CaseSolve, AteneoRoom, etc.)
-│   │   ├── App.jsx        # Enrutador principal y barra de navegación
-│   │   └── main.jsx       # Punto de entrada de React DOM
-│   └── vite.config.js     # Configuración de Vite, Proxy API y plugin PWA
-├── docker-compose.yml     # Orquestación de contenedores Docker con passthrough de GPU NVIDIA
-└── README.md
+│   │   ├── api/client.js        # Cliente Axios configurado con interceptor de Tokens Bearer JWT
+│   │   ├── components/          # Componentes visuales (FeedbackCard, SkillRadarChart, Analytics)
+│   │   ├── context/AuthContext.jsx # Proveedor global del estado de autenticación y sesión
+│   │   ├── pages/               # Vistas principales (Login, CaseList, CaseSolve, AteneoRoom, Dashboards)
+│   │   ├── App.jsx              # Router principal con rutas protegidas por RBAC
+│   │   ├── main.jsx             # Punto de entrada de React 18 DOM
+│   │   └── index.css            # Configuración de Tailwind CSS y fuentes tipográficas
+│   ├── vite.config.js           # Configuración de Vite, proxy de desarrollo y plugin PWA
+│   ├── package.json             # Dependencias de JavaScript (React, Tailwind, Recharts, Lucide)
+│   └── Dockerfile               # Configuración de contenedor Nginx de producción para la SPA
+├── docker-compose.yml           # Orquestación multicontenedor (Backend + Frontend) con soporte GPU
+└── README.md                    # Documentación principal de entrada del proyecto
 ```
 
 ---
 
 ## 3. Instalación y Puesta en Marcha Local
 
-### Prerrequisitos
-- Python 3.11 o superior.
-- Node.js 18.x o superior con npm.
-- Clave de API activa de Google Gemini (`GEMINI_API_KEY`).
-
-### 3.1 Configuración del Entorno Backend
-1. Clonar el repositorio y navegar a la carpeta del backend:
-   ```bash
-   cd backend
-   ```
-2. Crear y activar un entorno virtual de Python:
-   ```bash
-   python -m venv venv
-   # En Windows:
-   .\venv\Scripts\activate
-   # En Linux/macOS:
-   source venv/bin/activate
-   ```
-3. Instalar dependencias:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Configurar el archivo de entorno `.env` en `backend/.env`:
-   ```env
-   GEMINI_API_KEY=tu_clave_api_gemini_aqui
-   GEMINI_MODEL=gemini-2.5-flash
-   CHROMA_PERSIST_PATH=./data/chroma_db
-   RAW_PDFS_PATH=./data/raw_pdfs
-   CASES_FILE_PATH=./cases_data/cases.json
-   ```
-5. Iniciar el servidor backend:
-   ```bash
-   python main.py
-   ```
-   El backend iniciará en `http://localhost:8000` (documentación Swagger disponible en `http://localhost:8000/docs`).
-
-### 3.2 Configuración del Entorno Frontend
-1. En una nueva terminal, navegar al directorio `frontend`:
-   ```bash
-   cd frontend
-   ```
-2. Instalar dependencias de Node:
-   ```bash
-   npm install
-   ```
-3. Iniciar el servidor de desarrollo:
-   ```bash
-   npm run dev
-   ```
-   El frontend estará disponible en `http://localhost:5173`.
+### Prerrequisitos del Sistema
+* **Python**: Versión `3.11.x` o superior.
+* **Node.js**: Versión `18.x` o superior con `npm`.
+* **API Key**: Clave activa de Google Gemini API (`GEMINI_API_KEY`).
 
 ---
 
-## 4. Pipeline de Datos y Fine-Tuning
+### 3.1 Configuración e Inicio del Backend (FastAPI)
 
-### 4.1 Ingesta Vectorial
-Para procesar nuevos documentos PDF de las GPC:
-1. Colocar los archivos PDF en `backend/data/raw_pdfs/`.
-2. Ejecutar la pipeline de ingesta:
+1. Posicionarse en el directorio `backend`:
+   ```bash
+   cd backend
+   ```
+
+2. Crear y activar el entorno virtual de Python:
+   ```bash
+   # En Windows:
+   python -m venv venv
+   .\venv\Scripts\activate
+
+   # En Linux / macOS:
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+
+3. Instalar las dependencias fijadas en [requirements.txt](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/requirements.txt):
+   ```bash
+   pip install --upgrade pip
+   pip install -r requirements.txt
+   ```
+
+4. Crear el archivo de configuración `.env` en la ruta `backend/.env`:
+   ```env
+   GEMINI_API_KEY=tu_clave_api_gemini_aqui
+   GEMINI_MODEL=gemini-3.5-flash
+   CHROMA_PERSIST_PATH=./data/chroma_db
+   RAW_PDFS_PATH=./data/raw_pdfs
+   CASES_FILE_PATH=./cases_data/cases.json
+   JWT_SECRET_KEY=ateneo_clinical_rag_secret_key_2026_msp_ecuador
+   ACCESS_TOKEN_EXPIRE_MINUTES=120
+   ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173
+   ```
+
+5. Iniciar el servidor backend en modo desarrollo:
+   ```bash
+   python main.py
+   ```
+   * **Servidor HTTP**: `http://localhost:8000`
+   * **Documentación Interactiva OpenAPI (Swagger)**: `http://localhost:8000/docs`
+   * **Verificación de Estado (Healthcheck)**: `http://localhost:8000/health`
+
+---
+
+### 3.2 Configuración e Inicio del Frontend (React + Vite)
+
+1. Posicionarse en la carpeta `frontend`:
+   ```bash
+   cd frontend
+   ```
+
+2. Instalar los paquetes de Node.js:
+   ```bash
+   npm install
+   ```
+
+3. Ejecutar el servidor de desarrollo Vite:
+   ```bash
+   npm run dev
+   ```
+   * **Aplicación Web Cliente**: `http://localhost:5173`
+
+---
+
+## 4. Pipeline de Ingesta Vectorial y Fine-Tuning
+
+### 4.1 Indexación de Guías de Práctica Clínica (PDFs)
+Para incorporar nuevos documentos en formato PDF emitidos por el MSP Ecuador:
+1. Colocar los archivos PDF dentro del directorio [backend/data/raw_pdfs/](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/raw_pdfs).
+2. Ejecutar la pipeline de extracción, chunking e indexación vectorial:
    ```bash
    cd backend
    python ingestion/run_ingestion.py
    ```
 
-### 4.2 Generación de Dataset y Fine-Tuning
-1. Generar el dataset de 480 tripletas clínicas:
+### 4.2 Recreación del Dataset y Ajuste Supervisado
+1. Generar el dataset supervisado de 480 tripletas clínicas mediante [create_ft_dataset.py](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/ingestion/create_ft_dataset.py):
    ```bash
    python ingestion/create_ft_dataset.py
    ```
-2. Cargar el notebook `backend/ingestion/colab_fine_tuning.ipynb` y el archivo `backend/data/ft_dataset.json` en Google Colab con aceleradora GPU T4 (`batch_size=2`, `max_seq_length=512`, `epochs=3`).
-3. Descargar el archivo resultante `ateneo-bge-m3-ecuador.zip` y extraerlo en `backend/data/ateneo-bge-m3-ecuador/`.
+2. Cargar el notebook [colab_fine_tuning.ipynb](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/ingestion/colab_fine_tuning.ipynb) junto con el archivo [ft_dataset.json](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/ft_dataset.json) en **Google Colab** configurado con aceleradora **NVIDIA GPU T4** (15.3 GB VRAM).
+3. Tras completarse las 3 épocas (720 iteraciones), descargar el archivo resultante `ateneo-bge-m3-ecuador.zip` y descomprimirlo en:
+   `backend/data/ateneo-bge-m3-ecuador/`
+
+> ℹ️ **Resolución Automática del Modelo:** El archivo [config.py](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/config.py#L16-L20) detecta si la carpeta `backend/data/ateneo-bge-m3-ecuador/` contiene los pesos compilados (`config.json`, `model.safetensors`). De existir, los carga automáticamente; en su ausencia, conmuta hacia el modelo base multilingüe `BAAI/bge-m3`.
 
 ---
 
-## 5. Despliegue en Cualquier Otra Computadora (Paso a Paso)
+## 5. Despliegue Mediante Docker y Docker Compose
 
-Para desplegar y correr **Ateneo** en una computadora nueva (con o sin GPU NVIDIA), sigue este procedimiento:
-
-### Paso 5.1: Preparar la Carpeta del Modelo Fine-Tuned
-1. Asegúrate de tener los pesos del modelo ajustado extraídos en:
-   `backend/data/ateneo-bge-m3-ecuador/`
-2. Debe contener el archivo `config.json`, `model.safetensors`, `tokenizer.json`, etc.
-> ℹ️ **Resolución Automática:** Si la carpeta `ateneo-bge-m3-ecuador` existe, el backend utilizará tu modelo ajustado automáticamente. Si no existe, el sistema conmutará defensivamente al modelo base `BAAI/bge-m3` de HuggingFace.
-
-### Paso 5.2: Colocar las Guías de Práctica Clínica (PDFs)
-Coloca los archivos PDF normativos del MSP Ecuador en:
-`backend/data/raw_pdfs/`
-
-### Paso 5.3: Configurar Variables de Entorno
-Crea o edita el archivo `backend/.env` con tu clave de API de Gemini:
-```env
-GEMINI_API_KEY=tu_clave_api_gemini_aqui
-GEMINI_MODEL=gemini-3.5-flash
-CHROMA_PERSIST_PATH=./data/chroma_db
-RAW_PDFS_PATH=./data/raw_pdfs
-CASES_FILE_PATH=./cases_data/cases.json
-```
-
-### Paso 5.4: Indexación Vectorial Inicial
-Ejecuta la ingesta para poblar la base vectorial ChromaDB con las representaciones del modelo ajustado:
+### 5.1 Despliegue Estándar en CPU
+Para construir y levantar la infraestructura completa en contenedores aislados de Docker:
 ```bash
-# En Windows (usando el lanzador py):
-py backend/ingestion/run_ingestion.py
-
-# En Linux / macOS:
-python3 backend/ingestion/run_ingestion.py
+docker compose up --build -d
 ```
 
-### Paso 5.5: Despliegue con Docker Compose
-
-#### A) En equipos con CPU (Por defecto)
-Simplemente ejecuta desde la raíz del proyecto:
-```bash
-docker compose up --build
-```
-
-#### B) En equipos con GPU NVIDIA y `nvidia-container-toolkit`
-Si la nueva PC cuenta con tarjeta gráfica NVIDIA y soporte de GPU en Docker, puedes activar el passthrough de GPU agregando el bloque `reservations` bajo `deploy.resources` en [docker-compose.yml](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docker-compose.yml):
+### 5.2 Despliegue con Aceleración Hardware por GPU NVIDIA
+Si el servidor de despliegue posee tarjeta gráfica NVIDIA y la herramienta `nvidia-container-toolkit` instalada, el servicio backend aprovechará la GPU habilitando la sección `reservations` en [docker-compose.yml](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docker-compose.yml):
 ```yaml
+services:
+  backend:
     deploy:
       resources:
         limits:
@@ -189,24 +221,19 @@ Si la nueva PC cuenta con tarjeta gráfica NVIDIA y soporte de GPU en Docker, pu
               capabilities: [gpu]
 ```
 
-### Paso 5.6: Acceso a la Plataforma
-* **Aplicación Web (PWA):** `http://localhost:5173`
-* **Swagger API Docs:** `http://localhost:8000/docs`
-* **Healthcheck:** `http://localhost:8000/health`
-
-### Paso 5.7: Ingesta Nativa en Docker (Recomendación de Producción)
-Para evitar incompatibilidades de esquemas entre el sistema operativo host (Windows/macOS) y los contenedores Linux en `ChromaDB` (errores de deserialización `KeyError: '_type'`), se recomienda ejecutar la ingesta nativa directamente dentro de la imagen de Docker:
+### 5.3 Ingesta Nativa Contenerizada (Recomendación de Producción)
+Para prevenir errores de deserialización en ChromaDB causados por incompatibilidades entre esquemas de SQLite del Host (Windows/macOS) y Linux:
 ```bash
-# 1. Detener servicios activos
+# 1. Detener el contenedor del backend
 docker compose stop backend
 
-# 2. Eliminar carpeta vectorial previa
+# 2. Remover la base vectorial previa
 rm -rf backend/data/chroma_db
 
-# 3. Ejecutar ingesta nativa limpia en contenedor aislado
+# 3. Ejecutar la ingesta dentro del contenedor Linux
 docker compose run --rm backend python ingestion/run_ingestion.py
 
-# 4. Iniciar la aplicación
+# 4. Reiniciar los servicios
 docker compose up -d
 ```
 
@@ -214,18 +241,30 @@ docker compose up -d
 
 ## 6. Validación de Métricas Benchmark
 
-Para ejecutar el banco de pruebas automatizado de latencia, precisión de retrieval y salida JSON:
+Para ejecutar el banco de pruebas cuantitativo que valida el rendimiento del sistema sobre los 15 casos de prueba y 557 fragmentos vectoriales mediante [run_metrics.py](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/tests/run_metrics.py):
 ```bash
-py backend/tests/run_metrics.py
+cd backend
+python tests/run_metrics.py
 ```
-El informe detallado de rendimiento se guardará en `backend/tests/resultados_metricas.json`.
+
+### Resumen de Métricas Obtenidas ([resultados_metricas.json](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/tests/resultados_metricas.json))
+* **Total de Casos de Prueba**: `15`
+* **Chunks Vectorizados en ChromaDB**: `557` (Proyección densa de 1,024 dimensiones)
+* **Precisión de Recuperación (Hit@1)**: **`100.0%`** (15/15 coincidencias exactas con el fragmento ideal)
+* **Tasa de Validez de Salida JSON**: **`100.0%`** (15/15 estructuras convalidadas por Pydantic)
+* **Latencia Promedio por Consulta**: **`12.29 s`** (Tiempo transcurrido total)
+* **Latencia Mediana por Consulta**: **`7.73 s`** (Percentil 50 de procesamiento en CPU)
 
 ---
 
-## 7. Documentación Adicional
+## 7. Documentación Técnica Específica
 
-La especificación completa del sistema se encuentra dividida en los siguientes documentos técnicos en la carpeta `docs/`:
-- [ARQUITECTURA_RAG_Y_FINE_TUNING.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/ARQUITECTURA_RAG_Y_FINE_TUNING.md): Explicación detallada de la arquitectura RAG, función de pérdida MNRL y parser JSON.
-- [GUIA_INGESTA_Y_CASOS.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/GUIA_INGESTA_Y_CASOS.md): Especificación de esquemas de datos, API REST, SQLite e imágenes multimodales.
-- [GUIA_FINE_TUNING_COLAB_Y_METRICAS.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/GUIA_FINE_TUNING_COLAB_Y_METRICAS.md): Guía de entrenamiento en GPU cloud, memoria VRAM y resultados del benchmark.
-- [DESIGN_SYSTEM.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/DESIGN_SYSTEM.md): Tokens del sistema de diseño, componentes UI/UX y configuración PWA.
+Para revisar los detalles metodológicos profundos y la especificación completa del sistema, consultar los siguientes archivos en la carpeta `docs/`:
+
+* [ARQUITECTURA_RAG_Y_FINE_TUNING.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/ARQUITECTURA_RAG_Y_FINE_TUNING.md): Especificación matemática del RAG, Transformer bidireccional, pérdida MNRL y parser heurístico.
+* [GUIA_INGESTA_Y_CASOS.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/GUIA_INGESTA_Y_CASOS.md): Esquemas de datos Pydantic, endpoints OpenAPI REST, SQLite3 y algoritmo de analítica.
+* [GUIA_FINE_TUNING_COLAB_Y_METRICAS.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/GUIA_FINE_TUNING_COLAB_Y_METRICAS.md): Guía de hiperparámetros, optimización de VRAM y suite de pruebas del benchmark.
+* [DESIGN_SYSTEM.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/DESIGN_SYSTEM.md): Tokens del sistema de diseño visual, componentes UI React, Recharts y configuración PWA.
+* [METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md): Protocolo formal de reproducibilidad, desglose por patologías y parametrización determinista.
+* [DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md): Análisis crítico de resultados, discusión contra evaluadores zero-shot, limitaciones y trabajo futuro.
+* [PUBLICACION_Y_PRESENTACION_CONGRESO.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/PUBLICACION_Y_PRESENTACION_CONGRESO.md): Síntesis de hallazgos técnicos y guion de presentación ejecutiva.
