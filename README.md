@@ -133,18 +133,96 @@ Para procesar nuevos documentos PDF de las GPC:
 
 ---
 
-## 5. Validación de Métricas Benchmark
+## 5. Despliegue en Cualquier Otra Computadora (Paso a Paso)
 
-Para ejecutar el banco de pruebas automatizado:
+Para desplegar y correr **Ateneo** en una computadora nueva (con o sin GPU NVIDIA), sigue este procedimiento:
+
+### Paso 5.1: Preparar la Carpeta del Modelo Fine-Tuned
+1. Asegúrate de tener los pesos del modelo ajustado extraídos en:
+   `backend/data/ateneo-bge-m3-ecuador/`
+2. Debe contener el archivo `config.json`, `model.safetensors`, `tokenizer.json`, etc.
+> ℹ️ **Resolución Automática:** Si la carpeta `ateneo-bge-m3-ecuador` existe, el backend utilizará tu modelo ajustado automáticamente. Si no existe, el sistema conmutará defensivamente al modelo base `BAAI/bge-m3` de HuggingFace.
+
+### Paso 5.2: Colocar las Guías de Práctica Clínica (PDFs)
+Coloca los archivos PDF normativos del MSP Ecuador en:
+`backend/data/raw_pdfs/`
+
+### Paso 5.3: Configurar Variables de Entorno
+Crea o edita el archivo `backend/.env` con tu clave de API de Gemini:
+```env
+GEMINI_API_KEY=tu_clave_api_gemini_aqui
+GEMINI_MODEL=gemini-3.5-flash
+CHROMA_PERSIST_PATH=./data/chroma_db
+RAW_PDFS_PATH=./data/raw_pdfs
+CASES_FILE_PATH=./cases_data/cases.json
+```
+
+### Paso 5.4: Indexación Vectorial Inicial
+Ejecuta la ingesta para poblar la base vectorial ChromaDB con las representaciones del modelo ajustado:
 ```bash
-cd backend
-python tests/run_metrics.py
+# En Windows (usando el lanzador py):
+py backend/ingestion/run_ingestion.py
+
+# En Linux / macOS:
+python3 backend/ingestion/run_ingestion.py
+```
+
+### Paso 5.5: Despliegue con Docker Compose
+
+#### A) En equipos con CPU (Por defecto)
+Simplemente ejecuta desde la raíz del proyecto:
+```bash
+docker compose up --build
+```
+
+#### B) En equipos con GPU NVIDIA y `nvidia-container-toolkit`
+Si la nueva PC cuenta con tarjeta gráfica NVIDIA y soporte de GPU en Docker, puedes activar el passthrough de GPU agregando el bloque `reservations` bajo `deploy.resources` en [docker-compose.yml](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docker-compose.yml):
+```yaml
+    deploy:
+      resources:
+        limits:
+          memory: 14G
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+```
+
+### Paso 5.6: Acceso a la Plataforma
+* **Aplicación Web (PWA):** `http://localhost:5173`
+* **Swagger API Docs:** `http://localhost:8000/docs`
+* **Healthcheck:** `http://localhost:8000/health`
+
+### Paso 5.7: Ingesta Nativa en Docker (Recomendación de Producción)
+Para evitar incompatibilidades de esquemas entre el sistema operativo host (Windows/macOS) y los contenedores Linux en `ChromaDB` (errores de deserialización `KeyError: '_type'`), se recomienda ejecutar la ingesta nativa directamente dentro de la imagen de Docker:
+```bash
+# 1. Detener servicios activos
+docker compose stop backend
+
+# 2. Eliminar carpeta vectorial previa
+rm -rf backend/data/chroma_db
+
+# 3. Ejecutar ingesta nativa limpia en contenedor aislado
+docker compose run --rm backend python ingestion/run_ingestion.py
+
+# 4. Iniciar la aplicación
+docker compose up -d
+```
+
+---
+
+## 6. Validación de Métricas Benchmark
+
+Para ejecutar el banco de pruebas automatizado de latencia, precisión de retrieval y salida JSON:
+```bash
+py backend/tests/run_metrics.py
 ```
 El informe detallado de rendimiento se guardará en `backend/tests/resultados_metricas.json`.
 
 ---
 
-## 6. Documentación Adicional
+## 7. Documentación Adicional
 
 La especificación completa del sistema se encuentra dividida en los siguientes documentos técnicos en la carpeta `docs/`:
 - [ARQUITECTURA_RAG_Y_FINE_TUNING.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/ARQUITECTURA_RAG_Y_FINE_TUNING.md): Explicación detallada de la arquitectura RAG, función de pérdida MNRL y parser JSON.

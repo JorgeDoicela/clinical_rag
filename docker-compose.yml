@@ -11,15 +11,15 @@ services:
       - ./backend:/app
     env_file:
       - ./backend/.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     deploy:
       resources:
         limits:
-          memory: 14G
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+          memory: 12G
     restart: unless-stopped
 
   frontend:
@@ -32,7 +32,8 @@ services:
       - ./frontend:/app
       - /app/node_modules
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     environment:
       - VITE_API_URL=http://localhost:8000
     restart: unless-stopped

@@ -31,12 +31,12 @@ def build_vector_db(chunks: List[Dict[str, Any]], persist_path: str = CHROMA_PER
     if not chunks:
         return collection
 
-    texts = [c["texto"] for c in chunks]
-    ids = [c["chunk_id"] for c in chunks]
+    texts = [str(c["texto"]) for c in chunks]
+    ids = [str(c["chunk_id"]) for c in chunks]
     metadatas = [{
-        "guia_fuente": c["guia_fuente"],
-        "pagina": c["pagina"],
-        "seccion": c["seccion"]
+        "guia_fuente": str(c.get("guia_fuente") or "MSP Ecuador"),
+        "pagina": int(c.get("pagina") or 1),
+        "seccion": str(c.get("seccion") or "General")
     } for c in chunks]
 
     embeddings = model.encode(texts, show_progress_bar=True).tolist()

@@ -1,7 +1,20 @@
-import chromadb
+import sys
 from typing import Dict, Any, Optional
+import chromadb
 from sentence_transformers import SentenceTransformer
+import sentence_transformers.models
 from config import CHROMA_PERSIST_PATH, EMBEDDING_MODEL_NAME
+
+# Compatibilidad defensiva para rutas de importación heredadas de sentence_transformers
+if "sentence_transformers.base" not in sys.modules:
+    import types
+    base_mod = types.ModuleType("sentence_transformers.base")
+    base_mod.modules = sentence_transformers.models
+    sys.modules["sentence_transformers.base"] = base_mod
+    sys.modules["sentence_transformers.base.modules"] = sentence_transformers.models
+    sys.modules["sentence_transformers.base.modules.transformer"] = sentence_transformers.models
+    sys.modules["sentence_transformers.sentence_transformer"] = sentence_transformers
+    sys.modules["sentence_transformers.sentence_transformer.modules"] = sentence_transformers.models
 
 _MODEL_CACHE = None
 _CHROMA_CLIENT = None
@@ -17,6 +30,8 @@ def get_embedding_model() -> SentenceTransformer:
 def get_chroma_client(persist_path: str = CHROMA_PERSIST_PATH) -> chromadb.PersistentClient:
     global _CHROMA_CLIENT
     if _CHROMA_CLIENT is None:
+        import os
+        os.makedirs(persist_path, exist_ok=True)
         _CHROMA_CLIENT = chromadb.PersistentClient(
             path=persist_path,
             settings=chromadb.config.Settings(anonymized_telemetry=False)
@@ -28,7 +43,7 @@ def retrieve_relevant_chunk(query: str, guia_filtro: Optional[str] = None, top_k
     Recupera el fragmento de Guía de Práctica Clínica más relevante desde ChromaDB.
     Aplica filtro por guia_fuente si se especifica.
     """
-    print(f"[RAG] Buscando en ChromaDB para guía '{guia_filtro}'...", flush=True)
+    print(f"[RAG] Búsqueda ejecutada usando el Modelo Fine-Tuned: '{EMBEDDING_MODEL_NAME}' | Filtro Guía: '{guia_filtro}'", flush=True)
     model = get_embedding_model()
     client = get_chroma_client()
 
@@ -51,20 +66,13 @@ def retrieve_relevant_chunk(query: str, guia_filtro: Optional[str] = None, top_k
         where=where_filter
     )
 
-    # Si no hay coincidencias con el filtro específico por guia_fuente, intentar re-ingestar para actualizar la DB
+    # Si no hay coincidencias con el filtro específico por guia_fuente, realizar búsqueda semántica general en la colección
     if not results or not results.get("ids") or not results["ids"][0]:
-        print(f"[RAG] Reejecutando ingesta de respaldo para cargar posibles nuevos fragmentos de '{guia_filtro}'...", flush=True)
-        try:
-            from ingestion.run_ingestion import run_ingestion_pipeline
-            run_ingestion_pipeline()
-            collection = client.get_collection("gpc_msp")
-            results = collection.query(
-                query_embeddings=query_embedding,
-                n_results=top_k,
-                where=where_filter
-            )
-        except Exception as err:
-            print(f"[RAG] Error en re-ingesta: {err}", flush=True)
+        print(f"[RAG] Reintento de búsqueda semántica general (sin filtro estricto para '{guia_filtro}')...", flush=True)
+        results = collection.query(
+            query_embeddings=query_embedding,
+            n_results=top_k
+        )
 
     # Si aún no hay coincidencias con el filtro específico, realizar búsqueda semántica general en la colección
     if not results or not results.get("ids") or not results["ids"][0]:

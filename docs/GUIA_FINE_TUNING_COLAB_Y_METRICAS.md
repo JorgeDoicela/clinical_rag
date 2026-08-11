@@ -39,12 +39,14 @@ Por esta razón, la fase de Fine-Tuning se adaptó para ejecutarse en **Google C
 
 ## 4. Resultados del Benchmark Automatizado (`run_metrics.py`)
 
-Los resultados registrados en [resultados_metricas.json](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/tests/resultados_metricas.json) tras la evaluación del banco de 15 casos de prueba muestran los siguientes valores:
+Los resultados registrados en [resultados_metricas.json](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/tests/resultados_metricas.json) tras la evaluación del banco de 15 casos de prueba sobre los **557 fragmentos vectorizados** de las 5 GPCs del MSP muestran los siguientes valores:
 
 | Métrica de Rendimiento | Resultado Obtención | Significado y Validación |
 | :--- | :---: | :--- |
-| **Total de Casos Evaluados** | `15` | Muestra de casos clínicos distribuidos en Dengue, Preeclampsia, EHIRN, NAC y Hemorragia Posparto. |
-| **Precisión de Retrieval (Hit@1)** | `100.0%` | El modelo recupera el fragmento normativo exacto de la GPC del MSP en todos los casos de prueba. |
-| **Tasa de Validez JSON** | `100.0%` | Las respuestas del evaluador LLM cumplen estrictamente con la especificación Pydantic. |
-| **Latencia Promedio por Consulta** | `13.38 s` | Tiempo total transcurrido desde la recepción de la respuesta hasta el dictamen formativo. |
-| **Latencia Mediana por Consulta** | `10.80 s` | Valor central del tiempo de procesamiento. |
+| **Total de Casos Evaluados** | `15` | Muestra de casos clínicos distribuidos en Dengue, Preeclampsia, EHIRN, NAC, Hemorragia Posparto, HTA, Tuberculosis, VIH y ERC. |
+| **Chunks Vectorizados en DB** | `557` | Proyección densa de 1,024 dimensiones generada por `ateneo-bge-m3-ecuador`. |
+| **Precisión de Retrieval (Hit@1)** | **`100.0%`** | El modelo recupera el fragmento normativo exacto de la GPC del MSP en el 100% de los casos de prueba (15/15). |
+| **Tasa de Validez JSON** | **`100.0%`** | Las respuestas del evaluador LLM cumplen estrictamente con la especificación Pydantic sin errores de sintaxis (15/15). |
+| **Latencia Promedio por Consulta** | **`12.29 s`** | Tiempo total transcurrido desde la recepción de la respuesta hasta el dictamen formativo. |
+| **Latencia Mediana por Consulta** | **`7.73 s`** | Valor central del tiempo de procesamiento en CPU. |
+

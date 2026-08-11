@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchCaseById, evaluateResponse } from '../api/client';
+import { fetchCaseById, evaluateResponse, API_URL } from '../api/client';
 import { ArrowLeft, Send, Loader2, BookOpen, AlertCircle, FileImage, Maximize2 } from 'lucide-react';
 import FeedbackCard from '../components/FeedbackCard';
 import ImageUploadZone from '../components/ImageUploadZone';
@@ -117,7 +117,7 @@ export default function CaseSolve() {
               </div>
               <div className="relative group rounded-xl overflow-hidden border border-slate-300 bg-white shadow-xs max-w-xl mx-auto">
                 <img
-                  src={`http://localhost:8000${caso.imagen_url}`}
+                  src={`${API_URL}${caso.imagen_url}`}
                   alt="Imagen Médica del Caso Clínico"
                   className="w-full h-auto object-contain max-h-96 rounded-xl hover:scale-[1.01] transition-transform duration-200"
                 />

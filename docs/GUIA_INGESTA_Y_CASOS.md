@@ -151,4 +151,23 @@ def calculate_room_analytics(room: Dict[str, Any]) -> Dict[str, Any]:
         "nivel_consenso": nivel_consenso,
         "top_brechas_sala": top_brechas
     }
+
+---
+
+## 6. Recomendaciones de Ingesta Nativa en Entornos Contenerizados (Docker)
+
+Al trabajar con ChromaDB en contenedores Docker y volúmenes montados en vivo (`./backend:/app`):
+
+1. **Prevención de Incompatibilidad de Esquema (`KeyError: '_type'`):**
+   Generar `chroma.sqlite3` desde el entorno host (Windows/macOS) y luego consumirlo dentro de una imagen Linux de Docker puede provocar discrepancias en los esquemas de deserialización de colecciones de ChromaDB.
+2. **Procedimiento Recomendado:**
+   Se recomienda ejecutar la ingesta de vectores de manera **nativa dentro del contenedor de Docker**:
+   ```bash
+   docker compose stop backend
+   rm -rf backend/data/chroma_db
+   docker compose run --rm backend python ingestion/run_ingestion.py
+   docker compose up -d
+   ```
+   Esto garantiza que el archivo de SQLite se cree y formatee estrictamente con la versión de `chromadb` de la imagen de producción (`0.6.3`).
+
 ```
