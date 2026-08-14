@@ -1,94 +1,181 @@
 {
+  "version": "2026.2",
+  "descripcion": "Banco formal de casos de evaluación clínica para benchmark experimental (In-Distribution y Out-of-Distribution).",
   "casos_prueba": [
     {
       "id": "test_01",
       "guia_asociada": "dengue",
-      "respuesta_simulada": "Paciente con Dengue con signos de alarma. Se debe hospitalizar e iniciar reposición de líquidos intravenosos con Lactato Ringer a 7 ml/kg/h en las primeras 2 horas y monitorear hematocrito.",
+      "tipo_split": "in_distribution",
+      "respuesta_simulada": "Paciente con Dengue con signos de alarma. Se debe hospitalizar e iniciar reposición de líquidos intravenosos con Lactato Ringer a 7 ml/kg/h en las primeras 2 horas y monitorear hematocrito seriado.",
       "fragmento_gpc_ideal_id": "dengue_chunk_004"
     },
     {
       "id": "test_02",
       "guia_asociada": "dengue",
-      "respuesta_simulada": "Dengue grave con shock hipovolémico. Dar paracetamol oral e indicar reposo ambulatorio con abundantes sueros orales.",
+      "tipo_split": "in_distribution",
+      "respuesta_simulada": "Dengue grave con shock hipovolémico. Dar paracetamol oral e indicar reposo ambulatorio con abundantes sueros orales sin hospitalizar.",
       "fragmento_gpc_ideal_id": "dengue_chunk_004"
     },
     {
       "id": "test_03",
       "guia_asociada": "preeclampsia",
-      "respuesta_simulada": "Preeclampsia severa. Administrar Sulfato de Magnesio 4g IV en 20 minutos como dosis de ataque y 1g/h de mantenimiento. Controlar PA con Labetalol o Nifedipino.",
+      "tipo_split": "in_distribution",
+      "respuesta_simulada": "Preeclampsia severa con PA 170/110 mmHg. Administrar Sulfato de Magnesio 4g IV en 20 minutos como dosis de ataque y 1g/h en infusión continua de mantenimiento. Tratar crisis con Labetalol o Nifedipino.",
       "fragmento_gpc_ideal_id": "preeclampsia_chunk_002"
     },
     {
       "id": "test_04",
       "guia_asociada": "preeclampsia",
-      "respuesta_simulada": "Cefalea y visión borrosa en embarazada con PA 170/110. Indicar reposo en casa y control en 1 semana con examen de orina.",
+      "tipo_split": "in_distribution",
+      "respuesta_simulada": "Cefalea y visión borrosa en embarazada de 34 semanas con PA 165/110. Indicar reposo en casa y citar a control ambulatorio en una semana.",
       "fragmento_gpc_ideal_id": "preeclampsia_chunk_002"
     },
     {
       "id": "test_05",
       "guia_asociada": "diabetes_t2",
-      "respuesta_simulada": "Diabetes tipo 2 con HbA1c 8.8%. Iniciar Metformina 500mg día e incrementar según tolerancia. Evaluar terapia dual por HbA1c elevada.",
+      "tipo_split": "in_distribution",
+      "respuesta_simulada": "Diabetes mellitus tipo 2 con HbA1c 8.8%. Iniciar Metformina 500mg día e incrementar progresivamente hasta dosis máxima tolerada. Considerar terapia combinada dual temprana.",
       "fragmento_gpc_ideal_id": "diabetes_chunk_005"
     },
     {
       "id": "test_06",
       "guia_asociada": "diabetes_t2",
-      "respuesta_simulada": "Iniciar insulina glargina 40 unidades inmediatamente como primera línea para diabetes no controlada sin evaluar metformina.",
+      "tipo_split": "in_distribution",
+      "respuesta_simulada": "Iniciar insulina glargina 40 unidades inmediatamente como primera línea para diabetes no controlada sin evaluar metformina ni estilo de vida.",
       "fragmento_gpc_ideal_id": "diabetes_chunk_005"
     },
     {
       "id": "test_07",
-      "guia_asociada": "hemorragia_posparto",
-      "respuesta_simulada": "Atonía uterina en código rojo. Realizar masaje uterino bimanual continuo e inyectar Oxitocina 10 UI IM / 5 UI IV en bolo lento y infusión IV.",
+      "guia_asociada": "hemorragia_postparto",
+      "tipo_split": "in_distribution",
+      "respuesta_simulada": "Atonía uterina en código rojo obstétrico. Realizar masaje uterino bimanual continuo e inyectar Oxitocina 10 UI IM o 5 UI IV en bolo lento seguido de infusión de 20 UI. Administrar Ácido Tranexámico 1g IV temprano.",
       "fragmento_gpc_ideal_id": "hemorragia_chunk_001"
     },
     {
       "id": "test_08",
-      "guia_asociada": "hemorragia_posparto",
-      "respuesta_simulada": "Hemorragia por laceración cervical. Indicar hielo local y esperar resolución espontánea sin masaje uterino ni uterotónicos.",
+      "guia_asociada": "hemorragia_postparto",
+      "tipo_split": "in_distribution",
+      "respuesta_simulada": "Sangrado posparto activo abundante. Indicar hielo local y esperar resolución espontánea sin masaje uterino ni fármacos uterotónicos.",
       "fragmento_gpc_ideal_id": "hemorragia_chunk_001"
     },
     {
       "id": "test_09",
-      "guia_asociada": "dengue",
-      "respuesta_simulada": "Dolor abdominal continuo y vómitos en paciente febril de zona endémica. Iniciar hidratación IV rápida con solución salina y vigilar diuresis.",
-      "fragmento_gpc_ideal_id": "dengue_chunk_004"
+      "guia_asociada": "nac_neumonia",
+      "tipo_split": "in_distribution",
+      "respuesta_simulada": "Neumonía adquirida en la comunidad con CURB-65 de 2 puntos (hospitalización). Iniciar Ampicilina/Sulbactam 1.5g IV cada 6 horas más Claritromicina 500mg cada 12 horas.",
+      "fragmento_gpc_ideal_id": "neumonia_chunk_001"
     },
     {
       "id": "test_10",
-      "guia_asociada": "preeclampsia",
-      "respuesta_simulada": "Emergencia hipertensiva en gestante de 34 semanas. Dar Sulfato de Magnesio de impregnación y mantenimiento para profilaxis eclampsia.",
-      "fragmento_gpc_ideal_id": "preeclampsia_chunk_002"
+      "guia_asociada": "nac_neumonia",
+      "tipo_split": "in_distribution",
+      "respuesta_simulada": "Paciente anciano con neumonía, confusión y urea elevada (CURB-65 = 3). Manejo ambulatorio con amoxicilina oral por 3 días.",
+      "fragmento_gpc_ideal_id": "neumonia_chunk_001"
     },
     {
       "id": "test_11",
-      "guia_asociada": "diabetes_t2",
-      "respuesta_simulada": "Pacientes con glicemia en ayunas elevada. Dieta sola sin fármacos por 1 año a pesar de HbA1c > 8.5%.",
-      "fragmento_gpc_ideal_id": "diabetes_chunk_005"
+      "guia_asociada": "ehirn",
+      "tipo_split": "in_distribution",
+      "respuesta_simulada": "Enfermedad hemorrágica del recién nacido clásica con sangrado umbilical. Administrar Fitomenadiona (Vitamina K1) 1 mg IV lento y evaluar necesidad de plasma fresco congelado si hay coagulopatía grave.",
+      "fragmento_gpc_ideal_id": "ehirn_chunk_001"
     },
     {
       "id": "test_12",
-      "guia_asociada": "hemorragia_posparto",
-      "respuesta_simulada": "Sangrado abundante posparto por atonia. Usar Ergometrina 0.2mg o Misoprostol 800mcg sublingual junto a masaje uterino bimanual.",
-      "fragmento_gpc_ideal_id": "hemorragia_chunk_001"
+      "guia_asociada": "hta",
+      "tipo_split": "in_distribution",
+      "respuesta_simulada": "Crisis hipertensiva tipo emergencia con daño de órgano diana (encefalopatía). Reducir la presión arterial media en no más de 20-25% en la primera hora mediante fármacos parenterales en UCI.",
+      "fragmento_gpc_ideal_id": null
     },
     {
       "id": "test_13",
-      "guia_asociada": "dengue",
-      "respuesta_simulada": "Fiebre y sangrado de mucosas. Prescribir ibuprofeno o aspirina para controlar el dolor y la fiebre.",
-      "fragmento_gpc_ideal_id": "dengue_chunk_004"
+      "guia_asociada": "tuberculosis",
+      "tipo_split": "in_distribution",
+      "respuesta_simulada": "Tuberculosis pulmonar con baciloscopía positiva. Iniciar esquema estándar de primera línea en fase intensiva con Isoniazida, Rifampicina, Pirazinamida y Etambutol (HRZE) diaria por 2 meses.",
+      "fragmento_gpc_ideal_id": null
     },
     {
       "id": "test_14",
-      "guia_asociada": "preeclampsia",
-      "respuesta_simulada": "Gestante con crisis hipertensiva. Usar nifedipino 10mg VO o labetalol IV como antihipertensivo de rápida acción.",
-      "fragmento_gpc_ideal_id": "preeclampsia_chunk_002"
+      "guia_asociada": "vih",
+      "tipo_split": "in_distribution",
+      "respuesta_simulada": "Paciente con diagnóstico confirmado de infección por VIH. Iniciar terapia antirretroviral (TARV) basada en Tenofovir/Emtricitabina/Dolutegravir (TLD) de forma inmediata independientemente del recuento de CD4.",
+      "fragmento_gpc_ideal_id": null
     },
     {
       "id": "test_15",
-      "guia_asociada": "hemorragia_posparto",
-      "respuesta_simulada": "Código rojo obstétrico por sangrado posparto. Administrar Ácido Tranexámico 1g IV dentro de los primeros minutos.",
-      "fragmento_gpc_ideal_id": "hemorragia_chunk_001"
+      "guia_asociada": "erc",
+      "tipo_split": "in_distribution",
+      "respuesta_simulada": "Enfermedad renal crónica estadio 3b con albuminuria persistente. Optimizar control de PA con IECA o ARA-II para nefroprotección y ajustar dosis de fármacos según la tasa de filtrado glomerular.",
+      "fragmento_gpc_ideal_id": null
+    },
+    {
+      "id": "test_16",
+      "guia_asociada": "sepsis_neonatal",
+      "tipo_split": "out_of_distribution",
+      "respuesta_simulada": "Recién nacido con sospecha de sepsis temprana e inestabilidad térmica. Iniciar esquema antibiótico empírico de primera línea con Ampicilina más Gentamicina IV previa toma de hemocultivos.",
+      "fragmento_gpc_ideal_id": null
+    },
+    {
+      "id": "test_17",
+      "guia_asociada": "neonato_prematuro",
+      "tipo_split": "out_of_distribution",
+      "respuesta_simulada": "Amenaza de parto pretérmino en gestación de 30 semanas. Indicar maduración pulmonar fetal con Betametasona 12 mg IM cada 24 horas por 2 dosis y neuroprotección con sulfato de magnesio.",
+      "fragmento_gpc_ideal_id": null
+    },
+    {
+      "id": "test_18",
+      "guia_asociada": "ruptura_membranas",
+      "tipo_split": "out_of_distribution",
+      "respuesta_simulada": "Ruptura prematura de membranas en embarazo pretérmino de 32 semanas sin signos de corioamnionitis. Manejo conservador con antibióticos de latencia (Ampicilina + Eritromicina) y corticoides.",
+      "fragmento_gpc_ideal_id": null
+    },
+    {
+      "id": "test_19",
+      "guia_asociada": "artritis_reumatoide",
+      "tipo_split": "out_of_distribution",
+      "respuesta_simulada": "Artritis reumatoide temprana activa. Iniciar fármaco modificador de la enfermedad (FAME) sintético convencional de primera línea con Metotrexato oral semanal asociado a ácido fólico.",
+      "fragmento_gpc_ideal_id": null
+    },
+    {
+      "id": "test_20",
+      "guia_asociada": "dolor_lumbar",
+      "tipo_split": "out_of_distribution",
+      "respuesta_simulada": "Lumbago agudo sin banderas rojas (sin déficit neurológico ni síndrome de cauda equina). Prescribir AINE por corto tiempo, calor local y mantener actividad física habitual evitando reposo en cama prolongado.",
+      "fragmento_gpc_ideal_id": null
+    },
+    {
+      "id": "test_21",
+      "guia_asociada": "fenilcetonuria",
+      "tipo_split": "out_of_distribution",
+      "respuesta_simulada": "Tamizaje neonatal positivo para fenilcetonuria confirmado con fenilalanina elevada. Iniciar inmediatamente fórmula médica exenta de fenilalanina para prevenir daño neurológico irreversible.",
+      "fragmento_gpc_ideal_id": null
+    },
+    {
+      "id": "test_22",
+      "guia_asociada": "acne",
+      "tipo_split": "out_of_distribution",
+      "respuesta_simulada": "Acné inflamatorio pápulo-pustuloso moderado. Tratamiento combinado tópico con peróxido de benzoilo y retinoide tópico, asociado a doxiciclina oral por máximo 8 a 12 semanas.",
+      "fragmento_gpc_ideal_id": null
+    },
+    {
+      "id": "test_23",
+      "guia_asociada": "linfoma_hodgkin",
+      "tipo_split": "out_of_distribution",
+      "respuesta_simulada": "Sospecha de linfoma de Hodgkin por adenopatía cervical indolora y síntomas B (fiebre y sudoración nocturna). El diagnóstico confirmatorio requiere biopsia escisional de ganglio linfático para identificar células de Reed-Sternberg.",
+      "fragmento_gpc_ideal_id": null
+    },
+    {
+      "id": "test_24",
+      "guia_asociada": "dolor_oncologico",
+      "tipo_split": "out_of_distribution",
+      "respuesta_simulada": "Dolor oncológico severo EVA 8/10 en paciente con neoplasia avanzada. Iniciar opioides mayores (Morfina oral o parenteral) con titulación de dosis de rescate según la escalera analgésica de la OMS.",
+      "fragmento_gpc_ideal_id": null
+    },
+    {
+      "id": "test_25",
+      "guia_asociada": "depresion",
+      "tipo_split": "out_of_distribution",
+      "respuesta_simulada": "Episodio depresivo mayor moderado en adulto. Iniciar farmacoterapia de primera línea con inhibidor selectivo de la recaptación de serotonina (ISRS como Sertralina o Escitalopram) acompañado de psicoterapia cognitivo-conductual.",
+      "fragmento_gpc_ideal_id": null
     }
   ]
 }

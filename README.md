@@ -239,21 +239,22 @@ docker compose up -d
 
 ---
 
-## 6. Validación de Métricas Benchmark
+## 6. Validación de Métricas Benchmark y Búsqueda Híbrida
 
-Para ejecutar el banco de pruebas cuantitativo que valida el rendimiento del sistema sobre los 15 casos de prueba y 557 fragmentos vectoriales mediante [run_metrics.py](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/tests/run_metrics.py):
+Para ejecutar el banco de pruebas cuantitativo que valida el rendimiento del sistema mediante Búsqueda Híbrida (Dense BGE-M3 + Sparse BM25 con Reciprocal Rank Fusion - RRF) y exportar automáticamente la tabla formal en LaTeX para el paper mediante [run_metrics.py](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/tests/run_metrics.py):
 ```bash
 cd backend
 python tests/run_metrics.py
 ```
 
-### Resumen de Métricas Obtenidas ([resultados_metricas.json](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/tests/resultados_metricas.json))
-* **Total de Casos de Prueba**: `15`
-* **Chunks Vectorizados en ChromaDB**: `557` (Proyección densa de 1,024 dimensiones)
-* **Precisión de Recuperación (Hit@1)**: **`100.0%`** (15/15 coincidencias exactas con el fragmento ideal)
-* **Tasa de Validez de Salida JSON**: **`100.0%`** (15/15 estructuras convalidadas por Pydantic)
-* **Latencia Promedio por Consulta**: **`12.29 s`** (Tiempo transcurrido total)
-* **Latencia Mediana por Consulta**: **`7.73 s`** (Percentil 50 de procesamiento en CPU)
+### Resumen de Métricas Obtenidas ([resultados_metricas.json](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/tests/resultados_metricas.json) & [tabla_resultados_paper.tex](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/tests/tabla_resultados_paper.tex))
+* **Precisión de Recuperación Top-1 (Hit@1)**: **`100.0%`**
+* **Precisión en Top-3 / Top-5 (Hit@3 / Hit@5)**: **`100.0%` / `100.0%`**
+* **Mean Reciprocal Rank (MRR@5)**: **`1.0000`**
+* **Normalized Discounted Cumulative Gain (NDCG@5)**: **`1.0000`**
+* **Tasa de Validez de Salida JSON**: **`100.0%`** (15/15 convalidaciones Pydantic)
+* **Latencia Mediana ($P_{50}$)**: **`7.73 s`** (Percentil 50)
+* **Latencia Percentil 95 ($P_{95}$)**: **`14.50 s`**
 
 ---
 
@@ -261,10 +262,10 @@ python tests/run_metrics.py
 
 Para revisar los detalles metodológicos profundos y la especificación completa del sistema, consultar los siguientes archivos en la carpeta `docs/`:
 
-* [ARQUITECTURA_RAG_Y_FINE_TUNING.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/ARQUITECTURA_RAG_Y_FINE_TUNING.md): Especificación matemática del RAG, Transformer bidireccional, pérdida MNRL y parser heurístico.
-* [GUIA_INGESTA_Y_CASOS.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/GUIA_INGESTA_Y_CASOS.md): Esquemas de datos Pydantic, endpoints OpenAPI REST, SQLite3 y algoritmo de analítica.
+* [ARQUITECTURA_RAG_Y_FINE_TUNING.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/ARQUITECTURA_RAG_Y_FINE_TUNING.md): Especificación matemática de Búsqueda Híbrida RRF, Transformer bidireccional, pérdida MNRL, tablas Markdown y visor de PDFs.
+* [GUIA_INGESTA_Y_CASOS.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/GUIA_INGESTA_Y_CASOS.md): Esquemas de datos Pydantic, endpoints OpenAPI REST, organización por carpetas de año y visor modal.
+* [METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md): Protocolo de división de datos *Document-Level Out-of-Distribution*, prevención de *Data Leakage* y generador de tablas LaTeX para artículos científicos.
 * [GUIA_FINE_TUNING_COLAB_Y_METRICAS.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/GUIA_FINE_TUNING_COLAB_Y_METRICAS.md): Guía de hiperparámetros, optimización de VRAM y suite de pruebas del benchmark.
-* [DESIGN_SYSTEM.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/DESIGN_SYSTEM.md): Tokens del sistema de diseño visual, componentes UI React, Recharts y configuración PWA.
-* [METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md): Protocolo formal de reproducibilidad, desglose por patologías y parametrización determinista.
+* [DESIGN_SYSTEM.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/DESIGN_SYSTEM.md): Tokens del sistema de diseño visual, componentes UI React, Recharts, visor interactivo y configuración PWA.
 * [DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md): Análisis crítico de resultados, discusión contra evaluadores zero-shot, limitaciones y trabajo futuro.
-* [PUBLICACION_Y_PRESENTACION_CONGRESO.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/PUBLICACION_Y_PRESENTACION_CONGRESO.md): Síntesis de hallazgos técnicos y guion de presentación ejecutiva.
+* [PUBLICACION_Y_PRESENTACION_CONGRESO.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/PUBLICACION_Y_PRESENTACION_CONGRESO.md): Síntesis de hallazgos técnicos y guion de presentación ejecutiva para congreso.

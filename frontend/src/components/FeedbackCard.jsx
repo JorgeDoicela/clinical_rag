@@ -1,6 +1,9 @@
-import React from 'react';
-import { CheckCircle2, AlertTriangle, BookOpen, Award, RefreshCw, User, FileImage, Target, Stethoscope, Pill, ShieldAlert, Activity } from 'lucide-react';
+import React, { useState } from 'react';
+import { CheckCircle2, AlertTriangle, BookOpen, Award, RefreshCw, User, FileImage, Target, Stethoscope, Pill, ShieldAlert, Activity, FileText, Download, Loader2 } from 'lucide-react';
 import SkillRadarChart from './SkillRadarChart';
+import PdfViewerModal from './PdfViewerModal';
+import client from '../api/client';
+import { useAuth } from '../context/AuthContext';
 
 const EJES_CONFIG = [
   { key: 'diagnóstico', label: 'Diagnóstico', icon: Stethoscope, badge: 'bg-sky-50 text-sky-800 border-sky-200' },
@@ -10,6 +13,10 @@ const EJES_CONFIG = [
 ];
 
 export default function FeedbackCard({ result, studentAnswer, studentImage, onReset }) {
+  const [pdfModalOpen, setPdfModalOpen] = useState(false);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
+  const { user } = useAuth();
+
   if (!result) return null;
 
   const {
@@ -88,6 +95,37 @@ export default function FeedbackCard({ result, studentAnswer, studentImage, onRe
     };
   });
 
+  const handleDownloadPdf = async () => {
+    setDownloadingPdf(true);
+    try {
+      const response = await client.post('/evaluate/export-pdf', {
+        case_id: result.case_id || 'caso_evaluacion',
+        case_title: result.case_title || 'Evaluación de Razonamiento Clínico',
+        student_name: user?.nombre || 'Estudiante de Ciencias de la Salud',
+        guia_asociada: result.cita_normativa?.guia || 'Norma Oficial MSP',
+        student_answer: studentAnswer || '',
+        eval_result: result
+      }, {
+        responseType: 'blob'
+      });
+
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Informe_Clinico_Ateneo_${result.case_id || 'evaluacion'}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Error al exportar PDF:", err);
+      alert("Hubo un problema al generar el PDF del informe clínico.");
+    } finally {
+      setDownloadingPdf(false);
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Razonamiento Registrado del Estudiante */}
@@ -114,7 +152,7 @@ export default function FeedbackCard({ result, studentAnswer, studentImage, onRe
         </div>
       )}
 
-      {/* Header con Score */}
+      {/* Header con Score y Botón de Descarga de PDF */}
       <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-xs relative overflow-hidden">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
@@ -127,9 +165,20 @@ export default function FeedbackCard({ result, studentAnswer, studentImage, onRe
             </h2>
           </div>
 
-          <div className={`flex items-baseline gap-2 px-5 py-2.5 rounded-xl border ${scoreBadgeColor}`}>
-            <span className="text-3xl font-extrabold">{score}</span>
-            <span className="text-xs font-bold opacity-80">/ {score_max} pts</span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleDownloadPdf}
+              disabled={downloadingPdf}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-xs transition-colors"
+            >
+              {downloadingPdf ? <Loader2 className="w-4 h-4 animate-spin text-sky-400" /> : <Download className="w-4 h-4 text-sky-400" />}
+              <span>{downloadingPdf ? "Generando..." : "Descargar PDF"}</span>
+            </button>
+
+            <div className={`flex items-baseline gap-2 px-5 py-2.5 rounded-xl border ${scoreBadgeColor}`}>
+              <span className="text-3xl font-extrabold">{score}</span>
+              <span className="text-xs font-bold opacity-80">/ {score_max} pts</span>
+            </div>
           </div>
         </div>
 
@@ -247,13 +296,24 @@ export default function FeedbackCard({ result, studentAnswer, studentImage, onRe
         </div>
       </div>
 
-      {/* Cita Normativa GPC (Azul / Índigo MSP) */}
+      {/* Cita Normativa GPC con Botón para Abrir Visor Oficial */}
       {cita_normativa && (
-        <div className="bg-sky-50/30 rounded-2xl p-6 border border-sky-200/80 shadow-xs">
-          <div className="flex items-center gap-2 text-slate-900 font-bold text-sm mb-3">
-            <BookOpen className="w-5 h-5 text-sky-600 shrink-0" />
-            <h3>Cita Normativa Oficial (MSP Ecuador)</h3>
+        <div className="bg-sky-50/40 rounded-2xl p-6 border border-sky-200/80 shadow-xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
+              <BookOpen className="w-5 h-5 text-sky-600 shrink-0" />
+              <h3>Cita Normativa Oficial (MSP Ecuador)</h3>
+            </div>
+
+            <button
+              onClick={() => setPdfModalOpen(true)}
+              className="inline-flex items-center justify-center gap-2 px-3.5 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-bold text-xs shadow-xs transition-colors"
+            >
+              <FileText className="w-4 h-4" />
+              <span>Ver en Guía Oficial (Pág. {cita_normativa.pagina || 1})</span>
+            </button>
           </div>
+
           <div className="space-y-3 text-xs text-slate-700">
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-sky-900 font-semibold bg-sky-100/60 p-2.5 rounded-xl border border-sky-200/60">
               <span><strong>Guía:</strong> {cita_normativa.guia}</span>
@@ -273,20 +333,38 @@ export default function FeedbackCard({ result, studentAnswer, studentImage, onRe
         </div>
       )}
 
-      {/* Acciones */}
-      {onReset && (
-        <div className="flex justify-end pt-2">
+      {/* Modal Visor Interactivo de la Guía Oficial */}
+      {cita_normativa && (
+        <PdfViewerModal
+          isOpen={pdfModalOpen}
+          onClose={() => setPdfModalOpen(false)}
+          guiaId={cita_normativa.guia}
+          pagina={cita_normativa.pagina || 1}
+          seccion={cita_normativa.seccion}
+        />
+      )}
+
+      {/* Acciones Finales */}
+      <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
+        <button
+          onClick={handleDownloadPdf}
+          disabled={downloadingPdf}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 font-bold text-xs transition-colors shadow-xs"
+        >
+          {downloadingPdf ? <Loader2 className="w-4 h-4 animate-spin text-sky-600" /> : <Download className="w-4 h-4 text-sky-600" />}
+          <span>Descargar Dictamen en PDF Institucional</span>
+        </button>
+
+        {onReset && (
           <button
             onClick={onReset}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-colors shadow-xs"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-colors shadow-xs"
           >
             <RefreshCw className="w-4 h-4" />
             <span>Intentar Nuevamente</span>
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
-
-

@@ -1,12 +1,16 @@
-# Secrets & Environment Files
+# ==========================================
+# 1. SECRETOS Y CREDENCIALES (CRÍTICO)
+# ==========================================
 .env
 *.env
 **/.env
 **/*.env
 **/*.env.*
-!.env.example
+!**/.env.example
 
-# Python & Virtual Envs
+# ==========================================
+# 2. PYTHON, VIRTUAL ENVS & CACHE
+# ==========================================
 __pycache__/
 **/__pycache__/
 *.py[cod]
@@ -16,18 +20,25 @@ __pycache__/
 venv/
 **/venv/
 ENV/
+.pytest_cache/
+.coverage
+*.log
 
-# Data & ChromaDB
+# ==========================================
+# 3. BASE VECTORIAL Y PESOS GIGANTES (>100MB)
+# ==========================================
+# ChromaDB local y checkpoints binarios
 backend/data/chroma_db/
 backend/data/processed/
-backend/data/ateneo-bge-m3-ecuador/*
-!backend/data/ateneo-bge-m3-ecuador/.gitkeep
+backend/data/ateneo-bge-m3-ecuador/*.safetensors
+backend/data/ateneo-bge-m3-ecuador/*.bin
+backend/data/ateneo-bge-m3-ecuador/*.pt
+backend/data/ateneo-bge-m3-ecuador/checkpoints/
 backend/checkpoints/
-backend/data/raw_pdfs/*.pdf
-!backend/data/raw_pdfs/.gitkeep
 
-
-# Node / Frontend
+# ==========================================
+# 4. FRONTEND / NODE
+# ==========================================
 node_modules/
 **/node_modules/
 dist/
@@ -35,13 +46,10 @@ dist/
 .dist/
 *.local
 
-# Environment & IDE
+# ==========================================
+# 5. IDE & OS METADATA
+# ==========================================
 .vscode/
 .idea/
 .DS_Store
-
-# Testing & Logs
-.pytest_cache/
-.coverage
-*.log
-
+Thumbs.db

@@ -1,0 +1,419 @@
+{
+  "version": "2026.2",
+  "fuente_oficial": "Ministerio de Salud Pública del Ecuador & OMS CIE-10",
+  "especialidades_principales": [
+    "Ginecología y Obstetricia",
+    "Pediatría y Neonatología",
+    "Medicina Interna y Crónicos",
+    "Infectología y Epidemiología",
+    "Cardiología y Neumología",
+    "Genética y Hematología",
+    "Salud Mental y Neurología",
+    "Dermatología",
+    "Odontología",
+    "Cuidados Paliativos y Oncología",
+    "Medicina Familiar y Preventiva"
+  ],
+  "catalogo_guias": [
+    {
+      "guia_key": "dengue",
+      "patrones_nombre": ["dengue", "arbovirosis"],
+      "titulo_oficial": "Guía de Práctica Clínica: Prevención, Diagnóstico y Tratamiento del Dengue",
+      "cie10_codigo": "A90",
+      "cie10_descripcion": "Fiebre del dengue (clásico y dengue grave con signos de alarma)",
+      "especialidad": "Infectología y Epidemiología",
+      "grupo_etario": "Población General (Pediátrico y Adulto)",
+      "nivel_atencion": "Primer, Segundo y Tercer Nivel"
+    },
+    {
+      "guia_key": "preeclampsia",
+      "patrones_nombre": ["preeclampsia", "eclampsia", "trastornos_hipertensivos", "trastornos-hipertensivos"],
+      "titulo_oficial": "Guía de Práctica Clínica: Trastornos Hipertensivos del Embarazo (Preeclampsia / Eclampsia)",
+      "cie10_codigo": "O14.1",
+      "cie10_descripcion": "Preeclampsia severa y síndrome HELLP",
+      "especialidad": "Ginecología y Obstetricia",
+      "grupo_etario": "Mujeres Gestantes y Puérperas",
+      "nivel_atencion": "Segundo y Tercer Nivel"
+    },
+    {
+      "guia_key": "hemorragia_postparto",
+      "patrones_nombre": ["hemorragia_postparto", "hemorragia-postparto", "atonia_uterina", "codigo_rojo"],
+      "titulo_oficial": "Guía de Práctica Clínica: Prevención y Manejo de la Hemorragia Posparto (Código Rojo Obstétrico)",
+      "cie10_codigo": "O72.1",
+      "cie10_descripcion": "Hemorragia posparto inmediata secundaria a atonía uterina",
+      "especialidad": "Ginecología y Obstetricia",
+      "grupo_etario": "Mujeres en Trabajo de Parto y Posparto",
+      "nivel_atencion": "Todos los Niveles de Atención"
+    },
+    {
+      "guia_key": "aborto",
+      "patrones_nombre": ["aborto", "aborto_espontaneo", "aborto-terapeutico", "incompleto"],
+      "titulo_oficial": "Guía de Práctica Clínica: Manejo del Aborto Espontáneo, Incompleto y Terapéutico",
+      "cie10_codigo": "O03",
+      "cie10_descripcion": "Aborto espontáneo e incompleto",
+      "especialidad": "Ginecología y Obstetricia",
+      "grupo_etario": "Mujeres en Edad Fértil / Gestantes < 20 semanas",
+      "nivel_atencion": "Primer y Segundo Nivel"
+    },
+    {
+      "guia_key": "anemia_embarazo",
+      "patrones_nombre": ["anemia", "anemia_embarazo", "ferropenica"],
+      "titulo_oficial": "Guía de Práctica Clínica: Diagnóstico y Tratamiento de la Anemia en el Embarazo",
+      "cie10_codigo": "O99.0",
+      "cie10_descripcion": "Anemia que complica el embarazo y puerperio (Ferropénica D50)",
+      "especialidad": "Ginecología y Obstetricia",
+      "grupo_etario": "Mujeres Gestantes",
+      "nivel_atencion": "Primer y Segundo Nivel"
+    },
+    {
+      "guia_key": "infeccion_vaginal",
+      "patrones_nombre": ["infeccion_vaginal", "vaginitis", "vaginosis", "candidiasis"],
+      "titulo_oficial": "Guía de Práctica Clínica: Infecciones Vaginales en Obstetricia",
+      "cie10_codigo": "O23.5",
+      "cie10_descripcion": "Infección de la vagina y vulva en el embarazo",
+      "especialidad": "Ginecología y Obstetricia",
+      "grupo_etario": "Mujeres Gestantes",
+      "nivel_atencion": "Primer Nivel"
+    },
+    {
+      "guia_key": "trabajo_parto",
+      "patrones_nombre": ["trabajo_parto", "parto_inmediato", "atencion_del_trabajo_parto"],
+      "titulo_oficial": "Guía de Práctica Clínica: Atención del Trabajo de Parto, Parto y Posparto Inmediato",
+      "cie10_codigo": "O60",
+      "cie10_descripcion": "Atención del parto y vigilancia obstétrica",
+      "especialidad": "Ginecología y Obstetricia",
+      "grupo_etario": "Mujeres Gestantes en Término",
+      "nivel_atencion": "Segundo y Tercer Nivel"
+    },
+    {
+      "guia_key": "cesarea",
+      "patrones_nombre": ["cesarea", "parto_por_cesarea"],
+      "titulo_oficial": "Guía de Práctica Clínica: Atención del Parto por Cesárea",
+      "cie10_codigo": "O82",
+      "cie10_descripcion": "Parto único por cesárea",
+      "especialidad": "Ginecología y Obstetricia",
+      "grupo_etario": "Mujeres Gestantes",
+      "nivel_atencion": "Segundo y Tercer Nivel"
+    },
+    {
+      "guia_key": "ruptura_membranas",
+      "patrones_nombre": ["ruptura_prematura_de_membranas", "rpm", "ruptura_membranas"],
+      "titulo_oficial": "Guía de Práctica Clínica: Ruptura Prematura de Membranas",
+      "cie10_codigo": "O42",
+      "cie10_descripcion": "Ruptura prematura de las membranas ovulares",
+      "especialidad": "Ginecología y Obstetricia",
+      "grupo_etario": "Mujeres Gestantes",
+      "nivel_atencion": "Segundo y Tercer Nivel"
+    },
+    {
+      "guia_key": "control_prenatal",
+      "patrones_nombre": ["control_prenatal", "prenatal", "componente_materno"],
+      "titulo_oficial": "Guía de Práctica Clínica: Control Prenatal y Componente Materno",
+      "cie10_codigo": "Z34",
+      "cie10_descripcion": "Supervisión de embarazo normal de bajo y alto riesgo",
+      "especialidad": "Ginecología y Obstetricia",
+      "grupo_etario": "Mujeres Gestantes",
+      "nivel_atencion": "Primer y Segundo Nivel"
+    },
+    {
+      "guia_key": "insercion_placentaria",
+      "patrones_nombre": ["insercion_placentaria", "placenta_previa", "anomalias_de_insercion"],
+      "titulo_oficial": "Guía de Práctica Clínica: Anomalías de Inserción Placentaria y Placenta Previa",
+      "cie10_codigo": "O44",
+      "cie10_descripcion": "Placenta previa y acretismo placentario",
+      "especialidad": "Ginecología y Obstetricia",
+      "grupo_etario": "Mujeres Gestantes",
+      "nivel_atencion": "Segundo y Tercer Nivel"
+    },
+    {
+      "guia_key": "nutricion_gestante",
+      "patrones_nombre": ["alimentacion", "nutricion_mujer_gestante", "lactancia_materna"],
+      "titulo_oficial": "Guía de Práctica Clínica: Alimentación y Nutrición de la Mujer Gestante y en Lactancia",
+      "cie10_codigo": "Z39.1",
+      "cie10_descripcion": "Atención y nutrición de la madre lactante y gestante",
+      "especialidad": "Ginecología y Obstetricia",
+      "grupo_etario": "Mujeres Gestantes y Lactantes",
+      "nivel_atencion": "Primer Nivel"
+    },
+    {
+      "guia_key": "sepsis_neonatal",
+      "patrones_nombre": ["sepsis_neonatal", "sepsis-neonatal"],
+      "titulo_oficial": "Guía de Práctica Clínica: Diagnóstico y Tratamiento de la Sepsis Neonatal",
+      "cie10_codigo": "P36",
+      "cie10_descripcion": "Sepsis bacteriana del recién nacido",
+      "especialidad": "Pediatría y Neonatología",
+      "grupo_etario": "Recién Nacidos (0-28 días)",
+      "nivel_atencion": "Segundo y Tercer Nivel"
+    },
+    {
+      "guia_key": "neonato_prematuro",
+      "patrones_nombre": ["prematuro", "recén-nacido-prematuro", "recien_nacido_prematuro"],
+      "titulo_oficial": "Guía de Práctica Clínica: Manejo del Recién Nacido Prematuro",
+      "cie10_codigo": "P07.3",
+      "cie10_descripcion": "Otros recién nacidos pretérmino",
+      "especialidad": "Pediatría y Neonatología",
+      "grupo_etario": "Recién Nacidos Prematuros (< 37 semanas)",
+      "nivel_atencion": "Segundo y Tercer Nivel"
+    },
+    {
+      "guia_key": "dificultad_respiratoria_neonato",
+      "patrones_nombre": ["dificultad_para_respirar", "respirar", "distres_respiratorio"],
+      "titulo_oficial": "Guía de Práctica Clínica: Recién Nacido con Dificultad para Respirar",
+      "cie10_codigo": "P22.0",
+      "cie10_descripcion": "Síndrome de dificultad respiratoria del recién nacido",
+      "especialidad": "Pediatría y Neonatología",
+      "grupo_etario": "Recién Nacidos",
+      "nivel_atencion": "Segundo y Tercer Nivel"
+    },
+    {
+      "guia_key": "ehirn",
+      "patrones_nombre": ["ehirn", "hemorragica_recien_nacido", "vitamina_k"],
+      "titulo_oficial": "Guía de Práctica Clínica: Enfermedad Hemorrágica del Recién Nacido (EHIRN)",
+      "cie10_codigo": "P53",
+      "cie10_descripcion": "Enfermedad hemorrágica del feto y del recién nacido",
+      "especialidad": "Pediatría y Neonatología",
+      "grupo_etario": "Recién Nacidos y Lactantes Menores",
+      "nivel_atencion": "Segundo y Tercer Nivel"
+    },
+    {
+      "guia_key": "aplv",
+      "patrones_nombre": ["leche_de_vaca", "proteína_d_ela_leche", "aplv"],
+      "titulo_oficial": "Guía de Práctica Clínica: Alergia a la Proteína de la Leche de Vaca (APLV)",
+      "cie10_codigo": "K52.2",
+      "cie10_descripcion": "Gastroenteritis y colitis alérgicas y dietéticas",
+      "especialidad": "Pediatría y Neonatología",
+      "grupo_etario": "Lactantes y Niños Menores",
+      "nivel_atencion": "Primer, Segundo y Tercer Nivel"
+    },
+    {
+      "guia_key": "hipotiroidismo_congenito",
+      "patrones_nombre": ["hipotiroidismo-congénito", "hipotiroidismo_congenito"],
+      "titulo_oficial": "Guía de Práctica Clínica: Diagnóstico y Tratamiento del Hipotiroidismo Congénito",
+      "cie10_codigo": "E03.1",
+      "cie10_descripcion": "Hipotiroidismo congénito sin bocio",
+      "especialidad": "Pediatría y Neonatología",
+      "grupo_etario": "Neonatos y Lactantes",
+      "nivel_atencion": "Segundo y Tercer Nivel"
+    },
+    {
+      "guia_key": "hta",
+      "patrones_nombre": ["hta", "hipertension", "presion_arterial", "gpc_hta"],
+      "titulo_oficial": "Guía de Práctica Clínica: Hipertensión Arterial Primaria (Esencial) en el Adulto",
+      "cie10_codigo": "I10",
+      "cie10_descripcion": "Hipertensión esencial (primaria)",
+      "especialidad": "Cardiología y Neumología",
+      "grupo_etario": "Adultos y Adultos Mayores",
+      "nivel_atencion": "Primer y Segundo Nivel"
+    },
+    {
+      "guia_key": "nac_neumonia",
+      "patrones_nombre": ["neumonia", "nac", "curb65", "neumonía-adquirida"],
+      "titulo_oficial": "Guía de Práctica Clínica: Diagnóstico y Tratamiento de la Neumonía Adquirida en la Comunidad",
+      "cie10_codigo": "J18.9",
+      "cie10_descripcion": "Neumonía adquirida en la comunidad no especificada",
+      "especialidad": "Cardiología y Neumología",
+      "grupo_etario": "Población General",
+      "nivel_atencion": "Primer y Segundo Nivel"
+    },
+    {
+      "guia_key": "fibrosis_quistica",
+      "patrones_nombre": ["fibrosis_quistica", "fibrosis-quística", "cftr"],
+      "titulo_oficial": "Guía de Práctica Clínica: Diagnóstico y Tratamiento de la Fibrosis Quística",
+      "cie10_codigo": "E84",
+      "cie10_descripcion": "Fibrosis quística",
+      "especialidad": "Cardiología y Neumología",
+      "grupo_etario": "Pacientes Pediátricos y Adultos Jóvenes",
+      "nivel_atencion": "Tercer Nivel"
+    },
+    {
+      "guia_key": "tuberculosis",
+      "patrones_nombre": ["tuberculosis", "gp_tuberculosis", "gpc_tuberculosis"],
+      "titulo_oficial": "Guía de Práctica Clínica: Prevención, Diagnóstico, Tratamiento y Control de la Tuberculosis",
+      "cie10_codigo": "A15.0",
+      "cie10_descripcion": "Tuberculosis del pulmón",
+      "especialidad": "Infectología y Epidemiología",
+      "grupo_etario": "Población General",
+      "nivel_atencion": "Todos los Niveles de Atención"
+    },
+    {
+      "guia_key": "vih",
+      "patrones_nombre": ["vih", "tar", "antirretroviral", "gpc_vih"],
+      "titulo_oficial": "Guía de Práctica Clínica: Atención Integral de la Infección por VIH en Adultos y Gestantes",
+      "cie10_codigo": "B20",
+      "cie10_descripcion": "Enfermedad por el Virus de la Inmunodeficiencia Humana (VIH)",
+      "especialidad": "Infectología y Epidemiología",
+      "grupo_etario": "Adultos, Gestantes y Niños",
+      "nivel_atencion": "Segundo y Tercer Nivel"
+    },
+    {
+      "guia_key": "diabetes_t2",
+      "patrones_nombre": ["diabetes", "diabetes_t2", "metformina", "glucemia"],
+      "titulo_oficial": "Guía de Práctica Clínica: Diagnóstico y Tratamiento de la Diabetes Mellitus Tipo 2",
+      "cie10_codigo": "E11",
+      "cie10_descripcion": "Diabetes mellitus no insulinodependiente (Tipo 2)",
+      "especialidad": "Medicina Interna y Crónicos",
+      "grupo_etario": "Adultos",
+      "nivel_atencion": "Primer y Segundo Nivel"
+    },
+    {
+      "guia_key": "erc",
+      "patrones_nombre": ["renal", "enfermedad_renal_cronica", "erc", "tfg"],
+      "titulo_oficial": "Guía de Práctica Clínica: Prevención, Diagnóstico y Tratamiento de la Enfermedad Renal Crónica",
+      "cie10_codigo": "N18",
+      "cie10_descripcion": "Enfermedad renal crónica",
+      "especialidad": "Medicina Interna y Crónicos",
+      "grupo_etario": "Adultos",
+      "nivel_atencion": "Todos los Niveles de Atención"
+    },
+    {
+      "guia_key": "artritis_reumatoide",
+      "patrones_nombre": ["artritis", "artritis_reumatoide", "artitis_reumatoide"],
+      "titulo_oficial": "Guía de Práctica Clínica: Diagnóstico y Tratamiento de la Artritis Reumatoide",
+      "cie10_codigo": "M05",
+      "cie10_descripcion": "Artritis reumatoide seropositiva",
+      "especialidad": "Medicina Interna y Crónicos",
+      "grupo_etario": "Adultos",
+      "nivel_atencion": "Segundo y Tercer Nivel"
+    },
+    {
+      "guia_key": "dolor_lumbar",
+      "patrones_nombre": ["dolor_lumbar", "dolor-lumbar", "lumbalgia"],
+      "titulo_oficial": "Guía de Práctica Clínica: Diagnóstico y Tratamiento del Dolor Lumbar",
+      "cie10_codigo": "M54.5",
+      "cie10_descripcion": "Lumbago no especificado",
+      "especialidad": "Medicina Interna y Crónicos",
+      "grupo_etario": "Población Adulta",
+      "nivel_atencion": "Primer y Segundo Nivel"
+    },
+    {
+      "guia_key": "fenilcetonuria",
+      "patrones_nombre": ["fenilcetonuria", "pku", "fenilalanina"],
+      "titulo_oficial": "Guía de Práctica Clínica: Diagnóstico y Manejo de la Fenilcetonuria",
+      "cie10_codigo": "E70.0",
+      "cie10_descripcion": "Fenilcetonuria clásica",
+      "especialidad": "Genética y Hematología",
+      "grupo_etario": "Neonatos y Pediátricos",
+      "nivel_atencion": "Tercer Nivel"
+    },
+    {
+      "guia_key": "gaucher",
+      "patrones_nombre": ["gaucher", "glucocerebrosidasa"],
+      "titulo_oficial": "Guía de Práctica Clínica: Diagnóstico y Tratamiento de la Enfermedad de Gaucher",
+      "cie10_codigo": "E75.2",
+      "cie10_descripcion": "Otras esfingolipidosis (Enfermedad de Gaucher)",
+      "especialidad": "Genética y Hematología",
+      "grupo_etario": "Población General",
+      "nivel_atencion": "Tercer Nivel"
+    },
+    {
+      "guia_key": "hemofilia",
+      "patrones_nombre": ["hemofilia", "hemofilia-congenita", "factor_viii"],
+      "titulo_oficial": "Guía de Práctica Clínica: Diagnóstico y Tratamiento de la Hemofilia Congénita",
+      "cie10_codigo": "D66",
+      "cie10_descripcion": "Deficiencia hereditaria del factor VIII (Hemofilia A)",
+      "especialidad": "Genética y Hematología",
+      "grupo_etario": "Población General",
+      "nivel_atencion": "Tercer Nivel"
+    },
+    {
+      "guia_key": "linfoma_hodgkin",
+      "patrones_nombre": ["linfoma_hodgkin", "hodgkin", "reed_sternberg"],
+      "titulo_oficial": "Guía de Práctica Clínica: Diagnóstico y Tratamiento del Linfoma de Hodgkin",
+      "cie10_codigo": "C81",
+      "cie10_descripcion": "Enfermedad de Hodgkin (Linfoma de Hodgkin)",
+      "especialidad": "Cuidados Paliativos y Oncología",
+      "grupo_etario": "Adolescentes y Adultos",
+      "nivel_atencion": "Tercer Nivel Oncológico"
+    },
+    {
+      "guia_key": "dolor_oncologico",
+      "patrones_nombre": ["dolor_oncologico", "dolor_oncológico", "analgesia_oncologica"],
+      "titulo_oficial": "Guía de Práctica Clínica: Manejo del Dolor Oncológico en Adultos",
+      "cie10_codigo": "R52.9",
+      "cie10_descripcion": "Dolor no especificado asociado a neoplasia maligna",
+      "especialidad": "Cuidados Paliativos y Oncología",
+      "grupo_etario": "Pacientes Oncológicos",
+      "nivel_atencion": "Segundo y Tercer Nivel"
+    },
+    {
+      "guia_key": "cuidados_paliativos",
+      "patrones_nombre": ["cuidados_paliativos", "paliativos"],
+      "titulo_oficial": "Guía de Práctica Clínica: Cuidados Paliativos en el Sistema Nacional de Salud",
+      "cie10_codigo": "Z51.5",
+      "cie10_descripcion": "Atención médica paliativa integral",
+      "especialidad": "Cuidados Paliativos y Oncología",
+      "grupo_etario": "Pacientes en Etapa Terminal",
+      "nivel_atencion": "Todos los Niveles de Atención"
+    },
+    {
+      "guia_key": "depresion",
+      "patrones_nombre": ["depresion", "episodio_depresivo", "trastorno_depresivo"],
+      "titulo_oficial": "Guía de Práctica Clínica: Diagnóstico y Tratamiento del Episodio Depresivo en el Adulto",
+      "cie10_codigo": "F32",
+      "cie10_descripcion": "Episodio depresivo moderado y grave",
+      "especialidad": "Salud Mental y Neurología",
+      "grupo_etario": "Adultos y Adultos Mayores",
+      "nivel_atencion": "Primer y Segundo Nivel"
+    },
+    {
+      "guia_key": "tea",
+      "patrones_nombre": ["autista", "espectro_autista", "tea"],
+      "titulo_oficial": "Guía de Práctica Clínica: Trastornos del Espectro Autista en Niños y Adolescentes",
+      "cie10_codigo": "F84.0",
+      "cie10_descripcion": "Autismo en la niñez",
+      "especialidad": "Salud Mental y Neurología",
+      "grupo_etario": "Población Pediátrica y Adolescentes",
+      "nivel_atencion": "Segundo y Tercer Nivel"
+    },
+    {
+      "guia_key": "acne",
+      "patrones_nombre": ["acne", "acné", "isotretinoina"],
+      "titulo_oficial": "Guía de Práctica Clínica: Diagnóstico y Tratamiento del Acné",
+      "cie10_codigo": "L70.0",
+      "cie10_descripcion": "Acné vulgar",
+      "especialidad": "Dermatología",
+      "grupo_etario": "Adolescentes y Adultos Jóvenes",
+      "nivel_atencion": "Primer y Segundo Nivel"
+    },
+    {
+      "guia_key": "caries",
+      "patrones_nombre": ["caries", "salud_bucal"],
+      "titulo_oficial": "Guía de Práctica Clínica: Diagnóstico y Prevención de Caries Dental",
+      "cie10_codigo": "K02",
+      "cie10_descripcion": "Caries dental",
+      "especialidad": "Odontología",
+      "grupo_etario": "Población General",
+      "nivel_atencion": "Primer Nivel"
+    },
+    {
+      "guia_key": "trauma_dental",
+      "patrones_nombre": ["trauma_dental", "trauma-dental", "avulsion_dental"],
+      "titulo_oficial": "Guía de Práctica Clínica: Manejo del Trauma Dental en Niños y Adultos",
+      "cie10_codigo": "S02.5",
+      "cie10_descripcion": "Fractura de los dientes",
+      "especialidad": "Odontología",
+      "grupo_etario": "Población General",
+      "nivel_atencion": "Primer y Segundo Nivel"
+    },
+    {
+      "guia_key": "tratamiento_odontologico",
+      "patrones_nombre": ["tratamiento-odontologico", "odontologico"],
+      "titulo_oficial": "Guía de Práctica Clínica: Protocolos de Tratamiento Odontológico General",
+      "cie10_codigo": "K00-K14",
+      "cie10_descripcion": "Enfermedades de la cavidad bucal y glándulas salivales",
+      "especialidad": "Odontología",
+      "grupo_etario": "Población General",
+      "nivel_atencion": "Primer Nivel"
+    },
+    {
+      "guia_key": "salud_adolescentes",
+      "patrones_nombre": ["adolescentes", "supervision_salud_adolescentes"],
+      "titulo_oficial": "Guía de Práctica Clínica: Supervisión de la Salud Integral de Adolescentes",
+      "cie10_codigo": "Z00.3",
+      "cie10_descripcion": "Examen del desarrollo en la adolescencia",
+      "especialidad": "Medicina Familiar y Preventiva",
+      "grupo_etario": "Adolescentes (10-19 años)",
+      "nivel_atencion": "Primer Nivel"
+    }
+  ]
+}

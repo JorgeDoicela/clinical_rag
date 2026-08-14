@@ -7,41 +7,40 @@ Este documento complementa la especificación del sistema **Ateneo**, ofreciendo
 ## 1. Análisis Comparativo de Resultados
 
 ### 1.1 Contrastación contra Evaluadores Zero-Shot y LLMs Genéricos
-Los experimentos demostraron que el uso directo de modelos de lenguaje genéricos en configuración *Zero-Shot* (sin RAG ni norma explícita inyectada) presenta dos deficiencias críticas para la evaluación formativa:
-1. **Alucinación Normativa:** Los modelos genéricos tienden a evaluar respuestas basadas en guías de práctica clínica internacionales (NICE, AHA, WHO) que no concuerdan estrictamente con las dosificaciones o algoritmos de decisión estandarizados por el Ministerio de Salud Pública (MSP) del Ecuador (ej. volúmenes de impregnación en Código Rojo o dosis ponderales de Vitamina K en EHIRN).
+Los experimentos demostraron que el uso directo de modelos de lenguaje genéricos en configuración *Zero-Shot* (sin RAG ni norma explícita inyectada) presenta dos deficiencias críticas para la educación médica:
+1. **Alucinación Normativa:** Los modelos genéricos tienden a evaluar respuestas basadas en guías de práctica clínica internacionales (NICE, AHA, WHO) que difieren de las dosificaciones, flujogramas o esquemas de decisión estandarizados por el Ministerio de Salud Pública (MSP) del Ecuador (ej. volúmenes de impregnación en Código Rojo Obstétrico o dosis ponderales de Vitamina K en EHIRN).
 2. **Subjetividad en la Penalización:** Sin una métrica acotada a la norma, la calificación oscila con alta variabilidad. La arquitectura **Ateneo RAG** resuelve esta limitación forzando al modelo a fundamentar la retroalimentación en la `cita_normativa` literal del fragmento recuperado.
 
-### 1.2 Impacto del Fine-Tuning Supervisado por Tripletas (MNRL)
-El ajuste supervisado del modelo `BAAI/bge-m3` mediante la función de pérdida *Multiple Negatives Ranking Loss* sobre 480 tripletas adaptó el espacio latente de 1,024 dimensiones para reconocer la terminología específica del MSP. Esto permitió incrementar la precisión de recuperación a **Hit@1 = 100.0%** en el banco de pruebas, superando la ambigüedad donde secciones de diferentes guías compartían términos clínicos genéricos (ej. "hidratación parenteral").
+### 1.2 Impacto de la Búsqueda Híbrida RRF y Fine-Tuning Supervisado (MNRL)
+La integración de **Búsqueda Densa (BGE-M3 Fine-Tuned)** con **Búsqueda Dispersa (BM25Okapi)** mediante **Reciprocal Rank Fusion ($k=60$)** permitió alcanzar un rendimiento óptimo (**Hit@1 = 100.0%**, **MRR@5 = 1.0000**, **NDCG@5 = 1.0000**):
+* La rama densa resuelve la intención semántica y variaciones sintácticas del estudiante.
+* La rama dispersa BM25 garantiza la exactitud léxica de fármacos, dosis numéricas (*"500 mg"*, *"1 g IV"*) y acrónimos clínicos (*"CURB-65"*, *"HELLP"*).
 
 ---
 
-## 2. Limitaciones del Sistema y Factores de Riesgo
+## 2. Mitigación de Limitaciones de Ingesta Mediante OCR Defensivo
 
-### 2.1 Dependencia de Calidad en la Extracción PDF (OCR Noise)
-* **Limitación:** El módulo [backend/ingestion/pdf_extractor.py](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/ingestion/pdf_extractor.py) utiliza `pypdf`, el cual extrae el flujo de texto incrustado. En documentos antiguos del MSP resguardados como archivos escaneados o imágenes sin capa de texto seleccionable, la extracción directa falla o produce cadenas distorsionadas.
-* **Mitigación Sugerida:** Integrar un pipeline de Reconocimiento Óptico de Caracteres (OCR) avanzado como `Tesseract OCR` o `PaddleOCR` antes del segmentador.
-
-### 2.2 Dependencia de Conectividad Cloud para el LLM
-* **Limitación:** Aunque la etapa de recuperación vectorial opera de forma 100% local en CPU/GPU mediante ChromaDB y `BAAI/bge-m3`, la etapa de evaluación cualitativa requiere conectividad a internet para invocar la API de Google Gemini.
-* **Factor de Riesgo:** En entornos hospitalarios o de educación rural con conectividad inestable o restringida, la latencia de red puede afectar la disponibilidad de la plataforma.
+* **Desafío Histórico:** En documentos antiguos del MSP (2013-2015) resguardados como escaneos sin capa de texto seleccionable, la extracción directa con bibliotecas estándar de PDF fallaba.
+* **Solución Implementada ([backend/ingestion/ocr_service.py](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/ingestion/ocr_service.py)):** Se implementó un pipeline de **OCR Defensivo Multinivel** que detecta páginas con baja densidad de texto (< 50 caracteres) pero con imágenes incrustadas, renderizándolas a 180 DPI en memoria y transcribiendo su contenido clínico mediante OCR local y visión multimodal de alta precisión (Gemini Vision API), preservando tablas y algoritmos diagnósticos.
 
 ---
 
 ## 3. Consideraciones Éticas, Legales y Gobernanza de Datos
 
-1. **Evaluación Formativa No Punitiva:** El sistema está diseñado exclusivamente para el refuerzo pedagógico y la autoevaluación formativa. No debe sustituir la evaluación sumativa o la supervisión directa de tutores docentes clínicos.
-2. **Anonimización y Datos Sintéticos:** Los casos clínicos procesados en `cases.json` y las respuestas registradas en `history.db` utilizan identidades y escenarios simulados anonimizados, cumpliendo con la Ley Orgánica de Protección de Datos Personales del Ecuador y los estándares internacionales de confidencialidad en salud.
+1. **Evaluación Formativa No Punitiva:** El sistema está concebido como una herramienta de apoyo pedagógico para el autoaprendizaje y la retroalimentación formativa en internado rotativo y pregrado de medicina, sin sustituir el criterio final del docente tutor.
+2. **Anonimización y Datos Sintéticos:** Los casos clínicos procesados y las respuestas en `history.db` utilizan identidades y escenarios simulados anonimizados, cumpliendo estrictamente con la Ley Orgánica de Protección de Datos Personales del Ecuador y las normas de bioética en salud.
+3. **Auditoría e Integridad Académica:** Cada informe emitido incluye un código criptográfico **SHA-256 (`ATENEO-MSP-XXXXXXXX`)** verificable para prevenir adulteraciones en portafolios académicos.
 
 ---
 
-## 4. Líneas de Trabajo Futuro y Extensión Arquitectónica
+## 4. Líneas de Trabajo Futuro y Extensión Científica
 
-### 4.1 Búsqueda Híbrida y Re-Ranking Denso-Esparso
-Para mejorar la resolución en consultas con terminología ultra-específica (nombres de fármacos o valores numéricos exactos de laboratorio):
-* **Recuperación Híbrida:** Combinar búsqueda esparsa (BM25 / TF-IDF) con búsqueda densa vectorial (`bge-m3`) mediante Fusión de Rango Recíproco (RRF - *Reciprocal Rank Fusion*).
-* **Re-Ranking Supervisado:** Implementar una capa intermedia de re-ordenamiento utilizando modelos de *Cross-Encoder* (ej. `BAAI/bge-reranker-large`) sobre el Top-5 de fragmentos devueltos.
+### 4.1 Re-Ranking con Cross-Encoders Biomédicos
+* **Capa de Re-ordenamiento:** Evaluar modelos de *Cross-Encoder* especializados (ej. `BAAI/bge-reranker-large` o `BioLinkBERT`) sobre el Top-10 devuelto por la Fusión RRF para refinar la ponderación en casos clínicos con múltiples comorbilidades concurrentes.
 
-### 4.2 Despliegue 100% Local y Offline mediante LLMs Cuantizados
-Para eliminar la dependencia de APIs en la nube:
-* Integrar modelos de lenguaje de código abierto fine-tuneados en salud (ej. `Llama-3-8B-Instruct`, `Meditron-7B` o `BioMistral`) ejecutados localmente mediante motores de inferencia cuantizada (vLLM / Ollama con GGUF FP16/INT4).
+### 4.2 Despliegue 100% Offline mediante LLMs Cuantizados (Edge Computing)
+* Para centros de salud rurales de Primer Nivel sin conectividad a internet:
+  * Integrar LLMs clínicos de código abierto cuantizados (ej. `Llama-3-8B-Instruct`, `Meditron-7B` o `BioMistral`) ejecutados localmente mediante Ollama / vLLM (GGUF Q4_K_M).
+
+### 4.3 Validación Clínica Multicéntrica
+* Diseñar un estudio experimental aleatorizado controlado con cohortes de estudiantes de medicina en múltiples facultades de ciencias de la salud del Ecuador para medir la ganancia de aprendizaje (*Learning Gain*) pre y post uso de la plataforma Ateneo.

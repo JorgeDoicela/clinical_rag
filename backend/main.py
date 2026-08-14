@@ -31,6 +31,11 @@ images_dir = os.path.join(os.path.dirname(__file__), "cases_data", "images")
 os.makedirs(images_dir, exist_ok=True)
 app.mount("/static/images", StaticFiles(directory=images_dir), name="static_images")
 
+# Servir PDFs oficiales de las GPC del MSP para el Visor Integrado
+pdfs_dir = os.path.join(os.path.dirname(__file__), "data", "raw_pdfs")
+os.makedirs(pdfs_dir, exist_ok=True)
+app.mount("/static/pdfs", StaticFiles(directory=pdfs_dir), name="static_pdfs")
+
 app.include_router(auth_router, prefix="/api")
 app.include_router(cases_router)
 app.include_router(evaluation_router)

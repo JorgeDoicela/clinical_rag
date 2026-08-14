@@ -1,8 +1,10 @@
 import sys
-from typing import Dict, Any, Optional
+import re
+from typing import Dict, Any, Optional, List
 import chromadb
 from sentence_transformers import SentenceTransformer
 import sentence_transformers.models
+from rank_bm25 import BM25Okapi
 from config import CHROMA_PERSIST_PATH, EMBEDDING_MODEL_NAME
 
 # Compatibilidad defensiva para rutas de importación heredadas de sentence_transformers
@@ -16,16 +18,18 @@ if "sentence_transformers.base" not in sys.modules:
     sys.modules["sentence_transformers.sentence_transformer"] = sentence_transformers
     sys.modules["sentence_transformers.sentence_transformer.modules"] = sentence_transformers.models
 
-_MODEL_CACHE = None
+_MODEL_CACHE = {}
 _CHROMA_CLIENT = None
+_BM25_INDEX = None
+_BM25_CORPUS_METAS = None
 
-def get_embedding_model() -> SentenceTransformer:
+def get_embedding_model(model_name: str = EMBEDDING_MODEL_NAME) -> SentenceTransformer:
     global _MODEL_CACHE
-    if _MODEL_CACHE is None:
-        print(f"[RAG] Cargando modelo de embeddings local ({EMBEDDING_MODEL_NAME})...", flush=True)
-        _MODEL_CACHE = SentenceTransformer(EMBEDDING_MODEL_NAME)
-        print("[RAG] Modelo de embeddings listo.", flush=True)
-    return _MODEL_CACHE
+    if model_name not in _MODEL_CACHE:
+        print(f"[RAG] Cargando modelo de embeddings ({model_name})...", flush=True)
+        _MODEL_CACHE[model_name] = SentenceTransformer(model_name)
+        print(f"[RAG] Modelo '{model_name}' listo.", flush=True)
+    return _MODEL_CACHE[model_name]
 
 def get_chroma_client(persist_path: str = CHROMA_PERSIST_PATH) -> chromadb.PersistentClient:
     global _CHROMA_CLIENT
@@ -38,13 +42,50 @@ def get_chroma_client(persist_path: str = CHROMA_PERSIST_PATH) -> chromadb.Persi
         )
     return _CHROMA_CLIENT
 
-def retrieve_relevant_chunk(query: str, guia_filtro: Optional[str] = None, top_k: int = 1) -> Dict[str, Any]:
+def tokenize_medical_text(text: str) -> List[str]:
+    """Tokeniza texto médico para búsqueda léxica BM25 en minúsculas."""
+    return re.findall(r'\b[a-záéíóúüñ0-9\-]+\b', text.lower())
+
+def get_bm25_index():
+    """Inicializa y cachea el índice BM25 de los documentos en ChromaDB."""
+    global _BM25_INDEX, _BM25_CORPUS_METAS
+    if _BM25_INDEX is None:
+        client = get_chroma_client()
+        try:
+            collection = client.get_collection("gpc_msp")
+            data = collection.get(include=["documents", "metadatas"])
+            docs = data.get("documents", [])
+            metas = data.get("metadatas", [])
+            ids = data.get("ids", [])
+
+            if docs:
+                tokenized_corpus = [tokenize_medical_text(d) for d in docs]
+                _BM25_INDEX = BM25Okapi(tokenized_corpus)
+                _BM25_CORPUS_METAS = []
+                for i in range(len(ids)):
+                    _BM25_CORPUS_METAS.append({
+                        "chunk_id": ids[i],
+                        "texto": docs[i],
+                        "metadata": metas[i] if metas else {}
+                    })
+                print(f"[RAG HYBRID] Índice Sparse BM25 construido con {len(docs)} fragmentos.", flush=True)
+        except Exception as e:
+            print(f"[RAG HYBRID] BM25 Index no disponible temporalmente: {e}", flush=True)
+    return _BM25_INDEX, _BM25_CORPUS_METAS
+
+def retrieve_top_k_chunks(
+    query: str, 
+    guia_filtro: Optional[str] = None, 
+    top_k: int = 5,
+    retrieval_mode: str = "hybrid",
+    custom_dense_model: Optional[str] = None
+) -> List[Dict[str, Any]]:
     """
-    Recupera el fragmento de Guía de Práctica Clínica más relevante desde ChromaDB.
-    Aplica filtro por guia_fuente si se especifica.
+    Recuperador Híbrido y Modular para Estudios de Ablación:
+    - mode='hybrid': Dense + BM25 con Reciprocal Rank Fusion (RRF)
+    - mode='dense_only': Solo Búsqueda Densa
+    - mode='sparse_only': Solo Búsqueda BM25
     """
-    print(f"[RAG] Búsqueda ejecutada usando el Modelo Fine-Tuned: '{EMBEDDING_MODEL_NAME}' | Filtro Guía: '{guia_filtro}'", flush=True)
-    model = get_embedding_model()
     client = get_chroma_client()
 
     try:
@@ -52,57 +93,122 @@ def retrieve_relevant_chunk(query: str, guia_filtro: Optional[str] = None, top_k
         if collection.count() == 0:
             raise ValueError("Colección ChromaDB vacía.")
     except Exception:
-        print("[RAG] Colección no encontrada o vacía. Ejecutando pipeline de ingesta de respaldo...", flush=True)
         from ingestion.run_ingestion import run_ingestion_pipeline
         run_ingestion_pipeline()
         collection = client.get_collection("gpc_msp")
 
-    query_embedding = model.encode([query]).tolist()
-    where_filter = {"guia_fuente": guia_filtro} if guia_filtro else None
+    fetch_k = max(top_k * 3, 10)
+    dense_ranked_ids = []
+    chunk_data_map = {}
 
-    results = collection.query(
-        query_embeddings=query_embedding,
-        n_results=top_k,
-        where=where_filter
-    )
+    # 1. Búsqueda Densa (si no es sparse_only)
+    if retrieval_mode in ["hybrid", "dense_only"]:
+        model_target = custom_dense_model or EMBEDDING_MODEL_NAME
+        model = get_embedding_model(model_target)
+        query_embedding = model.encode([query]).tolist()
+        where_filter = {"guia_fuente": guia_filtro} if guia_filtro else None
 
-    # Si no hay coincidencias con el filtro específico por guia_fuente, realizar búsqueda semántica general en la colección
-    if not results or not results.get("ids") or not results["ids"][0]:
-        print(f"[RAG] Reintento de búsqueda semántica general (sin filtro estricto para '{guia_filtro}')...", flush=True)
-        results = collection.query(
+        dense_results = collection.query(
             query_embeddings=query_embedding,
-            n_results=top_k
+            n_results=fetch_k,
+            where=where_filter
         )
 
-    # Si aún no hay coincidencias con el filtro específico, realizar búsqueda semántica general en la colección
-    if not results or not results.get("ids") or not results["ids"][0]:
-        print(f"[RAG] Reintento de búsqueda semántica general (sin filtro estricto de guía)...", flush=True)
-        results = collection.query(
-            query_embeddings=query_embedding,
-            n_results=top_k
-        )
+        if not dense_results or not dense_results.get("ids") or not dense_results["ids"][0]:
+            dense_results = collection.query(
+                query_embeddings=query_embedding,
+                n_results=fetch_k
+            )
 
-    if not results or not results.get("ids") or not results["ids"][0]:
-        print(f"[RAG] ADVERTENCIA: No se hallaron fragmentos en ChromaDB para '{guia_filtro}'. Retornando fallback defensivo.", flush=True)
-        return {
+        if dense_results and dense_results.get("ids") and dense_results["ids"][0]:
+            for i in range(len(dense_results["ids"][0])):
+                cid = dense_results["ids"][0][i]
+                dense_ranked_ids.append(cid)
+                chunk_data_map[cid] = {
+                    "chunk_id": cid,
+                    "texto": dense_results["documents"][0][i],
+                    "metadata": dense_results["metadatas"][0][i],
+                    "distancia": dense_results["distances"][0][i] if "distances" in dense_results and dense_results["distances"] else 0.0
+                }
+
+    # 2. Búsqueda Léxica Dispersa BM25 (si no es dense_only)
+    bm25_ranked_ids = []
+    if retrieval_mode in ["hybrid", "sparse_only"]:
+        bm25_idx, bm25_corpus = get_bm25_index()
+        if bm25_idx and bm25_corpus:
+            tokenized_query = tokenize_medical_text(query)
+            scores = bm25_idx.get_scores(tokenized_query)
+            scored_indices = sorted(range(len(scores)), key=lambda idx: scores[idx], reverse=True)
+            
+            for idx in scored_indices[:fetch_k]:
+                item = bm25_corpus[idx]
+                cid = item["chunk_id"]
+                meta = item["metadata"]
+                
+                if guia_filtro and meta.get("guia_fuente") != guia_filtro:
+                    continue
+                    
+                bm25_ranked_ids.append(cid)
+                if cid not in chunk_data_map:
+                    chunk_data_map[cid] = {
+                        "chunk_id": cid,
+                        "texto": item["texto"],
+                        "metadata": meta,
+                        "distancia": 0.5
+                    }
+
+    # 3. Cálculo de Puntuaciones y Fusión
+    rrf_scores = {}
+    k_rrf = 60.0
+
+    if retrieval_mode == "hybrid":
+        for rank, cid in enumerate(dense_ranked_ids, start=1):
+            rrf_scores[cid] = rrf_scores.get(cid, 0.0) + (1.0 / (k_rrf + rank))
+        for rank, cid in enumerate(bm25_ranked_ids, start=1):
+            rrf_scores[cid] = rrf_scores.get(cid, 0.0) + (1.0 / (k_rrf + rank))
+        sorted_cids = sorted(rrf_scores.keys(), key=lambda cid: rrf_scores[cid], reverse=True)
+    elif retrieval_mode == "dense_only":
+        sorted_cids = dense_ranked_ids
+        for rank, cid in enumerate(dense_ranked_ids, start=1):
+            rrf_scores[cid] = 1.0 / (k_rrf + rank)
+    else: # sparse_only
+        sorted_cids = bm25_ranked_ids
+        for rank, cid in enumerate(bm25_ranked_ids, start=1):
+            rrf_scores[cid] = 1.0 / (k_rrf + rank)
+
+    retrieved = []
+    for cid in sorted_cids[:top_k]:
+        if cid in chunk_data_map:
+            item = chunk_data_map[cid]
+            meta = item["metadata"]
+            retrieved.append({
+                "chunk_id": cid,
+                "texto": item["texto"],
+                "seccion": meta.get("seccion", "General"),
+                "pagina": meta.get("pagina", 1),
+                "guia_fuente": meta.get("guia_fuente", guia_filtro or "MSP Ecuador"),
+                "ano_publicacion": meta.get("ano_publicacion", 2019),
+                "distancia": item["distancia"],
+                "rrf_score": round(rrf_scores.get(cid, 1.0), 5)
+            })
+
+    if not retrieved:
+        retrieved.append({
             "chunk_id": "fallback_gpc_001",
             "texto": f"Guía de Práctica Clínica del MSP Ecuador para {guia_filtro or 'atención médica'}. Aplicar protocolo normativo de diagnóstico y tratamiento.",
             "seccion": "Normativa General MSP",
             "pagina": 1,
             "guia_fuente": guia_filtro or "MSP Ecuador",
-            "distancia": 0.0
-        }
+            "ano_publicacion": 2019,
+            "distancia": 0.0,
+            "rrf_score": 1.0
+        })
 
-    chunk_id = results["ids"][0][0]
-    texto = results["documents"][0][0]
-    metadata = results["metadatas"][0][0]
-    distancia = results["distances"][0][0] if "distances" in results and results["distances"] else 0.0
+    return retrieved
 
-    return {
-        "chunk_id": chunk_id,
-        "texto": texto,
-        "seccion": metadata.get("seccion", "General"),
-        "pagina": metadata.get("pagina", 1),
-        "guia_fuente": metadata.get("guia_fuente", guia_filtro or "MSP Ecuador"),
-        "distancia": distancia
-    }
+def retrieve_relevant_chunk(query: str, guia_filtro: Optional[str] = None, top_k: int = 1) -> Dict[str, Any]:
+    """
+    Recupera el fragmento óptimo mediante Búsqueda Híbrida RAG (BGE-M3 + BM25 + RRF).
+    """
+    chunks = retrieve_top_k_chunks(query=query, guia_filtro=guia_filtro, top_k=top_k, retrieval_mode="hybrid")
+    return chunks[0]

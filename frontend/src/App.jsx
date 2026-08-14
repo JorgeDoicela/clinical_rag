@@ -8,7 +8,8 @@ import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
 import AteneoRoom from './pages/AteneoRoom';
-import { Activity, ShieldCheck, HeartPulse, LogOut, User, GraduationCap, UserCheck, Lock } from 'lucide-react';
+import ScientificBenchmarkView from './components/ScientificBenchmarkView';
+import { Activity, ShieldCheck, HeartPulse, LogOut, User, GraduationCap, UserCheck, Lock, Award } from 'lucide-react';
 
 function Navbar() {
   const { user, logout } = useAuth();
@@ -40,7 +41,20 @@ function Navbar() {
         <div className="flex items-center gap-4 text-xs font-semibold text-slate-600">
           {user ? (
             <>
-              {/* Acceso a Paneles por Rol (Ocultar botones redundantes si ya está en la vista) */}
+              {/* Acceso a Benchmark Científico para Congreso / Artículos */}
+              <Link
+                to="/benchmark"
+                className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-colors ${
+                  location.pathname === '/benchmark'
+                    ? 'bg-sky-50 text-sky-700 font-bold border border-sky-200'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Award className="w-4 h-4 text-sky-600" />
+                <span>Benchmark Científico</span>
+              </Link>
+
+              {/* Acceso a Paneles por Rol */}
               {user.rol === 'administrador' && location.pathname !== '/admin' && (
                 <Link
                   to="/admin"
@@ -130,6 +144,15 @@ export default function App() {
                 element={
                   <ProtectedRoute allowedRoles={['alumno', 'docente', 'administrador']}>
                     <CaseSolve />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/benchmark"
+                element={
+                  <ProtectedRoute allowedRoles={['alumno', 'docente', 'administrador']}>
+                    <ScientificBenchmarkView />
                   </ProtectedRoute>
                 }
               />
