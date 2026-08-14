@@ -81,7 +81,8 @@ def run_ingestion_pipeline():
         print(f"[INGESTION] Encontrados {len(pdf_files)} PDFs en subcarpetas de {raw_dir}. Procesando con escaneo estructurado...", flush=True)
         total_pdf_chunks = 0
         for idx, pdf_file in enumerate(pdf_files, start=1):
-            guia_id = pdf_file.stem.lower().replace("-", "_").replace(" ", "_")
+            # Identificador único incluyendo el año para evitar colisiones
+            guia_id = f"{pdf_file.parent.name}_{pdf_file.stem}".lower().replace("-", "_").replace(" ", "_")
             pages = extract_advanced_text_by_page(pdf_file)
             chunks = chunk_by_section(pages, guia_id=guia_id, max_chunk_size=800, overlap_size=150)
             all_chunks.extend(chunks)

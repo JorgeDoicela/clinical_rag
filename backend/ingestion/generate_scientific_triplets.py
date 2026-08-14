@@ -1,14 +1,27 @@
 import json
 import random
 import re
+import unicodedata
 from pathlib import Path
 import sys
 from typing import List, Dict, Any, Tuple
 from collections import defaultdict
 
+# Configurar encoding UTF-8 en consola para Windows
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-from rag.retriever import get_chroma_client
 from models.medical_catalog import get_medical_metadata_for_guide, load_medical_catalog
+from config import RAW_PDFS_PATH
+from ingestion.pdf_advanced_parser import extract_advanced_text_by_page
+from ingestion.chunker import chunk_by_section
+
+def clean_name_display(name: str) -> str:
+    """Normaliza cadenas para visualización segura en consola Windows."""
+    return unicodedata.normalize("NFKC", str(name)).encode("ascii", "replace").decode("ascii")
 
 def compute_word_jaccard(text1: str, text2: str) -> float:
     """Calcula la similitud de Jaccard entre dos textos para la minería de negativos difíciles."""
@@ -104,7 +117,6 @@ def generate_clinical_queries_for_chunk(
     queries = []
     sec_clean = seccion.strip()
     
-    # Sintetizar tema principal
     first_lines = [l.strip() for l in doc.split("\n") if len(l.strip()) > 20 and not l.startswith("|")]
     topic_snippet = first_lines[0][:80] if first_lines else sec_clean
 
@@ -123,6 +135,49 @@ def generate_clinical_queries_for_chunk(
 
     return queries
 
+def load_all_chunks_from_chroma_or_pdfs() -> Tuple[List[str], List[Dict[str, Any]], List[str]]:
+    """
+    Carga todos los chunks estructurados desde ChromaDB si está disponible,
+    o directamente desde los 46 PDFs de forma rápida y determinista.
+    """
+    documents, metadatas, ids = [], [], []
+    
+    try:
+        from rag.retriever import get_chroma_client
+        client = get_chroma_client()
+        collection = client.get_collection("gpc_msp")
+        data = collection.get(include=["documents", "metadatas"])
+        documents = data.get("documents", [])
+        metadatas = data.get("metadatas", [])
+        ids = data.get("ids", [])
+    except Exception:
+        documents, metadatas, ids = [], [], []
+
+    if not documents:
+        print("[SCIENTIFIC DATASET] Extrayendo chunks directamente desde los PDFs oficiales...", flush=True)
+        raw_dir = Path(RAW_PDFS_PATH)
+        pdf_files = sorted(list(raw_dir.rglob("*.pdf")))
+        
+        for pdf_file in pdf_files:
+            guia_id = f"{pdf_file.parent.name}_{pdf_file.stem}".lower().replace("-", "_").replace(" ", "_")
+            pages = extract_advanced_text_by_page(pdf_file)
+            chunks = chunk_by_section(pages, guia_id=guia_id, max_chunk_size=800, overlap_size=150)
+            
+            for c in chunks:
+                ids.append(c["chunk_id"])
+                documents.append(c["texto"])
+                metadatas.append({
+                    "guia_fuente": c.get("guia_fuente", guia_id),
+                    "pagina": c.get("pagina", 1),
+                    "seccion": c.get("seccion", "General"),
+                    "ano_publicacion": c.get("ano_publicacion", 2019),
+                    "especialidad": c.get("especialidad", "Medicina Interna"),
+                    "cie10_codigo": c.get("cie10_codigo", "Z00")
+                })
+        print(f"[SCIENTIFIC DATASET] Extraidos exitosamente {len(documents)} fragmentos clinicos de los PDFs.", flush=True)
+
+    return documents, metadatas, ids
+
 def generate_scientific_triplets(
     output_dir: str = "./data",
     train_ratio: float = 0.70,
@@ -133,23 +188,13 @@ def generate_scientific_triplets(
     Genera el dataset de entrenamiento y aplica la partición científica
     Document-Level Stratified Out-of-Distribution Split (Train / Validation / Test Ciego).
     """
-    client = get_chroma_client()
-    try:
-        collection = client.get_collection("gpc_msp")
-    except Exception:
-        print("[ERROR] La colección 'gpc_msp' no existe. Ejecute primero run_ingestion.py")
-        return
-
-    data = collection.get(include=["documents", "metadatas"])
-    documents = data.get("documents", [])
-    metadatas = data.get("metadatas", [])
-    ids = data.get("ids", [])
+    documents, metadatas, ids = load_all_chunks_from_chroma_or_pdfs()
 
     if not documents:
-        print("[ERROR] ChromaDB no tiene fragmentos indexados.")
+        print("[ERROR] No se encontraron fragmentos clinicos en los PDFs ni en ChromaDB.")
         return
 
-    print(f"[SCIENTIFIC DATASET] Procesando {len(documents)} fragmentos indexados...", flush=True)
+    print(f"[SCIENTIFIC DATASET] Procesando {len(documents)} fragmentos normativos...", flush=True)
 
     # Identificar todas las Guías clínicas distintas
     guias_unicas = sorted(list(set([m.get("guia_fuente", "MSP Ecuador") for m in metadatas if m.get("guia_fuente")])))
@@ -160,17 +205,16 @@ def generate_scientific_triplets(
     )
 
     print(f"\n==================================================================")
-    print(f" DIVISIÓN CIENTÍFICA ESTRATIFICADA (Document-Level Out-of-Distribution)")
-    print(f" Total de Guías GPC únicas: {len(guias_unicas)}")
-    print(f"  - Guías Entrenamiento ({len(train_guias)}): {sorted(list(train_guias))}")
-    print(f"  - Guías Validación ({len(val_guias)}): {sorted(list(val_guias))}")
-    print(f"  - Guías Test Ciego ({len(test_guias)}): {sorted(list(test_guias))}")
+    print(f" DIVISION CIENTIFICA ESTRATIFICADA (Document-Level Out-of-Distribution)")
+    print(f" Total de Guias GPC unicas: {len(guias_unicas)}")
+    print(f"  - Guias Entrenamiento ({len(train_guias)}): {[clean_name_display(g) for g in sorted(list(train_guias))]}")
+    print(f"  - Guias Validacion ({len(val_guias)}): {[clean_name_display(g) for g in sorted(list(val_guias))]}")
+    print(f"  - Guias Test Ciego ({len(test_guias)}): {[clean_name_display(g) for g in sorted(list(test_guias))]}")
     print(f"==================================================================\n", flush=True)
 
     doc_by_id = {ids[i]: documents[i] for i in range(len(ids))}
     valid_indices = [i for i, doc in enumerate(documents) if is_meaningful_chunk(doc)]
 
-    # Mapeo de índices por guía y por especialidad para Hard Negative Mining
     indices_por_guia = defaultdict(list)
     indices_por_especialidad = defaultdict(list)
 
@@ -202,7 +246,6 @@ def generate_scientific_triplets(
                         pos_text = cand[0]
 
                 if pos_text:
-                    # Minería de negativo difícil dentro de la misma especialidad
                     meta_esp = get_medical_metadata_for_guide(guia_fuente).get("especialidad", "")
                     same_esp_candidates = [documents[i] for i in indices_por_especialidad.get(meta_esp, []) if documents[i] != pos_text]
                     
@@ -210,7 +253,7 @@ def generate_scientific_triplets(
                         neg_text = max(same_esp_candidates, key=lambda d: compute_word_jaccard(pos_text, d))
                     else:
                         other_candidates = [documents[i] for i in valid_indices if documents[i] != pos_text]
-                        neg_text = max(other_candidates, key=lambda d: compute_word_jaccard(pos_text, d)) if other_candidates else "Norma clínica general."
+                        neg_text = max(other_candidates, key=lambda d: compute_word_jaccard(pos_text, d)) if other_candidates else "Norma clinica general."
 
                     triplets_all.append({
                         "id": f"gold_seed_{c.get('id')}",
@@ -218,12 +261,12 @@ def generate_scientific_triplets(
                         "pos": pos_text,
                         "neg": neg_text,
                         "guia_fuente": guia_fuente,
-                        "seccion": "Caso Clínico Oro (Gold Standard)",
+                        "seccion": "Caso Clinico Oro (Gold Standard)",
                         "tipo_negativo": "Hard Negative Intra-Especialidad"
                     })
                     seen_queries.add(query_text)
 
-    # 2. Generación Masiva con Dense/Lexical Hard Negative Mining
+    # 2. Generación Masiva con Hard Negative Mining
     for idx in valid_indices:
         doc = documents[idx]
         meta = metadatas[idx]
@@ -239,7 +282,6 @@ def generate_scientific_triplets(
                 continue
             seen_queries.add(query_text)
 
-            # Estrategia de Negativo Difícil (Hard Negative Mining Multinivel)
             neg_text = ""
             tipo_neg = ""
 
@@ -248,18 +290,15 @@ def generate_scientific_triplets(
 
             dice = random.random()
             if same_guia_negatives and dice < 0.60:
-                # Nivel 1: Negativo difícil de la MISMA guía (máxima confusión temática)
                 neg_text = max(same_guia_negatives, key=lambda d: compute_word_jaccard(doc, d))
-                tipo_neg = "Hard Negative Intra-Guía"
+                tipo_neg = "Hard Negative Intra-Guia"
             elif same_esp_negatives and dice < 0.90:
-                # Nivel 2: Negativo difícil de la MISMA especialidad pero distinta guía
                 neg_text = max(same_esp_negatives, key=lambda d: compute_word_jaccard(doc, d))
                 tipo_neg = "Hard Negative Intra-Especialidad"
             else:
-                # Nivel 3: Negativo inter-guía aleatorio
                 other_negatives = [documents[i] for i in valid_indices if metadatas[i].get("guia_fuente") != guia_fuente]
-                neg_text = random.choice(other_negatives) if other_negatives else "Normativa médica general."
-                tipo_neg = "Negative Aleatorio Inter-Guía"
+                neg_text = random.choice(other_negatives) if other_negatives else "Normativa medica general."
+                tipo_neg = "Negative Aleatorio Inter-Guia"
 
             triplets_all.append({
                 "id": f"triplet_{len(triplets_all):05d}",
@@ -273,7 +312,7 @@ def generate_scientific_triplets(
                 "tipo_negativo": tipo_neg
             })
 
-    # Clasificar tripletas según su guía fuente para garantizar Cero Data Leakage
+    # Clasificar tripletas según su guía fuente
     train_triplets = [t for t in triplets_all if t.get("guia_fuente") in train_guias or t.get("id", "").startswith("gold_seed_")]
     val_triplets = [t for t in triplets_all if t.get("guia_fuente") in val_guias and not t.get("id", "").startswith("gold_seed_")]
     test_triplets = [t for t in triplets_all if t.get("guia_fuente") in test_guias and not t.get("id", "").startswith("gold_seed_")]
@@ -293,11 +332,11 @@ def generate_scientific_triplets(
     with open(base_dir / "test_triplets_blind.json", "w", encoding="utf-8") as f:
         json.dump(test_triplets, f, indent=2, ensure_ascii=False)
 
-    print(f"\n[OK] Generación de Datasets Científicos Completada:")
+    print(f"\n[OK] Generacion de Datasets Cientificos Completada:")
     print(f"  - Dataset Global Completo: {len(triplets_all)} tripletas en 'ft_dataset.json'")
-    print(f"  - Train Set (70%): {len(train_triplets)} tripletas ({len(train_guias)} Guías) en 'train_triplets.json'")
-    print(f"  - Validation Set (15%): {len(val_triplets)} tripletas ({len(val_guias)} Guías) en 'val_triplets.json'")
-    print(f"  - Test Set Ciego Out-of-Distribution (15%): {len(test_triplets)} tripletas ({len(test_guias)} Guías) en 'test_triplets_blind.json'", flush=True)
+    print(f"  - Train Set (70%): {len(train_triplets)} tripletas ({len(train_guias)} Guias) en 'train_triplets.json'")
+    print(f"  - Validation Set (15%): {len(val_triplets)} tripletas ({len(val_guias)} Guias) en 'val_triplets.json'")
+    print(f"  - Test Set Ciego Out-of-Distribution (15%): {len(test_triplets)} tripletas ({len(test_guias)} Guias) en 'test_triplets_blind.json'", flush=True)
 
     return len(triplets_all)
 

@@ -1,11 +1,22 @@
 import json
+import unicodedata
 from pathlib import Path
 from typing import Dict, Any
 from collections import defaultdict
 import sys
 
+# Configurar encoding UTF-8 en consola para Windows
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 from models.medical_catalog import get_medical_metadata_for_guide
+
+def clean_name_display(name: str) -> str:
+    """Normaliza cadenas para visualización segura en consola Windows."""
+    return unicodedata.normalize("NFKC", str(name)).encode("ascii", "replace").decode("ascii")
 
 def validate_dataset_integrity(base_dir_str: str = "./data") -> Dict[str, Any]:
     """
@@ -89,19 +100,19 @@ def validate_dataset_integrity(base_dir_str: str = "./data") -> Dict[str, Any]:
             "val_vs_test": list(overlap_val_test_guias)
         },
         "data_leakage_text_overlaps_count": len(pos_overlap_train_test),
-        "estado_integridad": "VÁLIDO (CERO FUGA DE DATOS: Document-Level Out-of-Distribution Estricto)" if not leakage_detected else "ALERTA DE DATA LEAKAGE DETECTADA"
+        "estado_integridad": "VALIDO (CERO FUGA DE DATOS: Document-Level Out-of-Distribution Estricto)" if not leakage_detected else "ALERTA DE DATA LEAKAGE DETECTADA"
     }
 
     print("\n==================================================================")
-    print(" AUDITORÍA CIENTÍFICA FORMAL DE INTEGRIDAD Y DATA LEAKAGE")
+    print(" AUDITORIA CIENTIFICA FORMAL DE INTEGRIDAD Y DATA LEAKAGE")
     print("==================================================================")
     print(f"Total Tripletas Globales: {report['total_tripletas_global']}")
-    print(f"  - Train Set (70%): {report['split_counts']['train']} tripletas | {report['guias_por_split']['train_guias_count']} Guías Clínicas")
-    print(f"  - Val Set   (15%): {report['split_counts']['val']} tripletas | {report['guias_por_split']['val_guias_count']} Guías Clínicas")
-    print(f"  - Test Set  (15%): {report['split_counts']['test_blind']} tripletas | {report['guias_por_split']['test_guias_count']} Guías Clínicas (Ciegas)")
+    print(f"  - Train Set (70%): {report['split_counts']['train']} tripletas | {report['guias_por_split']['train_guias_count']} Guias Clinicas")
+    print(f"  - Val Set   (15%): {report['split_counts']['val']} tripletas | {report['guias_por_split']['val_guias_count']} Guias Clinicas")
+    print(f"  - Test Set  (15%): {report['split_counts']['test_blind']} tripletas | {report['guias_por_split']['test_guias_count']} Guias Clinicas (Ciegas)")
     print(f"\nEstado de Integridad: {report['estado_integridad']}")
-    print(f"Fuga de Guías Train ∩ Test: {len(overlap_train_test_guias)} (Esperado: 0)")
-    print(f"Fuga de Párrafos Train ∩ Test: {len(pos_overlap_train_test)} (Esperado: 0)")
+    print(f"Fuga de Guias Train vs Test: {len(overlap_train_test_guias)} (Esperado: 0)")
+    print(f"Fuga de Parrafos Train vs Test: {len(pos_overlap_train_test)} (Esperado: 0)")
     print("==================================================================\n", flush=True)
 
     return report
