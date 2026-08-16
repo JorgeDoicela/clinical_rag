@@ -56,7 +56,16 @@ def build_vector_db(chunks: List[Dict[str, Any]], persist_path: str = CHROMA_PER
     } for c in unique_chunks]
 
     print(f"[RAG] Calculando embeddings para {len(texts)} fragmentos con {EMBEDDING_MODEL_NAME}...", flush=True)
-    embeddings = model.encode(texts, batch_size=32, show_progress_bar=True).tolist()
+    batch_size_encode = 64
+    all_embeddings = []
+    total_texts = len(texts)
+    for i in range(0, total_texts, batch_size_encode):
+        batch_texts = texts[i : i + batch_size_encode]
+        batch_emb = model.encode(batch_texts, batch_size=batch_size_encode, show_progress_bar=False)
+        all_embeddings.extend(batch_emb.tolist())
+        pct = min(100, int((i + len(batch_texts)) / total_texts * 100))
+        print(f"  - [RAG] Progreso embeddings: {i + len(batch_texts)}/{total_texts} ({pct}%)", flush=True)
+    embeddings = all_embeddings
 
     # 2. Upsert por lotes de 500 para estabilidad transaccional
     batch_size_upsert = 500
