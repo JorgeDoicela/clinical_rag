@@ -29,8 +29,8 @@ Para evitar la sobreestimación del rendimiento causada por la memorización del
 | Partición del Dataset | Proporción | Cantidad de Guías | Función Científica |
 | :--- | :---: | :---: | :--- |
 | **Training Set (`train_triplets.json`)** | **`70%`** | ~31 GPCs | Ajuste supervisado de los pesos del modelo denso `ateneo-bge-m3-ecuador` con pérdida MNRL en GPU NVIDIA A100. |
-| **Validation Set (`val_triplets.json`)** | **`15%`** | ~6 GPCs | Monitoreo de exactitud de ranking por época (`TripletEvaluator`) y parada temprana (*Early Stopping*). |
-| **Test Set Ciego (`test_triplets_blind.json`)** | **`15%`** | ~6 GPCs | Evaluación ciega *Out-of-Distribution* de generalización del RAG sobre normas jamás vistas en entrenamiento. |
+| **Validation Set (`val_triplets.json`)** | **`15%`** | ~7 GPCs | Monitoreo de exactitud de ranking por época (`TripletEvaluator`) y parada temprana (*Early Stopping*). |
+| **Test Set Ciego (`test_triplets_blind.json`)** | **`15%`** | ~7 GPCs | Evaluación ciega *Out-of-Distribution* de generalización del RAG sobre normas jamás vistas en entrenamiento. |
 
 ---
 
