@@ -6,7 +6,7 @@ Este documento describe el protocolo experimental riguroso implementado en **Ate
 
 ## 1. Corpus Normativo Oficial de Guías de Práctica Clínica (GPC)
 
-El corpus está compuesto por **46 documentos oficiales** emitidos por el Ministerio de Salud Pública (MSP) del Ecuador, organizados por sus años de promulgación (2013 a 2019). El 100% de los documentos se encuentra mapeado nosológicamente contra la Clasificación Internacional de Enfermedades (**CIE-10**) y categorizado en 11 especialidades médicas:
+El corpus está compuesto por **45 documentos oficiales** emitidos por el Ministerio de Salud Pública (MSP) del Ecuador, organizados por sus años de promulgación (2013 a 2019). El 100% de los documentos se encuentra mapeado nosológicamente contra la Clasificación Internacional de Enfermedades (**CIE-10**) y categorizado en 11 especialidades médicas:
 
 * **Ginecología y Obstetricia** (Preeclampsia, Hemorragia Posparto, RPM, Cesárea, Anemia Gestacional, Trabajo de Parto, Infección Vaginal, etc.)
 * **Pediatría y Neonatología** (EHIRN, Sepsis Neonatal, Recién Nacido Prematuro, Dificultad Respiratoria, APLV, Hipotiroidismo Congénito)

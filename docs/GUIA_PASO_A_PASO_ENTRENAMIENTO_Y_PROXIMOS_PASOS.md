@@ -66,7 +66,7 @@ Al finalizar la última celda, el notebook generará y descargará automáticame
 1. Descomprime el archivo descargado `ateneo-bge-m3-ecuador.zip`.
 2. Coloca la carpeta resultante en:
    `backend/data/ateneo-bge-m3-ecuador/`
-3. ¡Listo! El sistema [config.py](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/config.py) detectará los nuevos pesos y conmutará automáticamente todas las búsquedas hacia el modelo afinado con las 46 Guías del MSP.
+3. ¡Listo! El sistema [config.py](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/config.py) detectará los nuevos pesos y conmutará automáticamente todas las búsquedas hacia el modelo afinado con las 45 Guías del MSP.
 
 ---
 
@@ -97,7 +97,7 @@ py tests/run_ablation_study.py
 En cualquier otra computadora:
 
 ```bash
-# 1. Clonar el repositorio completo (incluye los 46 PDFs, datasets y configuraciones)
+# 1. Clonar el repositorio completo (incluye los 45 PDFs, datasets y configuraciones)
 git clone https://github.com/JorgeDoicela/clinical_rag.git
 cd clinical_rag
 
