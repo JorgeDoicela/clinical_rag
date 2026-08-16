@@ -8,7 +8,7 @@
   "is_local": false,
   "local_files_only": false,
   "mask_token": "<mask>",
-  "model_max_length": 512,
+  "model_max_length": 1024,
   "pad_token": "<pad>",
   "sep_token": "</s>",
   "sp_model_kwargs": {},

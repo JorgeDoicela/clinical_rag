@@ -55,7 +55,8 @@ Durante la construcción de tripletas $(q, p^+, n^-)$:
 
 * **Backbone:** `BAAI/bge-m3` (1,024 dimensiones latentes, 560M parámetros).
 * **Ventana Contextual (`max_seq_length`):** `1024 tokens` (preservación íntegra de tablas de dosis y algoritmos).
-* **Tamaño de Lote (`batch_size`):** `32` (genera 31 negativos *In-Batch* reales + 32 *Hard Negatives* por paso de gradiente).
+* **Tamaño de Lote (`batch_size`):** `8` (genera 7 negativos *In-Batch* reales + 8 *Hard Negatives* por paso de gradiente).
+* **Gestión de Memoria GPU:** `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` para prevención de fragmentación VRAM.
 * **Optimizador:** `AdamW` ($lr = 2\times 10^{-5}$, $weight\_decay = 0.01$).
 * **Scheduler:** `Cosine Annealing` con $10\%$ de pasos de calentamiento (*Warmup*).
 * **Precisión:** `BF16 / TF32` nativo acelerado en Tensor Cores.

@@ -4,454 +4,924 @@ tags:
 - sentence-similarity
 - feature-extraction
 - generated_from_trainer
-- dataset_size:480
+- dataset_size:1918
 - loss:MultipleNegativesRankingLoss
 base_model: BAAI/bge-m3
 widget:
-- source_sentence: '¿Qué establece la norma MSP (gpc_ehirn2019) respecto a: 71.  Gerner
-    GJ, Burton VJ, Poretti A, Bosemani T, Cristofalo E, Tekes A, et  al.?'
+- source_sentence: '¿Qué establece la Guía de Práctica Clínica oficial del MSP (2016_msp_trastornos_hipertensivos_del_embarazo_con_portada_3,
+    2016) respecto a: Trastornos hipertensivos del embarazo. (Actualización 2016).?'
   sentences:
-  - "46 \n \n71.  Gerner GJ, Burton VJ, Poretti A, Bosemani T, Cristofalo E, Tekes\
-    \ A, et  al. \nTransfontanellar duplex brain ultrasonography resistive indices\
-    \ as a prognostic tool in \nneonatal hypoxic -ischemic encephalopathy before and\
-    \ after treatment with therapeutic \nhypothermia. J Perinatol [Internet]. 2016;36(3):202\
-    \ –6. Disponible en: \nhttp://dx.doi.org/10.1038/jp.2015.169 \n72.  Liu J, Feng\
-    \ Z -C. Changes in pulmonary arterial pressure in term -infants with hypoxic -\n\
-    ischemic encephalopathy. Pediatr Int [Internet]. 2009;51(6):786 –9. Disponible\
-    \ en: \nhttp://www.embase.com/search/results?subaction=viewrecord&from=export&id=L358040\n\
-    739%5Cnhttp://dx.doi.org/10.1111/j.1442-\n200X.2009.02854.x%5Cnhttp://sfx.library.uu.nl/utrecht?sid=EMBASE&issn=13288067&id\n\
-    =doi:10.1111%2Fj.1442-200X.2009.02854.x&atitle=Changes \n73.  Abman SH, Hansmann\
-    \ G, Archer SL, Ivy DD, Adatia I, Chung WK, et  al. Pediatric \npulmonary hypertension.\
-    \ Vol. 132, Circulation. 2015. 2037-2099 p.  \n74.  Apitz C, Hansmann G, Schranz\
-    \ D. Hemodynamic assessment and acute pulmonary \nvasoreactivity testing in the\
-    \ evaluation of children with pulmonary vascular disease. \nExpert consen sus\
-    \ statement on the diagnosis and treatment of paediatric pulmonary \nhypertension.\
-    \ The European Paediatric Pulmon. Heart. 2016;102:ii23-ii29.  \n75.  Murphy K,\
-    \ van der Aa NE, Negro S, Groenendaal F, de Vries LS, Viergever MA, et  al. \n\
-    Automatic quantification of ischemic injury on diffusion-weighted MRI of neonatal\
-    \ hypoxic \nischemic encephalopathy. NeuroImage Clin [Internet]. 2017;14:222 –32.\
-    \ Disponible en: \nhttp://dx.doi.org/10.1016/j.nicl.2017.01.005 \n76.  Glass HC,\
-    \ Bonifacio SL, Shimotake T, Ferriero DM. Neurocr itical care for neonates. Curr\
-    \ \nTreat Options Neurol. 2011;13(6):574–89.  \n77.  Shankaran S, Laptook AR,\
-    \ Pappas A, McDonald SA, Das A, Tyson JE, et  al. Effect of \ndepth and duration\
-    \ of cooling on deaths in the NICU among neonates with hypoxic \nischemic encepha\
-    \ lopathy a randomized clinical trial. JAMA - J Am Med Assoc. \n2014;312(24):2629–39.\
-    \  \n78.  Blanco D. Neuroprotección con hipotermia en el recién nacido con encefalopatía\
-    \ hipóxico \nisquémica. Comisión de estándares de la SEN. Guía de estándares para\
-    \ su aplicaci ón \nclínica. An Pediatr. 2011;  \n79.  Gomella T, Cunningham M\
-    \ EF. Varicella -zoster infection. Neonatology: Management, \nprocedures, on call\
-    \ problems, disease, and drugs. 2013. 934-5 p.  \n80.  acobs,SE;Berg, M;Hunt R\
-    \ et al. Jacobs SE, Berg M, Hunt R, et al: Coo ling for newborns \nwith hypoxic\
-    \ ischaemic encephalopathy. Cochrane Database Syst Rev 2013; undefined: \nCochrane\
-    \ Database Syst. 2013;  \n81.  Village EG. Hypothermia and Neonatal Encephalopathy.\
-    \ Pediatrics [Internet]. \n2014;133(6):1146–50. Disponible en: \nhttp://pediatrics.aappublications.org/cgi/doi/10.1542/peds.2014-0899\
-    \ \n82.  Ly NP, Gold DR, Weiss ST, Celedón JC. Recurrent wheeze in early childhood\
-    \ and \nasthma among children at risk for atopy. Pediatrics. 2006;117(6):e1132–8.\
-    \  \n83.  Tooley JR, Satas S, Porter H, S ilver IA, Thoresen M. Head cooling with\
-    \ mild systemic \nhypothermia in anesthetized piglets is neuroprotective. Ann\
-    \ Neurol. 2003;53(1):65–72.  \n84.  Thoresen M, Satas S, LØberg EM, Whitelaw A,\
-    \ Acolet D, Lindgren C, et  al. Twenty-four \nhours of mild hypothermia  in unsedated\
-    \ newborn pigs starting after a severe global \nhypoxic-ischemic insult is not\
-    \ neuroprotective. Pediatr Res. 2001;50(3):405–11.  \n85.  Angeles DM, Ashwal\
-    \ S, Wycliffe ND, Ebner C, Fayard E, Sowers L, et  al. Relationship \nBetween\
-    \ Opioid Therapy, Tiss ue-Damaging Procedures, and Brain Metabolites as \nMeasured\
-    \ by Proton MRS in Asphyxiated Term Neonates. Pediatr Res. 2007;61(5):614 –\n\
-    21.  \n86.  Angeles DM, Wycliffe N, Michelson D, Holshouser BA, Deming DD, Pearce\
-    \ WJ, et  al. \nUse of opioids in asphyxiated term neonates: Effects on neuroimaging\
-    \ and clinical \noutcome. Pediatr Res. 2005;57(6):873–8."
-  - "50 \n \n \nEl grupo GeSIDA concluye que, en personas con hepatopatía crónica\
-    \ y función hepática \nconservada, incluida la cirrosis clase A de Child- Pugh,\
-    \ se puede utilizar cualquier \nmedicamento ARV (aunque es razonable evitar los\
-    \ dideoxinucleósidos y NVP).(17)  \n \nEn personas con insuficiencia hepatocelular\
-    \ leve/moderada (Child- Pugh A o B), los \ninhibidores de integrasa son los fármacos\
-    \ de elección y no precisan ajuste de dosis. \nRAL no requiere de ajuste de dosis,\
-    \ incluso en personas con hepatopatía avanzada. \nDTG tampoco requiere ajuste\
-    \ de dosis en insuficiencia hepática moderada. ATV/r es \nseguro en este escenario.\
-    \  \n \nEn la mayoría de individuos coinfectados por VIH 1 y VHB, tanto TDF como\
-    \ TAF \nsuprimen el VHB. Por tanto, en estas personas la TARV recomendada es un\
-    \ esquema \nque incluya TDF (o TAF) junto a FTC o 3TC.(94)  \n \nFigura 5. Seguimiento\
-    \ y manejo de la persona infectada con VIH con elevación de \nATL/AST \n \n  \
-    \  \nModificado de: EACS. Guía clínica 2017. (3) \n \nRecomendaciones para personas\
-    \ con VIH y hepatopatías \nB \n2a \nRealizar evaluación de la función hepática\
-    \ al inicio y periódicamente en todo \npaciente con infección por VIH. \nUtilizar\
-    \ cualquier TARV de las señaladas como primera línea en personas con \nhepatopatía\
-    \ crónica y función hepática conservada, incluida la cirrosis en clase A \nde\
-    \ Child-Pugh. \nConsiderar a los inhibidores de integrasa como fármacos de elección\
-    \ en personas \ncon insuficiencia hepatocelular leve/moderada (Child-Pugh A o\
-    \ B). \nIncluir TDF en régimen TARV cuando exista coinfección VIH/ hepatitis B."
-  - "84 \n \nParte 2: Asesoría preconcepcional y embarazo en infección por \nVIH \n\
-    \ \nPrevención \n \na) ¿Cuáles son las recomendaciones a seguir en personas con\
-    \ VIH que \nplanifican un embarazo? \n \nConsejería preconcepcional \n \nLa consejería\
-    \ preconcepcional, es el principal abordaje que se debe considerar en \nmujeres\
-    \ y hombres seropositivos, y en parejas serodiscordantes para evitar embarazos\
-    \ \nno planificados. \n \nEl objetivo es planificar la gestación en la mejor situación\
-    \ clínica posible, minimizando \nlos riesgos para la mujer, la pareja y el feto.\
-    \ \n \nLos puntos que se deben incluir en la consejería preconcepcional son los\
-    \ \nsiguientes:(130) \n \n− Contracepción efectiva \n− Hábitos saludables \n−\
-    \ Actualización de vacunas \n− Uso de ácido fólico preconcepcional para disminuir\
-    \ el riesgo de defectos del tubo \nneural fetal, como en la población general\
-    \ \n− Evaluación del estadio clínico, inmunológico, carga viral, TARV y adherencia\
-    \ al \nmismo hasta conseguir un estado óptimo para la gestación \n− Riesgo de\
-    \ transmisión materno-infantil \n− Prevención de la transmisión sexual \n \nOpciones\
-    \ reproductivas en parejas con infección por el VIH \n \nActualmente la mayor\
-    \ parte de las sociedades médicas reconocen el derecho de las  \npersonas infectadas\
-    \ por el VIH a acceder a técnicas de reproducción asistida en caso \ninfertilidad,\
-    \ o para evitar la transmisión horizontal en el caso de parejas \nserodiscordantes.\
-    \ \n \nPara ofrecer una opción reproductiva, debemos diferenciar qué miembro está\
-    \ infectado, \nel hombre o la mujer (parejas serodiscordantes) o si son ambos,\
-    \ y decidir conducta de \nacuerdo a los siguientes escenarios:(135,136) \n \n\
-    a) Hombre infectado por el VIH \n \nEl VIH está presente en el líquido seminal\
-    \ y el semen. Las parejas en las que el hombre \nes portador suponen hoy en día\
-    \ el escenar io más complejo y requieren de un \nasesoramiento muy especializado.\
-    \ \n \nLas opciones reproductivas son: \n \n- Lavado seminal con técnica de reproducción\
-    \ asistida asociada. \n- Concepción natural y profilaxis"
-- source_sentence: '¿Qué establece la norma MSP (guia_prevencion_diagnostico_tratamiento_enfermedad_renal_cronica_2018)
-    respecto a: En términos en años de vida perdida por muerte prematura (AVPP), ha
-    sucedido alg?'
+  - '616 + 614 + 618 (866)
+
+    M665 del Ecuador
+
+    Diagnóstico y tratamiento del aborto espontáneo, incompleto, diferido y recurrente,
+    guía de
+
+    práctica clínica.
+
+    Quito: , -MSP; 2013.
+
+    ---- 46p: tabs: gra: 18x25 cm.
+
+    ISBN 978-9942-07-553-6
+
+    1. Salud pública 4. Ecuador
+
+    2. Aborto 5.Guía de práctica clínica
+
+    3. Ginecología 6. Protocolo médico. Procedimientos
+
+    del Ecuador
+
+    Av. República de El Salvador N36-64 y Suecia
+
+    Quito - Ecuador
+
+    Teléfono: (593) 2 381 4400
+
+    Diagnóstico y tratamiento del aborto espontáneo, incompleto, diferido y recurrente,
+    Guía de Práctica Clínica.
+
+    Edición general: Esta Guía de Práctica Clínica (GPC) ha sido desarrollada por
+    profesionales de las instituciones del Sistema
+
+    Nacional de Salud y especialistas expertos en la materia, bajo la coordinación
+    de la Dirección Nacional de
+
+    Normatización del . En ella se reúnen evidencias y recomendaciones científicas
+    para
+
+    asistir a médicos y pacientes en la toma de decisiones acerca de prevención, diagnóstico
+    y tratamiento de esta
+
+    patología.
+
+    Estas son de carácter general y no definen un modo único de conducta procedimental
+    o terapéutica, sino una
+
+    orientación basada en evidencia científica para la misma. La aplicación de las
+    recomendaciones en la práctica
+
+    médica deberá basarse además en el buen juicio clínico de quien las emplea como
+    referencia, en las necesidades
+
+    específicas y preferencias de cada paciente, en los recursos disponibles al momento
+    de la atención, así como en
+
+    las normas existentes.
+
+    Los autores declaran no tener conflicto de interés y han procurado ofrecer información
+    completa y actualizada. Sin
+
+    embargo, en vista de la posibilidad de cambios en las ciencias médicas, se recomienda
+    revisar el prospecto de
+
+    cada medicamento que se planea administrar para cerciorarse de que no se hayan
+    producido cambios en las dosis
+
+    sugeridas o en las contraindicaciones para su administración. Esta recomendación
+    cobra especial importancia en
+
+    el caso de fármacos nuevos o de uso infrecuente.
+
+    Publicado en diciembre 2013.
+
+    ISBN 978-9942-07-553-6
+
+    Esta obra está bajo una licencia de Creative Commons Reconocimiento-NoComercial-Compartir
+    Igual 3.0 Ecuador,
+
+    y puede reproducirse libremente citando la fuente sin necesidad de autorización
+    escrita, con fines de enseñanza
+
+    y capacitación no lucrativas, dentro del Sistema Nacional de Salud.
+
+    . Diagnóstico y tratamiento del aborto espontáneo, incompleto, diferido y recurrente.
+
+    Guía de Práctica Clínica (GPC). Quito-2013: 1a edición. . Disponible en:
+
+    http://salud.gob.ec
+
+    Impreso por El Telégrafo
+
+    Corrección de estilo: La Caracola Editores
+
+    Hecho en Ecuador - Printed in Ecuador'
+  - 'n continua de TA
+
+    EKG, saturación durante su administración.
+
+    - 2%-4% hemorragia pulmonar.
+
+    - Mantener refrigerado entre 2o a 8 oC y protegido de la luz.
+
+
+    ### TABLAS CLÍNICAS NORMATIVAS:
+
+    | Código ATC | R07AA02 |
+
+    | --- | --- |
+
+    | Indicaciones | Tratamiento de la enfemerdad de membrana hialina. |
+
+    | Dosis | Poractant: 2,5 mL/kg por dosis intratraqueal seguido de dos dosis subsecuentes
+    de 1,25 mL/kg por dosis a las 12 horas. |
+
+    |  | Calfactant: dosis inicial de 3 mL/kg por dosis intratraqueal seguido de tres
+    dosis subsecuentes de 3 mL/kg por dosis con un intervalo de 12 horas. |
+
+    |  | Beractant: 4 mL/kg por dosis intratraqueal. Se pueden repetir hasta tres
+    dosis con intervalo de 6 a 8 horas. |
+
+    | Forma farmacéutica y concentración | Poractant: frascos de 1,5 mL y 3 mL Calfactant:
+    frascos de 3 mL y 6 mL Beractant: frascos de 4 mL y 8 mL |
+
+    | Contraindicaciones | Hipersensibilidad al medicamento o a sus componentes. |
+
+    | Precauciones | - Solamente para uso intratraqueal, mediante catéter insertado
+    en tubo endotraqueal. Se recomienda el uso de circuitos cerrados para su colocación.
+    - Es necesaria la aplicación y monitoreo por médicos especialistas experimentados
+    en ventilación mecánica neonatal, debido a los cambios súbitos en la función pulmonar
+    y la consecuente modificación de los requerimientos de oxígeno. - Si durante la
+    administración se produce, vigilar la aparición de bradicardia, desaturación de
+    oxígeno, reflujo por el tubo endotraqueal u obstrucción de la vía aérea, suspender
+    la administración hasta que el neonato sea estabilizado. - No agitar el frasco.
+    - Calentar el ambiente antes de administrar el medicamento. No utilizar medios
+    artificiales para calentar el frasco. - No utilizar el remanente posteriormente.
+    - Requiere monitorización continua de TA EKG, saturación durante su administración.
+    - 2%-4% hemorragia pulmonar. - Mantener refrigerado entre 2o a 8 oC y protegido
+    de la luz. |'
+  - '614+618+616 (866)
+
+    M665 del Ecuador.
+
+    Trastornos hipertensivos del embarazo. (Actualización 2016).
+
+    Quito: , – MSP;
+
+    2016 p 80: tabs: gra: 18 x 25 cm.
+
+    ISBN 978-9942-22-085-1
+
+    1. Salud Pública 4. Ecuador 7. Eclampsia
+
+    2. Embarazo 5. Guía de Práctica Clínica 8. HELLP
+
+    3. Hipertensión en el embarazo 6. Preeclampsia
+
+    Av. República de El Salvador N36-64 y Suecia
+
+    Quito-Ecuador
+
+    Teléfono: (593) 2 381-4400
+
+    Edición general: - MSP
+
+    Esta Guía de Práctica Clínica ha sido actualizada por profesionales del Hospital
+    Docente de Riobamba y
+
+    profesionales del Sistema Nacional de Salud expertos en la materia, bajo la coordinación
+    de la Dirección Nacional
+
+    de Normatización del (MSP). En ella se reúnen evidencias y recomendaciones
+
+    científicas para asistir a médicos y pacientes en la toma de decisiones acerca
+    de prevención, diagnóstico y
+
+    tratamiento de esta patología.
+
+    Estas recomendaciones son de carácter general y no definen un modo único de conducta
+    procedimental
+
+    o terapéutica, sino una orientación basada en evidencia científica para la misma.
+    La aplicación de las
+
+    recomendaciones en la práctica médica deberá basarse además, en el juicio clínico
+    de quien las emplea como
+
+    referencia, en las necesidades específicas y preferencias de cada paciente, en
+    los recursos disponibles al
+
+    momento de la atención, así como en las normas existentes.
+
+    Los miembros involucrados en esta Guía de Práctica Clínica han declarado no tener
+    conflicto de interés y han
+
+    procurado ofrecer información completa y actualizada. Sin embargo, en vista de
+    la posibilidad de cambios en
+
+    las ciencias médicas, se recomienda revisar el prospecto de cada medicamento que
+    se planea administrar para
+
+    cerciorarse de que no se hayan producido cambios en las dosis sugeridas o en las
+    contraindicaciones para su
+
+    administración. Esta recomendación cobra especial importancia en el caso de medicamentos
+    nuevos o de uso
+
+    infrecuente.
+
+    Publicado en Diciembre 2016
+
+    ISBN 978-9942-22-085-1
+
+    Esta obra está bajo Licencia Creative Commons de Atribution No Comercial Compartir
+    Igual 3.0 Ecuador, y
+
+    puede reproducirse libremente citando la fuente sin necesidad de autorización
+    escrita, con fines de enseñanza y
+
+    capacitación no lucrativas, dentro del Sistema Nacional de Salud.
+
+    Como citar esta obra: . Trastornos hipertensivos del embarazo. Guía de Práctica
+
+    Clínica (GPC). Segunda edición; Quito: ; 2016. Disponible en: http://
+
+    salud.gob.ec
+
+    Impreso por: El Telégrafo EP
+
+    Hecho en Ecuador - Printed in Ecuador'
+- source_sentence: '¿Qué establece la Guía de Práctica Clínica oficial del MSP (2016_msp_trastornos_hipertensivos_del_embarazo_con_portada_3,
+    2016) respecto a: en mujeres con preeclampsia sin signos de gravedad fue de 109.
+    La mortalidad mat?'
   sentences:
-  - "16 \n \nEn términos en años de vida perdida por muerte prematura (AVPP), ha sucedido\
-    \ algo \nsimilar en el Ecuador, donde se aprecia una tendencia a la pr eponderancia\
-    \ de \nenfermedades crónicas no transmisibles, incluyendo a la ERC (gráfico 3).(12)\
-    \ \n \n \nGráfico 3. Principales causas de años de vida perdidos por muerte prematura\
-    \ entre \nlos años 1990 y 2015 \n1990      Ranking 1990  Ranking 2013 Ranking\
-    \ 2015 \nEnfermedad diarreica \n  \n  Infecciones respiratorias \nbajas \n Infecciones\
-    \ respiratorias \nbajas \n1. Enfermedad respiratoria \n  \n  Accidentes de tránsito\
-    \ \n  Accidentes de tránsito \n2. Accidentes de tránsito \n  \n  Enfermedad isquémica\
-    \ del \ncorazón \n Enfermedad isquémica del \ncorazón \n3. Enfermedades neonatales\
-    \ \n  \n  Anomalías congénitas \n  Violencia interpersonal \n4. EPOC\n  \n  Violencia\
-    \ interpersonal \n Enfermedad renal \ncrónica \nAnomalías congénitas \n  \n  Enfermedad\
-    \ \ncerebrovascular \n  Anomalías congénitas \nProteínas- energía malnutrición\
-    \ \n  \n Enfermedad renal \ncrónica  \n Enfermedad \ncerebrovascular \n5. Enfermedad\
-    \ isquémica del corazón \n \n Enfermedades neonatales \n  Diabetes \n6. Violencia\
-    \ interpersonal \n  \n  Autolesiones \n  Complicaciones de parto \nprematuro \n\
-    \ Enfermedad cerebrovascular \n  \n  Diabetes \n  Autolesiones \nAutolesiones\
-    \  \n  \n  Enfermedad diarreica \n \nEnfermedad renal crónica \n  \n   EPOC \n\
-    \  Enfermedad diarreica  \nDiabetes \n  \n  Proteínas- energía \nmalnutrición\
-    \ \n \nSe muestra el ascenso en el ranking de las enfermedades prevalentes no\
-    \ transmisibles d e la ERC desde el puesto 20 al 7 en 23 años con un \nincremento\
-    \ del 106 %, ascendiendo hasta el puesto 5 en el año 2015. \n Enfermedades transmisibles,\
-    \ matern as, neonatales y de la nutrición \nEnfermedades no transmisibles \n Lesiones.\
-    \ Elaboración propia. Fuente: Institute of Health metrics and Evaluation, 2015.(12)\
-    \ \n \n \nEn cuanto a la mortalidad general, el impacto de la ERC en la misma\
-    \ es diferente \ndependiendo de la fuente consultada. Sin embargo, la ERC prevalece\
-    \ dentro d e las diez \nprimeras causas de mortalidad general en el Ecuador, llegando\
-    \ al cuarto lugar según los \ndatos más actuales (tabla 2).(28–30)"
-  - En pacientes con Diabetes Mellitus Tipo 2 con HbA1c entre 7.5% y 9.0% al diagnóstico
-    o tras falla de estilo de vida, se recomienda iniciar terapia farmacológica con
-    Metformina (dosis inicial 500-850 mg/día escalando hasta 2000 mg/día). Si HbA1c
-    > 8.5%, considerar inicio temprano de terapia combinada dual (Metformina + iSGLT2
-    o aGLP-1 si hay riesgo cardiovascular/renal elevado, o Metformina + Sulfonilurea
-    según disponibilidad).
-  - "60 \n \nCon respecto a la elección de un tratamiento para los CE, se espera que\
-    \ el usuario logre \npor lo menos el control de la viremia que tienen por debajo\
-    \ de los límites de detección, \nmediante el uso de fármacos con buena penetración\
-    \ al sistema nervioso central y a los \nreservorios donde se supone la existencia\
-    \ de células CD4+ portadoras de VIH \npotencialmente infeccioso.  \n \nReferente\
-    \ al tratamiento, no existe experiencia en grandes grupos de pacientes, sin \n\
-    embargo, la mayoría de la información disponible en CE tratados, es sobre el uso\
-    \ de \nprimeras líneas, y por lo tanto incluyeron Tenofovir Emtricitabina y Efavirenz\
-    \ como \ninhibidores de la transcriptasa inversa, y Raltegravir o Dolutegravir\
-    \ como inhibidores de \nla integrasa.(21) \n \nRecomendaciones sobre TARV en infección\
-    \ primaria por VIH y controladores élite \nB \n2a \n \nOfrecer TARV a todo usuario\
-    \ con IPV o CE. \nIniciar TARV en base a criterios específicos e individualizados\
-    \ de acuerdo a \ncondición clínica del usuario. \n \n \n \n \n \n \nm) ¿Cuál es\
-    \ la conducta a seguir en la presentación tardía por infección por VIH? \n \n\
-    El riesgo de desarrollar enfermedades oportunistas en personas infectadas por\
-    \ VIH sin \ntratamiento aumenta exponencialmente en relación a la caída de CD4+,\
-    \ particularmente \nen aquellas personas con un contaje de CD4+ menor de 200 células/mL.\
-    \  \n \nAnte la ausencia de una definición unificada del término “presentación\
-    \ tardía”, en el 2011 \nel grupo de consenso conformado por la Sociedad Clínica\
-    \ Europea del SIDA (EACS), la \nOrganización Mundial de la Salud ( OMS), Sociedad\
-    \ Internacional del SIDA ( IAS), y la \nAsociación Británica del VIH ( BHIVA),\
-    \ determinaron que la “presentación tardía” se \ndefine como personas que acuden\
-    \ a un establecimiento de salud con un contaje de CD4 \nmenor de 200 células/mL\
-    \ o la presencia de una enfermedad definitoria de SIDA, \nindependientemente del\
-    \ conteo de células CD4. (58) \n \nEl término “presentación tardía” hace referencia\
-    \ a toda persona infectada por VIH que \naccede al sistema de salud en un estado\
-    \ de su enfermedad que sugiere una \nprobabilidad baja de beneficiarse en su totalidad\
-    \ del inicio de TARV. Por otro lado, el \ntérmino “ presentación avanzada del\
-    \ VIH” debe ser reservada para el subgrupo de \npersonas en presentación tardía\
-    \ que se encuentran en un riesgo inminente de \nenfermedad severa y muerte. (104)\
-    \ \n \nCon lo mencionado, aquellas personas con un contaje de CD4+ de 200 células/mL\
-    \ \ncumplen ambos criterios para ser catalogados como “presentadores tardíos”\
-    \ y \n“presentadores con enfermedad avanzada por el VIH”. Adicionalmente, cualquier\
-    \ \npersona con una condición definitoria de SIDA, estará considerada dentro del\
-    \ mismo \ngrupo. \n \nVale la pena aclarar que el término “acudir por atención”\
-    \ significa acceder a un \nestablecimiento que esté en la capacidad de establecer\
-    \ y monitorizar la progresión de \nla enfermedad y por tanto, iniciar de manera\
-    \ oportuna el tratamiento médico, incluyendo \nla administración de TARV. Por\
-    \ esto, se debe asegurar un diagnóstico oportuno  de \ninfección por VIH y la\
-    \ subsecuente vinculación al sistema de salud.(104)"
-- source_sentence: '¿Qué establece la norma MSP (gpc_ehirn2019) respecto a: Anexo
-    11 Procedimiento de hipotermia activa?'
+  - 'ión leve, se deben realizar intervenciones
+
+    Fuerte a favor psicoterapéuticas de menor intensidad (psicoeducación) como primera
+    opción
+
+    [2,4,59,121-126].
+
+
+    ### TABLAS CLÍNICAS NORMATIVAS:
+
+    | D | El manejo de la depresión debe incluir psicoeducación, consejería, la intervención
+    psicosocial grupal, apoyo individual y familiar, coordinación con otros profesionales,
+    atención de las comorbilidades y monitorización regular del estado mental y físico
+    [3]. |
+
+    | --- | --- |
+
+    | D | Las diferentes intervenciones para el tratamiento de la depresión deben
+    estar estructuradas en un programa de atención y aplicarse a cada persona a través
+    de un plan individual de tratamiento integral [5]. |
+
+    | A | El plan de tratamiento de la depresión se realizará considerando severidad
+    del cuadro, refractariedad, comorbilidades, persistencia, género y etapa de ciclo
+    vital [5,92-97]. |
+
+    | A | Todo plan de tratamiento debe incluir especificaciones respecto de las metas
+    del tratamiento y sus plazos [5,92]. |
+
+    | A | Se recomienda indicar un programa estructurado de actividad física para
+    el tratamiento de personas con depresión [5,98-103]. |
+
+    | D | En el manejo de pacientes adultos con depresión leve, se recomienda aplicar
+    las siguientes estrategias [4]: - Explorar y hablar con el paciente de los eventos
+    estresantes recientes [34]. - Programar citas de seguimiento hasta cada 15 días
+    por tres meses consecutivos [33]. - Recomendar ejercicio entre 30 y 45 minutos
+    tres veces por semana durante 10 a 14 semanas [59,99,103-114]. - Recomendar mantener
+    una rutina cotidiana y hábitos de vida saludables [34]. - Promover higiene del
+    sueño [34]. |
+
+    | Fuerte en contra | Los antidepresivos no deben usarse de manera rutinaria para
+    tratar los síntomas depresivos leves debido a que el riesgo-beneficio no lo amerita.
+    Las únicas excepciones, en que el manejo debe ser por el especialista e individualizado,
+    son: antecedente de depresión moderada o grave, o pacientes con síntomas que persisten
+    a pesar de otras intervenciones [4,59,115-117]. |
+
+    | Fuerte en contra | No se recomienda prescribir inductores del sueño de rutina
+    por riesgo de abuso y dependencia [4,118-120]. |
+
+    | Fuerte a favor | Si, durante las citas de seguimiento, el paciente adulto con
+    diagnóstico de depresión leve no ha presentado mejoría o empeoran los síntomas,
+    se lo debe referir a una consulta especializada de salud mental y/o psiquiatría
+    [2,4,34]. |'
+  - 'Trastornos hipertensivos del embarazo.
+
+    Nivel de
+
+    Evidencias para el tratamiento preventivo de la eclampsia
+
+    evidencia
+
+    El sulfato de magnesio reduce el riesgo de eclampsia en pacientes con preeclampsia
+    grave
+
+    Ib
+
+    (con signos de gravedad). (141)
+
+    Un ensayo clínico aleatorio (Magpie 2002) (135) demostró que el uso de sulfato
+    de magnesio
+
+    versus placebo, disminuye las convulsiones en la eclampsia. Además reportó una
+    reducción
+
+    del riesgo relativo de eclampsia en un 58 %, con un número necesario a tratar
+    (NNT) de 91.
+
+    Ib
+
+    En mujeres con preeclampsia severa, el NNT fue de 63, mientras que en mujeres
+    con
+
+    preeclampsia sin signos de gravedad fue de 109. La mortalidad materna también
+    tuvo una
+
+    disminución del riesgo relativo del 45 %.
+
+    Fuerza de la
+
+    Recomendaciones para el tratamiento preventivo de la preeclampsia
+
+    recomendación
+
+    Para las mujeres con preeclampsia con síntomas de gravedad se recomienda la
+
+    A
+
+    administración de sulfato de magnesio como preventivo de convulsiones. (139)
+
+    En mujeres con preeclampsia sin síntomas de gravedad se recomienda el uso de sulfato
+
+    D
+
+    de magnesio como preventivo de convulsiones. (101)
+
+    Para las mujeres con eclampsia, se recomienda la administración de sulfato de
+    magnesio
+
+    A
+
+    como preventivo de nuevas convulsiones. (29,139)
+
+    Se recomienda la administración de sulfato de magnesio a todas las mujeres con
+
+    C
+
+    preeclampsia durante el parto, transcesárea y posparto. (101)
+
+    Para las mujeres con preeclampsia sometidas a cesárea, se recomienda la administración
+
+    A intraoperatoria continua de sulfato de magnesio para prevenir convulsiones (eclampsia).
+
+    (139)
+
+    Se debe mantener el sulfato de magnesio para la prevención o tratamiento de eclampsia
+
+    A
+
+    hasta 24 horas postparto, post-cesárea o después de la última crisis convulsiva.
+    (139)
+
+    C Sulfato de magnesio y nifedipina pueden utilizarse simultáneamente. (9,142,143)
+
+    Aunque tiene cierto efecto vasodilatador, el sulfato de magnesio no debe ser utilizado
+
+    C como droga antihipertensiva. Siempre debe asociarse el sulfato de magnesio a
+
+    medicamentos antihipertensivos recomendadas para tal fin. (9,144–146)
+
+    D No se recomienda el monitoreo rutinario de los niveles de magnesio en suero.
+    (9)
+
+    La fenitoína no debe ser utilizada para profilaxis de convulsiones o el tratamiento
+    de la
+
+    D eclampsia, a menos que exista una contraindicación para el uso del sulfato de
+    magnesio
+
+    o este sea ineficaz. (9)
+
+    Si existen indicaciones maternas o fetales de un parto de emergencia, este no
+    debe ser
+
+    D
+
+    retrasado con el propósito de administrarle sulfato de magnesio. (9)'
+  - 'en mujeres con preeclampsia sin signos de gravedad fue de 109. La mortalidad
+    materna también tuvo una disminución del riesgo relativo del 45 %. | Ib |
+
+
+    | Fuerza de la recomendación | Recomendaciones para el tratamiento preventivo
+    de la preeclampsia |
+
+    | --- | --- |
+
+    | A | Para las mujeres con preeclampsia con síntomas de gravedad se recomienda
+    la administración de sulfato de magnesio como preventivo de convulsiones. (139)
+    |
+
+    | D | En mujeres con preeclampsia sin síntomas de gravedad se recomienda el uso
+    de sulfato de magnesio como preventivo de convulsiones. (101) |
+
+    | A | Para las mujeres con eclampsia, se recomienda la administración de sulfato
+    de magnesio como preventivo de nuevas convulsiones. (29,139) |
+
+    | C | Se recomienda la administración de sulfato de magnesio a todas las mujeres
+    con preeclampsia durante el parto, transcesárea y posparto. (101) |
+
+    | A | Para las mujeres con preeclampsia sometidas a cesárea, se recomienda la
+    administración intraoperatoria continua de sulfato de magnesio para prevenir convulsiones
+    (eclampsia). (139) |
+
+    | A | Se debe mantener el sulfato de magnesio para la prevención o tratamiento
+    de eclampsia hasta 24 horas postparto, post-cesárea o después de la última crisis
+    convulsiva. (139) |
+
+    | C | Sulfato de magnesio y nifedipina pueden utilizarse simultáneamente. (9,142,143)
+    |
+
+    | C | Aunque tiene cierto efecto vasodilatador, el sulfato de magnesio no debe
+    ser utilizado como droga antihipertensiva. Siempre debe asociarse el sulfato de
+    magnesio a medicamentos antihipertensivos recomendadas para tal fin. (9,144–146)
+    |
+
+    | D | No se recomienda el monitoreo rutinario de los niveles de magnesio en suero.
+    (9) |
+
+    | D | La fenitoína no debe ser utilizada para profilaxis de convulsiones o el
+    tratamiento de la eclampsia, a menos que exista una contraindicación para el uso
+    del sulfato de magnesio o este sea ineficaz. (9) |
+
+    | D | Si existen indicaciones maternas o fetales de un parto de emergencia, este
+    no debe ser retrasado con el propósito de administrarle sulfato de magnesio. (9)
+    |'
+- source_sentence: '¿Qué establece la Guía de Práctica Clínica oficial del MSP (2015_gpc_atencion_parto_por_cesarea_2015,
+    2015) respecto a: adas con sospecha de placenta creta,?'
   sentences:
-  - "110 \n \nHDL Determinación cuantitativa. \nReactivos listos para usar. \nCaracterísticas\
-    \ analíticas ha ser \ndefinidas por la unidad requirente. \nCompatible con el\
-    \ equipo \nexistente en el establecimiento de \nsalud o propo rcionado por el\
-    \ \nproveedor. Debe incluir inserto. \n18-913 Reactivo/Kit para \ndeterminación\
-    \ de colesterol \nLDL \nMétodo enzimático colorimétrico o \nmétodo precipitante.\
-    \ \nDeterminación cuantitativa. \nReactivos listos para usar. \nCaracterísticas\
-    \ analíticas ha ser \ndefinidas por la unidad requirente. \nCompatible con el\
-    \ equipo \nexistente en el establecimiento de \nsalud o proporcionado por el \n\
-    proveedor. Debe incluir inserto.  \n18-941 Reactivo/Kit para \ndeterminación de\
-    \ creatinina \nMétodo enzimático colorimétrico o \nmétodo cinéti co (Jaffe). \n\
-    Determinación cuantitativa. \nReactivos listos para usar. \nCaracterísticas analíticas\
-    \ ha ser \ndefinidas por la unidad requirente. \nCompatible con el equipo \nexistente\
-    \ en el establecimiento de \nsalud o proporcionado por el \nproveedor. Debe incluir\
-    \ inserto.  \n18-947 Reactivo/Kit para \ndeterminación de electrolitos \nMétodo\
-    \ electroquímico, electrodo \nde ión selectivo.  Determinación \ncuantitativa.\
-    \ Reactivos listos para \nusar. Características analíticas ha \nser definidas\
-    \ por la unidad \nrequirente. Compatible con el  \nequipo existente en el \nestablecimiento\
-    \ de salud o \nproporcionado por el proveedor. \nDebe incluir inserto. \n17-342\
-    \ Reactivos/Kits para \ndeterminación de ferritina \nReactivos listos para usar.\
-    \ Puede \nincluir su propio calibrador. \n18-929 Reactivo/Kit para \ndeterminación\
-    \ de glucosa \nMétodo enzimático colorimétrico. \nDeterminación cuantitativa.\
-    \ \nReactivos listos para usar. \nCaracterísticas analíticas ha ser \ndefinidas\
-    \ por la unidad requirente. \nCompatible con el equipo \nexistente en el establecimiento\
-    \ de \nsalud o proporcion ado por el \nproveedor. Debe incluir inserto.  \n18-904\
-    \ Reactivo/Kit para \ndeterminación de \nhemoglobina glicosilada \nMétodo inmunoturbidimétrico\
-    \ o \nmétodo enzimático Determinación \ncuantitativa. Reactivos listos para \n\
-    usar. Características analíticas ha \nser defini das por la unidad \nrequirente.\
-    \ Compatible con el \nequipo existente en el \nestablecimiento de salud o \nproporcionado\
-    \ por el proveedor. \nDebe incluir calibrador y control. \nIncluye inserto."
-  - "46 \n \nE-2b \nR-B \nCuando exista hiperpotasemia, previo al uso de antagonistas\
-    \ del sistema \nrenina-angiotensina, se recomienda evaluar, investigar y tratar\
-    \ las causas \nde hiperpotasemia y reevaluar los valores de potasio.(2,182,325–329)\
-    \ \nE-2b \nR-B \nEl uso concurrente de medicamentos que promuevan la hiperpotasemia\
-    \ \nno son una contraindicación para el uso de antagonistas del sistema \nrenina-angiotensina.\
-    \ Sin embargo, se debe tomar en cuenta que el \nmonitoreo de la concentración\
-    \ de potasio sérico debe ser más \nfrecuente.(2,314–320) \n  \nEn pacientes con\
-    \ ERC y que reciban medicamentos que promuevan la \nhiperpotasemia, se recomienda\
-    \ realizar un monitoreo en un rango no \nmayor a los 15 días. \nE-2b \nR-B \n\
-    Se recomienda suspender el us o de antagonistas del sistema renina -\nangiotensina\
-    \ si las concentraciones de potasio sérico son mayores o \niguales a los 6 mEq/litro\
-    \ habiendo retirado otra medicación que podría \ncausar hiperpotasemia.(2,182,325–329)\
-    \ \nE-2b \nR-B \nNo se recomienda modificar la dosis de los antagonistas del SRAA\
-    \ si la \nTFG disminuye menos del 25 % de su valor inicial (pretratamiento), o\
-    \ si la \ncreatinina sérica incrementa menos del 30 % de su valor inicial \n(pretratamiento).(2,314–320)\
-    \ \nE-2b \nR-B \nSi tras iniciar el tratamiento o aumentar la dosis de los antagonistas\
-    \ del \nSRAA existe descenso de la TFGe o un incremento de la creatinina \nsérica,\
-    \ pero es menor al 25 % (TFGe) o 30 % (creatinina) del valor inicial,  \nse recomienda\
-    \ repetir el examen en 1 a 2 semanas.(2,314–320) \nE-2b \nR-B \nEn pacientes con\
-    \ ERC tratados con antagonistas del SRAA, en quienes la \nTFGe disminuye más del\
-    \ 25 % y/o la creatinina aumenta más del 30 %, \nse recomienda(2,182,325–329):\
-    \ \n Investigar otras causas de deterioro de la función renal, tal como la \n\
-    depleción del volumen o el uso concomitante de otra medicación \nnefrotóxica (Ej.\
-    \ AINE); \n Si no existe otra causa de deterio ro de la función renal, se debe\
-    \ \nsuspender el antagonista del SRAA, reducir la dosis o utilizar otro \nantihipertensivo\
-    \ alternativo si se requiriera. \n  \nSe sugiere que en pacientes con ERC en\
-    \ quienes se requiera otra \nmedicación que no sea un antagonista del SR AA, se\
-    \ indique: \nbloqueadores de canales de calcio, betabloqueadores, o diuréticos.\
-    \ Para \nla prescripción de cualquiera de estos medicamentos, se recomienda \n\
-    individualizar el manejo según las características de cada paciente y \nevaluando\
-    \ los posibles efectos adversos y las posibles interacciones. \nManejo de la presión\
-    \ arterial en adultos mayores con ERC \nE-2b \nR-B \nEn adultos mayores con ERC\
-    \ e HTA, y sin diabetes mellitus se \nrecomienda ofrecer un tratamiento antihipertensivo\
-    \ individualizado de \naplicación escalonada, tomando en consideración comorbilidades\
-    \ y otras \nterapias prescritas, identificando posibles interacciones y efectos\
-    \ \nadversos, incluyendo alteraciones electrolíticas, injuria renal aguda, \n\
-    hipotensión ortostática y otras. (ver anexo 14 para toma de la p resión \narterial\
-    \ en adultos mayores)(6,182,219,325–329)"
-  - "58 \n \nAnexo 11 Procedimiento de hipotermia activa \n \nA. Confirmar la elegibilidad\
-    \ para el enfriamiento como se indicó en los Criterios de Inclusión.  \n \nB.\
-    \ Reunir todo el equipo para enfriamiento. Seguir las instrucciones de preparación\
-    \ de la máquina de \nenfriamiento según el manual de operación. \n \nC. Manejo\
-    \ del dolor. N o se recomiendan analgésicos o anestésicos específicos. La sedación\
-    \ durante \ntodo el procedimiento se basa en las necesidades de ventilación mecánica\
-    \ y/o en el control de las \nconvulsiones. La sedación más comúnmente utilizada\
-    \ es de tipo opioide. \n \nD. Pre -enfríe la manta a 5°C para la refrigeración\
-    \ de todo el cuerpo para mantener una temperatura \nesofágica de 33.5°C ± 0.5°C\
-    \ para neuroprotección. Coloque al lactante en decúbito supino sobre la \nmanta\
-    \ pre-enfriada con el occipucio apoyado sobre la manta. Una mant a delgada de\
-    \ una capa puede \ncolocarse entre el bebé y la manta de enfriamiento para evitar\
-    \ la contaminación del equipo y facilitar la \nlimpieza. \n \nE. Inserte la sonda\
-    \ de temperatura esofágica a través de una ternilla nasal. La sonda puede suavizarse\
-    \ \nal colo carla en agua tibia durante unos minutos. La sonda debe colocarse\
-    \ en el tercio inferior del \nesófago (longitud deseada = distancia desde una\
-    \ oreja hasta una ternilla hasta la mitad del esternón \nmenos dos cm). Asegure\
-    \ la sonda pegándola con adhesivo al costa do de la nariz del bebé. Conecte la\
-    \ \nsonda a la unidad de enfriamiento y comience a monitorear la temperatura de\
-    \ inmediato. Confirme la \ncolocación de la sonda con una radiografía, pero no\
-    \ espere la radiografía para comenzar el enfriamiento.  \n \nF. Use una cuna de\
-    \ calor radiante de cuidados críticos. La temperatura de la piel debe monitorizarse\
-    \ con \nel sensor de temperatura cutáneo de la cuna de calor radiante colocado\
-    \ en la parte inferior del abdomen. \nLa cuna de calor radiante debe configurarse\
-    \ en \"modo manual\"  con la calefacción apagada (para \npermitir una monitorización\
-    \ continua de la temperatura de la piel sin producir calor). No use ninguna otra\
-    \ \nfuente de calor exógeno. \n \nG. Opere el equipo de enfriamiento en modo automático\
-    \ con un objetivo de temperatura cen tral de 33.5 \n° C ± 0.5 ° C. Siga el manual\
-    \ de instrucciones del dispositivo de enfriamiento de la unidad de cuidados \n\
-    intensivos neonatales (UCIN). \n \nH. La temperatura esofágica del bebé comenzará\
-    \ a disminuir poco después del inicio de la terapia de \nenfriamiento. El sistema\
-    \ de enfriamiento se ajusta automáticamente para alcanzar 33.5°C en ~ 90 -120\
-    \ \nminutos. Una vez estable a 33.5°C, es de esperar cierta fluctuación de la\
-    \ temperatura esofágica \nalrededor del punto de ajuste, pero no debe ser mayor\
-    \ de ± 0.5°C. C ontrole y registre las temperaturas \ndel esófago, la piel y el\
-    \ agua, así como todos los signos vitales en intervalos de 15 minutos durante\
-    \ el \nenfriamiento. El período total de enfriamiento es de 72 horas. \n \nI.\
-    \ El recalentamiento gradual se realizará durante  seis horas después de completar\
-    \ el período de \nenfriamiento de 72 horas. La temperatura del punto de ajuste\
-    \ de la unidad de enfriamiento automática se \nincrementará en 0.5°C cada hora\
-    \ hasta un punto de referencia máximo de 36.5°C. El objetivo es \naumentar lentamente\
-    \ la temperatura 0,5°C por hora para alcanzar normotermia al cabo de seis horas.\
-    \ \nControle los signos vitales (especialmente la temperatura) durante todo el\
-    \ período de recalentamiento. \nLa hipertermia debe evitarse a toda costa. \n\
-    \ \nJ. La monitorización  del niño enfriado debe incluir aEEG. Este modo de monitoreo\
-    \ utiliza un monitor de \nfunción cerebral junto a la cama que registra, amplifica\
-    \ e integra un EEG de un solo canal de electrodos \nbiparietales. El aEEG tiene\
-    \ la ventaja sobre EEGc de no requerir una  capacitación formal extensiva para\
-    \ \nla interpretación. Un meta análisis ha demostrado que un EEG es útil para\
-    \ predecir los resultados del \nneurodesarrollo a largo plazo en recién nacidos\
-    \ a término con EIH. La aparición de ciclos de vigilia en el \naEEG dentro  de\
-    \ las primeras 36 horas es indicativo de un buen pronóstico. Se sugiere el siguiente\
-    \ \nesquema de clasificación para describir los hallazgos de aEEG (ver anexo 9):"
-- source_sentence: '¿Qué establece la norma MSP (gpc_hta192019) respecto a: 14. ¿Cuáles
-    son las metas de control de TA de un paciente hipertenso de acuerdo ?'
+  - 'adas con sospecha de placenta creta,
+
+    incluida la posibilidad de transfusión sanguínea y cesárea planificada con la
+    participación del P
+
+    especialista.17
+
+
+    ### TABLAS CLÍNICAS NORMATIVAS:
+
+    | En el Ecuador la versión cefálica externa se puede realizar, entre las 35 a
+    37 semanas de gestación, en centros de atención hospitalaria de II y III nivel
+    de atención por el médico gineco-obstetra de mayor experiencia, asegurando la
+    disponibilidad de realizar una cesárea inmediata de presentarse una complicación.
+    | P |
+
+    | --- | --- |'
+  - 'rizada.(16,51,52) (Ver anexo 5)
+
+
+    ### TABLAS CLÍNICAS NORMATIVAS:
+
+    | Evidencia | E |
+
+    | --- | --- |
+
+    | Recomendación | R |
+
+    | Punto de buena práctica | ü |
+
+
+    | Evidencias / Recomendaciones | Nivel / Grado |
+
+    | --- | --- |
+
+    | La evaluación clínica de un paciente con artritis reumatoide de reciente inicio
+    debe considerarse como una prioridad. (3,33) | E: III |
+
+    | En los dos primeros años de evolución de la artritis reumatoide, se produce
+    daño articular grave e irreversible.(3,34–36) | E: III |
+
+    | El tratamiento temprano del paciente con artritis reumatoide aumenta la probabilidad
+    de controlar el proceso inflamatorio y disminuir el daño estructural. (3,16,37)
+    | E: III |
+
+    | La artritis reumatoide de reciente inicio se debe sospechar en todo paciente
+    con signos y síntomas de al menos 6 semanas de duración que presente (3,38,39):
+    – Tres (3) o más articulaciones inflamadas – Artritis en manos (interfalángicas
+    proximales, metacarpofalángica, carpos) – Rigidez articular matutina de 30 minutos
+    o más – Dolor a la compresión lateral de articulaciones metacarpofalángicas y
+    metatarsofalángicas (Signo de Morton), con afección simétrica. | E: III |
+
+    | Aquellos pacientes que presenten artritis de más de tres articulaciones, deben
+    ser referidos a evaluación por un médico reumatólogo, idealmente dentro de las
+    seis semanas de inicio de los síntomas.(3,16) | R: C |
+
+    | El dolor será evaluado por el propio paciente y la intensidad del dolor puede
+    ser cuantificada a través de la escala visual análoga del dolor. (3,40–42) (Ver
+    anexo 3) | R: C |
+
+    | La actividad inflamatoria se evalúa mediante (16,40,41): – El recuento de articulaciones
+    dolorosas y tumefactas. – Evaluación del dolor. – Evaluación global de la enfermedad
+    por el médico y el paciente. – Determinación de reactantes de fase aguda. | R:
+    C |
+
+    | Se recomienda la utilización de índices compuestos que evalúan la actividad
+    de la enfermedad (DAS28, SDAI, CDAI). (16,22,23,43–49) (Ver anexo 4, tabla 5)
+    | R-C |
+
+    | Se recomienda evaluar el grado de actividad inflamatoria en intervalos de uno
+    a tres meses, hasta alcanzar la remisión o baja actividad de la enfermedad.(16,50)
+    | R-B |
+
+    | Para predecir deterioro funcional y discapacidad laboral se dispone del cuestionario
+    para evaluación de salud (HAQ, por sus siglas en inglés), instrumento de autoevaluación
+    estandarizada.(16,51,52) (Ver anexo 5) | E: III |'
+  - 'Atención del parto por cesárea
+
+    En el Ecuador la versión cefálica externa se puede realizar, entre las 35 a 37
+    semanas de
+
+    gestación, en centros de atención hospitalaria de II y III nivel de atención por
+    el médico
+
+    P
+
+    gineco-obstetra de mayor experiencia, asegurando la disponibilidad de realizar
+    una cesárea
+
+    inmediata de presentarse una complicación.
+
+    Embarazo múltiple
+
+    En los embarazos a término de gemelos sin complicaciones, en los que la presentación
+
+    del primer gemelo es cefálica, la morbimortalidad perinatal se incrementa para
+    el segundo
+
+    R-C
+
+    gemelo. Sin embargo, es incierto el efecto de la cesárea planificada para mejorar
+    el resultado
+
+    para el segundo gemelo; por lo tanto la cesárea no se debe recomendar.17
+
+    Se recomienda la cesárea en los embarazos gemelares donde el primer gemelo no
+    está en
+
+    presentación cefálica, pese a que el efecto de cesárea para mejorar el resultado
+    perinatal es R-D
+
+    incierto, como medida de prevención.17
+
+    El nacimiento prematuro y la cesárea
+
+    El parto pretérmino se asocia con una mayor morbilidad y mortalidad neonatal.
+    Sin embargo,
+
+    la evidendia de la cesárea programada en la mejora de los resultados sigue siendo
+    incierta. R-C
+
+    Y por lo tanto la cesárea no se debe ofrecer rutinariamente en estos casos. 17
+
+    En el Ecuador la cesárea en un parto pretémino estará indicada cuando el estimado
+    de peso
+
+    P
+
+    fetal ecográfico sea menor de 1500 gr.
+
+    Placenta previa
+
+    Se recomienda la cesárea a las mujeres con una placenta que cubre parcial o totalmente
+    el
+
+    R-D
+
+    orificio cervical interno (placenta previa total o parcial). 17,19
+
+    Se recomienda frente al diagnóstico de una placenta previa que la mujer sea evaluada
+    y
+
+    manejada hasta el término del embarazo por especialista en Gineco-obstetricia
+    quien P
+
+    informará a la paciente con oportunidad la vía y forma de parto.
+
+    Placenta creta (adherida)
+
+    Si la placenta baja se confirma en la semana 32 a 34 en mujeres que han tenido
+    una cesárea
+
+    anterior, se debe realizar la ecografía Doppler color como la primera prueba diagnóstica
+    para R-C
+
+    descartar placenta creta (adherida).17
+
+    Si el resultado de la ecografía Doppler color sugiere placenta Creta se debe:17
+
+    1. Solicitar ultrasonido de alta complejidad (nivel 3) y de ser el caso complementar
+    con
+
+    resonancia magnética (RM) el diagnóstico de placenta creta y determinar el grado
+    de
+
+    invasión. P
+
+    2. Explicar a la paciente el procedimiento de RM.
+
+    3. Informar a la mujer que la experiencia actual sugiere que la RM es segura,
+    pero que faltan
+
+    pruebas a largo plazo de cualquier riesgo para el feto, sin embargo el riesgo
+    beneficio es mayor.
+
+    Discutir las intervenciones disponibles con las embarazadas con sospecha de placenta
+    creta,
+
+    incluida la posibilidad de transfusión sanguínea y cesárea planificada con la
+    participación del P
+
+    especialista.17'
+- source_sentence: '¿Qué establece la Guía de Práctica Clínica oficial del MSP (2016_diagnóstico_y_tratamiento_del_acné_16012017,
+    2016) respecto a: to de las cicatrices de acné debe realizarse únicamente por
+    o bajo la supervisió?'
   sentences:
-  - "23 \n \n¶¶ Valorar individualmente cada caso. En general recomendar PEP. Cuando\
-    \ la carga viral es indetectable se puede \nconsiderar no realizar PEP porque\
-    \ el riesgo de transmisión es muy bajo. \n#Contacto cutáneo de alto riesgo cuando\
-    \ se trata de líquidos con carga vir al elevada, el contacto es muy prolongado\
-    \ y \nel área es extensa o hay zonas de piel no íntegra. \n \nRecomendaciones\
-    \ para el manejo de profilaxis postexposición laboral \nA \n1a \n \nRealizar una\
-    \ valoración minuciosa del riesgo. \nDisponer de asesoramiento y asistencia las\
-    \ 24 horas del día para el personal \nexpuesto asegurando el diagnóstico serológico\
-    \ en menos de 2 horas para VIH y \nsiempre antes de las 72 horas. Para determinación\
-    \ de Hepatitis B y C (Anti-HBs, \nAnti-HBc, AgHBs, Anti-VHC), siempre antes de\
-    \ las 96 horas.  \nRealizar una valoración clínica general e integral, biometría\
-    \ completa, función \nrenal y hepática. \n Realizar prueba de embarazo previo\
-    \ al inicio de PEP. \nA \n1a \n \nIniciar PEP sin esperar los resultados de laboratorio.\
-    \ \nIniciar la profilaxis postexposición laboral en un accidente de alto riesgo\
-    \ dentro \nde las 2 horas y no más allá de las 72 horas, y continuar por 28 días.\
-    \ \nRealizar estudios serológicos de Hepatitis B (HbsAg), Hepatitis C (Anti VHC)\
-    \ y \nVIH a la fuente. \nConocer el estado virológico, inmunológico y el historial\
-    \ de TARV, en el caso de \nque la fuente sea una PVV. \nAsegurar la atención y\
-    \ seguimiento de los casos de exposición laboral por el \nmédico ocupacional o\
-    \ profesional de salud capacitado, en horario laboral, y el \nresponsable en el\
-    \ servicio de Emergencias, en horario no laboral. \nNotificar al médico ocupacional\
-    \ o profesional de salud capacitado para el manejo \nde los casos de accidentes\
-    \ laborales. \n \n \n \nProfilaxis postexposición no laboral \n \nLa exposición\
-    \ no laboral es el contacto con sangre o fluidos potencialmente infecciosos \n\
-    fuera del ámbito laboral, como por ejemplo la exposición sexual de alto riesgo\
-    \ (vaginal, \nanal, u oral) sin protección o con fallo de la misma por relaciones\
-    \ sexuales consentidas, \nagresión sexual con penetración, exposición parenteral\
-    \ en usuarios de drogas \ninyectables (UDI) con material contaminado, pinchazos\
-    \ accidentales o mordeduras, por \ntransfusiones sanguíneas y donación de órganos\
-    \ o tejidos.(41) \nValoración del riesgo \nLa determinación del riesgo se evalúa\
-    \ de acuerdo al tipo de exposición, estado de la \npersona fuente, la cantidad\
-    \ del virus en el inóculo, y las condiciones del individuo \nexpuesto.  \nContemplando\
-    \ estos factores, se pueden determinar diversos grados de riesgo. En \ncuanto\
-    \ a relaciones sexuales, éstas se consideran de riesgo potencial en los casos\
-    \ en \nlos que no se ha utilizado o se ha hecho mal uso del preservativo.(41)\
-    \ \n \nEl tipo de exposición se describirá desde el punto de vista del expuesto\
-    \ (ver tabla 5). \n \nTabla 5. Riesgo de infección no laboral según el tipo de\
-    \ exposición \nRiesgo Condición \n \nRiesgo \nconsiderable \n \n• Exposición de\
-    \ recto, vagina, ojos, boca u otras membranas \nmucosas, piel no intacta o contacto\
-    \ percutáneo \n• Con fluidos potencialmente infectantes"
-  - "38 \n \n \n \n14. ¿Cuáles son las metas de control de TA de un paciente hipertenso\
-    \ de acuerdo a la \nedad y comorbilidad? \n \nTabla 13. Metas de la TA de acuerdo\
-    \ a la edad y comorbilidad \n \nFuente: ESH/ESC Guidelines for the management\
-    \ of arterial hypertension, 2018.(20) \nElaboración propia \n \nRecomendaciones\
-    \ \n \nNivel/ \nclase \nSe recomienda que el primer objetivo del tratamiento sea\
-    \ reducir la TA a <140/90 \nmmHg en todos los pacientes y,  siempre que el tratamiento\
-    \ sea bien tolerado, los \nvalores de TA tratados deben dirigirse a valores inferiores\
-    \ a 130/80 mmHg. (20) \nIA \nLos pacientes con diabetes mellitus deben tener una\
-    \ presión menor a 130/80.(20) IA \nLos pacientes con infarto cerebral previo o\
-    \ ataque isquémico transitorio deben tener \nvalores inferiores a 130/80.(20)\
-    \ \nIA \nLos pacientes con enfermedad coronaria deben tener valores de 130/80.(20)\
-    \ IA \nEn enfermedad renal crónica la meta es tener valores inferiores a 130-140/80.(20)\
-    \ IA \n \n13. Abreviaturas \n \nAII Angiotensina tipo II \nADH Hormona anti diurética\
-    \ \nAIT Ataque isquémico transitorio \nAMPA Auto medida de presión arterial \n\
-    AR Arteria renal \nGrupo de \nedad Rangos objetivo de tratamiento de la TAS en\
-    \ el consultorio (mmHg) \nRango objetivo de \ntratamiento TAD de \nla consulta\
-    \ (mmHg) \n Hipertensión  + Diabetes + ERC + EAC  + Apoplejía/ \nAIT \n \n18 -\
-    \ 65  \naños \nObjetivo de 130 \no menos si se \ntolera*  \nNo <120 \nObjetivo\
-    \ de \n130 o menos \nsi se tolera*  \nNo <120 \nObjetivo \nde <140 a \n130  \n\
-    si se \ntolera* \nObjetivo de \n130 o menos \nsi se tolera* \nNo <120 \nObjetivo\
-    \ de 130 \no menos si se \ntolera* No <120 \n70–79 \n65 - 79 \naños** \nObjetivo\
-    \ a 130-\n139  \nsi es tolerado \nObjetivo de  \n130-139  \nsi es tolerado \n\
-    Objetivo \nde  \n130-139  \nsi es \ntolerado \nObjetivo de \n130-139  \nsi es\
-    \ tolerado \nObjetivo de  \n130-139  \nsi es tolerado \n70–79 \n≥80 años*** Objetivo\
-    \ a 130-\n139  \nsi es tolerado \nObjetivo de  \n130-139  \nsi es tolerado \n\
-    Objetivo \nde  \n130-139  \nsi es \ntolerado \nObjetivo de \n130-139  \nsi es\
-    \ tolerado \nObjetivo de  \n130-139  \nsi es tolerado \n70–79 \nEAC = enfermedad\
-    \ de la arteria coronaria; ERC = enfermedad renal crónica (incluye ERC diabética\
-    \ y no diabética); TAD = \npresión arterial diastólica; TAS = presión arterial\
-    \ sistólica; AIT = Ataque isquémico transitorio.  *En caso de no tolerar \n(presencia\
-    \ de efectos adversos que impidan continuar el tratamiento), será suficiente alcanzar\
-    \ una meta de TA de menos \nde 140/90.  **Se refiere a pacientes con accidente\
-    \ cerebrovascular previo y no se refiere a objetivos de presión arterial \ninmediatamente\
-    \ después de un acci dente cerebrovascular agudo.  ***Las decisiones de tratamiento\
-    \ y los objetivos de \npresión arterial pueden necesitar modificarse en pacientes\
-    \ mayores que son frágiles e independientes."
-  - "88 \n \nAnexo 5. Redistribución de la masa grasa durante el envejecimiento \n\
-    \ \nTabla 8: Cambios en la distribución de la masa grasa \n \n \nCambios en la\
-    \ distribución de la masa grasa \n \nDescenso de la cantidad de grasa subcutánea\
-    \ provocado por la progresiva disminución de la \ncapacidad del tejido adiposo\
-    \ subcutáneo para almacenar lípido (especialmente en las \nextremidades inferiores)\
-    \ \n \nAumento de la grasa visceral en torno al 0.4% cada año en hombres mayores\
-    \ y de mediana \nedad y en mujeres postmenopáusicas.  \n \nIncremento de la grasa\
-    \ intra-muscular \n \nCrecimiento de la masa grasa a nivel de medula ósea.  \n\
-    Fuente: Tomado de Geriatría. Gutiérrez Robledo, García Peña (2012).Se describen\
-    \ los cambios quese presentan con \nrespecto a la distribución de la grasa corporal\
-    \ y la disminución de masa magra en el adulto mayor (sarcopenia). \nElaboración\
-    \ propia. .(56) \n \n \n \n \nAnexo 6. Recomendaciones para el seguimiento y tratamiento\
-    \ de la enfermedad \nrenal crónica. \n \nTabla 9. Parámetros de seguimiento de\
-    \ la ERC \n \nIndicador Objetivo Frecuencia \nmínima \n  /   \n/ \n   /  \n/ \n\
-    \   / \n/ \n   / \n/ \n   /  \n/ \n   /  \n/ \n   /  \n/ \nCreatinina \nsérica/TFG\
-    \ \nProteinuria \nSeguimie\nnto de la \nTFG \nDepende del \nestadio y \nfactores\
-    \ \nclínicos \n       \nHemoglobin\na \n(Anemia) \n11 a 12 \ng/dL  \nCada 3 \n\
-    meses \n       \nBicarbonato \n(Enfermedad \nósea) \n>22 \nmeq/L \nCada 3 \nmeses\
-    \ \n       \nFósforo \n(Enfermedad \nósea) \n< 4.5 \nmg/dL \nCada 3 \nmeses \n\
-    \       \nDieta baja en fósforo prescrita        \nQuelante de fósforo prescrito"
-- source_sentence: '¿Qué establece la norma MSP (guia_prevencion_diagnostico_tratamiento_enfermedad_renal_cronica_2018)
-    respecto a:  Personas con origen afro o asiático;?'
+  - 'yodo),
+
+    17-348-1
+
+    (coloración Gram) agente decolorante (alcohol acetona), colorante
+
+    de contraste (safranina). Almacenar a 15-30oC y
+
+    protegido de la luz.
+
+
+    ### TABLAS CLÍNICAS NORMATIVAS:
+
+    | Lista de dispositivos médicos esenciales para sepsis neonatal |  |  |
+
+    | --- | --- | --- |
+
+    | Código ECRI | Nombre genérico | Especificaciones técnicas |
+
+    | 14-085-8 | Tubo endotraqueal I.D. 4,0 mm, sin balón | Polivinil siliconizado,
+    radiopaco con conector universal de 15 mm, marcado cada 10 mm, extremo en bisel,
+    estéril, descartable. |'
+  - 'Diagnóstico y tratamiento del acné
+
+    Las cicatrices en picahielo pueden presentar mejoría con ácido tricloroacético*
+    en
+
+    concentraciones del 20 al 30% solo o acompañado previamente de ácido glicólico
+    al
+
+    70%.120 Para las cicatrices en rollo se ha probado el tratamiento con sub incisiones,
+    que E-3
+
+    ha mostrado ser un método bien tolerado y con una buena relación costo-efecto,
+    con un
+
+    alto grado de satisfacción en los pacientes.112
+
+    El tratamiento de las cicatrices de acné debe realizarse únicamente por o bajo
+    la
+
+    ü
+
+    supervisión de médicos dermatólogos o cirujanos plásticos con experiencia.
+
+    * Medicamento no consta en el CNMB vigente, sin cobertura pública
+
+    Recomendaciones claves – Terapia física - Tratamiento de las complicaciones
+
+    – Las terapias físicas láser, luz pulsada y terapia fotodinámica son una alternativa
+    del tratamiento
+
+    del acné que se pueden considerar.
+
+    – Hay que tomar en cuenta que las cicatrices son un estigma en los pacientes y
+    existen opciones
+
+    terapéuticas que podrían ayudar a mejorar su aspecto.
+
+    13. Criterios de manejo según nivel de atención, referencia y contrarreferencia
+
+    Nivel de
+
+    Manejo Referencia y contrarreferencia
+
+    atención
+
+    - Educar al paciente -Derivación a segundo nivel para
+
+    - Detectar deterioro psicosocial tratamiento por especialidad.
+
+    Primer nivel - Diagnóstico clínico de acné - Establecer manejo interdisciplinario
+
+    - Cuando no se tiene certeza del con otros especialistas mediante
+
+    diagnóstico derivar al nivel superior. interconsultas.
+
+    - Derivar al tercer nivel en caso de:
+
+    - Acné fulminante o foliculitis por
+
+    gram negativos.
+
+    - Confirmar el diagnóstico.
+
+    - Formas nódulo quísticas
+
+    - Solicitud de exámenes óptimos.
+
+    - Acné moderado a severo en
+
+    - Iniciar tratamiento.
+
+    Segundo nivel pacientes con pigmentación
+
+    - Realizar seguimiento.
+
+    profunda de la piel
+
+    - Manejo de recaídas.
+
+    - Grave repercusión social o
+
+    - Tratamiento de cicatrices leves.
+
+    psicológica. (Falta de redes de
+
+    apoyo, mala adherencia demostrada
+
+    e ideación suicida)
+
+    - Diagnóstico, tratamiento y seguimiento - Contrarreferencia:
+
+    de casos graves de acné. Se recomienda la contrarreferencia
+
+    - Notificación de casos complicados. en casos de acné que muestren
+
+    Tercer nivel
+
+    - Vigilancia epidemiológica de reacciones adecuado control de la patología y
+
+    adversas de los fármacos empleados que necesiten pautas terapéuticas
+
+    para el tratamiento del acné. de mantenimiento.
+
+    Fuente: Criterios de derivación en: Acné. Fisterra. http://www.fisterra.com/guías-clinicas/acne/#guia.(on
+    line)
+
+    2013.39;Criterios de referencia en: Diagnóstico y Tratamiento del Acné México:
+    Secretaría de Salud, 2009.95'
+  - 'to de las cicatrices de acné debe realizarse únicamente por o bajo la supervisión
+    de médicos dermatólogos o cirujanos plásticos con experiencia. | ü |
+
+
+    | Recomendaciones claves – Terapia física - Tratamiento de las complicaciones
+    |
+
+    | --- |
+
+    | – Las terapias físicas láser, luz pulsada y terapia fotodinámica son una alternativa
+    del tratamiento del acné que se pueden considerar. – Hay que tomar en cuenta que
+    las cicatrices son un estigma en los pacientes y existen opciones terapéuticas
+    que podrían ayudar a mejorar su aspecto. |'
+- source_sentence: '¿Qué establece la Guía de Práctica Clínica oficial del MSP (2018_gp_tuberculosis_1,
+    2018) respecto a: Anexo 15. Manejo de las reacciones adversas más frecuentes a?'
   sentences:
-  - "1 \n \n \nEncefalopatía hipóxica \nisquémica del recién nacido \n \n \n \n \n\
-    \ \n       Guía de Práctica Clínica (GPC) \n        2019"
-  - "38 \n \n Personas con origen afro o asiático; \n Uso de medicamentos nefrotóxicos;\
-    \  \n Obstrucción del tracto urinario sin tratamiento. \n \nE-2b \nEl uso crónico\
-    \ de AINE y medicamentos nefrotóxicos, en personas con \nERC puede estar relacionado\
-    \ con progresión de la enfermedad; mientras \nque el uso esporádico o agudo, está\
-    \ relacionado con una disminución \nreversible de la TFG.(49,55,147,197–201) \n\
-    \  \nRecomendaciones para la definición, identificación y predicción de la \n\
-    progresión de la ERC \nE-2b \nR-B \nSe debe realizar TFG y alb uminuria al menos\
-    \ una vez al año en personas \ncon ERC.(6) \nE-2b \nR-B \nSe recomienda evaluar\
-    \ TFG e IAC de manera más seguida en personas \ncon alto riesgo de progresión\
-    \ (ver tablas de evidencia) y/o en las que la \nmedición de dichos parámetros\
-    \ influenciaría en las decisiones \nterapéuticas.(6) La periodicidad deberá estar\
-    \ acorde al c riterio del \nespecialista según el caso.(101)   \nE-2b \nR-B \n\
-    Se recomienda tomar en cuenta que fluctu aciones menores en la TFG son \ncomunes\
-    \ y no necesariamente indican progresión.(6) \nE-1b \nR-A \nPara identificar la\
-    \ tasa de progresión de la ERC, se \nrecomienda(2,49,55,147,197–201):  \n Obtener\
-    \ un mínimo de tres estimaciones de la TFGe en un periodo \nno menor a 90 días;\
-    \ \n En personas con disminución de la TFG, encontrada en laboratorio \ncomo\
-    \ nuevo hallazgo, repetir la TFG dentro de dos semanas, para \nexcluir causas\
-    \ de deterioro agudo de la TFG ( por ejemplo, injuria \nrenal aguda o inicio de\
-    \ terapia con antagonistas del sistema renina -\nangiotensina).  \nE-1b \nR-A\
-    \ \nSe recomienda definir a la progresión acelerada de ERC en presencia de \n\
-    las siguientes circunstancias(2,49,55,147,197–201):  \n Disminución sostenida\
-    \ del 25 % o más en la TFG calculada; \n Cambio en el estadio de la TFGc dentro\
-    \ de 12 meses; \n Disminución sostenida anual de 5 mL/min/1,73 m2 o más en la\
-    \ TFG.    \nE-2b \nR-B \nSe define como progresión acelerada a ERCA, si existe(2,126):\
-    \ \n Disminución sostenida del 25 % o más de la TFG en 12 meses, ó \n Disminución\
-    \ sostenida 15 mL /min/1,73 m2 o más de la TFG en 12 \nmeses.  \nE-2b A mayor\
-    \ número de mediciones de creatinina sérica y la periodicidad de"
-  - "41 \n \nO2 Oxígeno \nOH Radical hidroxilo  \nOPS Organización Panamericana de\
-    \ Salud \nP Fósforo \nPBF Perfil biofísico fetal \nPCO2 Presión de dióxido de\
-    \ carbono \nPCR Polymerase Chain Reaction \npH Potencial de hidrógeno \nPICO Paciente,\
-    \ intervención, comparación, resultado \nobservado \nPO2 Presión de oxígeno \n\
-    PRN Por razones necesarias \nRCIU \nRCP \nRestricción del crecimiento intrauterino\
-    \ \nReanimación cardiopulmonar \nRN Recién nacido  \nRMN Resonancia magnética\
-    \ nuclear \nSIHAD Secreción Inadecuada de Hormona Anti Diurética \nSNC Sistema\
-    \ Nervioso Central \nSO2 Saturación de oxígeno \ns 100 b Proteína b ligada a calcio\
-    \ \nTAC Tomografía axial computarizada \nTGO Transaminasa Glutamo Oxalacética\
-    \ \nTGP Transaminasa Glutamo Pirúvica \nTP Tiempo de protrombina \nTTP Tiempo\
-    \ de tromboplastina \nUCIN Unidad de Cuidados Intensivos Neonatales \nU/Kg Unidades\
-    \ por kilogramo \nμV Microvoltios \nVEEG Electroencefalograma por video monitorización\
-    \ \nVO Vía oral \nVPP Ventilación a presión positiva"
+  - 'Segunda edición 2018
+
+    Anexo 15. Manejo de las reacciones adversas más frecuentes a
+
+    medicamentos anti TB de primera línea
+
+    Importantes Suspender medicamento(s) en cuestión
+
+    Erupción cutánea Todos los medicamen- Suspender la medicación
+
+    tos antituberculosis
+
+    Hipoacusia (en ausencia Estreptomicina Suspender
+
+    de cerumen)
+
+    Mareos vértigo y nistag- Estreptomicina Suspender
+
+    mo)
+
+    Ictericia (en ausencia de Pirazinamida, isoniazi- Suspender la medicación
+
+    otras causas) da y rifampicina
+
+    Vómitos persistentes, La mayoría de los me- Suspender la medicación
+
+    confusión (sospechar dicamentos antituber- Realizar pruebas urgentes
+
+    insuficiencia hepática culosis funcionales hepáticas y obaguda de origen farma-
+    tener el tiempo de protromcológico) bina
+
+    Pérdida de agudeza vi- Etambutol Suspender
+
+    sual (en ausencia de
+
+    otras causas)
+
+    Choque, púrpura, insufi- Rifampicina Suspender la medicación y
+
+    ciencia renal aguda hospitalizar al afectado de
+
+    urgencia. No utilizar rifampicina cuando se reinicie el tratamiento, siempre y
+    cuando
+
+    esté seguro de que la rifampicina haya sido
+
+    responsable de esta reacción
+
+    Fuente: MSP. Manual de Normas y Procedimientos para el Manejo para el Control
+    de la Tuberculosis en el Ecuador, 2010.
+
+    Elaboración: Propia'
+  - 'isolona 18-36 5 4 0,8
+
+    Prednisona 18-36 5 4 0,8
+
+    Triamcinolona 18-36 4 5 0
+
+    Acción larga
+
+    Betametasona 36-54 0,6-0,75 25-30 0
+
+    Dexametasona 36-54 0,75 25 0
+
+
+    ### TABLAS CLÍNICAS NORMATIVAS:
+
+    | Precauciones | No debe ser utilizada para la somnolencia y/o delirio que no
+    amenaza la vida a causa del peligro de revertir el efecto analgésico de los opioides,
+    lo que precipita el dolor severo y el síndrome de abstinencia física importante
+    |
+
+    | --- | --- |
+
+    | Contraindicaciones | Hipersensibilidad al medicamento |
+
+    | Efectos adversos | Náusea y vómito. Ocasionalmente severa hipertensión, edema
+    pulmonar, taquicardia, arritmias, paro cardíaco; dosis tan pequeñas como 100-400
+    μg de naloxona han sido implicadas. |
+
+    | Interacciones | Buprenorfina, alfentanilo, codeína, morfina, fentanilo, meperidina,
+    metadona, oxicodona: disminuye sus efectos por antagonismo farmacodinámica. Tramadol
+    puede interferir en la reversión de los síntomas de sobredosis, puede desencadenar
+    convulsiones. |'
+  - 'sta reacción
+
+    Fuente: MSP. Manual de Normas y Procedimientos para el Manejo para el Control
+    de la Tuberculosis en el Ecuador, 2010.
+
+    Elaboración: Propia
+
+
+    ### TABLAS CLÍNICAS NORMATIVAS:
+
+    | Importantes | Suspender medicamento(s) en cuestión |  |
+
+    | --- | --- | --- |
+
+    | Erupción cutánea | Todos los medicamen- tos antituberculosis | Suspender la
+    medicación |
+
+    | Hipoacusia (en ausencia de cerumen) | Estreptomicina | Suspender |
+
+    | Mareos vértigo y nistag- mo) | Estreptomicina | Suspender |
+
+    | Ictericia (en ausencia de otras causas) | Pirazinamida, isoniazi- da y rifampicina
+    | Suspender la medicación |
+
+    | Vómitos persistentes, confusión (sospechar insuficiencia hepática aguda de origen
+    farma- cológico) | La mayoría de los me- dicamentos antituber- culosis | Suspender
+    la medicación Realizar pruebas urgentes funcionales hepáticas y ob- tener el tiempo
+    de protrom- bina |
+
+    | Pérdida de agudeza vi- sual (en ausencia de otras causas) | Etambutol | Suspender
+    |
+
+    | Choque, púrpura, insufi- ciencia renal aguda | Rifampicina | Suspender la medicación
+    y hospitalizar al afectado de urgencia. No utilizar rifampi- cina cuando se reinicie
+    el tra- tamiento, siempre y cuando esté seguro de que la rifam- picina haya sido
+    responsable de esta reacción |'
 pipeline_tag: sentence-similarity
 library_name: sentence-transformers
+metrics:
+- cosine_accuracy
+model-index:
+- name: SentenceTransformer based on BAAI/bge-m3
+  results:
+  - task:
+      type: triplet
+      name: Triplet
+    dataset:
+      name: ateneo validation benchmark
+      type: ateneo_validation_benchmark
+    metrics:
+    - type: cosine_accuracy
+      value: 0.96484375
+      name: Cosine Accuracy
 ---
 
 # SentenceTransformer based on BAAI/bge-m3
@@ -463,7 +933,7 @@ This is a [sentence-transformers](https://www.SBERT.net) model finetuned from [B
 ### Model Description
 - **Model Type:** Sentence Transformer
 - **Base model:** [BAAI/bge-m3](https://huggingface.co/BAAI/bge-m3) <!-- at revision 5617a9f61b028005a4858fdac845db406aefb181 -->
-- **Maximum Sequence Length:** 512 tokens
+- **Maximum Sequence Length:** 1024 tokens
 - **Output Dimensionality:** 1024 dimensions
 - **Similarity Function:** Cosine Similarity
 - **Supported Modality:** Text
@@ -504,9 +974,9 @@ from sentence_transformers import SentenceTransformer
 model = SentenceTransformer("sentence_transformers_model_id")
 # Run inference
 sentences = [
-    '¿Qué establece la norma MSP (guia_prevencion_diagnostico_tratamiento_enfermedad_renal_cronica_2018) respecto a: \uf0b7 Personas con origen afro o asiático;?',
-    '38 \n \n\uf0b7 Personas con origen afro o asiático; \n\uf0b7 Uso de medicamentos nefrotóxicos;  \n\uf0b7 Obstrucción del tracto urinario sin tratamiento. \n \nE-2b \nEl uso crónico de AINE y medicamentos nefrotóxicos, en personas con \nERC puede estar relacionado con progresión de la enfermedad; mientras \nque el uso esporádico o agudo, está relacionado con una disminución \nreversible de la TFG.(49,55,147,197–201) \n  \nRecomendaciones para la definición, identificación y predicción de la \nprogresión de la ERC \nE-2b \nR-B \nSe debe realizar TFG y alb uminuria al menos una vez al año en personas \ncon ERC.(6) \nE-2b \nR-B \nSe recomienda evaluar TFG e IAC de manera más seguida en personas \ncon alto riesgo de progresión (ver tablas de evidencia) y/o en las que la \nmedición de dichos parámetros influenciaría en las decisiones \nterapéuticas.(6) La periodicidad deberá estar acorde al c riterio del \nespecialista según el caso.(101)   \nE-2b \nR-B \nSe recomienda tomar en cuenta que fluctu aciones menores en la TFG son \ncomunes y no necesariamente indican progresión.(6) \nE-1b \nR-A \nPara identificar la tasa de progresión de la ERC, se \nrecomienda(2,49,55,147,197–201):  \n\uf0b7 Obtener un mínimo de tres estimaciones de la TFGe en un periodo \nno menor a 90 días; \n\uf0b7 En personas con disminución de la TFG, encontrada en laboratorio \ncomo nuevo hallazgo, repetir la TFG dentro de dos semanas, para \nexcluir causas de deterioro agudo de la TFG ( por ejemplo, injuria \nrenal aguda o inicio de terapia con antagonistas del sistema renina -\nangiotensina).  \nE-1b \nR-A \nSe recomienda definir a la progresión acelerada de ERC en presencia de \nlas siguientes circunstancias(2,49,55,147,197–201):  \n\uf0b7 Disminución sostenida del 25 % o más en la TFG calculada; \n\uf0b7 Cambio en el estadio de la TFGc dentro de 12 meses; \n\uf0b7 Disminución sostenida anual de 5 mL/min/1,73 m2 o más en la TFG.    \nE-2b \nR-B \nSe define como progresión acelerada a ERCA, si existe(2,126): \n\uf0b7 Disminución sostenida del 25 % o más de la TFG en 12 meses, ó \n\uf0b7 Disminución sostenida 15 mL /min/1,73 m2 o más de la TFG en 12 \nmeses.  \nE-2b A mayor número de mediciones de creatinina sérica y la periodicidad de',
-    '41 \n \nO2 Oxígeno \nOH Radical hidroxilo  \nOPS Organización Panamericana de Salud \nP Fósforo \nPBF Perfil biofísico fetal \nPCO2 Presión de dióxido de carbono \nPCR Polymerase Chain Reaction \npH Potencial de hidrógeno \nPICO Paciente, intervención, comparación, resultado \nobservado \nPO2 Presión de oxígeno \nPRN Por razones necesarias \nRCIU \nRCP \nRestricción del crecimiento intrauterino \nReanimación cardiopulmonar \nRN Recién nacido  \nRMN Resonancia magnética nuclear \nSIHAD Secreción Inadecuada de Hormona Anti Diurética \nSNC Sistema Nervioso Central \nSO2 Saturación de oxígeno \ns 100 b Proteína b ligada a calcio \nTAC Tomografía axial computarizada \nTGO Transaminasa Glutamo Oxalacética \nTGP Transaminasa Glutamo Pirúvica \nTP Tiempo de protrombina \nTTP Tiempo de tromboplastina \nUCIN Unidad de Cuidados Intensivos Neonatales \nU/Kg Unidades por kilogramo \nμV Microvoltios \nVEEG Electroencefalograma por video monitorización \nVO Vía oral \nVPP Ventilación a presión positiva',
+    '¿Qué establece la Guía de Práctica Clínica oficial del MSP (2018_gp_tuberculosis_1, 2018) respecto a: Anexo 15. Manejo de las reacciones adversas más frecuentes a?',
+    'Segunda edición 2018\nAnexo 15. Manejo de las reacciones adversas más frecuentes a\nmedicamentos anti TB de primera línea\nImportantes Suspender medicamento(s) en cuestión\nErupción cutánea Todos los medicamen- Suspender la medicación\ntos antituberculosis\nHipoacusia (en ausencia Estreptomicina Suspender\nde cerumen)\nMareos vértigo y nistag- Estreptomicina Suspender\nmo)\nIctericia (en ausencia de Pirazinamida, isoniazi- Suspender la medicación\notras causas) da y rifampicina\nVómitos persistentes, La mayoría de los me- Suspender la medicación\nconfusión (sospechar dicamentos antituber- Realizar pruebas urgentes\ninsuficiencia hepática culosis funcionales hepáticas y obaguda de origen farma- tener el tiempo de protromcológico) bina\nPérdida de agudeza vi- Etambutol Suspender\nsual (en ausencia de\notras causas)\nChoque, púrpura, insufi- Rifampicina Suspender la medicación y\nciencia renal aguda hospitalizar al afectado de\nurgencia. No utilizar rifampicina cuando se reinicie el tratamiento, siempre y cuando\nesté seguro de que la rifampicina haya sido\nresponsable de esta reacción\nFuente: MSP. Manual de Normas y Procedimientos para el Manejo para el Control de la Tuberculosis en el Ecuador, 2010.\nElaboración: Propia',
+    'sta reacción\nFuente: MSP. Manual de Normas y Procedimientos para el Manejo para el Control de la Tuberculosis en el Ecuador, 2010.\nElaboración: Propia\n\n### TABLAS CLÍNICAS NORMATIVAS:\n| Importantes | Suspender medicamento(s) en cuestión |  |\n| --- | --- | --- |\n| Erupción cutánea | Todos los medicamen- tos antituberculosis | Suspender la medicación |\n| Hipoacusia (en ausencia de cerumen) | Estreptomicina | Suspender |\n| Mareos vértigo y nistag- mo) | Estreptomicina | Suspender |\n| Ictericia (en ausencia de otras causas) | Pirazinamida, isoniazi- da y rifampicina | Suspender la medicación |\n| Vómitos persistentes, confusión (sospechar insuficiencia hepática aguda de origen farma- cológico) | La mayoría de los me- dicamentos antituber- culosis | Suspender la medicación Realizar pruebas urgentes funcionales hepáticas y ob- tener el tiempo de protrom- bina |\n| Pérdida de agudeza vi- sual (en ausencia de otras causas) | Etambutol | Suspender |\n| Choque, púrpura, insufi- ciencia renal aguda | Rifampicina | Suspender la medicación y hospitalizar al afectado de urgencia. No utilizar rifampi- cina cuando se reinicie el tra- tamiento, siempre y cuando esté seguro de que la rifam- picina haya sido responsable de esta reacción |',
 ]
 embeddings = model.encode(sentences)
 print(embeddings.shape)
@@ -515,9 +985,9 @@ print(embeddings.shape)
 # Get the similarity scores for the embeddings
 similarities = model.similarity(embeddings, embeddings)
 print(similarities)
-# tensor([[1.0000, 0.7846, 0.1703],
-#         [0.7846, 1.0000, 0.1832],
-#         [0.1703, 0.1832, 1.0000]])
+# tensor([[1.0000, 0.8330, 0.1345],
+#         [0.8330, 1.0000, 0.1285],
+#         [0.1345, 0.1285, 1.0000]])
 ```
 <!--
 ### Direct Usage (Transformers)
@@ -543,6 +1013,19 @@ You can finetune this model on your own dataset.
 *List how the model may foreseeably be misused and address what users ought not to do with the model.*
 -->
 
+## Evaluation
+
+### Metrics
+
+#### Triplet
+
+* Dataset: `ateneo_validation_benchmark`
+* Evaluated with [<code>TripletEvaluator</code>](https://sbert.net/docs/package_reference/sentence_transformer/evaluation.html#sentence_transformers.sentence_transformer.evaluation.TripletEvaluator)
+
+| Metric              | Value      |
+|:--------------------|:-----------|
+| **cosine_accuracy** | **0.9648** |
+
 <!--
 ## Bias, Risks and Limitations
 
@@ -561,20 +1044,20 @@ You can finetune this model on your own dataset.
 
 #### Unnamed Dataset
 
-* Size: 480 training samples
+* Size: 1,918 training samples
 * Columns: <code>sentence_0</code>, <code>sentence_1</code>, and <code>sentence_2</code>
 * Approximate statistics based on the first 100 samples:
-  |          | sentence_0                                                                         | sentence_1                                                                           | sentence_2                                                                           |
-  |:---------|:-----------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------|
-  | type     | string                                                                             | string                                                                               | string                                                                               |
-  | modality | text                                                                               | text                                                                                 | text                                                                                 |
-  | details  | <ul><li>min: 25 tokens</li><li>mean: 45.32 tokens</li><li>max: 80 tokens</li></ul> | <ul><li>min: 34 tokens</li><li>mean: 439.71 tokens</li><li>max: 512 tokens</li></ul> | <ul><li>min: 35 tokens</li><li>mean: 447.39 tokens</li><li>max: 512 tokens</li></ul> |
+  |          | sentence_0                                                                         | sentence_1                                                                            | sentence_2                                                                            |
+  |:---------|:-----------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------|
+  | type     | string                                                                             | string                                                                                | string                                                                                |
+  | modality | text                                                                               | text                                                                                  | text                                                                                  |
+  | details  | <ul><li>min: 40 tokens</li><li>mean: 59.25 tokens</li><li>max: 88 tokens</li></ul> | <ul><li>min: 74 tokens</li><li>mean: 400.25 tokens</li><li>max: 1024 tokens</li></ul> | <ul><li>min: 58 tokens</li><li>mean: 482.17 tokens</li><li>max: 1024 tokens</li></ul> |
 * Samples:
-  | sentence_0                                                                                                                                                                                                   | sentence_1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | sentence_2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-  |:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-  | <code>¿Qué establece la norma MSP (gp_tuberculosis-1) respecto a: 11.2	Clasificación	de	caso	basadas	en	la	historia?</code>                                                                                  | <code>Segunda edición 2018<br>25<br>11.2	Clasificación	de	caso	basadas	en	la	historia	<br>de tratamiento de TB previo (condición de <br>ingreso)<br>Caso nuevo. Persona con diagnóstico de TB pulmonar o extrapulmonar que <br>nunca recibió tratamiento anti TB o lo recibió por menos de un mes. (12) <br>En este grupo se incluye a los afectados que son contactos comprobados de <br>afectados con TB, resistente a medicamentos.<br>Caso previamente tratado. Persona que ha recibido tratamiento con <br>medicamentos antituberculosis por un mes o más (antes tratados).<br>Los previamente tratados se clasifican en:<br>• Afectado con tratamiento después de fracaso. Persona previamente <br>tratada para TB, y que su tratamiento fracasó al final de su ciclo más <br>reciente (12) indistintamente si el afectado recibió terapia con drogas <br>de primera y/o segunda línea.<br>• Afectado con tratamiento después de pérdida en el seguimiento. <br>Persona previamente tratada por TB, y cuyo caso fue declarado <br>pérdida en el seguimiento al final de su tratamiento más rec...</code>                               | <code>75 <br> <br> <br>Riesgo <br>cardiovascular <br> <br> <br>Evaluación del <br>riesgo (escala de <br>Framingham) <br>+ + <br> <br>2 años <br> <br>Se debería efectuar en todos <br>los hombres >40 años y <br>mujeres >50 años sin ECV <br> <br>Hipertensión <br> <br>Presión Arterial + +  <br>Anual <br> <br> <br>Lípidos <br> <br>TCT, c-HDL, c-<br>LDL, TG + + Anual <br> <br>Repetir en ayunas si sirve <br>para intervención terapéutica <br>(≥8h sin ingesta calórica) <br>Glucosa <br> <br>Glucosa en plasma <br>+ + Anual <br> <br>Considerar test de tolerancia <br>oral a la glucosa/HbA1c si se <br>repiten niveles de glucosa en <br>ayunas entre 5,7-6,9 mmol/L <br>(100-125 mg/dL) <br>Enfermedad <br>pulmonar <br>Síntomas <br>respiratorios y <br>factores de riesgo <br>+ + Anual <br> <br>Si se observa insuficiencia <br>respiratoria con espirometría <br>preservada, se debe realizar <br>un ecocardiograma para <br>descartar insuficiencia <br>cardiaca y/o <br>hipertensión pulmonar <br> <br>Espirometría <br>   <br> <br>Según <br>indicación <br> <br> <br>La espirometría se debe <br>realizar en todas las personas <br>sintomáticas <br>Enfermedad <br>hepática <br> <br>Evaluación de <br>riesgo <br>+ + Anual <br> <br> <br>ALT/AST, FAL, <br>...</code> |
-  | <code>¿Qué establece la norma MSP (guia_prevencion_diagnostico_tratamiento_enfermedad_renal_cronica_2018) respecto a: 317.  Catalá-López F, Macía s Saint -Gerons D, González -Bermejo D, Rosano GM,?</code> | <code>76 <br> <br>317.  Catalá-López F, Macía s Saint -Gerons D, González -Bermejo D, Rosano GM, <br>Davis BR, Ridao M, et  al. Cardiovascular and Renal Outcomes of Renin -<br>Angiotensin System Blockade in Adult Patients with Diabetes Mellitus: A <br>Systematic Review with Network Meta -Analyses. PLoS Med. marzo de <br>2016;13(3):e1001971.  <br>318.  Van Hateren KJJ, Landman GWD, Groenier KH, Bilo HJG, Kleefstra N. <br>Effectiveness of angiotensin II receptor antagonists in a cohort of Dutch patients <br>with type 2 diabetes mellitus (ZODIAC -14). Can J diabetes. abril de <br>2015;39(2):157–61.  <br>319.  Cheng J, Zhang W, Zhang X, Han F, Li X, He X, et  al. Effect of angiotensin -<br>converting enzyme inhibitors and angiotensin II receptor blockers on all -cause <br>mortality, cardiovascular deaths, and cardiovascular events in patients with <br>diabetes me llitus: a meta -analysis. JAMA Intern Med. mayo de <br>2014;174(5):773–85.  <br>320.  Gopinath S, Ganesh BA, Manoj K, Rubiya. 2 year followup of patients with <br>diabetes mellitus neph...</code>                                  | <code>11 <br> <br> <br> <br>4. Introducción <br> <br> <br>Las enfermedades crónicas no transmisibles (ECNT) son definidas por la Organización Mundial <br>de la Salud (OMS)(1,2) como "enfermedades de larga duración y, en general, progresión lenta", <br>que no se transmiten de persona a persona; representan el principal problema de salud <br>mundial del siglo XXI y generan una gran carga para los sistemas sanitarios en todo el <br>planeta.(3–5) En 2011, la Asamblea General de las Naciones Unidas reconoció la magnitud del <br>problema que representan las ECNT, defin iéndolo incluso como epidemia, y reconociendo el <br>desafío social que representan. (6) En el año 2008, alrededor del mundo, el 58% de todas las <br>muertes se debieron a ECNT y se espera que el porcentaje aumente en un 20% para el <br>2030.(5) Las dos causas principales de la creciente prevalencia de ECNT son : las prácticas de <br>vida poco saludable (falta de actividad física , malos hábitos nutricionales y consumos nocivos) <br>y el envejecimiento de la población, ampliamente r...</code>                                                                                                                                                                                  |
-  | <code>¿Qué establece la norma MSP (gpc_vih_acuerdo_ministerial05-07-2019) respecto a: Tomado: EACS. Guía Clínica Versión 9.0. 2017. (3)?</code>                                                              | <code>46 <br> <br> <br>Tomado: EACS. Guía Clínica Versión 9.0. 2017. (3) <br> <br>Recomendaciones para personas con VIH y comorbilidades cardiovasculares  <br> <br> <br> <br> <br> <br>B <br>2a <br>Promover medidas respecto a cambio de estilo de vida: <br>- Reducir las grasas saturadas, bebidas azucaradas, disminuir la ingesta de <br>sal, e incrementar la ingesta de verduras, frutas y productos ricos en fibra. <br>- Realizar actividad física aeróbica regular y moderada. <br>- Disminuir factores de estrés. <br>- Evitar el consumo de alcohol, tabaco y drogas. <br>Determinar el riesgo cardiovascular a toda PVV que acuda a consulta. <br>Realizar el manejo de las comorbilidades asociadas como diabetes mellitus, <br>hipertensión arterial y dislipidemia. <br>Preferir las siguientes pautas TARV: <br>- Como eje ITIAN: TDF o TAF + 3TC o FTC  <br>- Como tercera droga: INI como DTG o RAL, o un IP/r de mejor perfil <br>metabólico como DRV/r o ATV/r. <br>Utilizar de preferencia las siguientes estatinas: atorvastatina, pravastatina, <br>rosuvastatina, y pitavastatina. <br>Preferir las esta...</code> | <code>46 <br> <br> <br> <br>81.  Lenfant C, Chobanian AA V, Jones DWD, Roccella EEJ, Bakris GL, Black HR, et  al. <br>Conflicts of Interest - Financial Disclosure: The Seventh Report of the Joint National <br>Committee on Prevention, Detection, Evaluation, and Treatment of High Blood Pressure <br>(JNC 7) [In ternet]. Vol. 289, The Seventh Report of the Joint National Committee on <br>Prevention, Detection, Evaluation, and Treatment of High Blood Pressure (JNC 7). 2003. <br>p. 1206 –52. Disponible en: <br>http://www.nhlbi.nih.gov/guidelines/hypertension/writers.htm%5Cnhttp://jama.jamanetwor<br>k.com.ezp-<br>prod1.hul.harvard.edu/article.aspx?articleid=196589&resultClick=3%5Cnhttp://www.nhlbi.<br>nih.gov/guidelines/hypertension/disclose.htm <br>82.  Jebb SA, Ahern AL, Olson AD, Aston LM, Holzapfel C, Stoll J, et  al. Primary care referral <br>to a commercial provider for weight loss treatment versus standard care: A randomised <br>controlled trial. Lancet [Internet]. 2011;378(9801):1485 –92. Disponible en: <br>http://dx.doi.org/10.1016/S0140-6...</code>                                                                                                                                                                                  |
+  | sentence_0                                                                                                                                                                                                                                                          | sentence_1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | sentence_2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+  |:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | <code>¿Qué establece la Guía de Práctica Clínica oficial del MSP (2014_gpc_cuidados_paliativos_completa_2014, 2014) respecto a: iedad asociada a depresión, delirium, disnea o dolor intenso, pueden utilizarse ?</code>                                            | <code>iedad asociada a depresión, delirium, disnea o dolor intenso, pueden utilizarse antidepresivos tricíclicos, haloperidol u opioides, respectivamente. \|<br><br>\| D \| La evaluación inicial del paciente deprimido en CP comprende: identificación y abordaje de causas potencialmente tratables, valoración de los efectos adversos y las interacciones de los tratamientos farmacológicos previos y estimación del posible riesgo de suicidio. \|<br>\| --- \| --- \|<br>\| B \| La terapia inicial del paciente deprimido en CP comprende intervenciones estructuradas psicosociales, incluida la psicoterapia por el personal del equipo que le atiende y, si el caso lo requiere, por personal especializado dentro de un programa estructurado. \|</code>                                                                                                                                                                                                                                                                                                                 | <code>eficaces en el tratamiento de la depresión en el paciente en CP.203, 207 \|<br>\| 2+ \| Existen grupos de pacientes en CP con mayor riesgo de suicidio.189 \|<br><br>\| D \| La evaluación inicial del paciente deprimido en CP comprende: identificación y abordaje de causas potencialmente tratables, valoración de los efectos adversos e interacciones con psicofármacos de los tratamientos farmacológicos previos y estimación del posible riesgo de suicidio. \|<br>\| --- \| --- \|<br>\| B \| La terapia inicial del paciente deprimido en CP comprende intervenciones estructuradas psicosociales, incluida la psicoterapia por el personal del equipo que le atiende y, si el caso lo requiere, por personal especializado dentro de un programa estructurado. \|<br>\| B \| En caso necesario, pueden usarse fármacos antidepresivos (ISRS o tricíclicos) teniendo en cuenta sus propiedades farmacológicas, otros fármacos que recibe el paciente y su perfil de síntomas en cada momento. \|</code>                                                                                                                                                                   |
+  | <code>¿Qué establece la Guía de Práctica Clínica oficial del MSP (2014_alimentacion_y_nutricion_de_la_mujer_gestante_y_la_madre_en_periodo_de_lactancia, 2014) respecto a: ntal ) y ácido fólico (400 μg), hasta que los valores de hemoglobina llegue a co?</code> | <code>ntal ) y ácido fólico (400 μg), hasta que los valores de hemoglobina llegue a concentraciones normales.58 Véase la GPC de anemia en el embarazo. \| E \|<br><br>\| Se recomienda realizar exámenes de rutina y la suplementación nutricional en el embarazo después de una cirugía bariátrica. El embarazo parece ser seguro después que la mujer ha logrado un peso estable (seis meses con el mismo peso). \| R \|<br>\| --- \| --- \|<br>\| La anemia es el problema más común durante el embarazo después de la cirugía bariátrica, por lo tanto, todas las deficiencias de nutrientes deben ser identificadas y corregidas antes del embarazo. A menudo es necesaria también la suplementación con calcio y vitaminas. En algunos casos, la terapia con hierro parenteral o transfusiones de sangre han sido esenciales para corregir la anemia.60 \| E \|</code>                                                                                                                                                                                                           | <code>e √<br>hipercapnia.<br>Evitar la hipotensión e hipertensión sistémica ya que puede causar lesión isquémica √<br>y complicaciones hemorrágicas respectivamente.<br><br>### TABLAS CLÍNICAS NORMATIVAS:<br>\|  \| Recomendaciones \|  \|  \| Grado \|  \|<br>\| --- \| --- \| --- \| --- \| --- \| --- \|<br>\|  \| Se recomienda vigilancia cardiorespiratoria continua que incluya control de la \|  \|  \| R B \|  \|<br>\|  \| frecuencia cardíaca y respiratoria, presión arterial, saturación de oxígeno y \|  \|  \|  \|  \|<br>\|  \| monitoreo de aEEG continuo.(65) \|  \|  \|  \|  \|<br>\|  \| La SaO de los recién nacidos que necesitan soporte ventilatorio debe mantenerse 2 \|  \|  \| R B \|  \|<br>\|  \| entre 90 y 95%.(55) \|  \|  \|  \|  \|<br>\|  \| Se recomienda no utilizar coloides para reanimación en hipotensión puesto que es \|  \|  \| R B \|  \|<br>\|  \| más probable que la falla sea secundaria a la disfunción del miocardio que a la \|  \|  \|  \|  \|<br>\|  \| hipovolemia.(62) \|  \|  \|  \|  \|<br>\|  \| Se deben corregir los electrolitos que se encuentran en concentraciones bajas, ya \|  \|  \| R B \|  \|<br>\|  \| ...</code> |
+  | <code>¿Qué establece la Guía de Práctica Clínica oficial del MSP (2018_gp_tuberculosis_1, 2018) respecto a: El monitoreo terapéutico de los medicamentos se recomienda solamente en paciente?</code>                                                                | <code>El monitoreo terapéutico de los medicamentos se recomienda solamente en pacientes en los que<br>se sospecha una mala absorción o un fracaso terapéutico.<br><br>### TABLAS CLÍNICAS NORMATIVAS:<br>\| Efectos adversos \| Frecuentes o muy comunes: Neuropatía periférica. Hepa- titis. Frecuencia desconocida: Agranulocitosis, anemia aplasti- ca, trastornos de la sangre, estreñimiento, convulsiones, dificultad con la micción, boca seca, fiebre, ginecomastia, anemia hemolítica, pérdida auditiva (en pacientes con in- suficiencia renal), hiperglucemia, hiperreflexia, reacciones de hipersensibilidad, neumonitis intersticial, náuseas, neu- ritis óptica, neuritis con altas dosis, síndrome de lupus eri- tematoso sistémico, tinnitus (en pacientes con insuficien- cia renal en etapa terminal), vértigo, vómito. \|<br>\| --- \| --- \|<br>\| Penetración LCR \| Concentración equivalente a la plasmática en presencia de inflamación meníngea. Un 20% de concentración de los ni- veles en plasma cuando no están inflamadas las meninges. \|<br>...</code> | <code>Segunda edición 2018<br>Efectos adversos Frecuentes o muy comunes: Neuropatía periférica. Hepatitis.<br>Frecuencia desconocida: Agranulocitosis, anemia aplastica, trastornos de la sangre, estreñimiento, convulsiones,<br>dificultad con la micción, boca seca, fiebre, ginecomastia,<br>anemia hemolítica, pérdida auditiva (en pacientes con insuficiencia renal), hiperglucemia, hiperreflexia, reacciones<br>de hipersensibilidad, neumonitis intersticial, náuseas, neuritis óptica, neuritis con altas dosis, síndrome de lupus eritematoso sistémico, tinnitus (en pacientes con insuficiencia renal en etapa terminal), vértigo, vómito.<br>Penetración LCR Concentración equivalente a la plasmática en presencia de<br>inflamación meníngea. Un 20% de concentración de los niveles en plasma cuando no están inflamadas las meninges.<br>Circunstancias Uso durante el embarazo: Se desconoce si es perjudicial.<br>especiales Se recomienda el uso de Piridoxina como profiláctico.<br>Lactancia: Riesgo teórico de convulsiones y neuropatía; Piridoxin...</code>                                                                                                     |
 * Loss: [<code>MultipleNegativesRankingLoss</code>](https://sbert.net/docs/package_reference/sentence_transformer/losses.html#multiplenegativesrankingloss) with these parameters:
   ```json
   {
@@ -593,15 +1076,13 @@ You can finetune this model on your own dataset.
 ### Training Hyperparameters
 #### Non-Default Hyperparameters
 
-- `per_device_train_batch_size`: 2
 - `fp16`: True
-- `per_device_eval_batch_size`: 2
 - `multi_dataset_batch_sampler`: round_robin
 
 #### All Hyperparameters
 <details><summary>Click to expand</summary>
 
-- `per_device_train_batch_size`: 2
+- `per_device_train_batch_size`: 8
 - `num_train_epochs`: 3
 - `max_steps`: -1
 - `learning_rate`: 5e-05
@@ -645,7 +1126,7 @@ You can finetune this model on your own dataset.
 - `trackio_space_id`: None
 - `trackio_bucket_id`: None
 - `trackio_static_space_id`: None
-- `per_device_eval_batch_size`: 2
+- `per_device_eval_batch_size`: 8
 - `prediction_loss_only`: True
 - `eval_on_start`: False
 - `eval_do_concat_batches`: True
@@ -704,13 +1185,18 @@ You can finetune this model on your own dataset.
 </details>
 
 ### Training Logs
-| Epoch  | Step | Training Loss |
-|:------:|:----:|:-------------:|
-| 2.0833 | 500  | 0.0218        |
+| Epoch  | Step | Training Loss | ateneo_validation_benchmark_cosine_accuracy |
+|:------:|:----:|:-------------:|:-------------------------------------------:|
+| 0.5    | 120  | -             | 0.9629                                      |
+| 1.0    | 240  | -             | 0.9639                                      |
+| 1.5    | 360  | -             | 0.9629                                      |
+| 2.0    | 480  | -             | 0.9639                                      |
+| 2.0833 | 500  | 0.0750        | -                                           |
+| 2.5    | 600  | -             | 0.9648                                      |
 
 
 ### Training Time
-- **Training**: 8.7 minutes
+- **Training**: 6.6 minutes
 
 ### Framework Versions
 - Python: 3.12.13

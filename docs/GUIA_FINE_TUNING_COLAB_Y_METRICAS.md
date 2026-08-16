@@ -22,9 +22,10 @@ $$\mathcal{L}_{\text{MNRL}} = -\log \frac{e^{\text{sim}(q_i, p_i^+) / \tau}}{\su
 
 | Parámetro | Valor | Justificación Técnica |
 | :--- | :---: | :--- |
-| **`max_seq_length`** | `1024` | Procesa el 100% de tablas clínicas y algoritmos normativos de las GPC. |
-| **`batch_size`** | `32` (A100) / `8` (V100) | Maximiza la cantidad de negativos de contraste por iteración de gradiente. |
-| **`epochs`** | `3` | Alcanza la convergencia global de la pérdida de contraste sin sobreajuste. |
+| **`max_seq_length`** | `1024` | Procesa el 100% de tablas clínicas y algoritmos normativos de las GPC sin truncamiento. |
+| **`batch_size`** | `8` (A100/V100) | Maximiza la estabilidad de VRAM manteniendo 15 distractores por paso (7 in-batch + 8 hard negatives). |
+| **`PYTORCH_CUDA_ALLOC_CONF`** | `expandable_segments:True` | Previene la fragmentación de VRAM en PyTorch durante el backward pass de secuencias largas. |
+| **`epochs`** | `3` | Alcanza la convergencia global de la pérdida de contraste ($\mathcal{L}_{\text{MNRL}} < 0.005$) sin sobreajuste. |
 | **`learning_rate`** | `2e-5` | Tasa de aprendizaje óptima para fine-tuning fino de encoders densos basados en RoBERTa/XLM. |
 | **`weight_decay`** | `0.01` | Regularización $L_2$ desacoplada en el optimizador AdamW. |
 | **`warmup_ratio`** | `10%` | Calentamiento lineal de la tasa de aprendizaje durante los primeros pasos. |
