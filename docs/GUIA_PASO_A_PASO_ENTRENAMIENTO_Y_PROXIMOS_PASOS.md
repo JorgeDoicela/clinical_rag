@@ -92,26 +92,36 @@ py tests/run_ablation_study.py
 
 ---
 
-## 5. Cómo Clonar y Correr en Otra Máquina (en tu Casa)
+## 5. Cómo Clonar, Migrar y Correr en Otra Máquina
 
-En cualquier otra computadora con conexión a internet:
+En cualquier otra computadora:
 
 ```bash
-# 1. Clonar el repositorio completo (incluye los 46 PDFs y los datasets)
+# 1. Clonar el repositorio completo (incluye los 46 PDFs, datasets y configuraciones)
 git clone https://github.com/JorgeDoicela/clinical_rag.git
 cd clinical_rag
 
-# 2. Configurar entorno del backend
-cd backend
-cp .env.example .env
-# (Editas .env y colocas tu GEMINI_API_KEY)
-pip install -r requirements.txt
+# 2. Copiar los Pesos del Modelo Finetuneado
+# Descarga y descomprime la carpeta 'ateneo-bge-m3-ecuador' desde la nube (Google Drive/S3) en:
+# backend/data/ateneo-bge-m3-ecuador/
 
-# 3. Iniciar el Backend
-uvicorn main:app --reload
+# 3. Base Vectorial ChromaDB (Estándar Profesional MLOps):
+# Los índices vectoriales binarios no se rastrean en Git para evitar corrupción y repositorios gigantes.
+# Tienes 2 opciones profesionales para levantar la base vectorial en la nueva máquina:
 
-# 4. En otra terminal, iniciar el Frontend
-cd ../frontend
-npm install
-npm run dev
+# Opción A (Re-ingestión determinista automática - Recomendada):
+docker compose run --rm backend python ingestion/run_ingestion.py
+
+# Opción B (Copiar artefacto pre-indexado comprimido):
+# Si respaldaste la carpeta chroma_db previamente (ej: tar -czvf chroma_db.tar.gz backend/data/chroma_db/),
+# solo descompresiónala directamente en: backend/data/chroma_db/
+
+# 4. Iniciar el Sistema Completo con Docker
+docker compose up -d --build
 ```
+
+---
+
+## 6. Registro de Compatibilidad de Modelos Fine-Tuned
+* **Notas de Versión en `ateneo-bge-m3-ecuador`:** Cuando el modelo es exportado desde Google Colab u otros entornos con versiones recientes de `sentence-transformers`, sus archivos de configuración (`sentence_bert_config.json`, `modules.json` y `1_Pooling/config.json`) deben mantener el esquema estándar compatible con la versión de producción (`sentence-transformers==3.3.1`). La plantilla oficial y compatible está comiteada en `master` (`c827982`).
+
