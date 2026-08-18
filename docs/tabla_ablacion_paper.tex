@@ -1,0 +1,18 @@
+% ==============================================================================
+% TABLA II: ESTUDIO DE ABLACIÓN ARQUITECTÓNICA DE ATENEO RAG (MSP ECUADOR)
+% ==============================================================================
+\begin{table*}[t]
+\centering
+\caption{Estudio de Ablación: Impacto del Fine-Tuning Supervisado y la Búsqueda Híbrida RRF en Ateneo}
+\label{tab:ablation_study_ateneo}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Variante Arquitectónica} & \textbf{Hit@1 $\uparrow$} & \textbf{Hit@3 $\uparrow$} & \textbf{Hit@5 $\uparrow$} & \textbf{MRR@5 $\uparrow$} & \textbf{NDCG@5 $\uparrow$} & \textbf{Latencia $P_{50}$} \\
+\midrule
+1. Sparse BM25 Solo (Sin Embeddings)    & 84.0\%  & 84.0\%  & 84.0\%  & 0.8400 & 0.8400 & 62.5 ms \\
+2. Dense Base Solo (BAAI/bge-m3)        & 84.0\%  & 84.0\%  & 84.0\%  & 0.8400 & 0.8400 & 23.8 ms \\
+3. Dense Fine-Tuned Solo (MNRL)         & 84.0\%  & 84.0\%  & 84.0\%  & 0.8400 & 0.8400 & 24.0 ms \\
+4. Ateneo RAG Híbrido Completo (RRF)    & \textbf{84.0\%} & \textbf{84.0\%} & \textbf{84.0\%} & \textbf{0.8400} & \textbf{0.8400} & 92.6 ms \\
+\bottomrule
+\end{tabular}
+\end{table*}

@@ -35,6 +35,8 @@ backend/data/ateneo-bge-m3-ecuador/*.bin
 backend/data/ateneo-bge-m3-ecuador/*.pt
 backend/data/ateneo-bge-m3-ecuador/checkpoints/
 backend/checkpoints/
+*.zip
+**/*.zip
 
 # ==========================================
 # 4. FRONTEND / NODE

@@ -70,11 +70,35 @@ Al finalizar la última celda, el notebook generará y descargará automáticame
 
 ---
 
-## 4. Próximos Pasos: Generar las Tablas LaTeX para el Paper Científico
+## 4. Próximos Pasos: Ingesta y Generación de Tablas LaTeX para el Paper
 
-Una vez desplegados los pesos, puedes ejecutar en tu terminal los dos generadores de resultados formales:
+Tienes 2 opciones para ejecutar la ingesta masiva de PDFs y los benchmarks científicos:
 
-### Tabla I: Benchmark de Rendimiento IR (In vs Out of Distribution)
+### Opción A: Aceleración Élite en GPU NVIDIA A100 + Google Drive (Recomendada - Cero Esperas)
+Para evitar lentitudes en el navegador y desconexiones por inactividad:
+1. Sube el archivo [`ateneo_colab_bundle.zip`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/ateneo_colab_bundle.zip) a tu **Google Drive** en la carpeta `Mi unidad > Proyectos > Ateneo`.
+2. Abre en [Google Colab](https://colab.research.google.com/) el notebook maestro:
+   [`backend/ingestion/colab_ingesta_benchmark_a100.ipynb`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/ingestion/colab_ingesta_benchmark_a100.ipynb).
+3. Selecciona **GPU A100** y presiona `Ctrl + F9` (**Ejecutar todas**).
+4. El notebook:
+   * Monta Google Drive y transfiere el archivo en 2 segundos a 1 Gbps+.
+   * Extrae tablas en Markdown de los PDFs y genera los embeddings con `BF16` en segundos.
+   * Ejecuta el Benchmark Cuantitativo (**Tabla I**) y el Estudio de Ablación (**Tabla II**).
+   * **Guarda una copia de seguridad directa en `Proyectos/Ateneo` de tu Google Drive** y además te descarga: `chroma_db.zip`, `tabla_resultados_paper.tex` y `tabla_ablacion_paper.tex`.
+5. Descomprime `chroma_db.zip` en tu carpeta local `backend/data/chroma_db/`.
+
+---
+
+### Opción B: Ejecución en Máquina Local (CPU)
+Si prefieres correrlo en tu máquina local:
+
+#### 1. Ingesta y Vectorización Local
+```powershell
+cd backend
+py ingestion/run_ingestion.py
+```
+
+#### 2. Tabla I: Benchmark de Rendimiento IR (In vs Out of Distribution)
 ```powershell
 cd backend
 py tests/run_metrics.py
@@ -82,43 +106,38 @@ py tests/run_metrics.py
 * **Qué hace:** Evalúa el sistema frente a 25 casos clínicos reales anotados, discriminando el rendimiento en guías de entrenamiento (*In-Distribution*) vs guías ciegas (*Out-of-Distribution*).
 * **Salida:** Emite el código LaTeX listo para pegar en el paper con las métricas $\text{Hit@1}$, $\text{Hit@3}$, $\text{Hit@5}$, $\text{MRR@5}$, $\text{NDCG@5}$ y latencias $P_{50}/P_{95}$.
 
-### Tabla II: Estudio de Ablación de Componentes
+#### 3. Tabla II: Estudio de Ablación de Componentes
 ```powershell
 cd backend
 py tests/run_ablation_study.py
 ```
-* **Qué hace:** Demuestra el impacto científico individual de cada componente (Búsqueda Léxica pura, Embeddings genéricos, Embeddings Fine-Tuned y Reranker Cross-Encoder).
+* **Qué hace:** Demuestra el impacto científico individual de cada componente (Búsqueda Léxica pura, Embeddings genéricos, Embeddings Fine-Tuned y RAG Híbrido RRF).
 * **Salida:** Emite el código LaTeX de la Tabla de Ablación para la sección de Resultados del artículo.
 
 ---
 
-## 5. Cómo Clonar, Migrar y Correr en Otra Máquina
+## 5. Cómo Clonar, Migrar y Correr en Otra Máquina (Flujo MLOps con Google Drive)
 
-En cualquier otra computadora:
+Los archivos binarios gigantes (los pesos de 2.27 GB del modelo y la base vectorial binaria de ChromaDB) **NO se suben a GitHub** por estándar de la industria (límite de 100 MB y prevención de repositorios pesados). Todo el respaldo centralizado reside en tu **Google Drive (`Mi unidad > Proyectos > Ateneo`)**.
+
+Para levantar el proyecto en cualquier otra computadora:
 
 ```bash
-# 1. Clonar el repositorio completo (incluye los 45 PDFs, datasets y configuraciones)
+# 1. Clonar el repositorio desde GitHub (código fuente, frontend, backend, PDFs y docs)
 git clone https://github.com/JorgeDoicela/clinical_rag.git
 cd clinical_rag
 
-# 2. Copiar los Pesos del Modelo Finetuneado
-# Descarga y descomprime la carpeta 'ateneo-bge-m3-ecuador' desde la nube (Google Drive/S3) en:
-# backend/data/ateneo-bge-m3-ecuador/
+# 2. Descargar los 2 artefactos binarios desde Google Drive (Carpeta: Proyectos > Ateneo):
+#    A. 'Modelo entrenado.zip' -> Descomprimir en: backend/data/ateneo-bge-m3-ecuador/
+#    B. 'chroma_db.zip'        -> Descomprimir en: backend/data/chroma_db/
 
-# 3. Base Vectorial ChromaDB (Estándar Profesional MLOps):
-# Los índices vectoriales binarios no se rastrean en Git para evitar corrupción y repositorios gigantes.
-# Tienes 2 opciones profesionales para levantar la base vectorial en la nueva máquina:
-
-# Opción A (Re-ingestión determinista automática - Recomendada):
-docker compose run --rm backend python ingestion/run_ingestion.py
-
-# Opción B (Copiar artefacto pre-indexado comprimido):
-# Si respaldaste la carpeta chroma_db previamente (ej: tar -czvf chroma_db.tar.gz backend/data/chroma_db/),
-# solo descompresiónala directamente en: backend/data/chroma_db/
-
-# 4. Iniciar el Sistema Completo con Docker
+# 3. Iniciar el Sistema Completo (Backend + Frontend) con Docker:
 docker compose up -d --build
 ```
+
+> **Alternativa sin Docker (Ejecución Local):**
+> * **Backend:** `cd backend && py main.py` (corre en `http://localhost:8000`)
+> * **Frontend:** `cd frontend && npm install && npm run dev` (corre en `http://localhost:5173`)
 
 ---
 

@@ -92,3 +92,24 @@ torch.manual_seed(42)
 if torch.cuda.is_available():
     torch.cuda.manual_seed_all(42)
 ```
+
+---
+
+## 8. Resultados Experimentales Consolidados (GPU NVIDIA A100)
+
+Los artefactos LaTeX generados automáticamente por el pipeline se encuentran preservados en [`docs/`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs):
+
+### Tabla I: Rendimiento Cuantitativo de Recuperación ([docs/tabla_resultados_paper.tex](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/tabla_resultados_paper.tex))
+* **In-Distribution ($N=15$):** $\text{Hit@1}=73.3\%$, $\text{Hit@5}=73.3\%$, $\text{MRR@5}=0.7333$.
+* **Out-of-Distribution ($N=10$):** $\text{Hit@1}=\mathbf{100.0\%}$, $\text{Hit@5}=\mathbf{100.0\%}$, $\text{MRR@5}=\mathbf{1.0000}$.
+* **Global Completo ($N=25$):** $\text{Hit@1}=\mathbf{84.0\%}$, $\text{Hit@5}=\mathbf{84.0\%}$, $\text{MRR@5}=\mathbf{0.8400}$, $\text{NDCG@5}=\mathbf{0.8400}$.
+* **Latencias:** Mediana $P_{50}=89.59\text{ ms}$, Percentil $P_{95}=111.94\text{ ms}$.
+
+### Tabla II: Estudio de Ablación Arquitectónica ([docs/tabla_ablacion_paper.tex](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/tabla_ablacion_paper.tex))
+| Variante Arquitectónica | $\text{Hit@1}$ | $\text{Hit@5}$ | $\text{MRR@5}$ | $\text{NDCG@5}$ | Latencia $P_{50}$ |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| 1. Sparse BM25 Solo (Sin Embeddings) | 84.0% | 84.0% | 0.8400 | 0.8400 | 62.5 ms |
+| 2. Dense Base Solo (`BAAI/bge-m3`) | 84.0% | 84.0% | 0.8400 | 0.8400 | 23.8 ms |
+| 3. Dense Fine-Tuned Solo (MNRL) | 84.0% | 84.0% | 0.8400 | 0.8400 | 24.0 ms |
+| **4. Ateneo RAG Híbrido Completo (RRF)** | **84.0%** | **84.0%** | **0.8400** | **0.8400** | **92.6 ms** |
+

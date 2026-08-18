@@ -197,10 +197,25 @@ Para incorporar nuevos documentos en formato PDF emitidos por el MSP Ecuador:
 
 ---
 
-## 5. Despliegue Mediante Docker y Docker Compose
+## 5. Clonación, Migración y Despliegue en Otra Computadora
 
-### 5.1 Despliegue Estándar en CPU
-Para construir y levantar la infraestructura completa en contenedores aislados de Docker:
+Los artefactos binarios pesados (los pesos de 2.27 GB del modelo y la base vectorial de ChromaDB) **no se guardan en el repositorio Git** para cumplir con las mejores prácticas de MLOps y los límites de GitHub (<100 MB). Todo el respaldo centralizado se encuentra en **Google Drive (`Mi unidad > Proyectos > Ateneo`)**.
+
+### 5.1 Pasos para levantar el proyecto en una nueva máquina:
+1. **Clonar el repositorio:**
+   ```bash
+   git clone https://github.com/JorgeDoicela/clinical_rag.git
+   cd clinical_rag
+   ```
+2. **Restaurar los 2 artefactos desde tu Google Drive (`Proyectos > Ateneo`):**
+   * Descargar `Modelo entrenado.zip` $\rightarrow$ Descomprimir en `backend/data/ateneo-bge-m3-ecuador/`.
+   * Descargar `chroma_db.zip` $\rightarrow$ Descomprimir en `backend/data/chroma_db/`.
+3. **Iniciar los servicios con Docker Compose:**
+   ```bash
+   docker compose up --build -d
+   ```
+
+### 5.2 Despliegue Estándar en CPU (Docker)
 ```bash
 docker compose up --build -d
 ```
@@ -262,10 +277,13 @@ python tests/run_metrics.py
 
 Para revisar los detalles metodológicos profundos y la especificación completa del sistema, consultar los siguientes archivos en la carpeta `docs/`:
 
+* [PROTOCOLO_A100_MLOPS_Y_GROUND_TRUTH.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/PROTOCOLO_A100_MLOPS_Y_GROUND_TRUTH.md): Arquitectura MLOps en GPU NVIDIA A100, precisión BF16/TF32, contrato de datos de Ground Truth desacoplado y Fusión Recíproca de Rangos (RRF).
+* [GUIA_PASO_A_PASO_ENTRENAMIENTO_Y_PROXIMOS_PASOS.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/GUIA_PASO_A_PASO_ENTRENAMIENTO_Y_PROXIMOS_PASOS.md): Manual operativo paso a paso para ingesta acelerada en A100, generación de tablas LaTeX y migración en Docker.
 * [ARQUITECTURA_RAG_Y_FINE_TUNING.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/ARQUITECTURA_RAG_Y_FINE_TUNING.md): Especificación matemática de Búsqueda Híbrida RRF, Transformer bidireccional, pérdida MNRL, tablas Markdown y visor de PDFs.
 * [GUIA_INGESTA_Y_CASOS.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/GUIA_INGESTA_Y_CASOS.md): Esquemas de datos Pydantic, endpoints OpenAPI REST, organización por carpetas de año y visor modal.
 * [METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md): Protocolo de división de datos *Document-Level Out-of-Distribution*, prevención de *Data Leakage* y generador de tablas LaTeX para artículos científicos.
-* [GUIA_FINE_TUNING_COLAB_Y_METRICAS.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/GUIA_FINE_TUNING_COLAB_Y_METRICAS.md): Guía de hiperparámetros, optimización de VRAM y suite de pruebas del benchmark.
+* [GUIA_FINE_TUNING_COLAB_Y_METRICAS.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/GUIA_FINE_TUNING_COLAB_Y_METRICAS.md): Justificación matemática de Large Batch Size ($B=32$), pérdida MNRL y suite de pruebas del benchmark.
+* [PUBLICACION_Y_PRESENTACION_CONGRESO.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/PUBLICACION_Y_PRESENTACION_CONGRESO.md): Síntesis de hallazgos técnicos, Tablas I y II en LaTeX y guion de 10 diapositivas para congreso internacional.
+* [CUANTIZACION_Y_DESPLIEGUE_AWS.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/CUANTIZACION_Y_DESPLIEGUE_AWS.md): Cuantización ONNX/INT8, arquitectura serverless y despliegue elástico en AWS ECS/Fargate.
 * [DESIGN_SYSTEM.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/DESIGN_SYSTEM.md): Tokens del sistema de diseño visual, componentes UI React, Recharts, visor interactivo y configuración PWA.
 * [DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md): Análisis crítico de resultados, discusión contra evaluadores zero-shot, limitaciones y trabajo futuro.
-* [PUBLICACION_Y_PRESENTACION_CONGRESO.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/PUBLICACION_Y_PRESENTACION_CONGRESO.md): Síntesis de hallazgos técnicos y guion de presentación ejecutiva para congreso.

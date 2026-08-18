@@ -30,10 +30,18 @@ backend/data/raw_pdfs/
 
 ---
 
-## 2. Pipeline de Ingesta Recursiva con Extracción de Tablas Markdown
+## 2. Pipeline de Ingesta Recursiva y Vectorización Acelerada
 
-### 2.1 Ejecución de la Ingesta
-Para procesar recursivamente todas las subcarpetas e indexar los fragmentos en **ChromaDB**:
+### 2.1 Opciones de Ejecución de la Ingesta
+
+#### Opción 1: Aceleración Élite en GPU NVIDIA A100 (Estándar MLOps Recomendado - < 60 segundos)
+A través del notebook maestro [`backend/ingestion/colab_ingesta_benchmark_a100.ipynb`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/ingestion/colab_ingesta_benchmark_a100.ipynb):
+* Procesa los embeddings de 1024 tokens con precisión nativa `TF32/BF16` en Tensor Cores.
+* Genera la base persistente `chroma_db/` con espacio métrico `cosine`.
+* Empaqueta automáticamente el artefacto `chroma_db.zip` para descarga y despliegue inmediato en local o AWS.
+
+#### Opción 2: Ejecución Local en CPU
+Para procesar recursivamente todas las subcarpetas e indexar los fragmentos localmente:
 ```bash
 py backend/ingestion/run_ingestion.py
 ```
