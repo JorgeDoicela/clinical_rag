@@ -77,6 +77,14 @@
       "enunciado": "Recién nacido masculino de 3 días de vida, nacido de parto fortuito en domicilio sin profilaxis neonatal de Vitamina K al nacer. La madre lo ingresa a emergencias por presentar sangrado continuo en napa a nivel del muñón umbilical de 6 horas de evolución, sumado a equimosis en zonas de presión. Al examen físico: pálido, hipotónico moderado; PA 62/36 mmHg, FC 148 bpm, FR 44 rpm. Se adjunta el informe del laboratorio de hemostasia y coagulación sanguínea neonatal realizado a su ingreso.",
       "pregunta": "Analice el reporte de laboratorio adjunto, clasifique el tipo de Enfermedad Hemorrágica del Recién Nacido (EHIRN) según la edad de presentación (temprana, clásica o tardía) de acuerdo con la GPC del MSP Ecuador y prescriba el esquema completo de tratamiento de urgencia (dosis de fitomenadiona/vitamina K1, vía de administración y concentrado de complejo protrombínico/plasma si hay sangrado mayor).",
       "nivel_esperado": "pregrado_avanzado"
+    },
+    {
+      "id": "case_nac_01",
+      "guia_asociada": "neumonia",
+      "titulo": "Preescolar con Neumonía Adquirida en la Comunidad Grave y Signos de Alarma",
+      "enunciado": "Paciente masculino de 3 años de edad (peso 14 kg), es traído a emergencia por su madre por presentar fiebre de 38.9 °C de 3 días de evolución, tos húmeda frecuente, decaimiento e hiporexia marcada. Desde hace 8 horas la madre nota respiración rápida y hundimiento marcado de las costillas al respirar. Examen físico: letárgico, FC 138 bpm, FR 46 rpm (taquipnea marcada para su grupo etario), SatO2 89% al aire ambiente, tiraje subcostal e intercostal evidente y aleteo nasal. A la auscultación pulmonar: estertores crepitantes y disminución del murmullo vesicular en base pulmonar derecha.",
+      "pregunta": "Identifique los signos clínicos de Neumonía Grave según la GPC de Neumonía (3 meses a 15 años) del MSP Ecuador (taquipnea por grupo etario, tiraje subcostal, hipoxemia), establezca el ámbito de tratamiento correspondiente (hospitalización inmediata) y formule el esquema de antibioticoterapia empírica parenteral de primera línea normado por el MSP con su dosificación por kg/día.",
+      "nivel_esperado": "pregrado_avanzado"
     }
   ]
 }

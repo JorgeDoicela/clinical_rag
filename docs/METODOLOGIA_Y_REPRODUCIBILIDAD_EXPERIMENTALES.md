@@ -113,3 +113,29 @@ Los artefactos LaTeX generados automáticamente por el pipeline se encuentran pr
 | 3. Dense Fine-Tuned Solo (MNRL) | 84.0% | 84.0% | 0.8400 | 0.8400 | 24.0 ms |
 | **4. Ateneo RAG Híbrido Completo (RRF)** | **84.0%** | **84.0%** | **0.8400** | **0.8400** | **92.6 ms** |
 
+---
+
+## 9. Calibración Psicométrica de la Rúbrica y Resiliencia en Producción
+
+### 9.1 Rúbrica de Evaluación Anclada en Evidencia (Anchor-based Scoring)
+Para evitar el sesgo de indulgencia (*leniency bias*) y garantizar el poder discriminante ($D > 0.40$), el evaluador multimodal LLM fue calibrado con una escala estricta de 5 niveles:
+
+| Nivel | Rango de Puntuación | Definición Clínica / Criterio Pedagógico | Desglose en Ejes Clínicos |
+| :--- | :---: | :--- | :--- |
+| **I. Desconocimiento / Omisión** | $0.0 - 1.0\text{ pts}$ | Respuesta en blanco, "no sé", evasiva o ausencia total de razonamiento clínico. | Brecha identificada en los 4 ejes ($100\%$ omisiones). |
+| **II. Insuficiente / Riesgo** | $1.1 - 4.0\text{ pts}$ | Diagnóstico erróneo, indicación de fármacos/conductas contraindicadas según la GPC o razonamiento incoherente. | Brechas críticas en Diagnóstico y Tratamiento. |
+| **III. Parcial Básico** | $4.1 - 6.5\text{ pts}$ | Diagnóstico principal correcto, pero omite el esquema terapéutico normado o dosificación exacta del MSP. | Brecha en Tratamiento / Seguimiento. |
+| **IV. Competente / Bueno** | $6.6 - 8.5\text{ pts}$ | Diagnóstico y pilar terapéutico correctos; omisiones leves en seguimiento temporal o prevención terciaria. | Omisiones menores contextuales. |
+| **V. Excelente / Normativo** | $8.6 - 10.0\text{ pts}$ | Razonamiento integral alineado al 100% con la GPC (diagnóstico, dosis exacta por kg/h, monitoreo y prevención). | Cero omisiones normativas. |
+
+### 9.2 Resiliencia de Inferencia y Tolerancia a Fallos
+1. **Fallback Automático de Modelos Multimodales:** Implementación de cascada de fallback ante picos de demanda o códigos de saturación transitoria de la API (`503 UNAVAILABLE`), conmutando en milisegundos entre `gemini-3.5-flash`, `gemini-3.6-flash`, `gemini-2.5-flash` y `gemini-2.0-flash`.
+2. **Normalización de Persistencia Vectorial HNSW:** Migración de índices de ChromaDB a objetos `PersistentData` tipados con dimensión fija `dim=1024` y espacio coseno, garantizando latencias sub-segundo sin re-ingestas en tiempo de ejecución.
+3. **Aislamiento en Contenedores y Optimización de Memoria:** Configuración calibrada de cuotas en Docker y WSL2 (`memory=4GB`, `processors=4`) para prevenir paginación de disco (*swapping*) en entornos de desarrollo con recursos limitados.
+
+### 9.3 Trazabilidad y Sincronización Demográfica con las GPC del MSP
+1. **Resolución Canónica Insensible a Diacríticos (`resolve_canonical_guia`):** Implementación de una capa de normalización Unicode/ASCII NFD en el motor RAG para reconciliar identificadores de consulta con nombres de archivo del repositorio normativo (ej. reconciliación de `neumonia` con `gpc_neumonía_adquirida_2017.pdf` y caracteres con tildes).
+2. **Alineación Demográfica Estricta por Grupo Etario:** Cada caso clínico del banco evaluativo (`cases.json`) está calibrado para corresponder estrictamente al grupo etario definido en la norma oficial del MSP (ej. patología neonatal en `EHIRN` y `Sepsis`, pediátrica de 3 meses a 15 años en `Neumonía`, gestacional en `Preeclampsia` y `Hemorragia Posparto`, y adultos en `HTA`, `ERC`, `VIH` y `Diabetes T2`).
+3. **Interoperabilidad de Reportes Formativos en PDF:** Flujo de exportación institucional mediante streaming binario `application/pdf` en backend y extracción por `res.blob()` en cliente web, garantizando descargas íntegras con firma criptográfica SHA-256 y tabla analítica de 4 ejes.
+
+

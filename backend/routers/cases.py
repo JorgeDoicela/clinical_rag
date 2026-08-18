@@ -14,27 +14,68 @@ async def list_cases():
     """
     return load_all_cases()
 
+def _normalize_filename_key(text: str) -> str:
+    import unicodedata
+    nfd = unicodedata.normalize("NFD", str(text).lower())
+    ascii_clean = nfd.encode("ascii", "ignore").decode("ascii")
+    return ascii_clean.replace("_", "").replace("-", "").replace(" ", "")
+
 @router.get("/pdf-location/{guia_id}")
 async def get_pdf_location(guia_id: str) -> Dict[str, Any]:
     """
     Localiza la URL estática del PDF oficial de la GPC buscando recursivamente
-    en todas las subcarpetas por año (2013-2019, general).
+    en todas las subcarpetas por año (2013-2019, general) con mapeo semántico de alias.
     """
     raw_dir = Path(RAW_PDFS_PATH)
-    clean_query = guia_id.lower().replace("_", "").replace("-", "")
+    clean_query = _normalize_filename_key(guia_id)
     
-    # 1. Búsqueda exacta y por similitud de nombre
+    # Mapeo de alias semánticos para casos clínicos canónicos
+    SEMANTIC_ALIASES = {
+        "preeclampsia": ["trastornoshipertensivos", "preeclampsia", "eclampsia"],
+        "hemorragia": ["hemorragiapostparto", "hemorragiaposparto", "hemorragia"],
+        "hemorragiaposparto": ["hemorragiapostparto", "hemorragiaposparto"],
+        "tuberculosis": ["tuberculosis", "gptuberculosis"],
+        "tb": ["tuberculosis", "gptuberculosis"],
+        "vih": ["vih", "gpcvih"],
+        "hta": ["hta", "gpchta"],
+        "hipertension": ["hta", "gpchta", "hipertensiv"],
+        "erc": ["enfermedadrenalcronica", "renal"],
+        "renal": ["enfermedadrenalcronica", "renal"],
+        "ehirn": ["ehirn", "gpcehirn"],
+        "parto": ["trabajopartoposparto", "partoporcesarea"],
+        "dengue": ["dengue", "fiebre"],
+        "neumonia": ["neumonia", "gpcneumonia", "neumoniaadquirida"]
+    }
+
+    target_keywords = [clean_query]
+    for key, aliases in SEMANTIC_ALIASES.items():
+        if key in clean_query or clean_query in key:
+            target_keywords.extend([_normalize_filename_key(a) for a in aliases])
+            break
+
     all_pdfs = list(raw_dir.rglob("*.pdf"))
     matched_pdf = None
 
-    for pdf in all_pdfs:
-        pdf_name_clean = pdf.stem.lower().replace("_", "").replace("-", "")
-        if clean_query in pdf_name_clean or pdf_name_clean in clean_query:
-            matched_pdf = pdf
+    # 1. Búsqueda por palabras clave objetivo
+    for kw in target_keywords:
+        for pdf in all_pdfs:
+            pdf_name_clean = _normalize_filename_key(pdf.stem)
+            if kw in pdf_name_clean:
+                matched_pdf = pdf
+                break
+        if matched_pdf:
             break
 
+    # 2. Si no hay coincidencia exacta para la guía
+    if not matched_pdf:
+        # Si no existe PDF físico local para esa guía (ej. Dengue con fragmentos sembrados),
+        # buscar si existe algún PDF de medicina general o el primer archivo normativo afín
+        for pdf in all_pdfs:
+            if "componente" in pdf.stem.lower() or "general" in pdf.stem.lower():
+                matched_pdf = pdf
+                break
+
     if not matched_pdf and all_pdfs:
-        # Fallback al primer PDF disponible
         matched_pdf = all_pdfs[0]
 
     if not matched_pdf:

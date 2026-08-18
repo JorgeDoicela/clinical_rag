@@ -50,14 +50,14 @@
   {
     "chunk_id": "neumonia_chunk_001",
     "guia_fuente": "neumonia",
-    "pagina": 15,
-    "seccion": "Diagnóstico, Severidad (CURB-65) y Tratamiento de Neumonía Adquirida en la Comunidad",
+    "pagina": 24,
+    "seccion": "Diagnóstico, Signos de Gravedad y Tratamiento de Neumonía Pediátrica",
     "ano_publicacion": 2017,
     "cie10_codigo": "J18.9",
     "cie10_descripcion": "Neumonía no especificada",
-    "especialidad": "Neumología",
-    "grupo_etario": "Adultos / Adultos Mayores",
-    "texto": "Neumonía Adquirida en la Comunidad (NAC): Criterios diagnósticos clínicos (fiebre, tos expectorante, estertores crepitantes, soplo tubárico) y consolidación radiológica en imagen de tórax. Escala de severidad CURB-65: C (Confusión), U (Urea > 19 mg/dL), R (FR >= 30 rpm), B (PA sistólica < 90 o diastólica <= 60 mmHg), 65 (Edad >= 65 años). Puntuación 0-1: Manejo ambulatorio (Amoxicilina 1g VO c/8h o Azitromicina 500mg VO c/24h). Puntuación >= 2: Criterio de hospitalización. Tratamiento hospitalario empírico: Ampicilina/Sulbactam 1.5g-3g IV c/6h o Ceftriaxona 1g-2g IV c/24h + Claritromicina 500mg VO/IV c/12h."
+    "especialidad": "Pediatría / Neumología Pediátrica",
+    "grupo_etario": "Pediátrico (3 meses a 15 años)",
+    "texto": "Neumonía Adquirida en la Comunidad Pediátrica (3 meses a 15 años): Signos de taquipnea según el grupo etario: > 50 rpm (2 a 11 meses), > 40 rpm (1 a 5 años), > 30 rpm (> 5 años). Criterios de Neumonía Grave y Hospitalización Inmediata: Presencia de tiraje subcostal, aleteo nasal, quejido espiratorio, saturación de oxígeno < 90% al aire ambiente o incapacidad para beber/alimentarse. Tratamiento antibiótico empírico de primera línea: En pacientes hospitalizados (neumonía grave), administrar Ampicilina 150 a 200 mg/kg/día IV dividida cada 6 horas (o Penicilina Sódica Cristalina 200,000 a 250,000 UI/kg/día IV cada 4 a 6 horas). En sospecha de gérmenes atípicos o falta de respuesta, asociar Claritromicina 15 mg/kg/día o Azitromicina 10 mg/kg/día."
   },
   {
     "chunk_id": "ehirn_chunk_001",

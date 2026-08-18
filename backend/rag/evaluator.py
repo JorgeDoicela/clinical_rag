@@ -223,8 +223,25 @@ def evaluate_clinical_reasoning(
 
     try:
         raw_text = call_gemini_llm(prompt, imagen_bytes=imagen_bytes, imagen_mime=imagen_mime)
-        return parse_and_validate_llm_json(raw_text)
+        resultado = parse_and_validate_llm_json(raw_text)
     except ValueError:
         retry_prompt = prompt + "\n\nNOTA: Asegúrate estrictamente de devolver ÚNICAMENTE el objeto JSON sin bloques de código."
         raw_text_retry = call_gemini_llm(retry_prompt, imagen_bytes=imagen_bytes, imagen_mime=imagen_mime)
-        return parse_and_validate_llm_json(raw_text_retry)
+        resultado = parse_and_validate_llm_json(raw_text_retry)
+
+    # Enriquecer y sincronizar la cita normativa con la metadata fidedigna del fragmento RAG
+    if chunk and resultado.cita_normativa:
+        chunk_page = chunk.get("pagina")
+        if chunk_page:
+            try:
+                resultado.cita_normativa.pagina = int(chunk_page)
+            except (ValueError, TypeError):
+                pass
+        chunk_sec = chunk.get("seccion")
+        if chunk_sec and (resultado.cita_normativa.seccion in ["General", "Sección Oficial", ""] or not resultado.cita_normativa.seccion):
+            resultado.cita_normativa.seccion = str(chunk_sec)
+        chunk_guia = chunk.get("guia_fuente")
+        if chunk_guia and (resultado.cita_normativa.guia in ["GPC MSP Ecuador", "MSP Ecuador", ""] or not resultado.cita_normativa.guia):
+            resultado.cita_normativa.guia = f"GPC {str(chunk_guia).upper()} MSP Ecuador"
+
+    return resultado

@@ -73,6 +73,35 @@ def get_bm25_index():
             print(f"[RAG HYBRID] BM25 Index no disponible temporalmente: {e}", flush=True)
     return _BM25_INDEX, _BM25_CORPUS_METAS
 
+def _normalize_guide_name(text: str) -> str:
+    import unicodedata
+    if not text:
+        return ""
+    nfd = unicodedata.normalize("NFD", str(text).lower())
+    ascii_clean = nfd.encode("ascii", "ignore").decode("ascii")
+    return ascii_clean.replace("_", "").replace("-", "").replace(" ", "")
+
+def resolve_canonical_guia(collection, guia_filtro: Optional[str]) -> Optional[str]:
+    if not guia_filtro:
+        return None
+    target_clean = _normalize_guide_name(guia_filtro)
+    if not target_clean:
+        return None
+
+    # Intentar coincidencia exacta primero
+    try:
+        # Obtener nombres de guías disponibles desde BM25 o Chroma
+        _, corpus = get_bm25_index()
+        available_guias = list(set(str(item["metadata"].get("guia_fuente", "")) for item in corpus if item.get("metadata")))
+    except Exception:
+        available_guias = []
+
+    for g in available_guias:
+        g_clean = _normalize_guide_name(g)
+        if target_clean == g_clean or target_clean in g_clean or g_clean in target_clean:
+            return g
+    return guia_filtro
+
 def retrieve_top_k_chunks(
     query: str, 
     guia_filtro: Optional[str] = None, 
@@ -92,10 +121,22 @@ def retrieve_top_k_chunks(
         collection = client.get_collection("gpc_msp")
         if collection.count() == 0:
             raise ValueError("Colección ChromaDB vacía.")
-    except Exception:
-        from ingestion.run_ingestion import run_ingestion_pipeline
-        run_ingestion_pipeline()
-        collection = client.get_collection("gpc_msp")
+    except Exception as e:
+        print(f"[RAG WARNING] Error al acceder a ChromaDB: {e}. Intentando reparación de schema...", flush=True)
+        try:
+            import sqlite3
+            con = sqlite3.connect(f"{CHROMA_PERSIST_PATH}/chroma.sqlite3")
+            con.execute("UPDATE collections SET config_json_str = NULL WHERE config_json_str = '{}';")
+            con.commit()
+            con.close()
+            collection = client.get_collection("gpc_msp")
+        except Exception:
+            from ingestion.run_ingestion import run_ingestion_pipeline
+            run_ingestion_pipeline()
+            collection = client.get_collection("gpc_msp")
+
+    # Resolver nombre canónico exacto para la base de datos
+    canonical_guia = resolve_canonical_guia(collection, guia_filtro)
 
     fetch_k = max(top_k * 3, 10)
     dense_ranked_ids = []
@@ -106,7 +147,7 @@ def retrieve_top_k_chunks(
         model_target = custom_dense_model or EMBEDDING_MODEL_NAME
         model = get_embedding_model(model_target)
         query_embedding = model.encode([query]).tolist()
-        where_filter = {"guia_fuente": guia_filtro} if guia_filtro else None
+        where_filter = {"guia_fuente": canonical_guia} if canonical_guia else None
 
         dense_results = collection.query(
             query_embeddings=query_embedding,
@@ -115,10 +156,12 @@ def retrieve_top_k_chunks(
         )
 
         if not dense_results or not dense_results.get("ids") or not dense_results["ids"][0]:
-            dense_results = collection.query(
-                query_embeddings=query_embedding,
-                n_results=fetch_k
-            )
+            if canonical_guia:
+                # Si falló con el canonical_guia, intentar sin filtro
+                dense_results = collection.query(
+                    query_embeddings=query_embedding,
+                    n_results=fetch_k
+                )
 
         if dense_results and dense_results.get("ids") and dense_results["ids"][0]:
             for i in range(len(dense_results["ids"][0])):
@@ -140,12 +183,13 @@ def retrieve_top_k_chunks(
             scores = bm25_idx.get_scores(tokenized_query)
             scored_indices = sorted(range(len(scores)), key=lambda idx: scores[idx], reverse=True)
             
+            clean_canonical = _normalize_guide_name(canonical_guia) if canonical_guia else None
             for idx in scored_indices[:fetch_k]:
                 item = bm25_corpus[idx]
                 cid = item["chunk_id"]
                 meta = item["metadata"]
                 
-                if guia_filtro and meta.get("guia_fuente") != guia_filtro:
+                if clean_canonical and _normalize_guide_name(meta.get("guia_fuente")) != clean_canonical:
                     continue
                     
                 bm25_ranked_ids.append(cid)

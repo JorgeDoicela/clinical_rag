@@ -208,8 +208,8 @@ Los artefactos binarios pesados (los pesos de 2.27 GB del modelo y la base vecto
    cd clinical_rag
    ```
 2. **Restaurar los 2 artefactos desde tu Google Drive (`Proyectos > Ateneo`):**
-   * Descargar `Modelo entrenado.zip` $\rightarrow$ Descomprimir en `backend/data/ateneo-bge-m3-ecuador/`.
-   * Descargar `chroma_db.zip` $\rightarrow$ Descomprimir en `backend/data/chroma_db/`.
+   * **`Modelo entrenado.zip` (1.68 GB):** Descomprimir en `backend/data/ateneo-bge-m3-ecuador/` (Pesos calibrados con ventana de 1024 tokens).
+   * **`chroma_db.zip` (63.61 MB):** Descomprimir en `backend/data/chroma_db/` (Base vectorial saneada con 5,944 fragmentos normativos del MSP, metadatos HNSW tipados con `PersistentData` y dimensión fija `dim=1024` para compatibilidad universal en Docker, Linux, Windows y macOS).
 3. **Iniciar los servicios con Docker Compose:**
    ```bash
    docker compose up --build -d

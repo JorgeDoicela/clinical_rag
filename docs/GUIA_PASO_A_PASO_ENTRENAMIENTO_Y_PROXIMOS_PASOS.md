@@ -141,6 +141,8 @@ docker compose up -d --build
 
 ---
 
-## 6. Registro de Compatibilidad de Modelos Fine-Tuned
+## 6. Registro de Compatibilidad de Modelos Fine-Tuned y Base Vectorial
 * **Notas de Versión en `ateneo-bge-m3-ecuador`:** Cuando el modelo es exportado desde Google Colab u otros entornos con versiones recientes de `sentence-transformers`, sus archivos de configuración (`sentence_bert_config.json`, `modules.json` y `1_Pooling/config.json`) deben mantener el esquema estándar compatible con la versión de producción (`sentence-transformers==3.3.1`). La plantilla oficial y compatible está comiteada en `master` (`c827982`).
+* **Persistencia HNSW en `ChromaDB 0.6.3`:** En el despliegue con Docker, los metadatos de los segmentos vectoriales (`index_metadata.pickle`) se instancian como objetos tipados `PersistentData` fijando explícitamente `dimensionality=1024` y `space='cosine'`, previniendo errores de carga y evitando re-ingestas redundantes de los 45 PDFs en tiempo de inferencia.
+* **Rúbrica Psicométrica Calibrada:** La evaluación con Gemini aplica una escala de 5 niveles con anclaje en evidencia ($0.0$ a $10.0$) que penaliza rigurosamente omisiones totales ($0.0\text{ pts}$ ante "no sé" o en blanco) y desglosa las brechas en los 4 ejes clínicos (Diagnóstico, Tratamiento, Prevención, Seguimiento).
 

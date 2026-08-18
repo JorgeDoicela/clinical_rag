@@ -109,7 +109,7 @@ export default function FeedbackCard({ result, studentAnswer, studentImage, onRe
         responseType: 'blob'
       });
 
-      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const blob = response.data instanceof Blob ? response.data : new Blob([response.data], { type: 'application/pdf' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;

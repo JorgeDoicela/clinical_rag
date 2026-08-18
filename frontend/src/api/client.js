@@ -83,3 +83,64 @@ export async function evaluateResponse(caseId, respuestaEstudiante, imagen = nul
 
   return res.json();
 }
+
+/**
+ * Cliente HTTP unificado con sintaxis axios-like (client.get, client.post)
+ * para los componentes de dashboard, visor de PDFs y benchmark.
+ */
+const client = {
+  async request(endpoint, options = {}) {
+    const normalizedEndpoint = endpoint.startsWith('/api') 
+      ? endpoint 
+      : endpoint.startsWith('/') 
+        ? `/api${endpoint}` 
+        : `/api/${endpoint}`;
+
+    const url = `${API_URL}${normalizedEndpoint}`;
+    const headers = getAuthHeaders(options.headers || {});
+    
+    if (!(options.body instanceof FormData) && !headers['Content-Type'] && options.body) {
+      headers['Content-Type'] = 'application/json';
+    }
+
+    const res = await fetch(url, {
+      ...options,
+      headers,
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      const err = new Error(errorData.detail || `Error HTTP ${res.status}: ${res.statusText}`);
+      err.response = { status: res.status, data: errorData };
+      throw err;
+    }
+
+    if (options.responseType === 'blob') {
+      const blobData = await res.blob();
+      return { data: blobData, status: res.status, ok: res.ok };
+    }
+
+    const data = await res.json().catch(() => ({}));
+    return { data, status: res.status, ok: res.ok };
+  },
+
+  get(endpoint, options = {}) {
+    return this.request(endpoint, { ...options, method: 'GET' });
+  },
+
+  post(endpoint, body, options = {}) {
+    const serializedBody = body instanceof FormData ? body : JSON.stringify(body);
+    return this.request(endpoint, { ...options, method: 'POST', body: serializedBody });
+  },
+
+  put(endpoint, body, options = {}) {
+    const serializedBody = body instanceof FormData ? body : JSON.stringify(body);
+    return this.request(endpoint, { ...options, method: 'PUT', body: serializedBody });
+  },
+
+  delete(endpoint, options = {}) {
+    return this.request(endpoint, { ...options, method: 'DELETE' });
+  }
+};
+
+export default client;
