@@ -1,159 +1,310 @@
 {
-  "total_casos": 15,
-  "precision_retrieval_porcentaje": 100.0,
-  "tasa_exito_json_porcentaje": 100.0,
-  "latencia_promedio_segundos": 12.29,
-  "latencia_mediana_segundos": 7.73,
+  "total_casos": 25,
+  "metrics_ir_global": {
+    "hit_1_porcentaje": 80.0,
+    "hit_3_porcentaje": 80.0,
+    "hit_5_porcentaje": 80.0,
+    "mrr_at_5": 0.8,
+    "ndcg_at_5": 0.8
+  },
+  "metrics_ir_in_distribution": {
+    "hit_1_porcentaje": 100.0,
+    "hit_3_porcentaje": 100.0,
+    "hit_5_porcentaje": 100.0,
+    "mrr_at_5": 1.0,
+    "ndcg_at_5": 1.0
+  },
+  "metrics_ir_out_of_distribution": {
+    "hit_1_porcentaje": 50.0,
+    "hit_3_porcentaje": 50.0,
+    "hit_5_porcentaje": 50.0,
+    "mrr_at_5": 0.5,
+    "ndcg_at_5": 0.5
+  },
+  "metrics_llm": {
+    "total_evaluados": 25,
+    "tasa_exito_json_porcentaje": 100.0
+  },
+  "latencias": {
+    "latencia_promedio_segundos": 22.45,
+    "latencia_p50_segundos": 11.19,
+    "latencia_p95_segundos": 66.09
+  },
   "detalles": [
     {
       "test_id": "test_01",
       "guia": "dengue",
-      "retrieval_correcto": true,
-      "retrieved_chunk_id": "dengue_chunk_004",
-      "expected_chunk_id": "dengue_chunk_004",
+      "tipo_split": "in_distribution",
+      "retrieval_rank": 1,
+      "hit_1": true,
+      "retrieved_top_chunk_id": "dengue_chunk_004",
       "json_valido": true,
-      "score": 10.0,
-      "latencia_segundos": 28.829
+      "score": 8.8,
+      "latencia_segundos": 66.091
     },
     {
       "test_id": "test_02",
       "guia": "dengue",
-      "retrieval_correcto": true,
-      "retrieved_chunk_id": "dengue_chunk_004",
-      "expected_chunk_id": "dengue_chunk_004",
+      "tipo_split": "in_distribution",
+      "retrieval_rank": 1,
+      "hit_1": true,
+      "retrieved_top_chunk_id": "dengue_chunk_004",
       "json_valido": true,
       "score": 1.5,
-      "latencia_segundos": 40.151
+      "latencia_segundos": 28.295
     },
     {
       "test_id": "test_03",
       "guia": "preeclampsia",
-      "retrieval_correcto": true,
-      "retrieved_chunk_id": "preeclampsia_chunk_002",
-      "expected_chunk_id": "preeclampsia_chunk_002",
+      "tipo_split": "in_distribution",
+      "retrieval_rank": 1,
+      "hit_1": true,
+      "retrieved_top_chunk_id": "preeclampsia_chunk_002",
       "json_valido": true,
-      "score": 8.5,
-      "latencia_segundos": 23.986
+      "score": 8.2,
+      "latencia_segundos": 36.097
     },
     {
       "test_id": "test_04",
       "guia": "preeclampsia",
-      "retrieval_correcto": true,
-      "retrieved_chunk_id": "preeclampsia_chunk_002",
-      "expected_chunk_id": "preeclampsia_chunk_002",
+      "tipo_split": "in_distribution",
+      "retrieval_rank": 1,
+      "hit_1": true,
+      "retrieved_top_chunk_id": "preeclampsia_chunk_002",
       "json_valido": true,
-      "score": 1.0,
-      "latencia_segundos": 8.687
+      "score": 1.2,
+      "latencia_segundos": 8.166
     },
     {
       "test_id": "test_05",
       "guia": "diabetes_t2",
-      "retrieval_correcto": true,
-      "retrieved_chunk_id": "diabetes_chunk_005",
-      "expected_chunk_id": "diabetes_chunk_005",
+      "tipo_split": "in_distribution",
+      "retrieval_rank": 1,
+      "hit_1": true,
+      "retrieved_top_chunk_id": "diabetes_chunk_005",
       "json_valido": true,
-      "score": 8.5,
-      "latencia_segundos": 7.734
+      "score": 8.0,
+      "latencia_segundos": 7.384
     },
     {
       "test_id": "test_06",
       "guia": "diabetes_t2",
-      "retrieval_correcto": true,
-      "retrieved_chunk_id": "diabetes_chunk_005",
-      "expected_chunk_id": "diabetes_chunk_005",
+      "tipo_split": "in_distribution",
+      "retrieval_rank": 1,
+      "hit_1": true,
+      "retrieved_top_chunk_id": "diabetes_chunk_005",
       "json_valido": true,
-      "score": 0.0,
-      "latencia_segundos": 7.098
+      "score": 1.5,
+      "latencia_segundos": 8.844
     },
     {
       "test_id": "test_07",
-      "guia": "hemorragia_posparto",
-      "retrieval_correcto": true,
-      "retrieved_chunk_id": "hemorragia_chunk_001",
-      "expected_chunk_id": "hemorragia_chunk_001",
+      "guia": "hemorragia_postparto",
+      "tipo_split": "in_distribution",
+      "retrieval_rank": 1,
+      "hit_1": true,
+      "retrieved_top_chunk_id": "guía_de_hemorragia_postparto_p19_3",
       "json_valido": true,
       "score": 7.5,
-      "latencia_segundos": 7.353
+      "latencia_segundos": 10.165
     },
     {
       "test_id": "test_08",
-      "guia": "hemorragia_posparto",
-      "retrieval_correcto": true,
-      "retrieved_chunk_id": "hemorragia_chunk_001",
-      "expected_chunk_id": "hemorragia_chunk_001",
+      "guia": "hemorragia_postparto",
+      "tipo_split": "in_distribution",
+      "retrieval_rank": 1,
+      "hit_1": true,
+      "retrieved_top_chunk_id": "guía_de_hemorragia_postparto_p17_1",
       "json_valido": true,
-      "score": 0.0,
-      "latencia_segundos": 8.486
+      "score": 1.2,
+      "latencia_segundos": 10.659
     },
     {
       "test_id": "test_09",
-      "guia": "dengue",
-      "retrieval_correcto": true,
-      "retrieved_chunk_id": "dengue_chunk_004",
-      "expected_chunk_id": "dengue_chunk_004",
+      "guia": "nac_neumonia",
+      "tipo_split": "in_distribution",
+      "retrieval_rank": 1,
+      "hit_1": true,
+      "retrieved_top_chunk_id": "neumonia_chunk_001",
       "json_valido": true,
-      "score": 6.5,
-      "latencia_segundos": 7.717
+      "score": 2.5,
+      "latencia_segundos": 12.417
     },
     {
       "test_id": "test_10",
-      "guia": "preeclampsia",
-      "retrieval_correcto": true,
-      "retrieved_chunk_id": "preeclampsia_chunk_002",
-      "expected_chunk_id": "preeclampsia_chunk_002",
+      "guia": "nac_neumonia",
+      "tipo_split": "in_distribution",
+      "retrieval_rank": 1,
+      "hit_1": true,
+      "retrieved_top_chunk_id": "neumonia_chunk_001",
       "json_valido": true,
-      "score": 6.0,
-      "latencia_segundos": 7.653
+      "score": 1.0,
+      "latencia_segundos": 20.985
     },
     {
       "test_id": "test_11",
-      "guia": "diabetes_t2",
-      "retrieval_correcto": true,
-      "retrieved_chunk_id": "diabetes_chunk_005",
-      "expected_chunk_id": "diabetes_chunk_005",
+      "guia": "ehirn",
+      "tipo_split": "in_distribution",
+      "retrieval_rank": 1,
+      "hit_1": true,
+      "retrieved_top_chunk_id": "gpc_ehirn2019_p15_1",
       "json_valido": true,
-      "score": 2.0,
-      "latencia_segundos": 7.459
+      "score": 5.0,
+      "latencia_segundos": 64.178
     },
     {
       "test_id": "test_12",
-      "guia": "hemorragia_posparto",
-      "retrieval_correcto": true,
-      "retrieved_chunk_id": "hemorragia_chunk_001",
-      "expected_chunk_id": "hemorragia_chunk_001",
+      "guia": "hta",
+      "tipo_split": "in_distribution",
+      "retrieval_rank": 1,
+      "hit_1": true,
+      "retrieved_top_chunk_id": "gpc_hta192019_p37_1",
       "json_valido": true,
-      "score": 6.0,
-      "latencia_segundos": 9.186
+      "score": 8.5,
+      "latencia_segundos": 35.295
     },
     {
       "test_id": "test_13",
-      "guia": "dengue",
-      "retrieval_correcto": true,
-      "retrieved_chunk_id": "dengue_chunk_004",
-      "expected_chunk_id": "dengue_chunk_004",
+      "guia": "tuberculosis",
+      "tipo_split": "in_distribution",
+      "retrieval_rank": 1,
+      "hit_1": true,
+      "retrieved_top_chunk_id": "gp_tuberculosis_1_p61_1",
       "json_valido": true,
-      "score": 2.0,
-      "latencia_segundos": 9.421
+      "score": 7.0,
+      "latencia_segundos": 8.204
     },
     {
       "test_id": "test_14",
-      "guia": "preeclampsia",
-      "retrieval_correcto": true,
-      "retrieved_chunk_id": "preeclampsia_chunk_002",
-      "expected_chunk_id": "preeclampsia_chunk_002",
+      "guia": "vih",
+      "tipo_split": "in_distribution",
+      "retrieval_rank": 1,
+      "hit_1": true,
+      "retrieved_top_chunk_id": "gpc_vih_acuerdo_ministerial05_07_2019_p16_1",
       "json_valido": true,
-      "score": 7.0,
-      "latencia_segundos": 7.628
+      "score": 6.8,
+      "latencia_segundos": 11.359
     },
     {
       "test_id": "test_15",
-      "guia": "hemorragia_posparto",
-      "retrieval_correcto": true,
-      "retrieved_chunk_id": "hemorragia_chunk_001",
-      "expected_chunk_id": "hemorragia_chunk_001",
+      "guia": "erc",
+      "tipo_split": "in_distribution",
+      "retrieval_rank": 1,
+      "hit_1": true,
+      "retrieved_top_chunk_id": "gp_tuberculosis_1_p68_2",
+      "json_valido": true,
+      "score": 0.0,
+      "latencia_segundos": 8.101
+    },
+    {
+      "test_id": "test_16",
+      "guia": "sepsis_neonatal",
+      "tipo_split": "out_of_distribution",
+      "retrieval_rank": 1,
+      "hit_1": true,
+      "retrieved_top_chunk_id": "gpc_sepsis_neonatal_p35_1",
       "json_valido": true,
       "score": 8.0,
-      "latencia_segundos": 2.945
+      "latencia_segundos": 9.336
+    },
+    {
+      "test_id": "test_17",
+      "guia": "neonato_prematuro",
+      "tipo_split": "out_of_distribution",
+      "retrieval_rank": "Not in Top 5",
+      "hit_1": false,
+      "retrieved_top_chunk_id": "gpc_ruptura_prematura_de_membranas_2015_p33_1",
+      "json_valido": true,
+      "score": 10.0,
+      "latencia_segundos": 6.201
+    },
+    {
+      "test_id": "test_18",
+      "guia": "ruptura_membranas",
+      "tipo_split": "out_of_distribution",
+      "retrieval_rank": "Not in Top 5",
+      "hit_1": false,
+      "retrieved_top_chunk_id": "gpc_ruptura_prematura_de_membranas_2015_p18_1",
+      "json_valido": true,
+      "score": 8.2,
+      "latencia_segundos": 8.448
+    },
+    {
+      "test_id": "test_19",
+      "guia": "artritis_reumatoide",
+      "tipo_split": "out_of_distribution",
+      "retrieval_rank": "Not in Top 5",
+      "hit_1": false,
+      "retrieved_top_chunk_id": "gpc_artitis_reumatoide_p26_1",
+      "json_valido": true,
+      "score": 8.0,
+      "latencia_segundos": 11.19
+    },
+    {
+      "test_id": "test_20",
+      "guia": "dolor_lumbar",
+      "tipo_split": "out_of_distribution",
+      "retrieval_rank": 1,
+      "hit_1": true,
+      "retrieved_top_chunk_id": "guía_dolor_lumbar_16012017_p27_1",
+      "json_valido": true,
+      "score": 8.5,
+      "latencia_segundos": 11.582
+    },
+    {
+      "test_id": "test_21",
+      "guia": "fenilcetonuria",
+      "tipo_split": "out_of_distribution",
+      "retrieval_rank": 1,
+      "hit_1": true,
+      "retrieved_top_chunk_id": "guía_de_fenilcetonuria_p16_1",
+      "json_valido": true,
+      "score": 7.5,
+      "latencia_segundos": 110.983
+    },
+    {
+      "test_id": "test_22",
+      "guia": "acne",
+      "tipo_split": "out_of_distribution",
+      "retrieval_rank": "Not in Top 5",
+      "hit_1": false,
+      "retrieved_top_chunk_id": "diagnóstico_y_tratamiento_del_acné_16012017_p21_1",
+      "json_valido": true,
+      "score": 8.2,
+      "latencia_segundos": 24.11
+    },
+    {
+      "test_id": "test_23",
+      "guia": "linfoma_hodgkin",
+      "tipo_split": "out_of_distribution",
+      "retrieval_rank": 1,
+      "hit_1": true,
+      "retrieved_top_chunk_id": "linfoma_hodgkin_p19_1",
+      "json_valido": true,
+      "score": 6.5,
+      "latencia_segundos": 8.642
+    },
+    {
+      "test_id": "test_24",
+      "guia": "dolor_oncologico",
+      "tipo_split": "out_of_distribution",
+      "retrieval_rank": "Not in Top 5",
+      "hit_1": false,
+      "retrieved_top_chunk_id": "gpc_dolor_oncológico_p32_1",
+      "json_valido": true,
+      "score": 6.2,
+      "latencia_segundos": 10.12
+    },
+    {
+      "test_id": "test_25",
+      "guia": "depresion",
+      "tipo_split": "out_of_distribution",
+      "retrieval_rank": 1,
+      "hit_1": true,
+      "retrieved_top_chunk_id": "61069_msp_guía_depresion_20180228_d_p37_1",
+      "json_valido": true,
+      "score": 8.0,
+      "latencia_segundos": 24.376
     }
   ]
 }

@@ -16,6 +16,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "120"
 
 pwd_context = CryptContext(schemes=["pbkdf2_sha256", "bcrypt"], deprecated="auto")
 security_scheme = HTTPBearer()
+optional_security_scheme = HTTPBearer(auto_error=False)
 
 # Base de datos demo en memoria de usuarios preconfigurados para evaluación
 DEMO_USERS_DB: dict[str, User] = {}
@@ -126,6 +127,27 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
         nombre=user.nombre,
         rol=user.rol
     )
+
+def get_optional_current_user(credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security_scheme)) -> Optional[UserResponse]:
+    if not credentials:
+        return None
+    try:
+        token = credentials.credentials
+        payload = decode_access_token(token)
+        email = payload.get("sub")
+        if not email:
+            return None
+        user = DEMO_USERS_DB.get(email.lower())
+        if not user or not user.activo:
+            return None
+        return UserResponse(
+            id=user.id,
+            email=user.email,
+            nombre=user.nombre,
+            rol=user.rol
+        )
+    except Exception:
+        return None
 
 def require_roles(allowed_roles: List[UserRole]):
     def role_checker(current_user: UserResponse = Depends(get_current_user)):

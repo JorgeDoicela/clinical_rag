@@ -1,0 +1,41 @@
+{
+  "protocolo": "Estudio Piloto de Ganancia de Aprendizaje - Post-Test (Casos Isomórficos)",
+  "institucion": "Facultad de Medicina (Ecuador)",
+  "casos": [
+    {
+      "id": "post_01_hta",
+      "especialidad": "Cardiología / Medicina Interna",
+      "titulo": "Urgencia Hipertensiva vs Emergencia en Paciente con Retinopatía Grado III",
+      "guia_msp": "gpc_hta192019",
+      "puntos_maximos": 10.0
+    },
+    {
+      "id": "post_02_dengue",
+      "especialidad": "Infectología / Urgencias",
+      "titulo": "Síndrome de Choque por Dengue y Reanimación Hídrica con Cristaloides",
+      "guia_msp": "dengue",
+      "puntos_maximos": 10.0
+    },
+    {
+      "id": "post_03_hemorragia",
+      "especialidad": "Ginecología y Obstetricia",
+      "titulo": "Hemorragia Posparto por Atonía Uterina (Activación Código Rojo MSP)",
+      "guia_msp": "hemorragia_posparto",
+      "puntos_maximos": 10.0
+    },
+    {
+      "id": "post_04_tb",
+      "especialidad": "Neumología / Infectología",
+      "titulo": "Tuberculosis Pulmonar Bacilífera y Esquema de Tratamiento Fase Intensiva",
+      "guia_msp": "gp_tuberculosis-1",
+      "puntos_maximos": 10.0
+    },
+    {
+      "id": "post_05_ehirn",
+      "especialidad": "Neonatología / Pediatría",
+      "titulo": "Encefalopatía Hipóxico-Isquémica Neonatal y Criterios de Hipotermia Terapéutica",
+      "guia_msp": "gpc_ehirn2019",
+      "puntos_maximos": 10.0
+    }
+  ]
+}

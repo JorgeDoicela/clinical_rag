@@ -1,4 +1,4 @@
----
+﻿---
 name: ateneo-design-system
 description: Activa esta skill para tareas de diseño UI/UX, modificación de estilos visuales, paleta de colores, tipografía, componentes analíticos y maquetación de la aplicación cliente Ateneo+ (React + Vite PWA).
 ---
@@ -95,9 +95,9 @@ className="py-2.5 px-7 bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600
 * **Omisiones Formativas:** Ámbar Formativo (`#d97706` / Contenedor `bg-amber-50 border-amber-200`)
 * **Cita Normativa Oficial MSP:** Azul Índigo (`#6366f1` / Contenedor `bg-indigo-50 border-indigo-200`)
 * **Nivel de Brecha Formativa (IBF):**
-  - 🔴 **Crítica (IBF > 0.40):** `#ef4444` (`red-500` / `bg-red-50 text-red-700 border-red-200`)
-  - 🟡 **Moderada (0.20 ≤ IBF ≤ 0.40):** `#f59e0b` (`amber-500` / `bg-amber-50 text-amber-700 border-amber-200`)
-  - 🟢 **Leve (IBF < 0.20):** `#10b981` (`emerald-500` / `bg-emerald-50 text-emerald-700 border-emerald-200`)
+  -  **Crítica (IBF > 0.40):** `#ef4444` (`red-500` / `bg-red-50 text-red-700 border-red-200`)
+  -  **Moderada (0.20 ≤ IBF ≤ 0.40):** `#f59e0b` (`amber-500` / `bg-amber-50 text-amber-700 border-amber-200`)
+  -  **Leve (IBF < 0.20):** `#10b981` (`emerald-500` / `bg-emerald-50 text-emerald-700 border-emerald-200`)
 
 ---
 
@@ -144,9 +144,9 @@ La pantalla principal (`http://localhost:5173/` - `CaseList.jsx` y `App.jsx`) im
 * **Superficie:** `bg-white rounded-[28px] p-6 sm:p-8 shadow-xs border-0 min-h-[700px]` descansando sobre `#f0f4f9`.
 * **Barra Unificada de 1 Sola Fila (Toolbar + Pestañas):**
   - **Izquierda:** Botón de recarga `RotateCw` + Pestañas con subrayado activo:
-    - `[ 📄 Todos los Casos (X) ]` (`border-[#0b57d0] text-[#0b57d0]`)
-    - `[ ⚡ Signos de Alarma / Código Rojo (X) ]` (`border-rose-600 text-rose-600`)
-    - `[ ✅ Casos Concluidos (X) ]` (`border-emerald-600 text-emerald-600`)
+    - `[  Todos los Casos (X) ]` (`border-[#0b57d0] text-[#0b57d0]`)
+    - `[  Signos de Alarma / Código Rojo (X) ]` (`border-rose-600 text-rose-600`)
+    - `[  Casos Concluidos (X) ]` (`border-emerald-600 text-emerald-600`)
   - **Derecha:** Contador descriptivo `Mostrando X de 10 casos` y alternador de vista `LayoutGrid` / `List`.
 * **Banner de Caso Recomendado (Hero Card):** Tarjeta destacada `bg-[#f0f4f9] rounded-[20px] p-6` con badge `Sparkles`, tiempo estimado y botón píldora CTA *"Iniciar Simulación"*.
 * **Modos de Visualización:**

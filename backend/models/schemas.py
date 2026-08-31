@@ -51,6 +51,26 @@ class EvaluationRequest(BaseModel):
     case_id: str = Field(..., description="ID del caso clínico evaluado")
     respuesta_estudiante: str = Field(..., description="Texto libre con el razonamiento del estudiante")
 
+class PhaseSchema(BaseModel):
+    fase_numero: int = Field(..., description="Número ordinal de la fase (1, 2, 3...)")
+    titulo: str = Field(..., description="Título del hito clínico (ej. Anamnesis & Sospecha)")
+    descripcion: str = Field(..., description="Contexto del paciente revelado en esta fase")
+    datos_revelados: Optional[str] = Field(None, description="Datos de anamnesis o paraclínicos que se desbloquean")
+    estudios_adjuntos: Optional[List[str]] = Field(default_factory=list, description="Lista de URLs de imágenes o estudios disponibles")
+    pregunta_evaluativa: str = Field(..., description="Pregunta específica a responder en esta fase")
+    ejes_evaluados: List[str] = Field(default_factory=lambda: ["diagnóstico"], description="Ejes clínicos foco de la fase")
+
+class PhaseEvaluationResult(BaseModel):
+    fase_numero: int = Field(..., description="Número de fase evaluada")
+    score_fase: float = Field(..., ge=0, le=10, description="Puntaje de la fase (0-10)")
+    aciertos: List[str] = Field(default_factory=list, description="Aciertos en la fase")
+    omisiones: List[str] = Field(default_factory=list, description="Omisiones en la fase")
+    competencias_deficientes: List[CompetenciaDeficiente] = Field(default_factory=list)
+    cita_normativa: CitaNormativa = Field(..., description="Cita de GPC relevante para esta fase")
+    retroalimentacion_fase: str = Field(..., description="Retroalimentación formativa de la fase")
+    desbloquea_siguiente: bool = Field(default=True, description="Indica si se aprueba avanzar a la siguiente fase")
+    datos_fase_siguiente: Optional[dict] = Field(None, description="Datos adicionales revelados para la próxima fase")
+
 class ClinicalCaseSchema(BaseModel):
     id: str
     guia_asociada: str
@@ -60,6 +80,9 @@ class ClinicalCaseSchema(BaseModel):
     imagen_url: Optional[str] = None
     nivel_esperado: Optional[str] = "pregrado_avanzado"
     fragmento_gpc_ideal_id: Optional[str] = None
+    modo_simulacion: Optional[str] = "single_turn" # "single_turn" | "fases"
+    fases: Optional[List[PhaseSchema]] = None
+    competencias_activadas: Optional[List[str]] = None
 
 from enum import Enum
 

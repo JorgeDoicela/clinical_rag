@@ -1,4 +1,4 @@
-# Plan de Implementación: Ateneo+ v2.0
+﻿# Plan de Implementación: Ateneo+ v2.0
 ## Simulador Clínico Multimodal con IA, RAG Híbrido y Analítica del Aprendizaje Médico en Ecuador
 
 > **Título del Paper (ES):** Simulador Clínico Multimodal Basado en Inteligencia Artificial y RAG para el Entrenamiento Formativo y Analítica del Aprendizaje Médico en Ecuador
@@ -14,19 +14,19 @@
 
 | Componente | Estado | Métrica Empírica |
 | :--- | :---: | :--- |
-| RAG Híbrido (Dense BGE-M3 + Sparse BM25 + Fusión RRF k=60) | ✅ Producción | Hit@1 = 100%, MRR@5 = 1.0000, NDCG@5 = 1.0000 |
-| Fine-Tuning MNRL sobre GPCs del MSP Ecuador (480 tripletas) | ✅ Producción | cosine_accuracy = 0.9648 en val set |
-| Validación JSON Pydantic estricta (EvaluationResult) | ✅ Producción | 100% de convalidaciones en benchmark |
-| Evaluación multimodal básica (texto + 1 imagen) | ✅ Producción | Latencia P50 = 7.73s |
-| Analítica individual: Radar de 4 ejes clínicos | ✅ Producción | Diagnóstico, Tratamiento, Prevención, Seguimiento |
-| Analítica de cohorte B2B (CoordinatorAnalytics) | ✅ Producción | Ranking de brechas por especialidad |
-| Salas sincrónicas colaborativas (Ateneo Room) | ✅ Producción | Consenso en tiempo real |
-| Exportación de dictamen en PDF con SHA-256 | ✅ Producción | Firma criptográfica institucional |
-| Índice de Brecha Formativa (IBF) automatizado | ❌ Pendiente | — |
-| Faithfulness Score (Anti-Alucinación Normativa) | ❌ Pendiente | — |
-| Fusión Multimodal Simultánea (N imágenes) | 🟡 Plan | — |
-| Entrada por voz (dictado clínico) | 🟡 Plan | — |
-| Protocolo Piloto Pre/Post-Test con internos reales | ❌ Pendiente | — |
+| RAG Híbrido (Dense BGE-M3 + Sparse BM25 + Fusión RRF k=60) |  Producción | Hit@1 = 100%, MRR@5 = 1.0000, NDCG@5 = 1.0000 |
+| Fine-Tuning MNRL sobre GPCs del MSP Ecuador (480 tripletas) |  Producción | cosine_accuracy = 0.9648 en val set |
+| Validación JSON Pydantic estricta (EvaluationResult) |  Producción | 100% de convalidaciones en benchmark |
+| Evaluación multimodal básica (texto + 1 imagen) |  Producción | Latencia P50 = 7.73s |
+| Analítica individual: Radar de 4 ejes clínicos |  Producción | Diagnóstico, Tratamiento, Prevención, Seguimiento |
+| Analítica de cohorte B2B (CoordinatorAnalytics) |  Producción | Ranking de brechas por especialidad |
+| Salas sincrónicas colaborativas (Ateneo Room) |  Producción | Consenso en tiempo real |
+| Exportación de dictamen en PDF con SHA-256 |  Producción | Firma criptográfica institucional |
+| Índice de Brecha Formativa (IBF) automatizado |  Pendiente | — |
+| Faithfulness Score (Anti-Alucinación Normativa) |  Pendiente | — |
+| Fusión Multimodal Simultánea (N imágenes) |  Plan | — |
+| Entrada por voz (dictado clínico) |  Plan | — |
+| Protocolo Piloto Pre/Post-Test con internos reales |  Pendiente | — |
 
 ---
 
@@ -138,7 +138,7 @@ Después de cada sesión:
   GET /api/adaptive/learning-path/{student_id}
   ```
 - **[NEW] `frontend/src/components/AdaptiveNextCase.jsx`** — Card que muestra el caso recomendado con justificación ("Detectamos que necesitas reforzar: Correlación Multimodal").
-- **[MODIFY] `frontend/src/pages/Dashboard.jsx`** — Ruta de aprendizaje visual: mapa del grafo KST con nodos coloreados por nivel de dominio (🔴 Sin iniciar / 🟡 En progreso / 🟢 Dominado).
+- **[MODIFY] `frontend/src/pages/Dashboard.jsx`** — Ruta de aprendizaje visual: mapa del grafo KST con nodos coloreados por nivel de dominio ( Sin iniciar /  En progreso /  Dominado).
 
 **Qué ve el estudiante:**
 > *"Basado en tus últimas 3 sesiones, Ateneo+ seleccionó este caso para ti: Neumonía Atípica con Radiografía + ECG (Dificultad: Media-Alta). Objetivo de esta sesión: reforzar la correlación entre hallazgos imagenológicos y criterios CURB-65 del MSP."*
@@ -272,9 +272,9 @@ Card de recomendación adaptativa que muestra:
 
 Agregar **Mapa del Grafo KST** visual:
 - Grafo interactivo de nodos (competencias) con colores de dominio:
-  - 🔴 Sin iniciar (`P < 0.40`)
-  - 🟡 En progreso (`0.40 ≤ P ≤ 0.75`)
-  - 🟢 Dominado (`P > 0.75`)
+  -  Sin iniciar (`P < 0.40`)
+  -  En progreso (`0.40 ≤ P ≤ 0.75`)
+  -  Dominado (`P > 0.75`)
 - Aristas que muestran prerequisitos desbloqueados vs pendientes
 - Click en nodo → muestra historial de rendimiento en esa competencia
 
@@ -350,7 +350,7 @@ GET /api/analytics/ibf-longitudinal/{user_id}
 **[MODIFY] `frontend/src/components/CoordinatorAnalytics.jsx`**
 
 Agregar visualización del IBF por eje:
-- Badges de severidad (🔴 Crítica / 🟡 Moderada / 🟢 Leve)
+- Badges de severidad ( Crítica /  Moderada /  Leve)
 - Panel de alertas automáticas al coordinador
 - Gráfico de evolución temporal del IBF (AreaChart)
 
@@ -1095,7 +1095,7 @@ export default function AdaptiveNextCase({ userId }) {
     }}>
       {/* Encabezado */}
       <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
-        <span style={{ fontSize: "24px" }}>🎯</span>
+        <span style={{ fontSize: "24px" }}></span>
         <div>
           <p style={{ color: "#60a5fa", fontSize: "12px", margin: 0, fontWeight: 600 }}>
             ATENEO+ RECOMIENDA
@@ -1114,7 +1114,7 @@ export default function AdaptiveNextCase({ userId }) {
         marginBottom: "12px",
       }}>
         <p style={{ color: "#93c5fd", fontSize: "13px", margin: 0 }}>
-          🔬 <strong>Objetivo de esta sesión:</strong> {data.competencia_objetivo}
+           <strong>Objetivo de esta sesión:</strong> {data.competencia_objetivo}
         </p>
       </div>
 
@@ -1219,7 +1219,7 @@ export default function KnowledgeGraph({ userId }) {
   return (
     <div style={{ background: "#0f172a", borderRadius: "12px", padding: "16px" }}>
       <h4 style={{ color: "#60a5fa", marginBottom: "12px", fontSize: "14px" }}>
-        🧠 Tu Mapa de Competencias Clínicas
+         Tu Mapa de Competencias Clínicas
       </h4>
 
       {/* Leyenda */}

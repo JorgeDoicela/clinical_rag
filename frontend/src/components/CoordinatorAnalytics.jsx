@@ -4,6 +4,7 @@ import { BarChart3, AlertTriangle, TrendingDown, Users, ShieldCheck, Sparkles } 
 
 export default function CoordinatorAnalytics() {
   const [analytics, setAnalytics] = useState(null);
+  const [ibfData, setIbfData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedCohort, setSelectedCohort] = useState('Cohorte Medicina 2026-A (Internado Rotativo)');
 
@@ -14,14 +15,22 @@ export default function CoordinatorAnalytics() {
   const fetchCoordinatorData = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/history/coordinator-analytics`, {
-        headers: getAuthHeaders()
-      });
-      if (!res.ok) throw new Error('Error al cargar datos institucionales');
-      const data = await res.json();
-      setAnalytics(data);
+      const [resCoord, resIbf] = await Promise.all([
+        fetch(`${API_URL}/api/history/coordinator-analytics`, { headers: getAuthHeaders() }),
+        fetch(`${API_URL}/api/history/ibf-cohort`, { headers: getAuthHeaders() })
+      ]);
+      
+      if (resCoord.ok) {
+        const data = await resCoord.json();
+        setAnalytics(data);
+      }
+      if (resIbf.ok) {
+        const ibf = await resIbf.json();
+        setIbfData(ibf);
+      }
     } catch (err) {
       console.error('Error al cargar analítica de coordinación:', err);
+
       // Fallback institucional
       setAnalytics({
         cohorte_nombre: selectedCohort,
@@ -131,7 +140,73 @@ export default function CoordinatorAnalytics() {
         </div>
       </div>
 
+      {/* ÍNDICE DE BRECHA FORMATIVA (IBF) POR EJE CLÍNICO (Contribución Metodológica Central) */}
+      {ibfData && (
+        <div className="bg-white rounded-[28px] p-6 sm:p-8 shadow-xs border-0 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-semibold text-blue-700 uppercase tracking-wider">
+                <ShieldCheck className="w-4 h-4 text-blue-600" />
+                <span>Métrica Psicométrica de Cohorte</span>
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 font-heading mt-0.5">
+                Índice de Brecha Formativa (IBF) por Eje Clínico
+              </h3>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-500 font-medium">IBF Global:</span>
+              <span className="text-sm font-bold px-3 py-1 bg-slate-100 text-slate-900 rounded-full border border-slate-200">
+                {ibfData.ibf_global_porcentaje}% ({ibfData.nivel_riesgo_global})
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            {ibfData.ejes_analiticos?.map((eje) => (
+              <div key={eje.eje_id} className="p-4 rounded-[20px] bg-slate-50 border border-slate-100 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-700 truncate">{eje.nombre}</span>
+                  <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                    eje.severidad === 'CRÍTICA' ? 'bg-rose-100 text-rose-800' :
+                    eje.severidad === 'MODERADA' ? 'bg-amber-100 text-amber-800' :
+                    'bg-emerald-100 text-emerald-800'
+                  }`}>
+                    {eje.severidad}
+                  </span>
+                </div>
+                <div className="text-2xl font-bold font-heading text-slate-900">
+                  {eje.ibf_porcentaje}%
+                  <span className="text-xs font-normal text-slate-500 ml-1.5">IBF</span>
+                </div>
+                <p className="text-[11px] text-slate-600">
+                  Promedio actual: {eje.promedio_cohorte}/10 (Meta MSP: {eje.puntaje_esperado})
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Alertas Docentes de Intervención Temprana */}
+          {ibfData.alertas_docentes && ibfData.alertas_docentes.length > 0 && (
+            <div className="pt-2 space-y-3">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4 text-amber-600" />
+                <span>Alertas Docentes de Intervención Curricular Inmediata:</span>
+              </h4>
+              <div className="space-y-2">
+                {ibfData.alertas_docentes.map((alerta, i) => (
+                  <div key={i} className="p-3.5 rounded-[16px] bg-amber-50/60 border border-amber-200/70 text-xs text-amber-900 space-y-1">
+                    <div className="font-bold">{alerta.mensaje}</div>
+                    <div className="text-amber-800 text-[11px] font-medium">Recomendación: {alerta.accion_sugerida}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Distribución de Falla Colectiva por Módulo GPC */}
+
       <div className="bg-white rounded-[28px] p-6 sm:p-8 shadow-xs border-0 space-y-6">
         <div className="flex items-center justify-between border-b border-slate-100 pb-4">
           <h3 className="text-lg font-normal text-[#1f1f1f] font-heading">

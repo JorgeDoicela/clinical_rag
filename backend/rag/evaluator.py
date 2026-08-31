@@ -4,8 +4,8 @@ from typing import Dict, Any, Optional, List, Tuple
 from google import genai
 from google.genai import types
 from config import GEMINI_API_KEY, GEMINI_MODEL
-from models.schemas import EvaluationResult, ClinicalCaseSchema, CitaNormativa
-from rag.prompt_builder import SYSTEM_INSTRUCTION, build_prompt
+from models.schemas import EvaluationResult, ClinicalCaseSchema, CitaNormativa, PhaseEvaluationResult
+from rag.prompt_builder import SYSTEM_INSTRUCTION, build_prompt, build_phase_prompt
 
 def call_gemini_llm(
     prompt: str,
@@ -272,3 +272,74 @@ def evaluate_clinical_reasoning(
             resultado.cita_normativa.guia = f"GPC {str(chunk_guia).upper()} MSP Ecuador"
 
     return resultado
+
+def evaluate_phase_reasoning(
+    caso: ClinicalCaseSchema,
+    fase_numero: int,
+    respuesta_estudiante: str,
+    chunk: Dict[str, Any],
+    historial_previo: str = "",
+    imagenes_list: Optional[List[Tuple[bytes, str]]] = None
+) -> PhaseEvaluationResult:
+    """
+    Evalúa la respuesta de una fase clínica específica y devuelve un PhaseEvaluationResult estructurado.
+    """
+    tiene_imagen = bool(imagenes_list)
+    prompt = build_phase_prompt(
+        caso=caso,
+        fase_numero=fase_numero,
+        respuesta_estudiante=respuesta_estudiante,
+        chunk=chunk,
+        historial_previo=historial_previo,
+        tiene_imagen=tiene_imagen
+    )
+
+    try:
+        raw_text = call_gemini_llm(prompt, imagenes_list=imagenes_list)
+        eval_base = parse_and_validate_llm_json(raw_text)
+    except Exception:
+        # Fallback defensivo si ocurre error de parseo en la fase
+        retry_prompt = prompt + "\n\nIMPORTANTE: Devuelve exclusivamente un objeto JSON sin caracteres Markdown."
+        raw_text_retry = call_gemini_llm(retry_prompt, imagenes_list=imagenes_list)
+        eval_base = parse_and_validate_llm_json(raw_text_retry)
+
+    # Construir PhaseEvaluationResult
+    cita = eval_base.cita_normativa
+    if chunk:
+        if chunk.get("pagina"):
+            try:
+                cita.pagina = int(chunk["pagina"])
+            except Exception:
+                pass
+        if chunk.get("seccion"):
+            cita.seccion = str(chunk["seccion"])
+        if chunk.get("guia_fuente"):
+            cita.guia = f"GPC {str(chunk['guia_fuente']).upper()} MSP Ecuador"
+
+    # Datos adicionales de la siguiente fase si existe
+    datos_sig = None
+    if caso.fases:
+        for f in caso.fases:
+            if f.fase_numero == fase_numero + 1:
+                datos_sig = {
+                    "fase_numero": f.fase_numero,
+                    "titulo": f.titulo,
+                    "descripcion": f.descripcion,
+                    "datos_revelados": f.datos_revelados,
+                    "estudios_adjuntos": f.estudios_adjuntos,
+                    "pregunta_evaluativa": f.pregunta_evaluativa
+                }
+                break
+
+    return PhaseEvaluationResult(
+        fase_numero=fase_numero,
+        score_fase=eval_base.score,
+        aciertos=eval_base.aciertos,
+        omisiones=eval_base.omisiones,
+        competencias_deficientes=eval_base.competencias_deficientes,
+        cita_normativa=cita,
+        retroalimentacion_fase=eval_base.retroalimentacion_general,
+        desbloquea_siguiente=eval_base.score >= 4.0 or fase_numero >= 3, # Desbloquea si no es reprobación total o si es la última
+        datos_fase_siguiente=datos_sig
+    )
+

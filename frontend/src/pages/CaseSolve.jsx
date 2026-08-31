@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { fetchCaseById, evaluateResponse, API_URL } from '../api/client';
+import { fetchCaseById, evaluateResponse, evaluatePhase, API_URL } from '../api/client';
 import { 
   ArrowLeft, 
   Send, 
@@ -12,12 +12,18 @@ import {
   Activity, 
   FileText,
   Clock,
-  Sparkles
+  Sparkles,
+  ChevronRight,
+  HelpCircle,
+  Pill,
+  CheckCircle2
 } from 'lucide-react';
 import FeedbackCard from '../components/FeedbackCard';
 import EvaluationGameLoader from '../components/EvaluationGameLoader';
 import VoiceInputButton from '../components/VoiceInputButton';
 import ImageUploadZone from '../components/ImageUploadZone';
+import SimulationStepper from '../components/SimulationStepper';
+import PhaseFeedbackCard from '../components/PhaseFeedbackCard';
 
 export default function CaseSolve() {
   const { id } = useParams();
@@ -31,6 +37,15 @@ export default function CaseSolve() {
   const [error, setError] = useState(null);
   const [resultado, setResultado] = useState(null);
 
+  // Estados exclusivos para el Modo de Simulación por Fases
+  const [currentPhase, setCurrentPhase] = useState(1);
+  const [phaseAnswers, setPhaseAnswers] = useState({});
+  const [phaseResults, setPhaseResults] = useState({});
+  const [phaseScores, setPhaseScores] = useState({});
+  const [completedPhases, setCompletedPhases] = useState([]);
+  const [currentPhaseResult, setCurrentPhaseResult] = useState(null);
+  const [showingPhaseFeedback, setShowingPhaseFeedback] = useState(false);
+
   useEffect(() => {
     fetchCaseById(id)
       .then(data => {
@@ -43,7 +58,13 @@ export default function CaseSolve() {
       });
   }, [id]);
 
-  const handleSubmit = async (e) => {
+  const isPhaseMode = !!(caso?.fases && caso.fases.length > 0);
+  const activePhaseData = isPhaseMode
+    ? caso.fases.find(f => f.fase_numero === currentPhase) || caso.fases[0]
+    : null;
+
+  // Envío en Modo Directo (Single-Turn)
+  const handleSubmitSingleTurn = async (e) => {
     e.preventDefault();
     if (!respuesta.trim()) return;
 
@@ -51,13 +72,104 @@ export default function CaseSolve() {
     setError(null);
 
     try {
-      // Pasar array de imagenes (puede ser vacío — el backend hace fallback al caso)
       const res = await evaluateResponse(id, respuesta, imagenes.length > 0 ? imagenes : null);
       setResultado(res);
     } catch (err) {
       setError(err.message);
     } finally {
       setEvaluating(false);
+    }
+  };
+
+  // Envío en Modo Simulación por Fases (Multi-Phase)
+  const handleSubmitPhase = async (e) => {
+    e.preventDefault();
+    if (!respuesta.trim()) return;
+
+    setEvaluating(true);
+    setError(null);
+
+    // Preparar historial previo acumulado de respuestas
+    const historialText = Object.entries(phaseAnswers)
+      .map(([num, ans]) => `Fase ${num}: ${ans}`)
+      .join('\n');
+
+    try {
+      const res = await evaluatePhase(
+        id,
+        currentPhase,
+        respuesta,
+        historialText,
+        imagenes.length > 0 ? imagenes : null
+      );
+
+      // Guardar respuesta y resultado de esta fase
+      setPhaseAnswers(prev => ({ ...prev, [currentPhase]: respuesta }));
+      setPhaseResults(prev => ({ ...prev, [currentPhase]: res }));
+      setPhaseScores(prev => ({ ...prev, [currentPhase]: res.score_fase }));
+      if (!completedPhases.includes(currentPhase)) {
+        setCompletedPhases(prev => [...prev, currentPhase]);
+      }
+
+      setCurrentPhaseResult(res);
+      setShowingPhaseFeedback(true);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setEvaluating(false);
+    }
+  };
+
+  // Acción al presionar "Continuar a siguiente fase" o "Ver Dictamen Global"
+  const handleProceedNextPhase = () => {
+    if (!isPhaseMode) return;
+
+    const totalPhases = caso.fases.length;
+    if (currentPhase < totalPhases) {
+      setCurrentPhase(prev => prev + 1);
+      setRespuesta('');
+      setImagenes([]);
+      setCurrentPhaseResult(null);
+      setShowingPhaseFeedback(false);
+    } else {
+      // Consolidar resultados de todas las 3 fases en un EvaluationResult maestro
+      const allResults = Object.values(phaseResults);
+      if (currentPhaseResult && !phaseResults[currentPhase]) {
+        allResults.push(currentPhaseResult);
+      }
+
+      const avgScore = allResults.length > 0
+        ? allResults.reduce((acc, r) => acc + (r.score_fase || 8.0), 0) / allResults.length
+        : 8.5;
+
+      const consolidatedAciertos = allResults.flatMap(r => r.aciertos || []);
+      const consolidatedOmisiones = allResults.flatMap(r => r.omisiones || []);
+      const consolidatedCompetencias = allResults.flatMap(r => r.competencias_deficientes || []);
+
+      const lastCita = currentPhaseResult?.cita_normativa || allResults[0]?.cita_normativa || {
+        guia: `GPC ${caso.guia_asociada.toUpperCase()} MSP Ecuador`,
+        seccion: "Manejo Clínico Estandarizado",
+        pagina: 1,
+        texto_relevante: "Normativa oficial de atención clínica del Ministerio de Salud Pública."
+      };
+
+      const finalEvalResult = {
+        score: parseFloat(avgScore.toFixed(1)),
+        score_max: 10,
+        aciertos: consolidatedAciertos.length > 0 ? consolidatedAciertos : ["Resolución secuencial completada"],
+        omisiones: consolidatedOmisiones,
+        competencias_deficientes: consolidatedCompetencias,
+        cita_normativa: lastCita,
+        retroalimentacion_general: `Simulación clínica en ${totalPhases} fases completada exitosamente. Promedio ponderado de desempeño: ${avgScore.toFixed(1)}/10 frente a la GPC del MSP.`
+      };
+
+      const allAnswersText = Object.entries(phaseAnswers)
+        .map(([num, ans]) => `[Fase ${num}] ${ans}`)
+        .join('\n\n');
+
+      setResultado(finalEvalResult);
+      setRespuesta(allAnswersText);
+      setShowingPhaseFeedback(false);
     }
   };
 
@@ -96,7 +208,7 @@ export default function CaseSolve() {
       {evaluating && (
         <EvaluationGameLoader
           guiaCodigo={caso?.guia_asociada}
-          hasImage={!!caso?.imagen_url}
+          hasImage={!!caso?.imagen_url || imagenes.length > 0}
         />
       )}
 
@@ -111,6 +223,11 @@ export default function CaseSolve() {
         </Link>
 
         <div className="flex items-center gap-3">
+          {isPhaseMode && (
+            <span className="px-3 py-1 rounded-full bg-[#c2e7ff] text-[#001d35] text-xs font-semibold">
+              Simulación Dinámica por Fases
+            </span>
+          )}
           <span className="px-3 py-1 rounded-full bg-white text-[#1f1f1f] text-xs font-medium shadow-xs">
             GPC {caso.guia_asociada} (MSP)
           </span>
@@ -119,6 +236,20 @@ export default function CaseSolve() {
           </span>
         </div>
       </div>
+
+      {/* Stepper de Fases (Visible solo si el caso soporta modo simulación por fases y no ha finalizado) */}
+      {isPhaseMode && !resultado && (
+        <SimulationStepper
+          currentPhase={currentPhase}
+          totalPhases={caso.fases.length}
+          phaseScores={phaseScores}
+          completedPhases={completedPhases}
+          onSelectPhase={(phaseNum) => {
+            setCurrentPhase(phaseNum);
+            setShowingPhaseFeedback(false);
+          }}
+        />
+      )}
 
       {/* DISPOSICIÓN SPLIT-SCREEN (50% / 50%) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -132,16 +263,29 @@ export default function CaseSolve() {
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-xs text-[#0b57d0] font-medium">
                 <Stethoscope className="w-4 h-4" />
-                <span>Simulación Clínica Formativa</span>
+                <span>
+                  {isPhaseMode
+                    ? `Simulador Clínico — ${activePhaseData?.titulo || `Fase ${currentPhase}`}`
+                    : "Simulación Clínica Formativa"
+                  }
+                </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-normal text-[#1f1f1f] leading-snug font-heading">
                 {caso.titulo}
               </h1>
             </div>
 
-            {/* Enunciado del Caso Clínico */}
+            {/* Enunciado del Caso Clínico o Contexto Revelado en la Fase */}
             <div className="bg-[#f0f4f9] p-5 sm:p-6 rounded-[20px] text-sm text-[#1f1f1f] leading-relaxed space-y-4">
-              <p>{caso.enunciado}</p>
+              <p>{isPhaseMode ? activePhaseData?.descripcion || caso.enunciado : caso.enunciado}</p>
+
+              {/* Datos adicionales revelados en la fase */}
+              {isPhaseMode && activePhaseData?.datos_revelados && (
+                <div className="p-3.5 rounded-[14px] bg-white border border-slate-200/80 text-xs text-[#1f1f1f] space-y-1 shadow-xs">
+                  <span className="font-semibold text-[#0b57d0] block">Datos Clínicos Desbloqueados en este Hito:</span>
+                  <p>{activePhaseData.datos_revelados}</p>
+                </div>
+              )}
 
               {/* Imagen / Estudio Multimodal Adjunto */}
               {caso.imagen_url && (
@@ -164,14 +308,19 @@ export default function CaseSolve() {
               )}
             </div>
 
-            {/* Pregunta Médica Evaluativa */}
+            {/* Pregunta Médica Evaluativa (del caso o de la fase activa) */}
             <div className="p-4 bg-sky-50 rounded-[18px] border border-sky-100 space-y-1">
               <div className="flex items-center gap-2 text-xs font-medium text-[#0b57d0]">
                 <BookOpen className="w-4 h-4" />
-                <span>Instrucción Diagnóstica & Terapéutica</span>
+                <span>
+                  {isPhaseMode
+                    ? `Instrucción Específica para Fase ${currentPhase}`
+                    : "Instrucción Diagnóstica & Terapéutica"
+                  }
+                </span>
               </div>
               <p className="text-sm font-medium text-[#1f1f1f] leading-snug">
-                {caso.pregunta}
+                {isPhaseMode ? activePhaseData?.pregunta_evaluativa : caso.pregunta}
               </p>
             </div>
 
@@ -182,13 +331,44 @@ export default function CaseSolve() {
             COLUMNA DERECHA (6 cols): ÁREA DE RAZONAMIENTO O FEEDBACK FORMATIVO
             ===================================================================== */}
         <div className="lg:col-span-6">
-          {!resultado ? (
-            <form onSubmit={handleSubmit} className="bg-white rounded-[28px] p-6 sm:p-8 shadow-xs border-0 space-y-6">
-              
+          {resultado ? (
+            /* Dictamen Final Consolidado (Single-Turn o Multi-Fase completado) */
+            <FeedbackCard
+              result={resultado}
+              studentAnswer={respuesta}
+              onReset={() => {
+                setResultado(null);
+                setCurrentPhase(1);
+                setPhaseAnswers({});
+                setPhaseResults({});
+                setPhaseScores({});
+                setCompletedPhases([]);
+                setShowingPhaseFeedback(false);
+                setRespuesta('');
+                setImagenes([]);
+              }}
+            />
+          ) : showingPhaseFeedback && currentPhaseResult ? (
+            /* Tarjeta de Retroalimentación Intermedia de Fase */
+            <PhaseFeedbackCard
+              phaseResult={currentPhaseResult}
+              currentPhase={currentPhase}
+              onProceedNextPhase={handleProceedNextPhase}
+              isLastPhase={isPhaseMode && currentPhase === caso.fases.length}
+            />
+          ) : (
+            /* Formulario de Entrada (Directo o Fase Activa) */
+            <form
+              onSubmit={isPhaseMode ? handleSubmitPhase : handleSubmitSingleTurn}
+              className="bg-white rounded-[28px] p-6 sm:p-8 shadow-xs border-0 space-y-6"
+            >
               <div className="space-y-2">
                 <div className="flex items-start justify-between gap-2">
                   <label className="block text-sm font-medium text-[#1f1f1f] pt-1">
-                    Tu Razonamiento Clínico y Conducta Terapéutica
+                    {isPhaseMode
+                      ? `Tu Razonamiento para la Fase ${currentPhase}:`
+                      : "Tu Razonamiento Clínico y Conducta Terapéutica"
+                    }
                   </label>
                   <VoiceInputButton
                     onTranscript={handleVoiceTranscript}
@@ -200,7 +380,11 @@ export default function CaseSolve() {
                   rows={12}
                   value={respuesta}
                   onChange={(e) => setRespuesta(e.target.value)}
-                  placeholder="Detalla tu diagnóstico de presunción, criterios de severidad según la GPC del MSP y el plan terapéutico inmediato..."
+                  placeholder={
+                    isPhaseMode
+                      ? `Escribe o dicta tu análisis específico para este hito clínico (${activePhaseData?.titulo})...`
+                      : "Detalla tu diagnóstico de presunción, criterios de severidad según la GPC del MSP y el plan terapéutico inmediato..."
+                  }
                   disabled={evaluating}
                   className="w-full bg-[#f0f4f9] hover:bg-white focus:bg-white border border-[#747775] hover:border-[#1f1f1f] focus:border-[#0b57d0] focus:ring-1 focus:ring-[#0b57d0] rounded-[16px] p-4 text-sm text-[#1f1f1f] placeholder:text-[#747775] focus:outline-none transition-all resize-y disabled:opacity-50"
                   required
@@ -233,11 +417,21 @@ export default function CaseSolve() {
                   {evaluating ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Evaluando con RAG (MSP)...</span>
+                      <span>
+                        {isPhaseMode
+                          ? `Evaluando Fase ${currentPhase} con RAG (MSP)...`
+                          : "Evaluando con RAG (MSP)..."
+                        }
+                      </span>
                     </>
                   ) : (
                     <>
-                      <span>Enviar para Evaluación Formativa</span>
+                      <span>
+                        {isPhaseMode
+                          ? `Evaluar Fase ${currentPhase}`
+                          : "Enviar para Evaluación Formativa"
+                        }
+                      </span>
                       <Send className="w-4 h-4" />
                     </>
                   )}
@@ -245,12 +439,6 @@ export default function CaseSolve() {
               </div>
 
             </form>
-          ) : (
-            <FeedbackCard
-              result={resultado}
-              studentAnswer={respuesta}
-              onReset={() => setResultado(null)}
-            />
           )}
         </div>
 

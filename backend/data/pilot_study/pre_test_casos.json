@@ -1,0 +1,41 @@
+{
+  "protocolo": "Estudio Piloto de Ganancia de Aprendizaje - Pre-Test",
+  "institucion": "Facultad de Medicina (Ecuador)",
+  "casos": [
+    {
+      "id": "pre_01_hta",
+      "especialidad": "Cardiología / Medicina Interna",
+      "titulo": "Emergencia Hipertensiva con Daño de Órgano Blanco",
+      "guia_msp": "gpc_hta192019",
+      "puntos_maximos": 10.0
+    },
+    {
+      "id": "pre_02_dengue",
+      "especialidad": "Infectología / Urgencias",
+      "titulo": "Dengue con Signos de Alarma y Trombocitopenia Severa",
+      "guia_msp": "dengue",
+      "puntos_maximos": 10.0
+    },
+    {
+      "id": "pre_03_preeclampsia",
+      "especialidad": "Ginecología y Obstetricia",
+      "titulo": "Preeclampsia con Criterios de Severidad e Impregnación",
+      "guia_msp": "preeclampsia",
+      "puntos_maximos": 10.0
+    },
+    {
+      "id": "pre_04_nac",
+      "especialidad": "Neumología / Pediatría",
+      "titulo": "Neumonía Adquirida en la Comunidad Severa con Criterios CURB-65",
+      "guia_msp": "neumonia",
+      "puntos_maximos": 10.0
+    },
+    {
+      "id": "pre_05_sepsis",
+      "especialidad": "Neonatología / Pediatría",
+      "titulo": "Sepsis Neonatal Temprana y Antibioticoterapia Empírica",
+      "guia_msp": "gpc-sepsis-neonatal",
+      "puntos_maximos": 10.0
+    }
+  ]
+}

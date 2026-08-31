@@ -29,6 +29,8 @@ import {
   X
 } from 'lucide-react';
 import ReasoningTrends from '../components/ReasoningTrends';
+import AdaptiveNextCase from '../components/AdaptiveNextCase';
+import KnowledgeSpaceGraph from '../components/KnowledgeSpaceGraph';
 
 const GPC_LABELS = {
   'dengue': { label: 'GPC Dengue (MSP 2023)', category: 'urgencias', time: '10-12 min', isUrgent: true },
@@ -72,6 +74,7 @@ export default function CaseList() {
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
   const [roomInput, setRoomInput] = useState('');
   const [showJoinModal, setShowJoinModal] = useState(false);
+  const [showKstGraph, setShowKstGraph] = useState(false);
   const navigate = useNavigate();
 
   const globalSearchQuery = searchParams.get('q') || '';
@@ -384,36 +387,14 @@ export default function CaseList() {
 
             </div>
 
-            {/* CASO RECOMENDADO (Banner Destacado) */}
-            {recommendedCase && selectedCategory === 'all' && classificationTab === 'all' && !globalSearchQuery && !loading && (
-              <div className="bg-[#f0f4f9] rounded-[20px] p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 border-0">
-                <div className="space-y-2 max-w-2xl">
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white text-[#0b57d0] text-xs font-semibold">
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>Recomendado para ti</span>
-                    </span>
-                    <span className="text-xs text-[#444746]">{recommendedMeta?.label}</span>
-                  </div>
-
-                  <h3 className="text-lg font-medium text-[#1f1f1f] font-heading">
-                    {recommendedCase.titulo}
-                  </h3>
-
-                  <p className="text-xs text-[#444746] line-clamp-2 leading-relaxed">
-                    {recommendedCase.enunciado}
-                  </p>
-                </div>
-
-                <Link
-                  to={`/case/${recommendedCase.id}`}
-                  className="py-2.5 px-6 bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 hover:from-cyan-700 hover:via-blue-700 hover:to-indigo-700 text-white font-medium text-xs rounded-full transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer shrink-0"
-                >
-                  <span>Iniciar Simulación</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
+            {/* RECOMENDACIÓN INTELIGENTE: MOTOR DE CURRÍCULO ADAPTATIVO KST & BKT */}
+            {selectedCategory === 'all' && classificationTab === 'all' && !globalSearchQuery && (
+              <AdaptiveNextCase
+                onSelectCase={(caso) => navigate(`/case/${caso.id}`)}
+                onToggleGraph={() => setShowKstGraph(true)}
+              />
             )}
+
 
             {/* LISTADO / CUADRÍCULA DE CASOS */}
             {loading ? (
@@ -593,6 +574,13 @@ export default function CaseList() {
         </div>
       )}
 
+      {/* Modal de Espacio de Conocimiento KST */}
+      <KnowledgeSpaceGraph
+        isOpen={showKstGraph}
+        onClose={() => setShowKstGraph(false)}
+      />
+
     </div>
   );
 }
+

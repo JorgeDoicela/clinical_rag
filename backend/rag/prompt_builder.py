@@ -55,3 +55,48 @@ Texto Normativo Oficial:
 {instruccion_imagen}
 Evalúa el razonamiento clínico del estudiante comparándolo directamente contra la norma oficial del MSP proporcionada.
 """
+
+def build_phase_prompt(
+    caso: ClinicalCaseSchema,
+    fase_numero: int,
+    respuesta_estudiante: str,
+    chunk: Dict[str, Any],
+    historial_previo: str = "",
+    tiene_imagen: bool = False
+) -> str:
+    """
+    Construye un prompt enfocado específicamente en el hito clínico de la fase actual:
+    - Fase 1: Anamnesis, factores de riesgo y sospecha diagnóstica preliminar.
+    - Fase 2: Interpretación multimodal de paraclínicos (ECG, radiografías, analítica).
+    - Fase 3: Prescripción farmacológica estricta según GPC, criterios de severidad y seguimiento.
+    """
+    fase_enfoque = {
+        1: "FASE 1: ANAMNESIS Y SOSPECHA DIAGNÓSTICA PRELIMINAR. Evalúa si el estudiante identificó correctamente los signos de alarma, factores de riesgo y la hipótesis diagnóstica inicial. No penalices por no dar esquemas terapéuticos aún.",
+        2: "FASE 2: SOLICITUD E INTERPRETACIÓN DE ESTUDIOS PARACLÍNICOS. Evalúa la precisión al interpretar los hallazgos en estudios de imagen (Rx), trazados (ECG) o valores paraclínicos/laboratorio.",
+        3: "FASE 3: PRESCRIPCIÓN TERAPÉUTICA Y PLAN DE SEGUIMIENTO. Evalúa la exactitud de los fármacos normados, dosificación, vías de administración, criterios de hospitalización/alta y monitoreo."
+    }.get(fase_numero, f"FASE {fase_numero}: EVALUACIÓN CLÍNICA SECUENCIAL.")
+
+    contexto_historial = f"\nHISTORIAL DE FASES PREVIAS DEL ESTUDIANTE:\n{historial_previo}\n" if historial_previo else ""
+    
+    instruccion_imagen = ""
+    if tiene_imagen:
+        instruccion_imagen = "\nESTUDIOS DIAGNÓSTICOS DISPONIBLES EN ESTA FASE: Evalúa la interpretación de las imágenes o trazados adjuntos frente a los hallazgos patológicos normados en la GPC."
+
+    return f"""SIMULACIÓN CLÍNICA POR FASES SECUENCIALES:
+Caso Clínico: {caso.titulo}
+Enunciado Global: {caso.enunciado}
+
+HITO CLÍNICO ACTUAL:
+{fase_enfoque}
+{contexto_historial}
+RESPUESTA DEL ESTUDIANTE EN ESTA FASE:
+{respuesta_estudiante}
+
+NORMATIVA OFICIAL DE RESPALDO (MSP ECUADOR):
+Guía: GPC {chunk.get('guia_fuente', '').upper()} MSP Ecuador
+Sección: {chunk.get('seccion', 'General')} (pág. {chunk.get('pagina', 'N/A')})
+Texto Oficial: "{chunk.get('texto', '')}"
+{instruccion_imagen}
+Evalúa el desempeño específico en esta fase ({fase_enfoque}) y retorna la retroalimentación formativa en formato JSON estricto.
+"""
+

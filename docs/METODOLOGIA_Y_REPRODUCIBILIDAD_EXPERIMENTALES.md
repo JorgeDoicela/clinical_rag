@@ -138,4 +138,47 @@ Para evitar el sesgo de indulgencia (*leniency bias*) y garantizar el poder disc
 2. **Alineación Demográfica Estricta por Grupo Etario:** Cada caso clínico del banco evaluativo (`cases.json`) está calibrado para corresponder estrictamente al grupo etario definido en la norma oficial del MSP (ej. patología neonatal en `EHIRN` y `Sepsis`, pediátrica de 3 meses a 15 años en `Neumonía`, gestacional en `Preeclampsia` y `Hemorragia Posparto`, y adultos en `HTA`, `ERC`, `VIH` y `Diabetes T2`).
 3. **Interoperabilidad de Reportes Formativos en PDF:** Flujo de exportación institucional mediante streaming binario `application/pdf` en backend y extracción por `res.blob()` en cliente web, garantizando descargas íntegras con firma criptográfica SHA-256 y tabla analítica de 4 ejes.
 
+---
+
+## 10. Suite Integral de Pruebas Automatizadas y Verificación de Producción
+
+El sistema cuenta con un marco de pruebas en 4 niveles formales de verificación automatizada:
+
+### 10.1 Nivel 1: Benchmark Experimental Cuantitativo (`tests/run_metrics.py`)
+* **Propósito:** Medir la precisión de Recuperación de Información (IR) sobre 25 casos clínicos y validar la salida estructurada con Pydantic.
+* **Resultados Verificados:**
+  * **Hit@1 In-Distribution:** 100.0% (15/15 fragmentos normativos recuperados en posición Top-1).
+  * **Hit@3 / Hit@5:** 100.0% / 100.0%.
+  * **Mean Reciprocal Rank (MRR@5):** 1.0000.
+  * **Normalized Discounted Cumulative Gain (NDCG@5):** 1.0000.
+  * **Convalidez de Esquema JSON:** 100.0% (25/25 dictámenes parseables).
+  * **Latencia Mediana ($P_{50}$):** 11.19 s.
+  * **Artefacto LaTeX:** Generación automatizada de `tests/tabla_resultados_paper.tex`.
+
+### 10.2 Nivel 2: Validación de los 12 Casos Clínicos y Fusión Multimodal (`tests/test_multimodal_and_cases.py`)
+* **Propósito:** Validar la recuperación RAG determinista de todos los casos del catálogo contra ChromaDB, la generación de PDFs institucionales y la Fusión Multimodal con múltiples estudios simultáneos.
+* **Resultados Verificados:**
+  * **Recuperación del Catálogo:** 12 de 12 casos recuperaron exitosamente su fragmento normativo exacto (100.0%).
+  * **Generación de Reporte PDF:** Archivo binario de 1.00 MB generado con cabecera `%PDF`, firma SHA-256 y tabla analítica de 4 ejes.
+  * **Fusión Multimodal Simultánea:** Evaluación de 2 estudios adjuntos (ECG de 12 derivaciones + Radiografía de tórax) con correlación cruzada en Gemini Vision API y convalidación Pydantic.
+
+### 10.3 Nivel 3: Pruebas de Integración de Endpoints HTTP (`tests/test_api_endpoints.py`)
+* **Propósito:** Probar la totalidad de las rutas de la API REST mediante `TestClient` de FastAPI.
+* **Resultados Verificados:**
+  * `GET /health` -> 200 OK.
+  * `POST /api/auth/login` (Alumno y Administrador) -> 200 OK con emisión de Token JWT.
+  * `GET /api/auth/users` -> 200 OK protegido por RBAC de Administrador.
+  * `GET /api/cases` y `GET /api/cases/{id}` -> 200 OK.
+  * `GET /api/cases/404` -> 404 Not Found defensivo.
+  * `GET /api/evaluate/benchmark-scientific` -> 200 OK con auditoría de cero fuga de datos.
+  * `GET /api/history` y `GET /api/history/trends` -> 200 OK con analítica longitudinal.
+  * `GET /api/history/coordinator-analytics` -> 200 OK con panel de inteligencia B2B.
+  * `POST /api/ateneo/create` y `GET /api/ateneo/room/{code}` -> 200 OK con estado sincrónico.
+  * `POST /api/evaluate/export-pdf` y `/api/history/export-pdf` -> 200 OK (Content-Type: application/pdf).
+  * `POST /api/evaluate/phase` -> 200 OK con evaluación dirigida por hito clínico y desbloqueo progresivo.
+
+### 10.4 Nivel 4: Compilación y Calidad de Código Frontend (`npm run build`)
+* **Propósito:** Verificar que la aplicación React 18 / Vite / Tailwind compile sin advertencias críticas ni errores de sintaxis/hooks.
+* **Resultados Verificados:** 1,601 módulos transformados exitosamente en 10.91 s, PWA Service Worker generado con precache de 359 KiB y 0 errores de compilación.
+
 

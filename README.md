@@ -57,58 +57,90 @@ clinical_rag/
 │   │   └── room_session.py      # Gestor de salas sincónicas colaborativas y analítica de consenso
 │   ├── rag/
 │   │   ├── retriever.py         # Motor de búsqueda vectorial denso híbrido RRF (BGE-M3 + BM25, k=60)
-│   │   ├── prompt_builder.py    # Constructor de prompts estructurados con directivas multimodales
-│   │   └── evaluator.py         # Motor de Fusión Multimodal: múltiples Part.from_bytes en 1 request Gemini
+│   ├── adaptive/                # Motor de Currículo Adaptativo (Knowledge Space Theory & BKT)
+│   │   ├── knowledge_space.py   # Grafo dirigido de 7 competencias clínicas y prerrequisitos KST
+│   │   ├── knowledge_tracer.py  # Bayesian Knowledge Tracing (BKT) continuo y probabilidades de dominio
+│   │   └── curriculum_engine.py # Selector proactivo en Zona de Desarrollo Próximo (ZDP) y rationale
+│   ├── evaluation/
+│   │   └── faithfulness_scorer.py # Algoritmo de fidelidad normativa y verificación anti-alucinación
+│   ├── models/
+│   │   ├── schemas.py           # Modelos Pydantic (EvaluationResult, PhaseSchema, UserRole, etc.)
+│   │   ├── clinical_case.py     # Gestor de lectura e instanciación de casos clínicos desde JSON
+│   │   ├── history_db.py        # DAO para persistencia relacional en SQLite y algoritmos de analítica
+│   │   ├── room_session.py      # Gestor de salas sincónicas colaborativas y analítica de consenso
+│   │   └── learning_analytics.py # Motor del Índice de Brecha Formativa (IBF) y alertas B2B docentes
+│   ├── rag/
+│   │   ├── retriever.py         # Motor de búsqueda vectorial denso híbrido RRF (BGE-M3 + BM25, k=60)
+│   │   ├── prompt_builder.py    # Constructor de prompts estructurados con directivas multimodales y por fases
+│   │   └── evaluator.py         # Motor de Fusión Multimodal y evaluación secuencial en Gemini Vision
 │   ├── routers/
 │   │   ├── auth.py              # Endpoints de inicio de sesión, verificación de token y catálogo de usuarios
 │   │   ├── cases.py             # Endpoints de consulta de casos clínicos activos
-│   │   ├── evaluation.py        # POST /api/evaluate con List[UploadFile] para fusión multimodal simultánea
-│   │   ├── history.py           # Endpoints de historial del estudiante, analítica B2B y exportación PDF
+│   │   ├── evaluation.py        # POST /api/evaluate y POST /api/evaluate/phase para simulación secuencial
+│   │   ├── history.py           # Historial, analítica B2B, IBF de cohorte, faithfulness y exportación PDF
+│   │   ├── adaptive.py          # Endpoints KST: next-case, knowledge-state, learning-path y topology
 │   │   └── collaboration.py     # Endpoints de gestión y participación en salas de Ateneo sincónicas
 │   ├── services/
-│   │   └── pdf_report_generator.py # Generador de dictámen PDF institucional con logo, SHA-256 y semáforo IBF
+│   │   └── pdf_report_generator.py # Generador de dictamen PDF institucional con SHA-256 y rúbrica MSP
 │   ├── tests/
 │   │   ├── test_cases_fixture.json # Banco de 15 casos de prueba anotados con fragmento ideal
+│   │   ├── run_all_tests.py     # Orquestador maestro rápido de todas las suites de prueba
 │   │   ├── run_metrics.py       # Runner de benchmark automatizado (Hit@1, validez JSON, latencia)
+│   │   ├── run_ablation_study.py # Estudio de ablación (Dense vs BM25 vs RRF Híbrido)
+│   │   ├── run_faithfulness_benchmark.py # Runner de fidelidad normativa (Faithfulness Score / Anti-Alucinación)
+│   │   ├── pilot_study_analyzer.py # Analizador inferencial de ganancia de aprendizaje (Hake Learning Gain)
+│   │   ├── test_adaptive_curriculum.py # Suite de pruebas del motor de currículo adaptativo KST & BKT
+│   │   ├── test_paper_differentiators.py # Suite de pruebas de diferenciadores (IBF & Faithfulness)
+│   │   ├── test_api_endpoints.py # Suite de integración de todos los endpoints HTTP (FastAPI TestClient)
+│   │   ├── test_multimodal_and_cases.py # Validación determinista de 12 casos, PDF y fusión multimodal
 │   │   └── resultados_metricas.json # Reporte cuantitativo de salida del benchmark
 │   ├── config.py                # Variables de entorno y resolución dinámica del modelo local
 │   ├── main.py                  # Inicialización FastAPI, CORS, telemetría silenciada y precalentamiento
 │   ├── requirements.txt         # Lista estricta de dependencias Python
 │   └── Dockerfile               # Configuración de contenedor Python 3.11-slim con PyTorch
 ├── docs/                        # Documentación técnica y académica detallada
-│   ├── ARQUITECTURA_RAG_Y_FINE_TUNING.md
-│   ├── ESTADO_SISTEMA_V2.md         # [NUEVO] Madurez por componente, brechas cerradas y trabajo futuro
-│   ├── DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md
-│   ├── GUIA_FINE_TUNING_COLAB_Y_METRICAS.md
-│   ├── GUIA_INGESTA_Y_CASOS.md
-│   ├── GUIA_PASO_A_PASO_ENTRENAMIENTO_Y_PROXIMOS_PASOS.md
-│   ├── METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md
-│   ├── PROTOCOLO_A100_MLOPS_Y_GROUND_TRUTH.md
-│   ├── PUBLICACION_Y_PRESENTACION_CONGRESO.md
-│   └── CUANTIZACION_Y_DESPLIEGUE_AWS.md
+│   ├── ARQUITECTURA_RAG_Y_FINE_TUNING.md # Arquitectura RAG Híbrida, multimodal y simulación por fases
+│   ├── CURRICULO_ADAPTATIVO_KST_Y_LEARNING_ANALYTICS.md # Motor adaptativo KST, BKT, ZDP e IBF
+│   ├── PROTOCOLO_PILOTO_LEARNING_GAIN.md # Protocolo de estudio piloto con internos y ganancia de Hake
+│   ├── MANUAL_DE_PRUEBAS_Y_BENCHMARKS.md # Guía de ejecución de suites de pruebas y tablas LaTeX
+│   ├── METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md # Resultados de las suites de pruebas y métricas
+│   ├── DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md # Análisis crítico, generalizabilidad y extensiones
+│   ├── GUIA_FINE_TUNING_COLAB_Y_METRICAS.md # Protocolo de entrenamiento supervisado en GPU Cloud T4
+│   ├── GUIA_INGESTA_Y_CASOS.md  # Procedimiento de segmentación e indexación de GPCs en ChromaDB
+│   ├── GUIA_PASO_A_PASO_ENTRENAMIENTO_Y_PROXIMOS_PASOS.md # Guía para réplica experimental y despliegue
+│   ├── PROTOCOLO_A100_MLOPS_Y_GROUND_TRUTH.md # Protocolo de generación de tripletas con A100
+│   ├── PUBLICACION_Y_PRESENTACION_CONGRESO.md # Guía de redacción del artículo y presentación
+│   └── CUANTIZACION_Y_DESPLIEGUE_AWS.md # Estrategias de cuantización y despliegue en la nube
+
 ├── frontend/                    # Aplicación cliente React + Vite (SPA/PWA) — Ateneo+ Design System
 │   ├── public/                  # Favicon, ateneo.png (imagotipo oficial) y manifest.webmanifest
 │   └── src/
-│       ├── api/client.js        # Cliente HTTP con soporte multi-imagen (File[]) y Bearer JWT
+│       ├── api/client.js        # Cliente HTTP con soporte multi-imagen (File[]), adaptativo y Bearer JWT
 │       ├── components/
-│       │   ├── VoiceInputButton.jsx   # [NUEVO v2.0] Dictado clínico por voz (Web Speech API, es-EC)
-│       │   ├── ImageUploadZone.jsx    # [NUEVO v2.0] Galería drag&drop multi-estudio con badges ECG/Rx/Lab
+│       │   ├── AdaptiveNextCase.jsx   # Tarjeta de recomendación inteligente en Zona de Desarrollo Próximo
+│       │   ├── KnowledgeSpaceGraph.jsx # Modal visualizador del grafo de competencias KST & BKT
+│       │   ├── VoiceInputButton.jsx   # Dictado clínico por voz (Web Speech API, es-EC)
+│       │   ├── ImageUploadZone.jsx    # Galería drag&drop multi-estudio con badges ECG/Rx/Lab
+│       │   ├── SimulationStepper.jsx  # Indicador de progreso por fases clínicas secuenciales
+│       │   ├── PhaseFeedbackCard.jsx  # Retroalimentación formativa por hito clínico
 │       │   ├── FeedbackCard.jsx       # Tarjeta de retroalimentación formativa y exportación PDF
 │       │   ├── SkillRadarChart.jsx    # Radar de competencias clínicas en 4 ejes (Recharts)
-│       │   ├── CoordinatorAnalytics.jsx # Panel B2B para directores académicos
+│       │   ├── CoordinatorAnalytics.jsx # Panel B2B para directores académicos con métricas IBF
 │       │   ├── ReasoningTrends.jsx    # Evolución longitudinal del puntaje del estudiante
 │       │   ├── EvaluationGameLoader.jsx # Loader animado multimodal durante evaluación RAG
 │       │   └── PdfViewerModal.jsx     # Visor interactivo del PDF oficial con salto a página normativa
 │       ├── context/AuthContext.jsx # Proveedor global del estado de autenticación y sesión
 │       ├── pages/
-│       │   ├── CaseList.jsx           # Vista principal Google Workspace 3-Zone con Ctrl+Click
-│       │   └── CaseSolve.jsx          # Vista split-screen: voz + multi-imagen + evaluación RAG
+│       │   ├── CaseList.jsx           # Vista principal Google Workspace 3-Zone con recomendador adaptativo
+│       │   └── CaseSolve.jsx          # Vista split-screen: voz + multi-imagen + simulación por fases
 │       ├── App.jsx                # Router principal con rutas protegidas por RBAC
 │       ├── main.jsx               # Punto de entrada de React 18 DOM
 │       └── index.css              # Tailwind CSS y fuentes tipográficas (Google Sans / Plus Jakarta Sans)
 ├── docker-compose.yml           # Orquestación multicontenedor (Backend + Frontend) con soporte GPU
-├── ideas.md                     # Visión, brechas identificadas y roadmap técnico del sistema
 └── README.md                    # Documentación principal de entrada del proyecto
+```
+
+
 
 ---
 
@@ -207,7 +239,7 @@ Para incorporar nuevos documentos en formato PDF emitidos por el MSP Ecuador:
 3. Tras completarse las 3 épocas (720 iteraciones), descargar el archivo resultante `ateneo-bge-m3-ecuador.zip` y descomprimirlo en:
    `backend/data/ateneo-bge-m3-ecuador/`
 
-> ℹ️ **Resolución Automática del Modelo:** El archivo [config.py](backend/config.py) detecta si la carpeta `backend/data/ateneo-bge-m3-ecuador/` contiene los pesos compilados (`config.json`, `model.safetensors`). De existir, los carga automáticamente; en su ausencia, conmuta hacia el modelo base multilingüe `BAAI/bge-m3`.
+> **Nota de Resolución Automática del Modelo:** El archivo [config.py](backend/config.py) detecta si la carpeta `backend/data/ateneo-bge-m3-ecuador/` contiene los pesos compilados (`config.json`, `model.safetensors`). De existir, los carga automáticamente; en su ausencia, conmuta hacia el modelo base multilingüe `BAAI/bge-m3`.
 
 ---
 

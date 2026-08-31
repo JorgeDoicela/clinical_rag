@@ -1,0 +1,25 @@
+{
+  "rubrica_nombre": "Rúbrica Estandarizada de Razonamiento Clínico MSP",
+  "ejes": [
+    {
+      "eje": "diagnostico",
+      "peso": 0.35,
+      "criterio": "Identificación de patología principal, diagnóstico diferencial y correlación con signos de alarma MSP."
+    },
+    {
+      "eje": "tratamiento",
+      "peso": 0.35,
+      "criterio": "Selección de fármacos de primera línea, dosificación exacta por kg/h y vía de administración normada."
+    },
+    {
+      "eje": "prevencion",
+      "peso": 0.15,
+      "criterio": "Manejo de factores de riesgo, profilaxis y educación preventiva al paciente y familia."
+    },
+    {
+      "eje": "seguimiento",
+      "peso": 0.15,
+      "criterio": "Monitoreo paraclínico temporal, vigilancia de complicaciones y criterios de alta médica."
+    }
+  ]
+}

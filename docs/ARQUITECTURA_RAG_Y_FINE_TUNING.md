@@ -98,3 +98,38 @@ Donde:
 ## 5. Integración con Visor Interactivo en Frontend ([../frontend/src/components/PdfViewerModal.jsx](../frontend/src/components/PdfViewerModal.jsx))
 
 Cada cita normativa generada por el evaluador se vincula al endpoint `/api/cases/pdf-location/{guia_id}`. El frontend en React permite abrir el visor de PDF oficial con salto directo `#page={pagina}`, permitiendo la auditoría instantánea de la fuente oficial en vivo durante congresos o sesiones docentes.
+
+---
+
+## 6. Motor de Simulación Dinámica por Fases Clínicas Secuenciales
+
+Para superar las limitaciones del modelo estático de pregunta y respuesta única (*Single-Turn QA*), **Ateneo+** implementa un motor de simulación clínica interactivo estructurado en tres hitos formativos con desbloqueo progresivo:
+
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ FASE 1: ANAMNESIS & SOSPECHA DIAGNÓSTICA PRELIMINAR                        │
+│ • Entrada: Motivo de consulta, antecedentes patológicos y signos vitales.   │
+│ • Evaluación RAG: Enfoque en el eje "Diagnóstico" y severidad preliminar.   │
+│ • Desbloqueo: Revela los paraclínicos solicitados y pasa a la Fase 2.      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ FASE 2: SOLICITUD E INTERPRETACIÓN DE ESTUDIOS PARACLÍNICOS (MULTIMODAL)   │
+│ • Entrada: Acceso a trazados ECG de 12 derivaciones, Rx y analítica lab.   │
+│ • Evaluación RAG: Correlación cruzada multimodal de hallazgos patológicos.  │
+│ • Desbloqueo: Se confirma el diagnóstico definitivo según la GPC del MSP.  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ FASE 3: PRESCRIPCIÓN TERAPÉUTICA DE EMERGENCIA & SEGUIMIENTO LONGITUDINAL  │
+│ • Entrada: Confirmación diagnóstica y evolución del paciente.              │
+│ • Evaluación RAG: Esquemas farmacológicos exactos (dosis/vía), metas de    │
+│   control, criterios de alta y monitoreo en los ejes Tratamiento/Control.  │
+│ • Cierre: Síntesis del Dictamen Global Consolidado (Radar 4 ejes + PDF).   │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 6.1 Componentes Técnicos del Subsistema de Simulación
+* **Esquemas Pydantic (`models/schemas.py`):** `PhaseSchema` para modelar cada hito dentro del caso clínico y `PhaseEvaluationResult` para el retorno estructurado con `score_fase`, aciertos, omisiones, cita y datos de desbloqueo.
+* **Constructor de Prompts Especializado (`rag/prompt_builder.py`):** `build_phase_prompt` ajusta el contexto y la directiva evaluativa según el hito activo (sin penalizar prematuramente en Fase 1 por detalles farmacológicos de Fase 3).
+* **Endpoint Transaccional (`routers/evaluation.py`):** `POST /api/evaluate/phase` recibe el estado de la fase actual, acumula el historial previo y procesa el request multimodal.
+* **Experiencia de Usuario en Frontend (`frontend/src/components/`):**
+  * `SimulationStepper.jsx`: Componente de navegación de pasos con estados visuales (Activo, Completado con score, Bloqueado).
+  * `PhaseFeedbackCard.jsx`: Panel de retroalimentación inmediata post-fase con cita textual de la GPC y botón de avance.
+  * Al culminar la Fase 3, `CaseSolve.jsx` consolida los resultados de los tres hitos en un único `EvaluationResult` maestro, alimentando el `SkillRadarChart` y habilitando la descarga del dictamen PDF oficial.

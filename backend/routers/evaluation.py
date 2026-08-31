@@ -7,8 +7,8 @@ from pydantic import BaseModel
 
 from models.clinical_case import get_case_by_id
 from rag.retriever import retrieve_relevant_chunk
-from rag.evaluator import evaluate_clinical_reasoning
-from models.schemas import EvaluationResult
+from rag.evaluator import evaluate_clinical_reasoning, evaluate_phase_reasoning
+from models.schemas import EvaluationResult, PhaseEvaluationResult
 from services.pdf_report_generator import generate_clinical_feedback_pdf
 
 router = APIRouter(prefix="/api/evaluate", tags=["Evaluación RAG"])
@@ -158,3 +158,55 @@ async def evaluate_response(
         return resultado
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error durante el procesamiento del LLM: {str(e)}")
+
+@router.post("/phase", response_model=PhaseEvaluationResult)
+async def evaluate_phase_response(
+    case_id: str = Form(...),
+    fase_numero: int = Form(...),
+    respuesta_estudiante: str = Form(...),
+    historial_previo: Optional[str] = Form(""),
+    imagenes: Optional[List[UploadFile]] = File(None)
+):
+    """
+    Evalúa una fase clínica secuencial individual (1: Anamnesis, 2: Estudios Paraclínicos, 3: Tratamiento).
+    Devuelve la retroalimentación formativa de la fase y desbloquea los datos para el siguiente hito clínico.
+    """
+    caso = get_case_by_id(case_id)
+    if not caso:
+        raise HTTPException(status_code=404, detail=f"Caso clínico '{case_id}' no encontrado.")
+
+    if not respuesta_estudiante.strip():
+        raise HTTPException(status_code=400, detail="La respuesta del estudiante en esta fase no puede estar vacía.")
+
+    # Construir lista de bytes de imágenes adjuntas en esta fase
+    imagenes_bytes_list: List[tuple] = []
+    if imagenes:
+        for img_file in imagenes:
+            if img_file and img_file.filename:
+                img_bytes = await img_file.read()
+                img_mime = img_file.content_type or "image/png"
+                imagenes_bytes_list.append((img_bytes, img_mime))
+
+    # Recuperar chunk normativo enfocado
+    try:
+        query_rag = f"{respuesta_estudiante} {caso.titulo}"
+        chunk = retrieve_relevant_chunk(
+            query=query_rag,
+            guia_filtro=caso.guia_asociada
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error en la recuperación RAG: {str(e)}")
+
+    try:
+        resultado_fase = evaluate_phase_reasoning(
+            caso=caso,
+            fase_numero=fase_numero,
+            respuesta_estudiante=respuesta_estudiante,
+            chunk=chunk,
+            historial_previo=historial_previo or "",
+            imagenes_list=imagenes_bytes_list
+        )
+        return resultado_fase
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error durante la evaluación de la fase con LLM: {str(e)}")
+

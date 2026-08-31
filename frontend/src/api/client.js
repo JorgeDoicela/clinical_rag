@@ -96,12 +96,93 @@ export async function evaluateResponse(caseId, respuestaEstudiante, imagenes = n
   return res.json();
 }
 
+/**
+ * Evalúa un hito clínico específico en el modo de simulación secuencial por fases.
+ *
+ * @param {string} caseId - ID del caso clínico
+ * @param {number} faseNumero - Número de fase (1, 2 o 3)
+ * @param {string} respuestaEstudiante - Respuesta del estudiante para esta fase
+ * @param {string} historialPrevio - Contexto de respuestas de fases anteriores
+ * @param {File|File[]|null} imagenes - Estudios o imágenes adjuntas en esta fase
+ */
+export async function evaluatePhase(caseId, faseNumero, respuestaEstudiante, historialPrevio = '', imagenes = null) {
+  const formData = new FormData();
+  formData.append('case_id', caseId);
+  formData.append('fase_numero', faseNumero.toString());
+  formData.append('respuesta_estudiante', respuestaEstudiante);
+  formData.append('historial_previo', historialPrevio);
 
+  if (imagenes) {
+    const imagenesArray = Array.isArray(imagenes) ? imagenes : [imagenes];
+    imagenesArray.forEach((img) => {
+      formData.append('imagenes', img, img.name);
+    });
+  }
+
+  const res = await fetch(`${API_URL}/api/evaluate/phase`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || `Error al evaluar la fase ${faseNumero}.`);
+  }
+
+  return res.json();
+}
+
+/**
+ * Obtiene la recomendación adaptativa proactiva basada en KST y BKT.
+ */
+export async function fetchAdaptiveNextCase(studentId = null) {
+  const query = studentId ? `?student_id=${encodeURIComponent(studentId)}` : '';
+  const res = await fetch(`${API_URL}/api/adaptive/next-case${query}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Error al obtener la recomendación adaptativa.');
+  }
+  return res.json();
+}
+
+/**
+ * Obtiene el estado continuo de dominio del grafo de competencias clínicas KST.
+ */
+export async function fetchKnowledgeState(studentId = null) {
+  const query = studentId ? `?student_id=${encodeURIComponent(studentId)}` : '';
+  const res = await fetch(`${API_URL}/api/adaptive/knowledge-state${query}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Error al obtener el estado de conocimiento.');
+  }
+  return res.json();
+}
+
+/**
+ * Obtiene la trayectoria longitudinal de aprendizaje BKT.
+ */
+export async function fetchLearningPath(studentId = null) {
+  const query = studentId ? `?student_id=${encodeURIComponent(studentId)}` : '';
+  const res = await fetch(`${API_URL}/api/adaptive/learning-path${query}`, {
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Error al obtener la trayectoria de aprendizaje.');
+  }
+  return res.json();
+}
 
 /**
  * Cliente HTTP unificado con sintaxis axios-like (client.get, client.post)
  * para los componentes de dashboard, visor de PDFs y benchmark.
  */
+
 const client = {
   async request(endpoint, options = {}) {
     const normalizedEndpoint = endpoint.startsWith('/api') 
