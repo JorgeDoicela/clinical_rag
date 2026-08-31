@@ -6,9 +6,13 @@ Referencia científica: Es et al. (2023), RAGAS: Automated Evaluation of Retriev
 """
 
 import os
+import sys
 import json
 from pathlib import Path
 from typing import Dict, Any, List
+
+# Asegurar importaciones del proyecto desde cualquier CWD
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from models.clinical_case import load_all_cases
 from rag.retriever import retrieve_relevant_chunk
@@ -80,7 +84,7 @@ def run_faithfulness_benchmark() -> Dict[str, Any]:
 def generate_faithfulness_latex_table(results: Dict[str, Any]):
     os.makedirs(OUTPUT_TEX_PATH.parent, exist_ok=True)
     tex_content = f"""% Tabla III: Evaluación de Fidelidad Normativa RAG y Anti-Alucinación (Faithfulness Score)
-% Generada automáticamente por Ateneo+ v2.0 MLOps Pipeline
+% Generada automáticamente por Ateneo+ MLOps Pipeline
 \\begin{{table}}[htbp]
 \\centering
 \\caption{{Auditoría de Grounding Normativo y Fidelidad de Retroalimentación RAG frente a las GPCs del MSP}}

@@ -1,0 +1,54 @@
+{
+  "descripcion": "IBF por eje — Cohorte Control vs Cohorte KST Adaptativa",
+  "cohorte_control": {
+    "por_eje": {
+      "diagnóstico": {
+        "media": 5.444,
+        "ibf": 0.3195,
+        "nivel": "Moderada"
+      },
+      "tratamiento": {
+        "media": 4.42,
+        "ibf": 0.4475,
+        "nivel": "Crítica"
+      },
+      "prevención": {
+        "media": 4.072,
+        "ibf": 0.491,
+        "nivel": "Crítica"
+      },
+      "seguimiento": {
+        "media": 4.78,
+        "ibf": 0.4025,
+        "nivel": "Crítica"
+      }
+    },
+    "ibf_global": 0.4151
+  },
+  "cohorte_kst": {
+    "por_eje": {
+      "diagnóstico": {
+        "media": 8.04,
+        "ibf": 0.0,
+        "nivel": "Leve"
+      },
+      "tratamiento": {
+        "media": 7.524,
+        "ibf": 0.0595,
+        "nivel": "Leve"
+      },
+      "prevención": {
+        "media": 7.108,
+        "ibf": 0.1115,
+        "nivel": "Leve"
+      },
+      "seguimiento": {
+        "media": 7.78,
+        "ibf": 0.0275,
+        "nivel": "Leve"
+      }
+    },
+    "ibf_global": 0.0496
+  },
+  "reduccion_brecha": 0.3655
+}

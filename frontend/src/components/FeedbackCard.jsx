@@ -201,6 +201,83 @@ export default function FeedbackCard({ result, studentAnswer, onReset }) {
         <SkillRadarChart competenciasPorEje={competenciasPorEje} />
       </div>
 
+      {/* 3b. Faithfulness Score — Verificación de Grounding Normativo (Anti-Alucinación) */}
+      {result.faithfulness_score !== undefined && result.faithfulness_score !== null && (
+        <div className="bg-white rounded-[28px] p-6 sm:p-8 shadow-xs border-0 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+            <div className="flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-blue-600 shrink-0" />
+              <div>
+                <p className="text-xs font-medium text-blue-700 uppercase tracking-wider">
+                  Diferenciador Científico 3 — Anti-Alucinación Normativa
+                </p>
+                <h3 className="text-sm font-semibold text-slate-900 font-heading">
+                  Faithfulness Score (Grounding MSP)
+                </h3>
+              </div>
+            </div>
+            <span className={`text-sm font-bold px-4 py-1.5 rounded-full ${
+              result.faithfulness_score >= 0.80
+                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                : result.faithfulness_score >= 0.60
+                ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                : 'bg-rose-50 text-rose-800 border border-rose-200'
+            }`}>
+              {Math.round((result.faithfulness_score || 0) * 100)}% anclaje normativo
+            </span>
+          </div>
+
+          <div className="space-y-3">
+            {/* Barra de progreso */}
+            <div>
+              <div className="flex justify-between text-xs text-slate-500 mb-1.5">
+                <span>Afirmaciones respaldadas por GPC del MSP</span>
+                <span className="font-medium text-slate-700">
+                  {result.grounded_claims ?? '—'} / {result.total_claims ?? '—'} verificadas
+                </span>
+              </div>
+              <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-700 ${
+                    result.faithfulness_score >= 0.80 ? 'bg-emerald-500' :
+                    result.faithfulness_score >= 0.60 ? 'bg-amber-400' : 'bg-rose-500'
+                  }`}
+                  style={{ width: `${Math.round((result.faithfulness_score || 0) * 100)}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Nivel de grounding */}
+            <div className={`text-xs px-4 py-3 rounded-[14px] ${
+              result.faithfulness_score >= 0.80
+                ? 'bg-emerald-50/70 text-emerald-900 border border-emerald-100'
+                : result.faithfulness_score >= 0.60
+                ? 'bg-amber-50/70 text-amber-900 border border-amber-100'
+                : 'bg-rose-50/70 text-rose-900 border border-rose-100'
+            }`}>
+              <span className="font-semibold">
+                {result.faithfulness_score >= 0.80 ? '✓ Alto Grounding Normativo' :
+                 result.faithfulness_score >= 0.60 ? '⚠ Grounding Moderado' :
+                 '✗ Bajo Grounding — Riesgo de Deriva Normativa'}
+              </span>
+              <span className="ml-2 opacity-75">
+                {result.faithfulness_score >= 0.80
+                  ? '— Evaluación consistente con las GPCs del MSP Ecuador.'
+                  : result.faithfulness_score >= 0.60
+                  ? '— Algunas afirmaciones no están respaldadas directamente por la normativa recuperada.'
+                  : '— La evaluación contiene afirmaciones sin sustento en el fragmento normativo recuperado.'}
+              </span>
+            </div>
+
+            <p className="text-[11px] text-slate-400 leading-relaxed">
+              Métrica de anti-alucinación basada en RAGAS (Es et al., 2023).
+              Proporción de afirmaciones clínicas respaldadas por el corpus normativo del MSP.
+              Objetivo Ateneo+ v2.0: ≥ 0.95 (paper Tabla III).
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* 4. Aciertos y Omisiones en Grid de 2 Columnas */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         

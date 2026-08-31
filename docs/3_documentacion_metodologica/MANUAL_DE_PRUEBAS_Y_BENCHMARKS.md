@@ -1,6 +1,6 @@
 # Manual de Pruebas Automatizadas, Suites de Integración y Benchmarks
 
-Este documento describe la arquitectura de pruebas automatizadas de **Ateneo+ v2.0**, los comandos para su ejecución bajo demanda y la interpretación de los artefactos generados para el artículo científico.
+Este documento describe la arquitectura de pruebas automatizadas de **Ateneo+**, los comandos para su ejecución bajo demanda y la interpretación de los artefactos generados para el artículo científico.
 
 ---
 

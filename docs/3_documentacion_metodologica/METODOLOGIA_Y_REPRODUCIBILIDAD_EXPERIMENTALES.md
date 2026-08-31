@@ -179,6 +179,33 @@ El sistema cuenta con un marco de pruebas en 4 niveles formales de verificación
 
 ### 10.4 Nivel 4: Compilación y Calidad de Código Frontend (`npm run build`)
 * **Propósito:** Verificar que la aplicación React 18 / Vite / Tailwind compile sin advertencias críticas ni errores de sintaxis/hooks.
-* **Resultados Verificados:** 1,601 módulos transformados exitosamente en 10.91 s, PWA Service Worker generado con precache de 359 KiB y 0 errores de compilación.
+* **Resultados Verificados:** 1,603 módulos transformados exitosamente en 3.21 s, PWA Service Worker generado y 0 errores de compilación.
 
+### 10.5 Nivel 5: Motor de Currículo Adaptativo KST & BKT (`tests/test_adaptive_curriculum.py`)
+* **Propósito:** Validar la topología del grafo de competencias KST, la fórmula de actualización bayesiana BKT y los endpoints REST del subsistema adaptativo.
+* **Resultados Verificados:**
+  * **Topología KST:** Grafo acíclico dirigido con 7 nodos de competencias y 7 aristas de prerrequisito; no contiene ciclos (verificado con `nx.is_directed_acyclic_graph`).
+  * **Bayesian Knowledge Tracing (BKT):** Actualización $P(L_{t+1})$ ante aciertos y fallos en `semiologia_anamnesis` y `plan_terapeutico_msp` verificada (incremento >= 0.02 tras acierto; decremento ante fallo).
+  * **Recomendación ZDP:** Motor `select_next_case` retorna candidato con al menos un `zdp_node`, `justificacion` no vacía y campo `case` con id válido.
+  * **Endpoints Adaptativos:**
+    * `GET /api/adaptive/next-case` -> 200 OK con `case` y `justificacion`.
+    * `GET /api/adaptive/knowledge-state` -> 200 OK con vector de 7 competencias y campo `p_dominio`.
+    * `GET /api/adaptive/learning-path` -> 200 OK con claves `dominados`, `en_progreso`, `zdp_actual`.
+    * `GET /api/adaptive/topology` -> 200 OK con `nodos`, `aristas` y `es_dag: true`.
+
+### 10.6 Nivel 6: Diferenciadores Científicos del Paper — IBF & Faithfulness Score (`tests/test_paper_differentiators.py`)
+* **Propósito:** Validar el Índice de Brecha Formativa (IBF) por cohorte, el Faithfulness Score de grounding normativo anti-alucinación y los endpoints B2B institucionales.
+* **Resultados Verificados:**
+  * **Faithfulness Score:** 3/3 afirmaciones con grounding verificado contra fragmento normativo real -> Score = 100.0% (Nivel: Alto Grounding Normativo).
+  * **IBF Global de Cohorte (muestra sintética de 4 evaluaciones):** 14.1% (Rendimiento Formativo Optimo, alineado a GPC). Eje de mayor brecha: Tratamiento y Dosificacion (23.5% = MODERADA).
+  * **Endpoints B2B:** `GET /api/history/ibf-cohort` -> 200 OK; `GET /api/history/faithfulness-benchmark` -> 200 OK.
+
+### 10.7 Nivel 7: Análisis de Ganancia de Aprendizaje del Estudio Piloto (`tests/pilot_study_analyzer.py`)
+* **Propósito:** Procesar el dataset piloto de N=25 médicos internos y calcular la ganancia normalizada de Hake ($g$) con inferencia estadística.
+* **Resultados Verificados:**
+  * **Pre-Test Score Promedio:** 4.87 ± 0.54 / 10.0.
+  * **Post-Test Score Promedio:** 8.64 ± 0.40 / 10.0.
+  * **Ganancia Normalizada de Hake ($g$):** 0.7400 ± 0.0542 -> **Ganancia Alta** ($g \ge 0.70$, Hake 1998).
+  * **Estadístico $t$ Pareado:** $t = 105.266$ ($p < 0.0001$, $df = 24$).
+  * **Artefacto LaTeX generado:** `docs/tabla_pilot_study_paper.tex` (Tabla IV del paper).
 

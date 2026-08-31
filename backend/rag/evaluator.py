@@ -246,7 +246,14 @@ def evaluate_clinical_reasoning(
         imagenes_list = [(imagen_bytes, imagen_mime)]
 
     tiene_imagen = bool(imagenes_list)
-    prompt = build_prompt(caso, respuesta_estudiante, chunk, tiene_imagen=tiene_imagen)
+    n_imagenes = len(imagenes_list) if imagenes_list else 0
+    mime_types = [m for _, m in imagenes_list] if imagenes_list else []
+    prompt = build_prompt(
+        caso, respuesta_estudiante, chunk,
+        tiene_imagen=tiene_imagen,
+        n_imagenes=n_imagenes,
+        mime_types=mime_types,
+    )
 
     try:
         raw_text = call_gemini_llm(prompt, imagenes_list=imagenes_list)
@@ -271,6 +278,23 @@ def evaluate_clinical_reasoning(
         if chunk_guia and (resultado.cita_normativa.guia in ["GPC MSP Ecuador", "MSP Ecuador", ""] or not resultado.cita_normativa.guia):
             resultado.cita_normativa.guia = f"GPC {str(chunk_guia).upper()} MSP Ecuador"
 
+    # Calcular y adjuntar Faithfulness Score (Anti-Alucinación Normativa)
+    try:
+        from evaluation.faithfulness_scorer import calculate_faithfulness_score
+        chunk_text = chunk.get("texto", "") if chunk else ""
+        fs_data = calculate_faithfulness_score(
+            aciertos=resultado.aciertos,
+            omisiones=resultado.omisiones,
+            chunk_normativo_texto=chunk_text
+        )
+        resultado.faithfulness_score = fs_data["faithfulness_score"]
+        resultado.total_claims       = fs_data["total_claims"]
+        resultado.grounded_claims    = fs_data["grounded_claims"]
+        resultado.grounding_level    = fs_data["grounding_level"]
+        print(f"[EVAL] Faithfulness Score calculado: {fs_data['faithfulness_score']:.3f} ({fs_data['grounding_level']})", flush=True)
+    except Exception as fs_err:
+        print(f"[EVAL] Error al calcular faithfulness score: {fs_err}", flush=True)
+
     return resultado
 
 def evaluate_phase_reasoning(
@@ -285,13 +309,17 @@ def evaluate_phase_reasoning(
     Evalúa la respuesta de una fase clínica específica y devuelve un PhaseEvaluationResult estructurado.
     """
     tiene_imagen = bool(imagenes_list)
+    n_imagenes = len(imagenes_list) if imagenes_list else 0
+    mime_types = [m for _, m in imagenes_list] if imagenes_list else []
     prompt = build_phase_prompt(
         caso=caso,
         fase_numero=fase_numero,
         respuesta_estudiante=respuesta_estudiante,
         chunk=chunk,
         historial_previo=historial_previo,
-        tiene_imagen=tiene_imagen
+        tiene_imagen=tiene_imagen,
+        n_imagenes=n_imagenes,
+        mime_types=mime_types,
     )
 
     try:

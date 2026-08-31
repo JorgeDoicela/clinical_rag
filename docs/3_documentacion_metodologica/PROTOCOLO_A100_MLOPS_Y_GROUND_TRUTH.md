@@ -1,6 +1,6 @@
 # Protocolo MLOps de Ingesta en GPU NVIDIA A100 y Gestión de Ground Truth Canónico
 
-Este documento define las especificaciones técnicas de ingeniería, estándares de reproducibilidad MLOps y el protocolo de datos desacoplado implementado en **Ateneo** para la indexación acelerada y el benchmark formal de publicación científica internacional (IEEE, Springer, MDPI, Lancet Digital Health).
+Este documento define las especificaciones técnicas de ingeniería, estándares de reproducibilidad MLOps y el protocolo de datos desacoplado implementado en **Ateneo** para la indexación acelerada y el benchmark formal de publicación científica (IEEE, Springer, MDPI, Lancet Digital Health).
 
 ---
 

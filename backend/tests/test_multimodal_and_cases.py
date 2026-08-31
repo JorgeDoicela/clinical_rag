@@ -116,9 +116,9 @@ def test_pdf_generation():
     print("\n-> Resultado: Reporte PDF institucional verificado (100%).")
 
 if __name__ == "__main__":
-    print("\n" + "#"*70)
-    print(" SUITE INTEGRAL DE PRUEBAS AUTOMATIZADAS - ATENEO+ v2.0")
-    print("#"*70)
+    print("=" * 70)
+    print(" SUITE INTEGRAL DE PRUEBAS AUTOMATIZADAS - ATENEO+")
+    print("=" * 70)
     
     test_all_12_cases_retrieval()
     test_pdf_generation()

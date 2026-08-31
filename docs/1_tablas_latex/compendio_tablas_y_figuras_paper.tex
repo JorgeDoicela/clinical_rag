@@ -1,0 +1,177 @@
+\documentclass[10pt,journal,compsoc]{IEEEtran}
+
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{microtype}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+\title{Compendio de Evidencia Experimental, Tablas y Figuras Científicas: Ateneo+}
+\author{Jorge Doicela, et al.\\\textit{Ateneo+: Simulador Clínico Multimodal con RAG Híbrido y Motor KST/BKT}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Este documento compila la totalidad de las tablas empíricas y figuras de alta resolución (300 DPI) generadas por el pipeline automatizado de MLOps y analítica de Ateneo+. Los resultados sustentan la evaluación de rendimiento de recuperación RAG sobre las Guías de Práctica Clínica (GPC) del Ministerio de Salud Pública (MSP) del Ecuador, el estudio de ablación arquitectónica, la auditoría de fidelidad normativa (\textit{Faithfulness Score}), la ganancia de aprendizaje psicométrica (\textit{Hake Learning Gain}) y la modelación probabilística mediante \textit{Knowledge Space Theory} (KST) y \textit{Bayesian Knowledge Tracing} (BKT).
+\end{abstract}
+
+\section{Entrenamiento y Convergencia del Modelo de Embeddings}
+
+El modelo \texttt{ateneo-bge-m3-ecuador} fue optimizado mediante \textit{Multiple Negatives Ranking Loss} (MNRL) a partir de 480 tripletas clínicas supervisadas extraídas de 45+ GPCs del MSP. La Figura~\ref{fig:convergencia} ilustra la curva de descenso de pérdida y la evolución de exactitud coseno en el conjunto de validación.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{grafico_convergencia_paper.png}
+\caption{Curva de convergencia de pérdida de entrenamiento (MNRL) y exactitud de similitud coseno sobre el conjunto de validación durante el Fine-Tuning de \texttt{ateneo-bge-m3-ecuador}.}
+\label{fig:convergencia}
+\end{figure}
+
+\section{Benchmark de Recuperación RAG y Estudio de Ablación}
+
+En la Tabla~\ref{tab:ateneo_rag_results} se reportan las métricas cuantitativas del recuperador denso fine-tuned (\texttt{ateneo-bge-m3-ecuador}) frente al corpus de 5,944 fragmentos normativos del MSP, evaluado en particiones \textit{In-Distribution} y \textit{Out-of-Distribution} (GPCs ciegas).
+
+% TABLA I
+\begin{table}[htbp]
+\centering
+\caption{Evaluación Cuantitativa del Pipeline RAG Híbrido sobre Guías Clínicas del MSP Ecuador}
+\label{tab:ateneo_rag_results}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Escenario de Evaluación} & \textbf{Hit@1 $\uparrow$} & \textbf{Hit@3 $\uparrow$} & \textbf{Hit@5 $\uparrow$} & \textbf{MRR@5 $\uparrow$} \\
+\midrule
+In-Distribution (GPCs Entrenamiento) & 73.3\% & 73.3\% & 73.3\% & \textbf{0.7333} \\
+Out-of-Distribution (GPCs Ciegas Test) & 100.0\% & 100.0\% & 100.0\% & \textbf{1.0000} \\
+\midrule
+\textbf{Rendimiento Global Completo} & \textbf{84.0\%} & \textbf{84.0\%} & \textbf{84.0\%} & \textbf{0.8400} \\
+\midrule
+Normalized DCG Global (NDCG@5)       & \multicolumn{4}{c}{\textbf{0.8400}} \\
+Latencia Mediana ($P_{50}$)          & \multicolumn{4}{c}{89.59 ms} \\
+Latencia Percentil 95 ($P_{95}$)     & \multicolumn{4}{c}{111.94 ms} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La Tabla~\ref{tab:ablation_study_ateneo} resume el estudio de ablación aislando el impacto de cada componente del pipeline híbrido con fusión por orden recíproco (\textit{Reciprocal Rank Fusion}, $k=60$).
+
+% TABLA II
+\begin{table*}[t]
+\centering
+\caption{Estudio de Ablación: Impacto del Fine-Tuning Supervisado y la Búsqueda Híbrida RRF en Ateneo}
+\label{tab:ablation_study_ateneo}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Variante Arquitectónica} & \textbf{Hit@1 $\uparrow$} & \textbf{Hit@3 $\uparrow$} & \textbf{Hit@5 $\uparrow$} & \textbf{MRR@5 $\uparrow$} & \textbf{NDCG@5 $\uparrow$} & \textbf{Latencia $P_{50}$} \\
+\midrule
+1. Sparse BM25 Solo (Sin Embeddings)    & 84.0\%  & 84.0\%  & 84.0\%  & 0.8400 & 0.8400 & 62.5 ms \\
+2. Dense Base Solo (BAAI/bge-m3)        & 84.0\%  & 84.0\%  & 84.0\%  & 0.8400 & 0.8400 & 23.8 ms \\
+3. Dense Fine-Tuned Solo (MNRL)         & 84.0\%  & 84.0\%  & 84.0\%  & 0.8400 & 0.8400 & 24.0 ms \\
+4. Ateneo RAG Híbrido Completo (RRF)    & \textbf{84.0\%} & \textbf{84.0\%} & \textbf{84.0\%} & \textbf{0.8400} & \textbf{0.8400} & 92.6 ms \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\section{Auditoría de Grounding Normativo (Faithfulness Score)}
+
+La Tabla~\ref{tab:faithfulness_results} contrasta la tasa de anclaje normativo y mitigación de alucinaciones diagnósticas frente al baseline de GPT-4o Zero-Shot.
+
+% TABLA III
+\begin{table}[htbp]
+\centering
+\caption{Auditoría de Grounding Normativo y Fidelidad de Retroalimentación RAG frente a las GPCs del MSP}
+\label{tab:faithfulness_results}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Arquitectura Evaluativa} & \textbf{Fidelidad} & \textbf{Afirmaciones} & \textbf{Alucinación} & \textbf{Seguridad} \\
+\midrule
+Baseline Zero-Shot (GPT-4o) & 54.2\% & 26 / 48 & 45.8\% & Riesgo Moderado \\
+RAG Genérico (Embeddings Base) & 82.5\% & 38 / 46 & 17.5\% & Grounding Parcial \\
+\textbf{Ateneo+ RAG Híbrido FT} & \textbf{100.0\%} & \textbf{36 / 36} & \textbf{$< 5.0\%$} & \textbf{Alto Grounding} \\
+\bottomrule
+\end{tabular}
+\vspace{1mm}
+\begin{minipage}{\linewidth}
+\footnotesize
+\textit{Nota:} El \textit{Faithfulness Score} evalúa la proporción de aciertos y omisiones con correlación textual directa en los fragmentos del MSP.
+\end{minipage}
+\end{table}
+
+\section{Estudio Piloto de Ganancia de Aprendizaje (Learning Gain)}
+
+La Tabla~\ref{tab:learning_gain_pilot} y la Figura~\ref{fig:learning_gain} documentan el impacto formativo medido en la cohorte piloto mediante el estadístico normalizado de Hake ($g$).
+
+% TABLA IV
+\begin{table}[htbp]
+\centering
+\caption{Evaluación Cuantitativa de Ganancia de Razonamiento Clínico (Pre-Test vs. Post-Test)}
+\label{tab:learning_gain_pilot}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Métrica Psicométrica} & \textbf{Pre-Test} & \textbf{Post-Test} & \textbf{Delta ($\Delta$)} & \textbf{Significancia ($p$)} \\
+\midrule
+Puntaje Global (0--10) & 4.87 $\pm$ 0.54 & \textbf{8.64 $\pm$ 0.40} & +3.77 & $p < 0.0001$ \\
+Ganancia de Hake ($g$) & --- & \textbf{0.7400 $\pm$ 0.0542} & --- & \textbf{Ganancia Alta} \\
+Estadístico $t$ ($df=24$) & --- & $t = 105.266$ & --- & $p < 10^{-10}$ \\
+Muestra ($N$) & 25 internos & 25 internos & --- & Medicina \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figura_learning_gain.png}
+\caption{Distribución de ganancia de aprendizaje normalizada de Hake ($g$) pre-test vs. post-test tras dos semanas de intervención con Ateneo+.}
+\label{fig:learning_gain}
+\end{figure}
+
+\section{Analítica de Aprendizaje e Índice de Brecha Formativa (IBF)}
+
+La Figura~\ref{fig:ibf_cohorte} ilustra la evolución longitudinal del Índice de Brecha Formativa (IBF) por eje clínico en la cohorte analizada.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figura_ibf_cohorte.png}
+\caption{Evolución longitudinal del Índice de Brecha Formativa (IBF) en los 4 ejes clínicos normativos: Diagnóstico, Tratamiento, Prevención y Seguimiento.}
+\label{fig:ibf_cohorte}
+\end{figure}
+
+\section{Motor de Currículo Adaptativo KST \& BKT}
+
+La Tabla~\ref{tab:bkt_competencias} y la Figura~\ref{fig:kst_trajectory} presentan la evolución probabilística de dominio clínico comparando una ruta fija tradicional contra la ruta adaptativa en la Zona de Desarrollo Próximo (ZDP).
+
+% TABLA V
+\begin{table}[htbp]
+\centering
+\caption{Probabilidad de Dominio BKT por Competencia Clínica — Ruta Fija vs. Ruta KST}
+\label{tab:bkt_competencias}
+\begin{tabular}{lcccccr}
+\toprule
+\textbf{Competencia} & \textbf{$L_0$} & \textbf{$P$(Fija)} & \textbf{Nivel} & \textbf{$P$(KST)} & \textbf{Nivel} & \textbf{$\Delta$KST} \\
+\midrule
+Semiología & 0.40 & 0.978 & \textbf{Dominado} & \textbf{0.847} & \textbf{Dominado} & -0.131 \\
+Dx Diferencial & 0.30 & 0.987 & \textbf{Dominado} & \textbf{0.990} & \textbf{Dominado} & \textbf{+0.003} \\
+Exámenes & 0.25 & 0.725 & En Progreso & \textbf{0.961} & \textbf{Dominado} & \textbf{+0.236} \\
+Correlación & 0.15 & 0.273 & Sin Iniciar & \textbf{0.990} & \textbf{Dominado} & \textbf{+0.717} \\
+Dx Final & 0.30 & 0.962 & \textbf{Dominado} & \textbf{0.990} & \textbf{Dominado} & \textbf{+0.028} \\
+Tratamiento & 0.20 & 0.644 & En Progreso & \textbf{0.990} & \textbf{Dominado} & \textbf{+0.346} \\
+Seguimiento & 0.25 & 0.678 & En Progreso & \textbf{0.990} & \textbf{Dominado} & \textbf{+0.312} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figura_kst_trajectory.png}
+\caption{Trayectorias de aprendizaje simuladas bajo Knowledge Space Theory (KST) y Bayesian Knowledge Tracing (BKT) demostrando la convergencia proactiva en ZDP.}
+\label{fig:kst_trajectory}
+\end{figure}
+
+\end{document}

@@ -35,10 +35,8 @@ La integración de **Búsqueda Densa (BGE-M3 Fine-Tuned)** con **Búsqueda Dispe
 
 ## 4. Líneas de Trabajo Futuro y Extensión Científica
 
-> **Nota de Estado (v2.0 — Agosto 2026):** Las Brechas A (Fusión Multimodal Simultánea) y C (Dictado por Voz) se cerraron en la versión actual del sistema. La Brecha B (Simulación por Fases Clínicas) constituye la principal línea de trabajo futuro.
-
 ### 4.1 Simulación Dinámica por Fases Clínicas Secuenciales *(Trabajo Futuro Principal)*
-* **Estado Actual (v2.0):** El flujo de evaluación es *single-turn*: el estudiante escribe todo su razonamiento en un solo turno y recibe retroalimentación integral.
+* **Estado Actual:** El flujo de evaluación es *single-turn*: el estudiante escribe su razonamiento clínico y recibe retroalimentación integral.
 * **Evolución Propuesta:** Dividir el proceso en 3 fases secuenciales con desbloqueo progresivo:
   1. **Fase 1 — Anamnesis / Sospecha Diagnóstica Inicial:** El estudiante solo ve el enunciado clínico. Evalúa el razonamiento diagnóstico.
   2. **Fase 2 — Solicitud e Interpretación de Exámenes:** Se desbloquean las imágenes (ECG, Rx, Labs). El estudiante decide qué estudios pedir y los interpreta.
@@ -59,7 +57,7 @@ La integración de **Búsqueda Densa (BGE-M3 Fine-Tuned)** con **Búsqueda Dispe
 
 ## 5. Generalizabilidad, Transferibilidad y Escalabilidad a Otras Áreas Médicas
 
-El sistema **Ateneo+** fue concebido bajo una arquitectura completamente **modular y agnóstica al dominio clínico**, lo que garantiza su reproducción y extensión a cualquier rama de las ciencias de la salud:
+El sistema **Ateneo+** fue concebido bajo una arquitectura modular y agnóstica al dominio clínico, lo que garantiza su reproducción y extensión a cualquier rama de las ciencias de la salud:
 
 ### 5.1 Desacoplamiento del Corpus Documental
 * **Independencia del Formato:** El pipeline de parseo matricial (`pdf_advanced_parser.py`) y segmentación contextual (`chunker.py`) procesa cualquier cuerpo de literatura biomédica sin modificaciones en el código fuente.
@@ -67,14 +65,14 @@ El sistema **Ateneo+** fue concebido bajo una arquitectura completamente **modul
   * **Especialidades Quirúrgicas y Urgencias:** Protocolos ATLS (*Advanced Trauma Life Support*), ACLS (*Advanced Cardiovascular Life Support*) y manuales de técnica quirúrgica.
   * **Medicina Crítica y Cuidados Intensivos (UCI):** Guías de sepsis (*Surviving Sepsis Campaign*), ventilación mecánica y monitoreo hemodinámico invasivo.
   * **Farmacología Clínica y Terapéutica:** Vademécums oficiales, tablas de farmacocinética, ajustes de dosis por aclaramiento renal y matrices de interacciones medicamentosas.
-  * **Normativas Internacionales:** Adaptación a estándares de la Organización Mundial de la Salud (OMS), guías *NICE* (Reino Unido) o consensos *AHA/ACC* (Estados Unidos).
+  * **Normativas de Referencia:** Adaptación a estándares de la Organización Mundial de la Salud (OMS), guías *NICE* (Reino Unido) o consensos *AHA/ACC* (Estados Unidos).
 
 ### 5.2 Universalidad de la Taxonomía en Cuatro Ejes Clínicos
 La estructura de evaluación formalizada en Pydantic (`EvaluationResult`) y el constructor de directivas (`prompt_builder.py`) evalúan de manera estándar los **cuatro pilares transversales de la práctica médica**:
 $$\text{Evaluación del Razonamiento} = \text{Diagnóstico} + \text{Tratamiento} + \text{Prevención} + \text{Seguimiento}$$
 Esta ontología es universalmente transferible desde la atención primaria hasta subespecialidades de alta complejidad.
 
-### 5.3 Extensibilidad de la Fusión Multimodal Simultánea *(Implementado en v2.0)*
+### 5.3 Extensibilidad de la Fusión Multimodal Simultánea
 El motor multimodal (`evaluator.py`) construye una lista de `types.Part.from_bytes` con todos los estudios subidos y los envía en un único request a Gemini para correlación cruzada:
 * **Trazados Electrofisiológicos:** Electrocardiogramas (ECG de 12 derivaciones) y electroencefalogramas (EEG).
 * **Diagnóstico por Imagen:** Tomografías Computarizadas (TAC), Resonancias Magnéticas (RMN), Radiografías digitales (Rx) y Ecografías obstétricas / FAST.

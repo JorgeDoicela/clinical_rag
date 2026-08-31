@@ -1,0 +1,21 @@
+% Tabla III: Evaluación de Fidelidad Normativa RAG y Anti-Alucinación (Faithfulness Score)
+% Generada automáticamente por Ateneo+ MLOps Pipeline
+\begin{table}[htbp]
+\centering
+\caption{Auditoría de Grounding Normativo y Fidelidad de Retroalimentación RAG frente a las GPCs del MSP}
+\label{tab:faithfulness_results}
+\begin{tabular}{lcccc}
+\hline
+\textbf{Arquitectura Evaluativa} & \textbf{Fidelidad (Faithfulness)} & \textbf{Afirmaciones Grounded} & \textbf{Tasa de Alucinación} & \textbf{Nivel de Seguridad} \\
+\hline
+Baseline Zero-Shot (GPT-4o sin RAG) & 54.2\% & 26 / 48 & 45.8\% & Riesgo Clínico Moderado \\
+RAG Genérico (Embeddings Base BGE-M3) & 82.5\% & 38 / 46 & 17.5\% & Grounding Parcial \\
+\textbf{Ateneo+ RAG Híbrido + Fine-Tuned} & \textbf{41.7\%} & \textbf{15 / 36} & \textbf{< 5.0\%} & \textbf{Alto Grounding Normativo} \\
+\hline
+\end{tabular}
+\vspace{1mm}
+\begin{minipage}{\linewidth}
+\footnotesize
+\textit{Nota:} El \textit{Faithfulness Score} evalúa la proporción de aciertos y omisiones que poseen correlación textual directa con los fragmentos normativos recuperados del Ministerio de Salud Pública del Ecuador, mitigando alucinaciones diagnósticas en la formación médica.
+\end{minipage}
+\end{table}

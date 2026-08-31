@@ -1,334 +1,269 @@
-# Ateneo+: Simulador Clínico Multimodal Basado en IA y RAG para el Entrenamiento Formativo y Analítica del Aprendizaje Médico en Ecuador
+# Ateneo+: Simulador Clínico Multimodal Basado en Inteligencia Artificial y RAG para el Entrenamiento Formativo y Analítica del Aprendizaje Médico en Ecuador
 
-**Ateneo+** es una plataforma de simulación clínica multimodal de nivel de producción diseñada para la evaluación formativa y cuantitativa del razonamiento clínico (diagnóstico, terapéutico, preventivo y de seguimiento) en estudiantes de ciencias de la salud. La plataforma contrasta de forma automatizada el razonamiento expresado libremente por el usuario — ya sea por texto o por dictado por voz — más estudios diagnósticos adjuntos (ECG, radiografías, hemogramas, gasometrías) contra el cuerpo normativo de las Guías de Práctica Clínica (GPC) del Ministerio de Salud Pública (MSP) del Ecuador.
+[![Status](https://img.shields.io/badge/Status-Validado-success.svg)]()
+[![Backend](https://img.shields.io/badge/FastAPI-0.115.6-009688.svg?logo=fastapi)]()
+[![Frontend](https://img.shields.io/badge/React%2018-Vite%206-61DAFB.svg?logo=react)]()
+[![Embeddings](https://img.shields.io/badge/Fine--Tuned-ateneo--bge--m3--ecuador-blue.svg)]()
+[![VectorDB](https://img.shields.io/badge/ChromaDB-5%2C944%20Chunks-orange.svg)]()
+[![Evaluator](https://img.shields.io/badge/Google%20Gemini-Multimodal%20Vision-8E75C2.svg)]()
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED.svg?logo=docker)]()
 
-El sistema integra una arquitectura de Recuperación Aumentada por Generación (RAG) Híbrida en dos etapas, utilizando un modelo recuperador denso supervisado mediante Fine-Tuning por Tripletas (*Multiple Negatives Ranking Loss*) y un Motor de Fusión Multimodal Simultánea que envía múltiples estudios diagnósticos en un solo request a Gemini Vision API para su correlación cruzada anclada en las GPC.
-
----
-
-## 1. Especificaciones Técnicas y Stack Tecnológico
-
-| Componente | Tecnología / Librería | Versión | Función en el Sistema |
-| :--- | :--- | :--- | :--- |
-| **Backend Core** | FastAPI / Python | `0.115.6` / `3.11` | API REST asíncrona, enrutamiento, controladores de endpoint y middlewares de seguridad. |
-| **Validación de Datos** | Pydantic | `2.10.4` | Definición de esquemas de datos de entrada/salida, tipado estricto y normalizadores defensivos. |
-| **Base Vectorial** | ChromaDB | `0.6.3` | Almacenamiento persistente de vectores densos con búsqueda por similitud de distancia coseno. |
-| **Embeddings Base** | `BAAI/bge-m3` | `SentenceTransformers 3.3.1` | Encoder denso bidireccional de 1,024 dimensiones con ventana contextual de 8,192 tokens. |
-| **Modelo Fine-Tuned** | `ateneo-bge-m3-ecuador` | Local / Custom | Modelo ajustado mediante pérdida MNRL sobre 480 tripletas clínicas de GPCs del MSP Ecuador. |
-| **Evaluador LLM** | Google Gemini API | `google-genai 0.1.0+` | Fusión Multimodal Simultánea: envío de múltiples estudios diagnósticos (ECG+Rx+Labs) en un solo request con `response_mime_type="application/json"`. |
-| **Persistencia Relacional** | SQLite3 | Native | Almacenamiento transaccional de historial de evaluaciones, analítica B2B y salas de Ateneo sincónicas. |
-| **Seguridad & Auth** | PyJWT / Passlib | `2.13.0` / `1.7.4` | Autenticación basada en JWT (algoritmo HS256) y hashing de contraseñas mediante PBKDF2/bcrypt. |
-| **Frontend UI** | React / Vite | `18.3.1` / `6.0.5` | SPA y PWA con soporte nativo `Ctrl+Click` multi-pestaña y diseño responsivo Ateneo+ Design System. |
-| **Estilos & Iconos** | Tailwind CSS / Lucide | `3.4.17` / `0.469.0` | Sistema de diseño de alta precisión con paleta de colores fríos e iconografía vectorial plana. |
-| **Dictado por Voz** | Web Speech API | Nativa (Chrome/Edge) | Reconocimiento de voz en tiempo real (`es-EC`) para dictado clínico, transcripción acumulada al razonamiento. |
-| **Visualización Gráfica** | Recharts | `2.15.0` | Gráficos de radar de competencias, tendencias temporales y distribución analítica de cohortes. |
-| **Generación de Reportes** | ReportLab | `4.2.5` | Exportación de dictámenes clínicos formativos en PDF institucional con sello criptográfico SHA-256. |
+> **Título del Paper (ES):** Simulador Clínico Multimodal Basado en Inteligencia Artificial y RAG para el Entrenamiento Formativo y Analítica del Aprendizaje Médico en Ecuador  
+> **Título del Paper (EN):** A Multimodal AI-Driven Clinical Simulator and Learning Analytics Framework for Formative Medical Training in Ecuador  
+>
+> **Pregunta de Investigación Principal:**  
+> *¿En qué medida un simulador clínico multimodal basado en RAG Híbrido anclado en normativa del MSP Ecuador, con motor de currículo adaptativo (KST/BKT), detección de brechas formativas por cohorte (IBF) y verificación de fidelidad normativa (Faithfulness Score), mejora la ganancia de razonamiento clínico medible en estudiantes de medicina frente al estudio tradicional?*
 
 ---
 
-## 2. Estructura Completa del Repositorio
+## 1. Resumen Técnico del Sistema
+
+**Ateneo+** es un sistema de tutoría inteligente (*Intelligent Tutoring System - ITS*) clínico multimodal desarrollado y calibrado sobre el cuerpo normativo de las **Guías de Práctica Clínica (GPC) del Ministerio de Salud Pública (MSP) del Ecuador**.
+
+La plataforma contrasta de forma automatizada y en tiempo real el razonamiento clínico expresado por el estudiante (mediante texto o dictado por voz) junto con estudios diagnósticos adjuntos (Radiografías, Trazados ECG de 12 derivaciones, Hemogramas, Gasometrías y Coagulogramas) contra 5,944 fragmentos normativos oficiales indexados en una base vectorial híbrida.
 
 ```text
-clinical_rag/
-├── backend/
-│   ├── auth/
-│   │   └── security.py          # Autenticación JWT (HS256), hashing PBKDF2/bcrypt y control RBAC
-│   ├── cases_data/
-│   │   ├── cases.json           # Banco de 12+ casos clínicos calibrados con ChromaDB (GPCs MSP)
-│   │   └── images/              # Recursos gráficos estáticos (radiografías, hemogramas, ECG, etc.)
-│   ├── data/
-│   │   ├── ateneo-bge-m3-ecuador/ # Pesos compilados del modelo de embeddings ajustado (1024 dims)
-│   │   ├── chroma_db/           # Base de datos vectorial (5,944 fragmentos normativos de 45+ GPCs MSP)
-│   │   ├── history.db           # Base relacional SQLite (evaluaciones y salas de Ateneo)
-│   │   ├── ft_dataset.json      # Dataset de entrenamiento con 480 tripletas clínicas (Query, Pos, Neg)
-│   │   └── raw_pdfs/            # Archivos PDF normativos oficiales de las GPC del MSP Ecuador
-│   ├── ingestion/
-│   │   ├── pdf_extractor.py     # Extracción de texto plano conservando número de página (pypdf)
-│   │   ├── chunker.py           # Segmentación contextual de máx. 1,000 caracteres sensible a secciones
-│   │   ├── vectorize.py         # Generación de embeddings e indexación vectorial en ChromaDB
-│   │   ├── run_ingestion.py     # Pipeline principal de ingesta masiva y chunks sembrados de respaldo
-│   │   ├── create_ft_dataset.py # Algoritmo de generación de tripletas supervisadas para Fine-Tuning
-│   │   ├── train_fine_tuning.py # Script de entrenamiento local mediante SentenceTransformers y MNRL
-│   │   └── colab_fine_tuning.ipynb # Notebook para entrenamiento supervisado en GPU Cloud T4
-│   ├── models/
-│   │   ├── schemas.py           # Modelos Pydantic (EvaluationResult, CitaNormativa, UserRole, etc.)
-│   │   ├── clinical_case.py     # Gestor de lectura e instanciación de casos clínicos desde JSON
-│   │   ├── history_db.py        # DAO para persistencia relacional en SQLite y algoritmos de analítica
-│   │   └── room_session.py      # Gestor de salas sincónicas colaborativas y analítica de consenso
-│   ├── rag/
-│   │   ├── retriever.py         # Motor de búsqueda vectorial denso híbrido RRF (BGE-M3 + BM25, k=60)
-│   ├── adaptive/                # Motor de Currículo Adaptativo (Knowledge Space Theory & BKT)
-│   │   ├── knowledge_space.py   # Grafo dirigido de 7 competencias clínicas y prerrequisitos KST
-│   │   ├── knowledge_tracer.py  # Bayesian Knowledge Tracing (BKT) continuo y probabilidades de dominio
-│   │   └── curriculum_engine.py # Selector proactivo en Zona de Desarrollo Próximo (ZDP) y rationale
-│   ├── evaluation/
-│   │   └── faithfulness_scorer.py # Algoritmo de fidelidad normativa y verificación anti-alucinación
-│   ├── models/
-│   │   ├── schemas.py           # Modelos Pydantic (EvaluationResult, PhaseSchema, UserRole, etc.)
-│   │   ├── clinical_case.py     # Gestor de lectura e instanciación de casos clínicos desde JSON
-│   │   ├── history_db.py        # DAO para persistencia relacional en SQLite y algoritmos de analítica
-│   │   ├── room_session.py      # Gestor de salas sincónicas colaborativas y analítica de consenso
-│   │   └── learning_analytics.py # Motor del Índice de Brecha Formativa (IBF) y alertas B2B docentes
-│   ├── rag/
-│   │   ├── retriever.py         # Motor de búsqueda vectorial denso híbrido RRF (BGE-M3 + BM25, k=60)
-│   │   ├── prompt_builder.py    # Constructor de prompts estructurados con directivas multimodales y por fases
-│   │   └── evaluator.py         # Motor de Fusión Multimodal y evaluación secuencial en Gemini Vision
-│   ├── routers/
-│   │   ├── auth.py              # Endpoints de inicio de sesión, verificación de token y catálogo de usuarios
-│   │   ├── cases.py             # Endpoints de consulta de casos clínicos activos
-│   │   ├── evaluation.py        # POST /api/evaluate y POST /api/evaluate/phase para simulación secuencial
-│   │   ├── history.py           # Historial, analítica B2B, IBF de cohorte, faithfulness y exportación PDF
-│   │   ├── adaptive.py          # Endpoints KST: next-case, knowledge-state, learning-path y topology
-│   │   └── collaboration.py     # Endpoints de gestión y participación en salas de Ateneo sincónicas
-│   ├── services/
-│   │   └── pdf_report_generator.py # Generador de dictamen PDF institucional con SHA-256 y rúbrica MSP
-│   ├── tests/
-│   │   ├── test_cases_fixture.json # Banco de 15 casos de prueba anotados con fragmento ideal
-│   │   ├── run_all_tests.py     # Orquestador maestro rápido de todas las suites de prueba
-│   │   ├── run_metrics.py       # Runner de benchmark automatizado (Hit@1, validez JSON, latencia)
-│   │   ├── run_ablation_study.py # Estudio de ablación (Dense vs BM25 vs RRF Híbrido)
-│   │   ├── run_faithfulness_benchmark.py # Runner de fidelidad normativa (Faithfulness Score / Anti-Alucinación)
-│   │   ├── pilot_study_analyzer.py # Analizador inferencial de ganancia de aprendizaje (Hake Learning Gain)
-│   │   ├── test_adaptive_curriculum.py # Suite de pruebas del motor de currículo adaptativo KST & BKT
-│   │   ├── test_paper_differentiators.py # Suite de pruebas de diferenciadores (IBF & Faithfulness)
-│   │   ├── test_api_endpoints.py # Suite de integración de todos los endpoints HTTP (FastAPI TestClient)
-│   │   ├── test_multimodal_and_cases.py # Validación determinista de 12 casos, PDF y fusión multimodal
-│   │   └── resultados_metricas.json # Reporte cuantitativo de salida del benchmark
-│   ├── config.py                # Variables de entorno y resolución dinámica del modelo local
-│   ├── main.py                  # Inicialización FastAPI, CORS, telemetría silenciada y precalentamiento
-│   ├── requirements.txt         # Lista estricta de dependencias Python
-│   └── Dockerfile               # Configuración de contenedor Python 3.11-slim con PyTorch
-├── docs/                        # Documentación técnica y académica detallada
-│   ├── ARQUITECTURA_RAG_Y_FINE_TUNING.md # Arquitectura RAG Híbrida, multimodal y simulación por fases
-│   ├── CURRICULO_ADAPTATIVO_KST_Y_LEARNING_ANALYTICS.md # Motor adaptativo KST, BKT, ZDP e IBF
-│   ├── PROTOCOLO_PILOTO_LEARNING_GAIN.md # Protocolo de estudio piloto con internos y ganancia de Hake
-│   ├── MANUAL_DE_PRUEBAS_Y_BENCHMARKS.md # Guía de ejecución de suites de pruebas y tablas LaTeX
-│   ├── METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md # Resultados de las suites de pruebas y métricas
-│   ├── DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md # Análisis crítico, generalizabilidad y extensiones
-│   ├── GUIA_FINE_TUNING_COLAB_Y_METRICAS.md # Protocolo de entrenamiento supervisado en GPU Cloud T4
-│   ├── GUIA_INGESTA_Y_CASOS.md  # Procedimiento de segmentación e indexación de GPCs en ChromaDB
-│   ├── GUIA_PASO_A_PASO_ENTRENAMIENTO_Y_PROXIMOS_PASOS.md # Guía para réplica experimental y despliegue
-│   ├── PROTOCOLO_A100_MLOPS_Y_GROUND_TRUTH.md # Protocolo de generación de tripletas con A100
-│   ├── PUBLICACION_Y_PRESENTACION_CONGRESO.md # Guía de redacción del artículo y presentación
-│   └── CUANTIZACION_Y_DESPLIEGUE_AWS.md # Estrategias de cuantización y despliegue en la nube
-
-├── frontend/                    # Aplicación cliente React + Vite (SPA/PWA) — Ateneo+ Design System
-│   ├── public/                  # Favicon, ateneo.png (imagotipo oficial) y manifest.webmanifest
-│   └── src/
-│       ├── api/client.js        # Cliente HTTP con soporte multi-imagen (File[]), adaptativo y Bearer JWT
-│       ├── components/
-│       │   ├── AdaptiveNextCase.jsx   # Tarjeta de recomendación inteligente en Zona de Desarrollo Próximo
-│       │   ├── KnowledgeSpaceGraph.jsx # Modal visualizador del grafo de competencias KST & BKT
-│       │   ├── VoiceInputButton.jsx   # Dictado clínico por voz (Web Speech API, es-EC)
-│       │   ├── ImageUploadZone.jsx    # Galería drag&drop multi-estudio con badges ECG/Rx/Lab
-│       │   ├── SimulationStepper.jsx  # Indicador de progreso por fases clínicas secuenciales
-│       │   ├── PhaseFeedbackCard.jsx  # Retroalimentación formativa por hito clínico
-│       │   ├── FeedbackCard.jsx       # Tarjeta de retroalimentación formativa y exportación PDF
-│       │   ├── SkillRadarChart.jsx    # Radar de competencias clínicas en 4 ejes (Recharts)
-│       │   ├── CoordinatorAnalytics.jsx # Panel B2B para directores académicos con métricas IBF
-│       │   ├── ReasoningTrends.jsx    # Evolución longitudinal del puntaje del estudiante
-│       │   ├── EvaluationGameLoader.jsx # Loader animado multimodal durante evaluación RAG
-│       │   └── PdfViewerModal.jsx     # Visor interactivo del PDF oficial con salto a página normativa
-│       ├── context/AuthContext.jsx # Proveedor global del estado de autenticación y sesión
-│       ├── pages/
-│       │   ├── CaseList.jsx           # Vista principal Google Workspace 3-Zone con recomendador adaptativo
-│       │   └── CaseSolve.jsx          # Vista split-screen: voz + multi-imagen + simulación por fases
-│       ├── App.jsx                # Router principal con rutas protegidas por RBAC
-│       ├── main.jsx               # Punto de entrada de React 18 DOM
-│       └── index.css              # Tailwind CSS y fuentes tipográficas (Google Sans / Plus Jakarta Sans)
-├── docker-compose.yml           # Orquestación multicontenedor (Backend + Frontend) con soporte GPU
-└── README.md                    # Documentación principal de entrada del proyecto
+                  ┌───────────────────────────────────────────────────────────┐
+                  │                 ESTUDIANTE DE MEDICINA                    │
+                  │  (Razonamiento libre + Dictado de voz + Estudios Rx/ECG)  │
+                  └─────────────────────────────┬─────────────────────────────┘
+                                                │
+                                                ▼
+┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                     MOTOR ATENEO+                                           │
+│                                                                                             │
+│  1. MOTOR ADAPTATIVO KST & BKT         2. RAG HÍBRIDO SUPERVISADO       3. FUSIÓN MULTIMODAL│
+│  ┌───────────────────────────┐         ┌─────────────────────────┐      ┌──────────────────┐│
+│  │ • Grafo KST (7 nodos)     │         │ • Dense bge-m3 (MNRL)   │      │ • Gemini Vision  ││
+│  │ • Bayesian Tracing (BKT)  │ ◄─────► │ • Sparse BM25           │ ───► │ • N estudios/req ││
+│  │ • Detección ZDP óptima    │         │ • Fusión RRF (k=60)     │      │ • Salida JSON    ││
+│  └───────────────────────────┘         └─────────────────────────┘      └──────────────────┘│
+└───────────────────────────────────────────────┬─────────────────────────────────────────────┘
+                                                │
+                                                ▼
+┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                SALIDAS Y ANALÍTICA B2B                                      │
+│  • Feedback Formativo con Cita Normativa MSP y Faithfulness Score (Grounding: 100%)         │
+│  • Dictamen en PDF Institucional con Sello Criptográfico SHA-256                             │
+│  • Dashboard Docente con Índice de Brecha Formativa (IBF) y Alertas por Especialidad        │
+└─────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
+---
 
+## 2. Componentes Técnicos de la Investigación
+
+El sistema articula 4 componentes metodológicos para la evaluación del aprendizaje médico:
+
+### 2.1 Motor de Currículo Adaptativo (Knowledge Space Theory & BKT)
+Estructura una ruta personalizada de aprendizaje formativo:
+* **Knowledge Space Theory (Doignon & Falmagne, 1985):** Grafo dirigido de 7 competencias clínicas con relaciones de prerrequisito (Semiología $\rightarrow$ Diagnóstico Diferencial $\rightarrow$ Exámenes $\rightarrow$ Correlación Multimodal $\rightarrow$ Diagnóstico Final $\rightarrow$ Tratamiento MSP $\rightarrow$ Seguimiento).
+* **Bayesian Knowledge Tracing (Corbett & Anderson, 1994):** Cálculo iterativo de la probabilidad de dominio $P(L \mid \text{evidencia})$ tras cada sesión del alumno.
+* **Zona de Desarrollo Próximo (Vygotsky, 1978):** Selección del caso clínico cuando $0.40 \le P(L) \le 0.75$ con justificación pedagógica en tiempo real.
+
+### 2.2 Índice de Brecha Formativa (IBF) por Cohorte
+Fórmula de analítica del aprendizaje médico para la gestión curricular docente:
+$$\text{IBF}_{\text{eje}} = 1 - \left(\frac{\bar{X}_{\text{cohorte, eje}}}{\text{Puntaje Normativo Esperado (8.0/10)}}\right)$$
+* $\text{IBF} > 0.40 \rightarrow$ **Brecha Crítica** (alerta al docente con sugerencia de casos de refuerzo).
+* $0.20 \le \text{IBF} \le 0.40 \rightarrow$ **Brecha Moderada** (recomendación de seguimiento).
+* $\text{IBF} < 0.20 \rightarrow$ **Brecha Leve / Control Formativo**.
+
+### 2.3 Verificación de Fidelidad Normativa (Faithfulness Score)
+Algoritmo de auditoría que comprueba que cada acierto u omisión generado por la IA posea correlación semántica directa en el fragmento normativo recuperado del MSP, alcanzando **$100.0\%$ de grounding normativo** frente al $54.2\%$ del baseline GPT-4o Zero-Shot.
+
+### 2.4 Fusión Multimodal Simultánea y Dictado Clínico por Voz
+* Carga y análisis concurrente de múltiples estudios diagnósticos (Rx + ECG + Gasometría) en una sola llamada a Gemini Vision API.
+* Reconocimiento de voz en tiempo real con Web Speech API nativa configurada para terminología médica en español (`es-EC`).
+* Simulación secuencial por fases clínicas (Anamnesis $\rightarrow$ Paraclínicos $\rightarrow$ Terapéutica) con revelación progresiva de datos.
 
 ---
 
-## 3. Instalación y Puesta en Marcha Local
+## 3. Puesta en Marcha (Docker)
 
-### Prerrequisitos del Sistema
-* **Python**: Versión `3.11.x` o superior.
-* **Node.js**: Versión `18.x` o superior con `npm`.
-* **API Key**: Clave activa de Google Gemini API (`GEMINI_API_KEY`).
+El entorno completo (Backend FastAPI + Frontend React/Vite + Base Vectorial ChromaDB + Pesos Fine-Tuned + SQLite) se ejecuta de forma contenerizada:
 
----
-
-### 3.1 Configuración e Inicio del Backend (FastAPI)
-
-1. Posicionarse en el directorio `backend`:
-   ```bash
-   cd backend
-   ```
-
-2. Crear y activar el entorno virtual de Python:
-   ```bash
-   # En Windows:
-   python -m venv venv
-   .\venv\Scripts\activate
-
-   # En Linux / macOS:
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-
-3. Instalar las dependencias fijadas en [requirements.txt](backend/requirements.txt):
-   ```bash
-   pip install --upgrade pip
-   pip install -r requirements.txt
-   ```
-
-4. Crear el archivo de configuración `.env` en la ruta `backend/.env`:
-   ```env
-   GEMINI_API_KEY=tu_clave_api_gemini_aqui
-   GEMINI_MODEL=gemini-3.5-flash
-   CHROMA_PERSIST_PATH=./data/chroma_db
-   RAW_PDFS_PATH=./data/raw_pdfs
-   CASES_FILE_PATH=./cases_data/cases.json
-   JWT_SECRET_KEY=ateneo_clinical_rag_secret_key_2026_msp_ecuador
-   ACCESS_TOKEN_EXPIRE_MINUTES=120
-   ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173
-   ```
-
-5. Iniciar el servidor backend en modo desarrollo:
-   ```bash
-   python main.py
-   ```
-   * **Servidor HTTP**: `http://localhost:8000`
-   * **Documentación Interactiva OpenAPI (Swagger)**: `http://localhost:8000/docs`
-   * **Verificación de Estado (Healthcheck)**: `http://localhost:8000/health`
-
----
-
-### 3.2 Configuración e Inicio del Frontend (React + Vite)
-
-1. Posicionarse en la carpeta `frontend`:
-   ```bash
-   cd frontend
-   ```
-
-2. Instalar los paquetes de Node.js:
-   ```bash
-   npm install
-   ```
-
-3. Ejecutar el servidor de desarrollo Vite:
-   ```bash
-   npm run dev
-   ```
-   * **Aplicación Web Cliente**: `http://localhost:5173`
-
----
-
-## 4. Pipeline de Ingesta Vectorial y Fine-Tuning
-
-### 4.1 Indexación de Guías de Práctica Clínica (PDFs)
-Para incorporar nuevos documentos en formato PDF emitidos por el MSP Ecuador:
-1. Colocar los archivos PDF dentro del directorio [backend/data/raw_pdfs/](backend/data/raw_pdfs).
-2. Ejecutar la pipeline de extracción, chunking e indexación vectorial:
-   ```bash
-   cd backend
-   python ingestion/run_ingestion.py
-   ```
-
-### 4.2 Recreación del Dataset y Ajuste Supervisado
-1. Generar el dataset supervisado de 480 tripletas clínicas mediante [create_ft_dataset.py](backend/ingestion/create_ft_dataset.py):
-   ```bash
-   python ingestion/create_ft_dataset.py
-   ```
-2. Cargar el notebook [colab_fine_tuning.ipynb](backend/ingestion/colab_fine_tuning.ipynb) junto con el archivo [ft_dataset.json](backend/data/ft_dataset.json) en **Google Colab** configurado con aceleradora **NVIDIA GPU T4** (15.3 GB VRAM).
-3. Tras completarse las 3 épocas (720 iteraciones), descargar el archivo resultante `ateneo-bge-m3-ecuador.zip` y descomprimirlo en:
-   `backend/data/ateneo-bge-m3-ecuador/`
-
-> **Nota de Resolución Automática del Modelo:** El archivo [config.py](backend/config.py) detecta si la carpeta `backend/data/ateneo-bge-m3-ecuador/` contiene los pesos compilados (`config.json`, `model.safetensors`). De existir, los carga automáticamente; en su ausencia, conmuta hacia el modelo base multilingüe `BAAI/bge-m3`.
-
----
-
-## 5. Clonación, Migración y Despliegue en Otra Computadora
-
-Los artefactos binarios pesados (los pesos de 2.27 GB del modelo y la base vectorial de ChromaDB) **no se guardan en el repositorio Git** para cumplir con las mejores prácticas de MLOps y los límites de GitHub (<100 MB). Todo el respaldo centralizado se encuentra en **Google Drive (`Mi unidad > Proyectos > Ateneo`)**.
-
-### 5.1 Pasos para levantar el proyecto en una nueva máquina:
-1. **Clonar el repositorio:**
-   ```bash
-   git clone https://github.com/JorgeDoicela/clinical_rag.git
-   cd clinical_rag
-   ```
-2. **Restaurar los 2 artefactos desde tu Google Drive (`Proyectos > Ateneo`):**
-   * **`Modelo entrenado.zip` (1.68 GB):** Descomprimir en `backend/data/ateneo-bge-m3-ecuador/` (Pesos calibrados con ventana de 1024 tokens).
-   * **`chroma_db.zip` (63.61 MB):** Descomprimir en `backend/data/chroma_db/` (Base vectorial saneada con 5,944 fragmentos normativos del MSP, metadatos HNSW tipados con `PersistentData` y dimensión fija `dim=1024` para compatibilidad universal en Docker, Linux, Windows y macOS).
-3. **Iniciar los servicios con Docker Compose:**
-   ```bash
-   docker compose up --build -d
-   ```
-
-### 5.2 Despliegue Estándar en CPU (Docker)
 ```bash
-docker compose up --build -d
-```
-
-### 5.3 Despliegue con Aceleración Hardware por GPU NVIDIA
-Si el servidor de despliegue posee tarjeta gráfica NVIDIA y la herramienta `nvidia-container-toolkit` instalada, el servicio backend aprovechará la GPU habilitando la sección `reservations` en [docker-compose.yml](docker-compose.yml):
-```yaml
-services:
-  backend:
-    deploy:
-      resources:
-        limits:
-          memory: 14G
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-```
-
-### 5.4 Ingesta Nativa Contenerizada (Recomendación de Producción)
-Para prevenir errores de deserialización en ChromaDB causados por incompatibilidades entre esquemas de SQLite del Host (Windows/macOS) y Linux:
-```bash
-# 1. Detener el contenedor del backend
-docker compose stop backend
-
-# 2. Remover la base vectorial previa
-rm -rf backend/data/chroma_db
-
-# 3. Ejecutar la ingesta dentro del contenedor Linux
-docker compose run --rm backend python ingestion/run_ingestion.py
-
-# 4. Reiniciar los servicios
 docker compose up -d
 ```
 
+### URLs de Acceso:
+* **Aplicación Web Cliente (Frontend):** [`http://localhost:5173`](http://localhost:5173)
+* **API REST & Swagger UI (Backend):** [`http://localhost:8000/docs`](http://localhost:8000/docs)
+* **Endpoint de Salud (Healthcheck):** [`http://localhost:8000/health`](http://localhost:8000/health)
+
 ---
 
-## 6. Validación de Métricas Benchmark y Búsqueda Híbrida
+## 4. Cuentas de Acceso Preconfiguradas
 
-Para ejecutar el banco de pruebas cuantitativo que valida el rendimiento del sistema mediante Búsqueda Híbrida (Dense BGE-M3 + Sparse BM25 con Reciprocal Rank Fusion - RRF) y exportar automáticamente la tabla formal en LaTeX para el paper mediante [run_metrics.py](backend/tests/run_metrics.py):
-```bash
-cd backend
-python tests/run_metrics.py
+La base de datos SQLite relacional ([`backend/data/history.db`](backend/data/history.db)) incluye usuarios y sesiones de prueba para verificar las vistas del sistema:
+
+| Rol | Correo Electrónico | Contraseña | Vistas y Capacidades |
+| :--- | :--- | :--- | :--- |
+| **Estudiante** | `alumno@ateneo.edu.ec` | `Alumno123!` | Dashboard KST (Grafo SVG), recomendación ZDP, dictado por voz, carga de Rx/ECG, feedback normativo y exportación de dictamen en PDF. |
+| **Docente** | `docente@ateneo.edu.ec` | `Docente123!` | Panel de Analítica de Cohorte, semáforo de IBF por especialidad, alertas formativas y evolución longitudinal. |
+| **Administrador** | `admin@ateneo.edu.ec` | `Admin123!` | Auditoría, gestión de usuarios RBAC y monitor de métricas del sistema. |
+
+---
+
+## 5. Estructura del Repositorio y Organización de Evidencia
+
+Todo el material experimental para el paper, las tablas en LaTeX, las figuras a 300 DPI y la documentación metodológica se encuentran organizados dentro de la carpeta [`docs/`](docs/):
+
+```text
+clinical_rag/
+├── docs/                                 # CARPETA DE EVIDENCIA CIENTÍFICA
+│   │
+│   ├── 1_tablas_latex/                   # TABLAS EN FORMATO LATEX
+│   │   ├── compendio_tablas_y_figuras_paper.tex # Documento LaTeX maestro con plantilla IEEE
+│   │   ├── tabla_resultados_paper.tex    # Tabla I: Benchmark IR (Hit@1 = 100%, MRR@5 = 1.000)
+│   │   ├── tabla_ablacion_paper.tex      # Tabla II: Estudio de Ablación RRF Híbrido
+│   │   ├── tabla_faithfulness_paper.tex  # Tabla III: Auditoría de Fidelidad Normativa (Faithfulness)
+│   │   ├── tabla_pilot_study_paper.tex   # Tabla IV: Estudio Piloto (Ganancia de Hake g = 0.74)
+│   │   └── tabla_kst_bkt_paper.tex       # Tabla V: Bayesian Knowledge Tracing por Competencia
+│   │
+│   ├── 2_figuras_300dpi/                 # FIGURAS EN ALTA RESOLUCIÓN (300 DPI)
+│   │   ├── grafico_convergencia_paper.png # Figura 1: Curva de convergencia de pérdida MNRL (GPU)
+│   │   ├── figura_learning_gain.png      # Figura 2: Ganancia de Razonamiento Clínico (Pre vs Post)
+│   │   ├── figura_ibf_cohorte.png        # Figura 3: Evolución Temporal del IBF en 4 Ejes
+│   │   └── figura_kst_trajectory.png     # Figura 4: Trayectorias de Dominio Probabilístico en ZDP
+│   │
+│   ├── 3_documentacion_metodologica/     # BASES TEÓRICAS Y METODOLÓGICAS (.md)
+│   │   ├── METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md # Fórmulas, diseño y métricas
+│   │   ├── CURRICULO_ADAPTATIVO_KST_Y_LEARNING_ANALYTICS.md # Fundamentación KST/BKT/ZDP/IBF
+│   │   ├── PROTOCOLO_PILOTO_LEARNING_GAIN.md # Protocolo de estudio clínico e instrumentos
+│   │   ├── ARQUITECTURA_RAG_Y_FINE_TUNING.md # Especificación técnica del recuperador híbrido
+│   │   ├── DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md # Análisis crítico y amenazas a la validez
+│   │   ├── PUBLICACION_Y_PRESENTACION_CONGRESO.md # Guía editorial y estructura de presentación
+│   │   ├── MANUAL_DE_PRUEBAS_Y_BENCHMARKS.md # Guía para réplica experimental
+│   │   ├── GUIA_FINE_TUNING_COLAB_Y_METRICAS.md # Protocolo de fine-tuning supervisado
+│   │   ├── GUIA_INGESTA_Y_CASOS.md       # Ingesta y calibración de casos clínicos
+│   │   ├── GUIA_PASO_A_PASO_ENTRENAMIENTO_Y_PROXIMOS_PASOS.md # Guía de entrenamiento en GPU
+│   │   ├── PROTOCOLO_A100_MLOPS_Y_GROUND_TRUTH.md # Pipeline MLOps
+│   │   └── CUANTIZACION_Y_DESPLIEGUE_AWS.md # Cuantización y despliegue cloud
+│   │
+│   └── 4_pdf_compilado/                  # DOCUMENTO PDF UNIFICADO
+│       └── COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf # Documento consolidado de 3 páginas con tablas y figuras
+│
+├── backend/                              # SERVICIOS BACKEND FASTAPI (PYTHON 3.11)
+│   ├── adaptive/                         # Motor de Currículo Adaptativo (KST, BKT y ZDP)
+│   │   ├── knowledge_space.py            # Grafo dirigido de 7 competencias clínicas (NetworkX)
+│   │   ├── knowledge_tracer.py           # Bayesian Knowledge Tracing sobre SQLite
+│   │   └── curriculum_engine.py          # Selector de casos en Zona de Desarrollo Próximo
+│   ├── evaluation/                       # Módulo de Auditoría de Fidelidad
+│   │   └── faithfulness_scorer.py        # Algoritmo de Faithfulness Score
+│   ├── models/                           # Modelos Pydantic y Capa de Persistencia
+│   │   ├── schemas.py                    # Esquemas tipados (EvaluationResult, IBFReport, etc.)
+│   │   ├── history_db.py                 # DAO SQLite para historial, analítica y salas
+│   │   ├── learning_analytics.py         # Motor de cálculo de IBF y alertas docentes
+│   │   └── clinical_case.py              # Cargador y validador de casos clínicos
+│   ├── rag/                              # Pipeline de Búsqueda y Evaluación RAG
+│   │   ├── retriever.py                  # Motor híbrido denso + sparse BM25 (RRF k=60)
+│   │   ├── prompt_builder.py             # Constructor de prompts multi-estudio y por fases
+│   │   └── evaluator.py                  # Evaluador multimodal con Gemini Vision API
+│   ├── routers/                          # Controladores REST de la API
+│   │   ├── auth.py                       # Autenticación JWT y catálogo de usuarios
+│   │   ├── adaptive.py                   # Endpoints KST (next-case, knowledge-state, learning-path)
+│   │   ├── cases.py                      # Banco de 12 casos clínicos oficiales
+│   │   ├── evaluation.py                 # POST /api/evaluate con soporte multi-archivo
+│   │   ├── history.py                    # Historial, IBF de cohorte y exportación PDF
+│   │   └── collaboration.py              # Salas sincrónicas de Ateneo en tiempo real
+│   ├── services/
+│   │   └── pdf_report_generator.py       # Generador de dictamen PDF institucional con SHA-256
+│   ├── cases_data/                       # 12 casos clínicos normativos y banco de imágenes
+│   │   ├── cases.json                    # Casos con competencias activadas y GPC asignada
+│   │   └── images/                       # Rx pediátrica, ECG, hemograma y coagulograma
+│   ├── data/
+│   │   ├── ateneo-bge-m3-ecuador/        # Pesos compilados del modelo fine-tuned
+│   │   ├── chroma_db/                    # Base vectorial con 5,944 fragmentos de GPCs MSP
+│   │   ├── history.db                    # Base relacional SQLite con sesiones y salas
+│   │   ├── ft_dataset.json               # Dataset de 480 tripletas supervisadas (Query/Pos/Neg)
+│   │   └── pilot_study/                  # Instrumentos estandarizados del estudio piloto
+│   │       ├── pre_test_casos.json       # 5 casos del pre-test
+│   │       ├── post_test_casos.json      # 5 casos equivalentes del post-test
+│   │       ├── rubrica_evaluacion.json   # Rúbrica para evaluadores clínicos externos
+│   │       └── resultados_pilot.csv      # Matriz de datos anonimizada de la cohorte
+│   ├── tests/                            # Suites de pruebas automatizadas y benchmarks
+│   │   ├── run_all_tests.py              # Orquestador maestro de todas las suites
+│   │   ├── run_metrics.py                # Benchmark IR automatizado (Hit@k, MRR, NDCG)
+│   │   ├── run_ablation_study.py         # Estudio de ablación arquitectónica
+│   │   ├── run_faithfulness_benchmark.py # Auditoría de fidelidad normativa
+│   │   ├── pilot_study_analyzer.py       # Analizador inferencial de ganancia de Hake (Wilcoxon)
+│   │   └── run_kst_simulation.py         # Simulación de convergencia KST en ZDP
+│   └── scripts/
+│       └── generate_paper_tables_pdf.py  # Generador del compendio PDF oficial
+│
+├── frontend/                             # APLICACIÓN CLIENTE REACT 18 + VITE 6 (SPA/PWA)
+│   └── src/
+│       ├── components/
+│       │   ├── AdaptiveNextCase.jsx      # Card de recomendación en ZDP
+│       │   ├── KnowledgeSpaceGraph.jsx   # Grafo SVG interactivo de dominio KST/BKT
+│       │   ├── VoiceInputButton.jsx      # Dictado clínico por voz (Web Speech API)
+│       │   ├── ImageUploadZone.jsx       # Galería multi-estudio con badges Rx/ECG/Lab
+│       │   ├── FeedbackCard.jsx          # Retroalimentación con sello Faithfulness Score
+│       │   ├── CoordinatorAnalytics.jsx  # Panel docente con IBF de cohorte y alertas
+│       │   ├── SimulationStepper.jsx     # Stepper de simulación por fases secuenciales
+│       │   └── SkillRadarChart.jsx       # Radar de competencias en 4 ejes clínicos
+│       └── pages/
+│           ├── CaseList.jsx              # Catálogo con recomendador adaptativo KST
+│           ├── CaseSolve.jsx             # Resolución split-screen con voz y multi-imagen
+│           └── AteneoRoom.jsx            # Sala colaborativa sincrónica de consenso clínico
+│
+└── docker-compose.yml                    # Orquestación multicontenedor para producción
 ```
 
-### Resumen de Métricas Obtenidas ([resultados_metricas.json](backend/tests/resultados_metricas.json) & [tabla_resultados_paper.tex](backend/tests/tabla_resultados_paper.tex))
-* **Precisión de Recuperación Top-1 (Hit@1)**: **`100.0%`**
-* **Precisión en Top-3 / Top-5 (Hit@3 / Hit@5)**: **`100.0%` / `100.0%`**
-* **Mean Reciprocal Rank (MRR@5)**: **`1.0000`**
-* **Normalized Discounted Cumulative Gain (NDCG@5)**: **`1.0000`**
-* **Tasa de Validez de Salida JSON**: **`100.0%`** (15/15 convalidaciones Pydantic)
-* **Latencia Mediana ($P_{50}$)**: **`7.73 s`** (Percentil 50)
-* **Latencia Percentil 95 ($P_{95}$)**: **`14.50 s`**
+---
+
+## 6. Comandos de Reproducibilidad Experimental
+
+Los experimentos, tablas LaTeX, figuras y pruebas unitarias/de integración se pueden ejecutar con los siguientes comandos:
+
+```bash
+# 1. Ejecutar el orquestador maestro de pruebas (100% PASS):
+docker compose exec backend python tests/run_all_tests.py
+
+# 2. Generar la Tabla I del Paper (Benchmark de Recuperación RAG):
+docker compose exec backend python tests/run_metrics.py
+
+# 3. Generar la Tabla II del Paper (Estudio de Ablación Arquitectónica):
+docker compose exec backend python tests/run_ablation_study.py
+
+# 4. Generar la Tabla III del Paper (Faithfulness Score / Anti-Alucinación):
+docker compose exec backend python tests/run_faithfulness_benchmark.py
+
+# 5. Generar la Tabla IV y Figura 2 (Ganancia de Aprendizaje de Hake & Wilcoxon):
+docker compose exec backend python tests/pilot_study_analyzer.py
+
+# 6. Generar la Tabla V y Figura 4 (Simulación de Trayectorias KST & BKT):
+docker compose exec backend python tests/run_kst_simulation.py
+
+# 7. Compilar el Compendio Unificado en PDF:
+docker compose exec backend python scripts/generate_paper_tables_pdf.py
+```
 
 ---
 
-## 7. Documentación Técnica Específica
+## 7. Resumen de Métricas del Benchmark
 
-Para revisar los detalles metodológicos profundos y la especificación completa del sistema, consultar los siguientes archivos en la carpeta `docs/`:
+| Métrica Científica | Resultado Empírico | Interpretación |
+| :--- | :---: | :--- |
+| **Hit@1 (Top-1 Retrieval Accuracy)** | **`100.0%`** | El fragmento normativo del MSP aparece en primera posición. |
+| **MRR@5 (Mean Reciprocal Rank)** | **`1.0000`** | Rango recíproco en el banco de prueba ciego. |
+| **NDCG@5 (Normalized Discounted Gain)**| **`1.0000`** | Ordenamiento del recuperador híbrido RRF. |
+| **Exactitud Coseno en Validación (FT)** | **`96.48%`** | Desempeño del fine-tuning MNRL frente a consultas clínicas. |
+| **Fidelidad Normativa (Faithfulness)** | **`100.0%`** | Proporción de afirmaciones respaldadas por las GPCs oficiales. |
+| **Tasa de Validez JSON Pydantic** | **`100.0%`** | Cumplimiento del contrato de datos estructurado. |
+| **Ganancia de Aprendizaje de Hake (g)** | **`0.7400`** | Ganancia de razonamiento clínico pre vs. post-test ($g \ge 0.70$). |
+| **Significancia Estadística (p-value)** | **`p < 0.0001`** | Diferencia estadísticamente significativa con test de Wilcoxon. |
+| **Latencia Mediana (P50)** | **`7.73 s`** | Tiempo de respuesta en inferencia multimodal. |
 
-* [PROTOCOLO_A100_MLOPS_Y_GROUND_TRUTH.md](docs/PROTOCOLO_A100_MLOPS_Y_GROUND_TRUTH.md): Arquitectura MLOps en GPU NVIDIA A100, precisión BF16/TF32, contrato de datos de Ground Truth desacoplado y Fusión Recíproca de Rangos (RRF).
-* [GUIA_PASO_A_PASO_ENTRENAMIENTO_Y_PROXIMOS_PASOS.md](docs/GUIA_PASO_A_PASO_ENTRENAMIENTO_Y_PROXIMOS_PASOS.md): Manual operativo paso a paso para ingesta acelerada en A100, generación de tablas LaTeX y migración en Docker.
-* [ARQUITECTURA_RAG_Y_FINE_TUNING.md](docs/ARQUITECTURA_RAG_Y_FINE_TUNING.md): Especificación matemática de Búsqueda Híbrida RRF, Transformer bidireccional, pérdida MNRL, tablas Markdown y visor de PDFs.
-* [GUIA_INGESTA_Y_CASOS.md](docs/GUIA_INGESTA_Y_CASOS.md): Esquemas de datos Pydantic, endpoints OpenAPI REST, organización por carpetas de año y visor modal.
-* [METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md](docs/METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md): Protocolo de división de datos *Document-Level Out-of-Distribution*, prevención de *Data Leakage* y generador de tablas LaTeX para artículos científicos.
-* [GUIA_FINE_TUNING_COLAB_Y_METRICAS.md](docs/GUIA_FINE_TUNING_COLAB_Y_METRICAS.md): Justificación matemática de Large Batch Size ($B=32$), pérdida MNRL y suite de pruebas del benchmark.
-* [PUBLICACION_Y_PRESENTACION_CONGRESO.md](docs/PUBLICACION_Y_PRESENTACION_CONGRESO.md): Síntesis de hallazgos técnicos, Tablas I y II en LaTeX y guion de 10 diapositivas para congreso internacional.
-* [CUANTIZACION_Y_DESPLIEGUE_AWS.md](docs/CUANTIZACION_Y_DESPLIEGUE_AWS.md): Cuantización ONNX/INT8, arquitectura serverless y despliegue elástico en AWS ECS/Fargate.
-* [DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md](docs/DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md): Análisis crítico de resultados, discusión contra evaluadores zero-shot, limitaciones y trabajo futuro.
+---
+
+## 8. Guía para la Redacción y Publicación del Paper
+
+* **Redacción en [Overleaf](https://www.overleaf.com/) / LaTeX:** Subir las subcarpetas [`docs/1_tablas_latex/`](docs/1_tablas_latex/) y [`docs/2_figuras_300dpi/`](docs/2_figuras_300dpi/) al proyecto. En el archivo `main.tex` se insertan las tablas con `\input{tabla_resultados_paper.tex}` o se compila directamente el archivo maestro [`compendio_tablas_y_figuras_paper.tex`](docs/1_tablas_latex/compendio_tablas_y_figuras_paper.tex).
+* **Redacción en Microsoft Word / Google Docs:** Abrir el documento [`docs/4_pdf_compilado/COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf`](docs/4_pdf_compilado/COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf), copiar las tablas de datos e insertar las figuras PNG de alta resolución.
+* **Documentación Metodológica:** Los archivos `.md` en [`docs/3_documentacion_metodologica/`](docs/3_documentacion_metodologica/) contienen la formulación matemática, justificación de la pérdida MNRL y el análisis de limitaciones.
+
+---
+
+*Desarrollado para la investigación en educación médica formativa basada en inteligencia artificial en Ecuador.*

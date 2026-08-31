@@ -43,34 +43,37 @@ def export_paper_latex_table(resumen: dict, output_latex_path: Path):
     """
     Genera el código LaTeX formal para la Tabla I del Artículo Científico (IEEE / Springer).
     Discrimina entre rendimiento Global, In-Distribution y Out-of-Distribution.
+    Incluye Faithfulness Score como columna adicional (Diferenciador Científico 3).
     """
     ir_global = resumen["metrics_ir_global"]
     ir_in = resumen.get("metrics_ir_in_distribution", ir_global)
     ir_out = resumen.get("metrics_ir_out_of_distribution", ir_global)
     lat = resumen["latencias"]
     llm = resumen["metrics_llm"]
+    fs_avg = llm.get("faithfulness_score_promedio")
+    fs_str = f"{fs_avg:.4f}" if fs_avg is not None else "N/A"
 
     latex_code = rf"""% ==============================================================================
 % TABLA I: RESULTADOS DEL BENCHMARK EXPERIMENTAL DE ATENEO RAG (MSP ECUADOR)
 % Generada automáticamente para publicación en Revista Indexada / Congreso Médico
+% Faithfulness Score añadido (Diferenciador 3 — Anti-Alucinación Normativa)
 % ==============================================================================
 \begin{{table}}[htbp]
 \centering
-\caption{{Evaluación Cuantitativa del Pipeline RAG Híbrido sobre Guías Clínicas del MSP Ecuador}}
+\caption{{Evaluación Cuantitativa del Pipeline RAG Híbrido + Faithfulness Score sobre Guías Clínicas del MSP Ecuador}}
 \label{{tab:ateneo_rag_results}}
-\begin{{tabular}}{{lcccc}}
+\begin{{tabular}}{{lccccc}}
 \toprule
-\textbf{{Escenario de Evaluación}} & \textbf{{Hit@1 $\uparrow$}} & \textbf{{Hit@3 $\uparrow$}} & \textbf{{Hit@5 $\uparrow$}} & \textbf{{MRR@5 $\uparrow$}} \\
+\textbf{{Escenario}} & \textbf{{Hit@1 $\uparrow$}} & \textbf{{Hit@3 $\uparrow$}} & \textbf{{MRR@5 $\uparrow$}} & \textbf{{NDCG@5 $\uparrow$}} & \textbf{{Faith. $\uparrow$}} \\
 \midrule
-In-Distribution (GPCs Entrenamiento) & {ir_in['hit_1_porcentaje']:.1f}\% & {ir_in['hit_3_porcentaje']:.1f}\% & {ir_in['hit_5_porcentaje']:.1f}\% & \textbf{{{ir_in['mrr_at_5']:.4f}}} \\
-Out-of-Distribution (GPCs Ciegas Test) & {ir_out['hit_1_porcentaje']:.1f}\% & {ir_out['hit_3_porcentaje']:.1f}\% & {ir_out['hit_5_porcentaje']:.1f}\% & \textbf{{{ir_out['mrr_at_5']:.4f}}} \\
+In-Distribution (GPCs Entrenamiento) & {ir_in['hit_1_porcentaje']:.1f}\% & {ir_in['hit_3_porcentaje']:.1f}\% & \textbf{{{ir_in['mrr_at_5']:.4f}}} & {ir_in['ndcg_at_5']:.4f} & --- \\
+Out-of-Distribution (Ciego) & {ir_out['hit_1_porcentaje']:.1f}\% & {ir_out['hit_3_porcentaje']:.1f}\% & \textbf{{{ir_out['mrr_at_5']:.4f}}} & {ir_out['ndcg_at_5']:.4f} & --- \\
 \midrule
-\textbf{{Rendimiento Global Completo}} & \textbf{{{ir_global['hit_1_porcentaje']:.1f}\%}} & \textbf{{{ir_global['hit_3_porcentaje']:.1f}\%}} & \textbf{{{ir_global['hit_5_porcentaje']:.1f}\%}} & \textbf{{{ir_global['mrr_at_5']:.4f}}} \\
+\textbf{{Global (todos los casos)}} & \textbf{{{ir_global['hit_1_porcentaje']:.1f}\%}} & \textbf{{{ir_global['hit_3_porcentaje']:.1f}\%}} & \textbf{{{ir_global['mrr_at_5']:.4f}}} & \textbf{{{ir_global['ndcg_at_5']:.4f}}} & \textbf{{{fs_str}}} \\
 \midrule
-Normalized DCG Global (NDCG@5)       & \multicolumn{{4}}{{c}}{{\textbf{{{ir_global['ndcg_at_5']:.4f}}}}} \\
-Convalidez Sintáctica JSON (LLM)      & \multicolumn{{4}}{{c}}{{{llm['tasa_exito_json_porcentaje']:.1f}\% ({llm['total_evaluados']}/{llm['total_evaluados']})}} \\
-Latencia Mediana ($P_{{50}}$)          & \multicolumn{{4}}{{c}}{{{lat['latencia_p50_segundos']:.2f} segundos}} \\
-Latencia Percentil 95 ($P_{{95}}$)     & \multicolumn{{4}}{{c}}{{{lat['latencia_p95_segundos']:.2f} segundos}} \\
+Convalidez Sintáctica JSON (LLM) & \multicolumn{{5}}{{c}}{{{llm['tasa_exito_json_porcentaje']:.1f}\% ({llm['total_evaluados']}/{llm['total_evaluados']})}} \\
+Latencia Mediana ($P_{{50}}$)     & \multicolumn{{5}}{{c}}{{{lat['latencia_p50_segundos']:.2f} segundos}} \\
+Latencia Percentil 95 ($P_{{95}}$) & \multicolumn{{5}}{{c}}{{{lat['latencia_p95_segundos']:.2f} segundos}} \\
 \bottomrule
 \end{{tabular}}
 \end{{table}}
@@ -152,11 +155,13 @@ def run_evaluation_benchmark():
         # 2. Medir Evaluador LLM + Salida JSON
         json_valido = False
         score_obtenido = 0.0
+        fs_score = None
         try:
             res = evaluate_clinical_reasoning(caso_dummy, tc["respuesta_simulada"], top_chunk)
             json_valido = True
             json_validos_count += 1
             score_obtenido = res.score
+            fs_score = res.faithfulness_score
         except Exception:
             json_valido = False
 
@@ -172,6 +177,7 @@ def run_evaluation_benchmark():
             "retrieved_top_chunk_id": top_chunk.get("chunk_id"),
             "json_valido": json_valido,
             "score": score_obtenido,
+            "faithfulness_score": round(fs_score, 4) if fs_score is not None else None,
             "latencia_segundos": round(elapsed, 3)
         })
 
@@ -206,6 +212,10 @@ def run_evaluation_benchmark():
     latencia_p50 = median(sorted_latencies) if sorted_latencies else 0
     latencia_p95 = sorted_latencies[int(len(sorted_latencies) * 0.95)] if sorted_latencies else 0
 
+    # Faithfulness Score promedio (solo para casos con resultado)
+    fs_scores_validos = [d["faithfulness_score"] for d in detalles if d.get("faithfulness_score") is not None]
+    faithfulness_avg = round(sum(fs_scores_validos) / len(fs_scores_validos), 4) if fs_scores_validos else None
+
     resumen = {
         "total_casos": len(test_cases),
         "metrics_ir_global": stats_global,
@@ -213,7 +223,8 @@ def run_evaluation_benchmark():
         "metrics_ir_out_of_distribution": stats_out,
         "metrics_llm": {
             "total_evaluados": len(test_cases),
-            "tasa_exito_json_porcentaje": round((json_validos_count / len(test_cases)) * 100, 2) if test_cases else 0
+            "tasa_exito_json_porcentaje": round((json_validos_count / len(test_cases)) * 100, 2) if test_cases else 0,
+            "faithfulness_score_promedio": faithfulness_avg,
         },
         "latencias": {
             "latencia_promedio_segundos": round(mean(latencias), 2) if latencias else 0,
@@ -236,6 +247,8 @@ def run_evaluation_benchmark():
     print(f" Hit@1 Global:  {stats_global['hit_1_porcentaje']:.1f}% | MRR@5: {stats_global['mrr_at_5']:.4f} | NDCG@5: {stats_global['ndcg_at_5']:.4f}")
     print(f" Hit@1 In-Dist: {stats_in['hit_1_porcentaje']:.1f}% | Out-of-Dist (Ciego): {stats_out['hit_1_porcentaje']:.1f}%")
     print(f" Convalidez JSON: {resumen['metrics_llm']['tasa_exito_json_porcentaje']:.1f}%")
+    if faithfulness_avg is not None:
+        print(f" Faithfulness Score (Anti-Alucinación): {faithfulness_avg:.4f} ({faithfulness_avg*100:.1f}%)")
     print(f" Latencia P50:   {latencia_p50:.2f}s | Latencia P95: {latencia_p95:.2f}s")
     print(f" Reporte JSON:   {output_json}")
     print(f" Tabla I LaTeX:  {output_latex}\n", flush=True)

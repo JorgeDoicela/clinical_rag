@@ -1,0 +1,74 @@
+{
+  "descripcion": "Simulación de trayectorias BKT: Ruta Fija vs Ruta KST Adaptativa",
+  "n_sesiones": 10,
+  "competencias": [
+    "semiologia_anamnesis",
+    "diagnostico_diferencial",
+    "examenes_complementarios",
+    "correlacion_multimodal",
+    "diagnostico_final",
+    "plan_terapeutico_msp",
+    "seguimiento_prevencion"
+  ],
+  "resultados": {
+    "Ruta Fija (Control)": {
+      "mastery_curve": [
+        0.2643,
+        0.3353,
+        0.3492,
+        0.4161,
+        0.4964,
+        0.509,
+        0.5367,
+        0.5494,
+        0.6849,
+        0.7191,
+        0.7496
+      ],
+      "dominio_inicial": 0.2643,
+      "dominio_final": 0.7496,
+      "ganancia_absoluta": 0.4853,
+      "final_state": {
+        "semiologia_anamnesis": 0.9776,
+        "diagnostico_diferencial": 0.9873,
+        "examenes_complementarios": 0.725,
+        "correlacion_multimodal": 0.2729,
+        "diagnostico_final": 0.9624,
+        "plan_terapeutico_msp": 0.6437,
+        "seguimiento_prevencion": 0.6781
+      }
+    },
+    "Ruta KST Adaptativa (Ateneo+)": {
+      "mastery_curve": [
+        0.2643,
+        0.401,
+        0.4957,
+        0.6067,
+        0.7153,
+        0.818,
+        0.9177,
+        0.9229,
+        0.9578,
+        0.9633,
+        0.9653
+      ],
+      "dominio_inicial": 0.2643,
+      "dominio_final": 0.9653,
+      "ganancia_absoluta": 0.701,
+      "final_state": {
+        "semiologia_anamnesis": 0.8467,
+        "diagnostico_diferencial": 0.99,
+        "examenes_complementarios": 0.9605,
+        "correlacion_multimodal": 0.99,
+        "diagnostico_final": 0.99,
+        "plan_terapeutico_msp": 0.99,
+        "seguimiento_prevencion": 0.99
+      }
+    }
+  },
+  "comparativa": {
+    "delta_kst_vs_fija": 0.2157,
+    "ganancia_kst_porcentaje": 96.5,
+    "ganancia_fija_porcentaje": 75.0
+  }
+}

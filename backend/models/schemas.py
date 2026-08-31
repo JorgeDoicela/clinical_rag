@@ -46,6 +46,11 @@ class EvaluationResult(BaseModel):
     )
     cita_normativa: CitaNormativa = Field(..., description="Referencia explícita a la norma MSP")
     retroalimentacion_general: str = Field(..., description="Retroalimentación formativa y constructiva para el estudiante")
+    # Faithfulness Score — Diferenciador Científico 3 (Anti-Alucinación Normativa)
+    faithfulness_score: Optional[float] = Field(None, description="Proporción de afirmaciones clínicas respaldadas por el fragmento normativo recuperado")
+    total_claims: Optional[int] = Field(None, description="Total de afirmaciones clínicas evaluadas")
+    grounded_claims: Optional[int] = Field(None, description="Afirmaciones verificadas en el corpus normativo")
+    grounding_level: Optional[str] = Field(None, description="Nivel de grounding normativo: Alto / Moderado / Bajo")
 
 class EvaluationRequest(BaseModel):
     case_id: str = Field(..., description="ID del caso clínico evaluado")

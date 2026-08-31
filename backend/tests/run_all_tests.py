@@ -12,7 +12,9 @@ import sys
 import time
 from pathlib import Path
 
-sys.path.append(str(Path(__file__).resolve().parent.parent))
+# Añadir el backend al sys.path
+backend_dir = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(backend_dir))
 
 from tests.test_adaptive_curriculum import (
     test_knowledge_space_topology,
@@ -30,7 +32,7 @@ from tests.pilot_study_analyzer import calculate_learning_gains, generate_latex_
 def run_full_verification_pipeline():
     start_time = time.time()
     print("\n" + "="*80)
-    print(" EJECUTANDO ORQUESTADOR MAESTRO DE PRUEBAS AUTOMATIZADAS - ATENEO+ v2.0")
+    print(" EJECUTANDO ORQUESTADOR MAESTRO DE PRUEBAS AUTOMATIZADAS - ATENEO+")
     print("="*80)
     
     suite_results = []

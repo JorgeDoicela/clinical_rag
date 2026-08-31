@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional
 from models.schemas import ClinicalCaseSchema
 
 SYSTEM_INSTRUCTION = """Eres un evaluador médico y docente experto en razonamiento clínico para estudiantes de ciencias de la salud en Ecuador.
@@ -20,20 +20,64 @@ REGLAS DE EVALUACIÓN Y FORMATO:
 8. Escribe una 'retroalimentacion_general' sintética y constructiva (2-3 oraciones).
 9. Basa la evaluación EXCLUSIVAMENTE en el fragmento de la guía proporcionado."""
 
-def build_prompt(caso: ClinicalCaseSchema, respuesta_estudiante: str, chunk: Dict[str, Any], tiene_imagen: bool = False) -> str:
+
+def _build_multimodal_section(n_imagenes: int, mime_types: Optional[List[str]] = None) -> str:
+    """
+    Genera la sección enumerada de estudios diagnósticos para el prompt multimodal.
+    Clasifica cada estudio por tipo según su MIME type.
+    """
+    MIME_TO_LABEL = {
+        "image/jpeg": "Imagen Clínica",
+        "image/jpg":  "Imagen Clínica",
+        "image/png":  "Imagen Clínica",
+        "image/webp": "Imagen Clínica",
+        "application/pdf": "Documento Clínico (PDF)",
+    }
+    mimes = mime_types or []
+    lineas = []
+    for i in range(1, n_imagenes + 1):
+        mime = mimes[i - 1] if i - 1 < len(mimes) else "image/jpeg"
+        label = MIME_TO_LABEL.get(mime, "Estudio Diagnóstico")
+        lineas.append(f"  [{i}] {label}")
+    return "\n".join(lineas)
+
+
+def build_prompt(
+    caso: ClinicalCaseSchema,
+    respuesta_estudiante: str,
+    chunk: Dict[str, Any],
+    tiene_imagen: bool = False,
+    n_imagenes: int = 0,
+    mime_types: Optional[List[str]] = None,
+) -> str:
     """
     Construye el prompt completo para ser procesado por el modelo Gemini.
-    Si tiene_imagen es True, agrega instrucciones para analizar la imagen clínica adjunta.
+    Soporta análisis multimodal para múltiples estudios adjuntos.
     """
+    n = n_imagenes if n_imagenes > 0 else (1 if tiene_imagen else 0)
     instruccion_imagen = ""
-    if tiene_imagen:
+
+    if n > 1:
+        estudios_str = _build_multimodal_section(n, mime_types)
+        instruccion_imagen = f"""
+
+ESTUDIOS DIAGNÓSTICOS DISPONIBLES ({n} estudios adjuntos en este caso):
+{estudios_str}
+
+INSTRUCCIÓN DE CORRELACIÓN MULTIMODAL (Obligatoria):
+Evalúa si el estudiante realizó una correlación diagnóstica coherente entre los hallazgos de los {n} estudios adjuntos y los criterios de la GPC del MSP Ecuador.
+- Verifica que el estudiante integró los hallazgos de TODOS los estudios de forma conjunta, no de forma aislada.
+- Si el estudiante omitió correlacionar algún estudio con el cuadro clínico, inclúyelo en 'omisiones' y en 'competencias_deficientes' bajo el eje "diagnóstico".
+- Menciona explícitamente los estudios adjuntos y su relevancia en la 'retroalimentacion_general'."""
+
+    elif n == 1:
         instruccion_imagen = """
 
 IMAGEN CLÍNICA ADJUNTA:
-El estudiante ha proporcionado una imagen clínica (puede ser un hemograma, radiografía, foto de lesión, ECG u otro estudio).
+El estudiante ha proporcionado una imagen clínica (puede ser un hemograma, radiografía, fotografía de lesión, ECG u otro estudio).
 Analiza la imagen e intégrala en tu evaluación:
 - Verifica si la interpretación que hace el estudiante de la imagen es correcta según la GPC.
-- Si la imagen aporta evidencia adicional (valores anormales, hallazgos clínicos), inclúyla en los 'aciertos' u 'omisiones' según corresponda.
+- Si la imagen aporta evidencia adicional (valores anormales, hallazgos clínicos), inclúyela en los 'aciertos' u 'omisiones' según corresponda.
 - Menciona la imagen explícitamente en la 'retroalimentacion_general'."""
 
     return f"""CASO CLÍNICO:
@@ -56,19 +100,20 @@ Texto Normativo Oficial:
 Evalúa el razonamiento clínico del estudiante comparándolo directamente contra la norma oficial del MSP proporcionada.
 """
 
+
 def build_phase_prompt(
     caso: ClinicalCaseSchema,
     fase_numero: int,
     respuesta_estudiante: str,
     chunk: Dict[str, Any],
     historial_previo: str = "",
-    tiene_imagen: bool = False
+    tiene_imagen: bool = False,
+    n_imagenes: int = 0,
+    mime_types: Optional[List[str]] = None,
 ) -> str:
     """
-    Construye un prompt enfocado específicamente en el hito clínico de la fase actual:
-    - Fase 1: Anamnesis, factores de riesgo y sospecha diagnóstica preliminar.
-    - Fase 2: Interpretación multimodal de paraclínicos (ECG, radiografías, analítica).
-    - Fase 3: Prescripción farmacológica estricta según GPC, criterios de severidad y seguimiento.
+    Construye un prompt enfocado específicamente en el hito clínico de la fase actual,
+    con soporte para múltiples estudios diagnósticos.
     """
     fase_enfoque = {
         1: "FASE 1: ANAMNESIS Y SOSPECHA DIAGNÓSTICA PRELIMINAR. Evalúa si el estudiante identificó correctamente los signos de alarma, factores de riesgo y la hipótesis diagnóstica inicial. No penalices por no dar esquemas terapéuticos aún.",
@@ -78,9 +123,18 @@ def build_phase_prompt(
 
     contexto_historial = f"\nHISTORIAL DE FASES PREVIAS DEL ESTUDIANTE:\n{historial_previo}\n" if historial_previo else ""
     
+    n = n_imagenes if n_imagenes > 0 else (1 if tiene_imagen else 0)
     instruccion_imagen = ""
-    if tiene_imagen:
-        instruccion_imagen = "\nESTUDIOS DIAGNÓSTICOS DISPONIBLES EN ESTA FASE: Evalúa la interpretación de las imágenes o trazados adjuntos frente a los hallazgos patológicos normados en la GPC."
+    if n > 1:
+        estudios_str = _build_multimodal_section(n, mime_types)
+        instruccion_imagen = (
+            f"\nESTUDIOS DIAGNÓSTICOS EN ESTA FASE ({n} estudios adjuntos):\n"
+            + estudios_str
+            + "\nEvalúa la interpretación INTEGRADA de TODOS los estudios frente a los hallazgos normados en la GPC. "
+              "Penaliza la falta de correlación multimodal como brecha en el eje 'diagnóstico'."
+        )
+    elif n == 1:
+        instruccion_imagen = "\nESTUDIO DIAGNÓSTICO ADJUNTO EN ESTA FASE: Evalúa la interpretación del estudio frente a los hallazgos patológicos normados en la GPC."
 
     return f"""SIMULACIÓN CLÍNICA POR FASES SECUENCIALES:
 Caso Clínico: {caso.titulo}
@@ -99,4 +153,3 @@ Texto Oficial: "{chunk.get('texto', '')}"
 {instruccion_imagen}
 Evalúa el desempeño específico en esta fase ({fase_enfoque}) y retorna la retroalimentación formativa en formato JSON estricto.
 """
-

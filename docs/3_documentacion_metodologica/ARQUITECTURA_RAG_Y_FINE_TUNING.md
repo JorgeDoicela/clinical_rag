@@ -133,3 +133,55 @@ Para superar las limitaciones del modelo estático de pregunta y respuesta únic
   * `SimulationStepper.jsx`: Componente de navegación de pasos con estados visuales (Activo, Completado con score, Bloqueado).
   * `PhaseFeedbackCard.jsx`: Panel de retroalimentación inmediata post-fase con cita textual de la GPC y botón de avance.
   * Al culminar la Fase 3, `CaseSolve.jsx` consolida los resultados de los tres hitos en un único `EvaluationResult` maestro, alimentando el `SkillRadarChart` y habilitando la descarga del dictamen PDF oficial.
+
+---
+
+## 7. Motor de Currículo Adaptativo (KST + BKT + ZDP)
+
+Para la transición del sistema de plataforma *reactiva* (el estudiante elige casos al azar) a *proactiva* (la IA selecciona el camino óptimo de aprendizaje), **Ateneo+** incorpora un **Intelligent Tutoring System (ITS)** basado en tres pilares teóricos.
+
+### 7.1 Componentes de Implementación (`backend/adaptive/`)
+
+* **[`knowledge_space.py`](../backend/adaptive/knowledge_space.py):** Define el grafo acíclico dirigido $G = (V, E)$ de 7 competencias clínicas y sus prerrequisitos. Implementado con `networkx.DiGraph`. Garantiza que la topología sea un DAG válido (sin ciclos).
+* **[`knowledge_tracer.py`](../backend/adaptive/knowledge_tracer.py):** Implementa el Bayesian Knowledge Tracing (BKT, Corbett & Anderson, 1994). Recorre el historial SQLite del estudiante en orden cronológico y aplica la regla de Bayes para actualizar $P(L_t^{(c)})$ por cada competencia $c$.
+* **[`curriculum_engine.py`](../backend/adaptive/curriculum_engine.py):** Detecta la Zona de Desarrollo Próximo (ZDP, Vygotsky 1978): $\text{ZDP} = \{c \in V \mid 0.40 \le P(L^{(c)}) \le 0.75 \land \text{prereqs dominados}\}$. Selecciona el caso del catálogo que maximiza la cobertura de nodos ZDP y genera una justificación pedagógica en lenguaje natural.
+
+### 7.2 Endpoints REST del Subsistema Adaptativo (`routers/adaptive.py`)
+
+| Endpoint | Método | Descripción |
+| :--- | :---: | :--- |
+| `/api/adaptive/next-case` | GET | Caso óptimo recomendado con justificación ZDP y nivel de dominio actual. |
+| `/api/adaptive/knowledge-state` | GET | Vector completo de dominio $P(L^{(c)})$ por competencia clínica del estudiante. |
+| `/api/adaptive/learning-path` | GET | Trayectoria de aprendizaje: competencias dominadas, en progreso y en ZDP. |
+| `/api/adaptive/topology` | GET | Topología del grafo KST (nodos, aristas, DAG verificado) para el frontend. |
+
+### 7.3 Componentes de Interfaz (`frontend/src/components/`)
+
+* **[`AdaptiveNextCase.jsx`](../frontend/src/components/AdaptiveNextCase.jsx):** Tarjeta de recomendación inteligente en la vista de catálogo. Muestra la competencia objetivo ZDP, el nivel de dominio actual y la justificación pedagógica. Botón CTA navega directamente al caso.
+* **[`KnowledgeSpaceGraph.jsx`](../frontend/src/components/KnowledgeSpaceGraph.jsx):** Modal interactivo con visualización de los 7 nodos KST, badges de estado (Dominado / ZDP / Inicial) y barras de porcentaje de dominio.
+
+---
+
+## 8. Analítica Institucional, Salas Colaborativas y RBAC
+
+### 8.1 Sistema de Roles y Control de Acceso (RBAC)
+
+El sistema define tres roles mutuamente excluyentes (`backend/models/schemas.py: UserRole`):
+* **Alumno:** Acceso de lectura y resolución de casos. Sin acceso a analítica de cohorte.
+* **Docente:** Panel de analítica B2B con IBF, tendencias y generación de reportes de grupo.
+* **Administrador:** Catálogo completo de usuarios, rotación de claves y configuración del sistema.
+
+La autenticación se implementa mediante JWT Bearer (HS256, `python-jose`). El middleware `get_current_user` en `auth/security.py` valida la firma y el rol en cada endpoint protegido.
+
+### 8.2 Salas de Ateneo Sincrónicas (`routers/collaboration.py`)
+
+Las salas de discusión colaborativa permiten a múltiples estudiantes resolver el mismo caso clínico simultáneamente. El motor de consenso agrega las respuestas individuales y genera retroalimentación grupal comparativa con el fragmento normativo del MSP. Cada sala posee un código de acceso único de 6 caracteres (alfanumérico), persistencia en SQLite y estado de sesión gestionado por `models/room_session.py`.
+
+### 8.3 Índice de Brecha Formativa Institucional (IBF) y Alertas Docentes
+
+El motor IBF (`models/learning_analytics.py`) calcula la distancia entre el rendimiento promedio de una cohorte y el estándar normativo MSP (8.0/10) en 4 ejes clínicos:
+
+$$\text{IBF}_e = \max\left(0, 1 - \frac{\overline{\text{Score}}_{\text{cohorte}, e}}{8.0}\right)$$
+
+Cuando $\text{IBF} > 0.40$, el sistema genera automáticamente una alerta de intervención curricular prioritaria para el coordinador académico visible en `CoordinatorAnalytics.jsx`.
+

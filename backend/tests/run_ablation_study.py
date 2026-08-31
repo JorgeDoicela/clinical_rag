@@ -169,8 +169,9 @@ def run_ablation_benchmark():
     with open(output_json, "w", encoding="utf-8") as f:
         json.dump({"total_casos": len(test_cases), "ablation_results": results}, f, indent=2, ensure_ascii=False)
 
-    # Guardar Tabla II en LaTeX
-    output_latex = Path(__file__).resolve().parent / "tabla_ablacion_paper.tex"
+    # Guardar Tabla II en LaTeX — directorio /docs/ (igual que las demás tablas del paper)
+    output_latex = Path(__file__).resolve().parent.parent.parent / "docs" / "tabla_ablacion_paper.tex"
+    output_latex.parent.mkdir(parents=True, exist_ok=True)
     export_ablation_latex_table(results, output_latex)
 
     print("\n================================================================")
