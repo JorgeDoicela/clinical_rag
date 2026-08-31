@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { fetchCaseById, evaluateResponse, API_URL } from '../api/client';
 import { 
   ArrowLeft, 
@@ -72,12 +72,12 @@ export default function CaseSolve() {
         <AlertCircle className="w-8 h-8 text-rose-600 mx-auto" />
         <h3 className="text-lg font-medium text-[#1f1f1f]">No se pudo cargar el caso clínico</h3>
         <p className="text-sm text-[#444746]">{error}</p>
-        <button
-          onClick={() => navigate('/')}
-          className="px-6 py-2.5 bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 text-white rounded-full text-xs font-medium cursor-pointer"
+        <Link
+          to="/"
+          className="px-6 py-2.5 bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 text-white rounded-full text-xs font-medium cursor-pointer inline-block"
         >
           Volver al Catálogo
-        </button>
+        </Link>
       </div>
     );
   }
@@ -93,13 +93,13 @@ export default function CaseSolve() {
 
       {/* Barra Superior de Retorno y Metadatos */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80">
-        <button
-          onClick={() => navigate('/')}
+        <Link
+          to="/"
           className="inline-flex items-center gap-2 text-xs font-medium text-[#444746] hover:text-[#1f1f1f] transition-colors cursor-pointer group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform text-[#0b57d0]" />
           <span>Volver al Catálogo de Casos</span>
-        </button>
+        </Link>
 
         <div className="flex items-center gap-3">
           <span className="px-3 py-1 rounded-full bg-white text-[#1f1f1f] text-xs font-medium shadow-xs">

@@ -18,9 +18,10 @@ El sistema integra una arquitectura de Recuperación Aumentada por Generación (
 | **Evaluador LLM** | Google Gemini API | `google-genai 0.1.0+` | Invocación multimodal autorregresiva (`gemini-3.5-flash` / `gemini-2.5-flash`) con `response_mime_type="application/json"`. |
 | **Persistencia Relacional** | SQLite3 | Native | Almacenamiento transaccional de historial de evaluaciones, analítica B2B y salas de Ateneo sincrónicas. |
 | **Seguridad & Auth** | PyJWT / Passlib | `2.13.0` / `1.7.4` | Autenticación basada en JWT (algoritmo HS256) y hashing de contraseñas mediante PBKDF2/bcrypt. |
-| **Frontend UI** | React / Vite | `18.3.1` / `6.0.5` | Single Page Application (SPA) y Progressive Web App (PWA) con React Router DOM v6. |
+| **Frontend UI** | React / Vite | `18.3.1` / `6.0.5` | Single Page Application (SPA) y Progressive Web App (PWA) con React Router DOM v6 y soporte nativo `Ctrl+Click`. |
 | **Estilos & Iconos** | Tailwind CSS / Lucide | `3.4.17` / `0.469.0` | Sistema de diseño de alta precisión con paleta de colores fríos e iconografía vectorial plana. |
 | **Visualización Gráfica** | Recharts | `2.15.0` | Gráficos de radar de competencias, tendencias temporales y distribución analítica de cohortes. |
+| **Generación de Reportes** | ReportLab | `4.2.5` | Exportación de dictámenes clínicos formativos en PDF institucional con sello criptográfico SHA-256. |
 
 ---
 

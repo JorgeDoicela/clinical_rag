@@ -115,18 +115,13 @@ export default function FeedbackCard({ result, studentAnswer, onReset }) {
   const handleDownloadPdf = async () => {
     setDownloadingPdf(true);
     try {
-      const response = await client.post('/history/export-pdf', {
-        case_id: result.case_id || 'caso_evaluado',
-        case_title: result.case_title || 'Caso Clínico MSP',
-        guia_asociada: result.cita_normativa?.guia || 'Norma Oficial MSP',
-        score: score,
-        score_max: score_max,
-        aciertos: aciertos,
-        omisiones: omisiones,
-        retroalimentacion: retroalimentacion_general,
-        fragmento_gpc: cita_normativa?.texto_relevante || '',
-        estudiante_nombre: user?.nombre || 'Estudiante',
-        docente_nombre: 'Dr. Carlos Andrade (Tutor MSP)'
+      const response = await client.post('/evaluate/export-pdf', {
+        case_id: result.case_id || 'case_dengue_01',
+        case_title: result.case_title || 'Caso Clínico Formativo MSP',
+        student_name: user?.nombre || 'Estudiante de Medicina',
+        guia_asociada: result.cita_normativa?.guia || 'Norma Oficial MSP Ecuador',
+        student_answer: studentAnswer || '',
+        eval_result: result
       }, {
         responseType: 'blob'
       });

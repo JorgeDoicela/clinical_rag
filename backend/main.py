@@ -1,7 +1,10 @@
+import os
+os.environ["ANONYMIZED_TELEMETRY"] = "False"
+os.environ["CHROMA_TELEMETRY"] = "False"
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-import os
 
 from routers.cases import router as cases_router
 from routers.evaluation import router as evaluation_router

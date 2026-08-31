@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Award, BarChart3, Database, FileText, CheckCircle2, Zap, Layers, Activity, Copy, Check, Sparkles, ArrowLeft } from 'lucide-react';
 import client from '../api/client';
 
@@ -37,12 +37,12 @@ export default function ScientificBenchmarkView() {
       <div className="bg-white rounded-[28px] p-8 shadow-xs border-0 max-w-lg mx-auto text-center space-y-4">
         <p className="font-medium text-rose-700">Error en el Benchmark Científico</p>
         <p className="text-xs text-[#444746]">{error || "Sin datos de benchmark disponibles."}</p>
-        <button
-          onClick={() => navigate('/')}
-          className="px-6 py-2.5 bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 text-white rounded-full text-xs font-medium cursor-pointer"
+        <Link
+          to="/"
+          className="px-6 py-2.5 bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 text-white rounded-full text-xs font-medium cursor-pointer inline-block"
         >
           Volver al Catálogo
-        </button>
+        </Link>
       </div>
     );
   }
@@ -92,13 +92,13 @@ Ateneo RAG Híbrido & ${ir.hit_1_porcentaje ?? 100}\\% & ${ir.hit_3_porcentaje ?
       
       {/* Barra Superior de Retorno */}
       <div className="flex items-center justify-between pb-2 border-b border-slate-200/80">
-        <button
-          onClick={() => navigate('/')}
+        <Link
+          to="/"
           className="inline-flex items-center gap-2 text-xs font-medium text-[#444746] hover:text-[#1f1f1f] transition-colors cursor-pointer group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform text-[#0b57d0]" />
           <span>Volver al Catálogo de Casos</span>
-        </button>
+        </Link>
       </div>
 
       {/* Encabezado Científico Material 3 */}

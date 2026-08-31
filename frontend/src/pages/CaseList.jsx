@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { fetchCases, API_URL, getAuthHeaders } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { 
@@ -171,19 +171,15 @@ export default function CaseList() {
       <aside className="lg:col-span-3 space-y-6">
         
         {/* Botón Principal CTA: + Iniciar Simulación (Estilo Botón Redactar) */}
-        <button
-          onClick={() => {
-            if (recommendedCase) {
-              navigate(`/case/${recommendedCase.id}`);
-            }
-          }}
+        <Link
+          to={recommendedCase ? `/case/${recommendedCase.id}` : '#'}
           className="w-full py-4 px-6 bg-white hover:bg-slate-50 text-[#1f1f1f] rounded-[20px] shadow-sm hover:shadow transition-all flex items-center gap-3.5 border-0 font-medium text-sm cursor-pointer group"
         >
           <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
             <Plus className="w-5 h-5 stroke-[2.5]" />
           </div>
           <span className="text-[15px] font-medium">Nueva Simulación</span>
-        </button>
+        </Link>
 
         {/* Menú de Navegación Principal con Árbol Jerárquico */}
         <div className="space-y-1">
@@ -409,13 +405,13 @@ export default function CaseList() {
                   </p>
                 </div>
 
-                <button
-                  onClick={() => navigate(`/case/${recommendedCase.id}`)}
+                <Link
+                  to={`/case/${recommendedCase.id}`}
                   className="py-2.5 px-6 bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 hover:from-cyan-700 hover:via-blue-700 hover:to-indigo-700 text-white font-medium text-xs rounded-full transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer shrink-0"
                 >
                   <span>Iniciar Simulación</span>
                   <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+                </Link>
               </div>
             )}
 
@@ -443,10 +439,10 @@ export default function CaseList() {
                 {filteredCases.map(item => {
                   const meta = GPC_LABELS[item.guia_asociada] || { label: `GPC ${item.guia_asociada}`, time: '10-15 min' };
                   return (
-                    <div
+                    <Link
                       key={item.id}
-                      onClick={() => navigate(`/case/${item.id}`)}
-                      className="bg-[#f0f4f9] hover:bg-[#e8f0fe] rounded-[20px] p-5 cursor-pointer flex flex-col justify-between group transition-all"
+                      to={`/case/${item.id}`}
+                      className="bg-[#f0f4f9] hover:bg-[#e8f0fe] rounded-[20px] p-5 cursor-pointer flex flex-col justify-between group transition-all block text-left"
                     >
                       <div className="space-y-2.5">
                         <div className="flex items-center justify-between gap-2">
@@ -471,7 +467,7 @@ export default function CaseList() {
                         <span>Comenzar evaluación</span>
                         <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                       </div>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>
@@ -481,10 +477,10 @@ export default function CaseList() {
                 {filteredCases.map(item => {
                   const meta = GPC_LABELS[item.guia_asociada] || { label: `GPC ${item.guia_asociada}`, time: '10-15 min' };
                   return (
-                    <div
+                    <Link
                       key={item.id}
-                      onClick={() => navigate(`/case/${item.id}`)}
-                      className="py-3.5 px-3 hover:bg-[#f0f4f9] rounded-xl cursor-pointer flex items-center justify-between gap-4 transition-colors group"
+                      to={`/case/${item.id}`}
+                      className="py-3.5 px-3 hover:bg-[#f0f4f9] rounded-xl cursor-pointer flex items-center justify-between gap-4 transition-colors group block text-left"
                     >
                       <div className="flex items-center gap-3.5 min-w-0 flex-1">
                         <div className="w-2 h-2 rounded-full bg-cyan-600 shrink-0"></div>
@@ -507,7 +503,7 @@ export default function CaseList() {
                         <span className="text-xs text-[#747775]">{meta.time}</span>
                         <ArrowRight className="w-4 h-4 text-[#0b57d0] group-hover:translate-x-1 transition-transform" />
                       </div>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>
