@@ -61,14 +61,14 @@
   },
   {
     "chunk_id": "ehirn_chunk_001",
-    "guia_fuente": "ehirn",
-    "pagina": 8,
-    "seccion": "Profilaxis y Tratamiento de la Enfermedad Hemorrágica del Recién Nacido",
+    "guia_fuente": "gpc_ehirn2019",
+    "pagina": 28,
+    "seccion": "Criterios Diagnósticos, Clasificación de Sarnat e Hipotermia Terapéutica en Encefalopatía Hipóxico-Isquémica Neonatal",
     "ano_publicacion": 2019,
-    "cie10_codigo": "P53",
-    "cie10_descripcion": "Enfermedad hemorrágica del recién nacido",
+    "cie10_codigo": "P91.6",
+    "cie10_descripcion": "Encefalopatía hipóxica isquémica del recién nacido",
     "especialidad": "Pediatría y Neonatología",
-    "grupo_etario": "Neonatos",
-    "texto": "Enfermedad Hemorrágica del Recién Nacido (EHIRN) por déficit de vitamina K. Profilaxis universal de primera línea al nacimiento: Fitomenadiona (Vitamina K1) 1 mg por vía intramuscular dosis única en recién nacidos a término (> 1500g) y 0.5 mg IM en prematuros (<= 1500g) en las primeras 2 a 4 horas de vida. Tratamiento del sangrado activo: Vitamina K1 1 mg IV lento en infusión, más infusión de Plasma Fresco Congelado (10-15 ml/kg) si existe sangrado mayor o alteración grave del tiempo de protrombina (TP)."
+    "grupo_etario": "Neonatos a Término",
+    "texto": "Encefalopatía Hipóxico-Isquémica del Recién Nacido (EHI-RN): Criterios de asfixia perinatal mayor: APGAR <= 3 a los 5 minutos, necesidad de reanimación avanzada con intubación endotraqueal > 10 minutos, o gasometría de cordón con pH < 7.00 o déficit de base >= 16 mmol/L. Clasificación de Sarnat: Estadio I (Leve: hiperalerta, tono normal), Estadio II (Moderada: letargia, hipotonía, succión débil, convulsiones clínicas), Estadio III (Grave: coma, flacidez, reflejos ausentes). Tratamiento de neuroprotección de primera línea: Hipotermia Terapéutica corporal total o selectiva de cráneo (33.5 °C a 34.5 °C durante 72 horas) iniciada en las primeras 6 horas de vida en neonatos >= 36 semanas con EHI moderada a grave. Manejo de soporte: ventilación mecánica protectora, control estricto de glucemia/electrolitos y tratamiento de crisis convulsivas con Fenobarbital (20 mg/kg IV en dosis de ataque)."
   }
 ]

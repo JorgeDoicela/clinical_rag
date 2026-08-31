@@ -1,5 +1,5 @@
 import React from 'react';
-import { Target, Activity } from 'lucide-react';
+import { Target, Activity, Sparkles } from 'lucide-react';
 
 export default function SkillRadarChart({ competenciasPorEje = [] }) {
   // Configuración de los 4 vértices del radar en un viewBox de 300x300 (centro 150,150, radio 95)
@@ -57,21 +57,21 @@ export default function SkillRadarChart({ competenciasPorEje = [] }) {
   const polygonPath = dataPoints.map(p => `${p.x},${p.y}`).join(' ');
 
   return (
-    <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4 relative overflow-hidden">
+    <div className="space-y-6">
       <div className="flex items-center justify-between border-b border-slate-100 pb-3">
         <div className="flex items-center gap-2">
-          <Target className="w-5 h-5 text-sky-600 shrink-0" />
+          <Target className="w-5 h-5 text-[#0b57d0] shrink-0" />
           <div>
-            <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
-              Radar de Habilidades Clínicas (4 Ejes GPC)
+            <h3 className="text-base font-normal text-[#1f1f1f] font-heading">
+              Radar de Competencias Clínicas (4 Ejes GPC)
             </h3>
-            <p className="text-[11px] text-slate-500">
-              Evaluación de consistencia según la GPC oficial MSP
+            <p className="text-xs text-[#747775]">
+              Consistencia frente a la norma oficial del MSP Ecuador
             </p>
           </div>
         </div>
-        <span className="text-[10px] font-mono font-bold uppercase tracking-wider bg-sky-50 text-sky-700 px-3 py-1 rounded-full border border-sky-200">
-          Analytics 4 Ejes
+        <span className="text-xs font-medium bg-sky-50 text-[#0b57d0] px-3 py-1 rounded-full">
+          Analítica 4 Ejes
         </span>
       </div>
 
@@ -81,8 +81,8 @@ export default function SkillRadarChart({ competenciasPorEje = [] }) {
           <svg viewBox="0 0 300 300" className="w-full h-full">
             <defs>
               <linearGradient id="radarGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#0284c7" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#0284c7" stopOpacity="0.08" />
+                <stop offset="0%" stopColor="#0b57d0" stopOpacity="0.25" />
+                <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.10" />
               </linearGradient>
             </defs>
 
@@ -119,7 +119,7 @@ export default function SkillRadarChart({ competenciasPorEje = [] }) {
             <polygon
               points={polygonPath}
               fill="url(#radarGradient)"
-              stroke="#0284c7"
+              stroke="#0b57d0"
               strokeWidth="2.5"
               className="transition-all duration-700 ease-out"
             />
@@ -131,7 +131,7 @@ export default function SkillRadarChart({ competenciasPorEje = [] }) {
                   cx={p.x}
                   cy={p.y}
                   r="5"
-                  fill="#0284c7"
+                  fill="#0b57d0"
                   stroke="#ffffff"
                   strokeWidth="2"
                 />
@@ -151,7 +151,7 @@ export default function SkillRadarChart({ competenciasPorEje = [] }) {
                   x={lx}
                   y={ly}
                   textAnchor={axis.align}
-                  className="fill-slate-700 text-[11px] font-bold tracking-tight"
+                  className="fill-[#1f1f1f] text-[11px] font-medium"
                 >
                   {axis.label} ({score}%)
                 </text>
@@ -162,9 +162,9 @@ export default function SkillRadarChart({ competenciasPorEje = [] }) {
 
         {/* Legend & Breakdown */}
         <div className="w-full md:w-1/2 space-y-3">
-          <div className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-            <Activity className="w-4 h-4 text-sky-600" />
-            <span>Nivel de Dominio por Competencia</span>
+          <div className="text-xs font-medium text-[#444746] flex items-center gap-1.5">
+            <Activity className="w-4 h-4 text-[#0b57d0]" />
+            <span>Nivel de Dominio por Eje Clínico</span>
           </div>
 
           <div className="space-y-2.5">
@@ -176,37 +176,37 @@ export default function SkillRadarChart({ competenciasPorEje = [] }) {
                 return eKey.includes(aKey);
               });
 
-              let barColor = 'bg-sky-600';
+              let barColor = 'bg-[#0b57d0]';
               let badgeText = matched?.estadoLabel || 'Alto';
-              let badgeBg = 'bg-sky-50 text-sky-800 border-sky-200';
+              let badgeBg = 'bg-sky-50 text-[#0b57d0]';
 
               if (score === 0) {
                 barColor = 'bg-slate-400';
                 badgeText = matched?.estadoLabel || 'No Demostrado';
-                badgeBg = 'bg-slate-100 text-slate-700 border-slate-200';
+                badgeBg = 'bg-slate-100 text-[#444746]';
               } else if (score < 50) {
                 barColor = 'bg-rose-500';
                 badgeText = matched?.estadoLabel || 'Brecha Crítica';
-                badgeBg = 'bg-rose-50 text-rose-800 border-rose-200';
+                badgeBg = 'bg-rose-50 text-rose-700';
               } else if (score < 80) {
                 barColor = 'bg-amber-500';
                 badgeText = matched?.estadoLabel || 'En Desarrollo';
-                badgeBg = 'bg-amber-50 text-amber-800 border-amber-200';
+                badgeBg = 'bg-amber-50 text-amber-700';
               } else {
                 badgeText = matched?.estadoLabel || 'Consolidado';
-                badgeBg = 'bg-emerald-50 text-emerald-800 border-emerald-200';
+                badgeBg = 'bg-emerald-50 text-emerald-700';
                 barColor = 'bg-emerald-600';
               }
 
               return (
-                <div key={axis.key} className="bg-slate-50/80 p-3 rounded-xl border border-slate-200/80 space-y-1.5 min-w-0">
-                  <div className="flex flex-wrap items-center justify-between gap-1.5 text-xs font-bold min-w-0">
-                    <span className="text-slate-800 truncate">{axis.label}</span>
+                <div key={axis.key} className="bg-[#f0f4f9] p-3.5 rounded-[16px] space-y-1.5 min-w-0">
+                  <div className="flex flex-wrap items-center justify-between gap-1.5 text-xs font-medium min-w-0">
+                    <span className="text-[#1f1f1f] truncate">{axis.label}</span>
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className={`text-[10px] px-2 py-0.5 rounded-md border font-semibold whitespace-nowrap ${badgeBg}`}>
+                      <span className={`text-[11px] px-2.5 py-0.5 rounded-full ${badgeBg}`}>
                         {badgeText}
                       </span>
-                      <span className="font-mono text-sky-700 font-bold">{score}%</span>
+                      <span className="font-mono text-[#0b57d0]">{score}%</span>
                     </div>
                   </div>
                   <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">

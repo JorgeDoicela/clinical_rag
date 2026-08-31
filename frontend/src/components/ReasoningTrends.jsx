@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, AlertTriangle, Award, Calendar, BookOpen, ChevronRight, Activity, Filter } from 'lucide-react';
+import { TrendingUp, AlertTriangle, Award, Calendar, BookOpen, ChevronRight, Activity, Filter, Sparkles } from 'lucide-react';
 import { API_URL, getAuthHeaders } from '../api/client';
 import SkillRadarChart from './SkillRadarChart';
 
@@ -31,7 +31,7 @@ export default function ReasoningTrends() {
       setTrends({
         total_evaluaciones: 4,
         promedio_general: 7.8,
-        punto_debil_principal: "Tu punto débil recurrente: Dosificación exacta de esquemas antimicrobianos y rehidratación intravenosa.",
+        punto_debil_principal: "Punto formativo prioritario: Dosificación exacta de esquemas antimicrobianos y rehidratación intravenosa.",
         progreso_por_gpc: {
           "GPC_EHIRN2019": { guia: "GPC_EHIRN2019", evaluaciones: 2, scores: [6.5, 8.0], promedio: 7.3 },
           "HIPERTENSION": { guia: "HIPERTENSION", evaluaciones: 2, scores: [7.0, 9.5], promedio: 8.3 }
@@ -61,20 +61,20 @@ export default function ReasoningTrends() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-xs flex items-center justify-center space-x-3 text-slate-500 text-sm">
-        <Activity className="w-5 h-5 animate-spin text-sky-600" />
-        <span>Cargando analítica de tendencias...</span>
+      <div className="bg-white rounded-[28px] p-12 shadow-xs border-0 flex items-center justify-center space-x-3 text-[#444746] text-sm">
+        <Activity className="w-5 h-5 animate-spin text-[#0b57d0]" />
+        <span>Cargando analítica de rendimiento formativo...</span>
       </div>
     );
   }
 
   if (!trends || trends.total_evaluaciones === 0) {
     return (
-      <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-xs text-center space-y-3">
-        <TrendingUp className="w-8 h-8 text-sky-600 mx-auto opacity-70" />
-        <h3 className="text-base font-bold text-slate-900">Sin historial suficiente</h3>
-        <p className="text-xs text-slate-500 max-w-md mx-auto">
-          Completa tus primeros casos clínicos para desbloquear la gráfica de progresión por GPC y el análisis inteligente de tu punto débil.
+      <div className="bg-white rounded-[28px] p-12 shadow-xs border-0 text-center space-y-4 max-w-lg mx-auto">
+        <TrendingUp className="w-8 h-8 text-[#0b57d0] mx-auto opacity-70" />
+        <h3 className="text-lg font-normal text-[#1f1f1f] font-heading">Sin historial suficiente</h3>
+        <p className="text-xs text-[#747775] leading-relaxed">
+          Completa tus primeros casos clínicos para desbloquear la gráfica de progresión por GPC y el análisis inteligente de tu desempeño formativo.
         </p>
       </div>
     );
@@ -112,21 +112,20 @@ export default function ReasoningTrends() {
   const polylinePoints = pointsSVG.map(p => `${p.x},${p.y}`).join(' ');
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-8 animate-fadeIn pb-12">
+      
       {/* Tarjeta de Advertencia Formativa: PUNTO DÉBIL */}
-      <div className="bg-amber-50/70 border border-amber-200/90 rounded-2xl p-6 shadow-xs relative overflow-hidden">
+      <div className="bg-white rounded-[28px] p-6 sm:p-8 shadow-xs border-0 space-y-4">
         <div className="flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <div className="space-y-1 flex-1">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-200/60 px-2 py-0.5 rounded-md">
-                Diagnóstico de Aprendizaje RAG
-              </span>
-            </div>
-            <h3 className="text-sm sm:text-base font-extrabold text-amber-950 tracking-tight pt-0.5">
+            <span className="text-xs font-medium text-amber-800 bg-amber-50 px-3 py-1 rounded-full inline-block">
+              Diagnóstico Formativo RAG
+            </span>
+            <h3 className="text-lg sm:text-xl font-normal text-[#1f1f1f] font-heading pt-1">
               {punto_debil_principal}
             </h3>
-            <p className="text-xs text-amber-900/90 leading-relaxed font-medium pt-1">
+            <p className="text-xs text-[#444746] leading-relaxed">
               Patrón detectado al contrastar tus respuestas previas contra la normativa oficial del MSP Ecuador.
             </p>
           </div>
@@ -134,15 +133,15 @@ export default function ReasoningTrends() {
 
         {/* Lista de Omisiones Recurrentes */}
         {omisiones_mas_frecuentes && omisiones_mas_frecuentes.length > 0 && (
-          <div className="mt-4 border-t border-amber-200/60 pt-3">
-            <span className="text-[11px] font-bold text-amber-900 block mb-2 uppercase tracking-wide">
+          <div className="mt-4 border-t border-slate-100 pt-4">
+            <span className="text-xs font-medium text-[#1f1f1f] block mb-3">
               Patrones de Omisión Más Frecuentes ({omisiones_mas_frecuentes.length}):
             </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {omisiones_mas_frecuentes.map((om, i) => (
-                <div key={i} className="flex items-center justify-between bg-white/80 p-2.5 rounded-xl border border-amber-200/60 text-xs font-medium text-amber-950">
+                <div key={i} className="flex items-center justify-between bg-[#f0f4f9] p-3 rounded-[16px] text-xs font-medium text-[#1f1f1f]">
                   <span className="truncate pr-2">{om.patron}</span>
-                  <span className="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md shrink-0">
+                  <span className="text-[10px] font-medium bg-amber-50 text-amber-800 px-2 py-0.5 rounded-full shrink-0">
                     {om.frecuencia}x
                   </span>
                 </div>
@@ -154,27 +153,31 @@ export default function ReasoningTrends() {
 
       {/* Componente del Radar de Habilidades del Estudiante */}
       {competenciasPorEje.length > 0 && (
-        <SkillRadarChart competenciasPorEje={competenciasPorEje} />
+        <div className="bg-white rounded-[28px] p-6 sm:p-8 shadow-xs border-0">
+          <SkillRadarChart competenciasPorEje={competenciasPorEje} />
+        </div>
       )}
 
       {/* Gráfica de Progreso de Score en el Tiempo por GPC */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-5">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+      <div className="bg-white rounded-[28px] p-6 sm:p-8 shadow-xs border-0 space-y-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
           <div>
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-sky-700">
-              <TrendingUp className="w-4 h-4 text-sky-600" />
+            <div className="flex items-center gap-2 text-xs font-medium text-[#0b57d0] mb-1">
+              <TrendingUp className="w-4 h-4" />
               <span>Progresión Longitudinal</span>
             </div>
-            <h3 className="text-lg font-bold text-slate-900">Evolución de Calificaciones por GPC</h3>
+            <h3 className="text-xl font-normal text-[#1f1f1f] font-heading">
+              Evolución de Calificaciones por GPC
+            </h3>
           </div>
 
           {/* Filtro por GPC */}
-          <div className="flex items-center gap-2">
-            <Filter className="w-3.5 h-3.5 text-slate-400" />
+          <div className="flex items-center bg-[#f0f4f9] px-3.5 py-1.5 rounded-full border border-slate-200">
+            <Filter className="w-3.5 h-3.5 text-[#747775] mr-2" />
             <select
               value={selectedGpc}
               onChange={(e) => setSelectedGpc(e.target.value)}
-              className="text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-slate-700 focus:outline-none focus:border-sky-500"
+              className="text-xs font-medium bg-transparent text-[#1f1f1f] focus:outline-none cursor-pointer"
             >
               <option value="TODAS">Todas las GPCs</option>
               {gpcKeys.map(gpc => (
@@ -195,7 +198,7 @@ export default function ReasoningTrends() {
                   return (
                     <g key={val}>
                       <line x1={padding} y1={y} x2={chartWidth - padding} y2={y} stroke="#f1f5f9" strokeWidth="1" strokeDasharray="3,3" />
-                      <text x={padding - 8} y={y + 3} textAnchor="end" className="text-[9px] fill-slate-400 font-bold">{val}</text>
+                      <text x={padding - 8} y={y + 3} textAnchor="end" className="text-[9px] fill-[#747775] font-medium">{val}</text>
                     </g>
                   );
                 })}
@@ -204,7 +207,7 @@ export default function ReasoningTrends() {
                 {pointsSVG.length > 1 && (
                   <polyline
                     fill="none"
-                    stroke="#0284c7"
+                    stroke="#0b57d0"
                     strokeWidth="3"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -215,13 +218,13 @@ export default function ReasoningTrends() {
                 {/* Puntos y Etiquetas del Eje X (Fechas) */}
                 {pointsSVG.map((p, idx) => (
                   <g key={idx} className="group cursor-pointer">
-                    <circle cx={p.x} cy={p.y} r="5" className="fill-white stroke-sky-600 stroke-[3px] group-hover:scale-125 transition-transform" />
-                    <text x={p.x} y={p.y - 10} textAnchor="middle" className="text-[10px] font-extrabold fill-slate-800">
+                    <circle cx={p.x} cy={p.y} r="5" className="fill-white stroke-[#0b57d0] stroke-[3px] group-hover:scale-125 transition-transform" />
+                    <text x={p.x} y={p.y - 10} textAnchor="middle" className="text-[10px] font-medium fill-[#1f1f1f]">
                       {p.score.toFixed(1)}
                     </text>
                     {/* Etiqueta de Fecha en el Eje X */}
                     {p.fechaLabel && (
-                      <text x={p.x} y={chartHeight - 12} textAnchor="middle" className="text-[9px] font-bold fill-slate-400">
+                      <text x={p.x} y={chartHeight - 12} textAnchor="middle" className="text-[9px] font-medium fill-[#747775]">
                         {p.fechaLabel}
                       </text>
                     )}
@@ -231,25 +234,26 @@ export default function ReasoningTrends() {
             </div>
           </div>
         ) : (
-          <p className="text-xs text-slate-500 italic text-center py-4">No hay datos registrados para esta GPC.</p>
+          <p className="text-xs text-[#747775] italic text-center py-4">No hay datos registrados para esta GPC.</p>
         )}
 
         {/* Métricas Resumen por GPC */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 border-t border-slate-100 pt-4">
-          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
-            <span className="text-[10px] font-bold text-slate-500 uppercase block">Promedio General</span>
-            <span className="text-xl font-extrabold text-slate-900">{promedio_general} / 10 pts</span>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-100 pt-4">
+          <div className="bg-[#f0f4f9] p-4 rounded-[20px]">
+            <span className="text-xs text-[#747775] block">Promedio General</span>
+            <span className="text-2xl font-normal text-[#1f1f1f] font-heading mt-1 block">{promedio_general} / 10 pts</span>
           </div>
-          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
-            <span className="text-[10px] font-bold text-slate-500 uppercase block">Evaluaciones RAG</span>
-            <span className="text-xl font-extrabold text-slate-900">{total_evaluaciones} realizadas</span>
+          <div className="bg-[#f0f4f9] p-4 rounded-[20px]">
+            <span className="text-xs text-[#747775] block">Evaluaciones Formativas</span>
+            <span className="text-2xl font-normal text-[#0b57d0] font-heading mt-1 block">{total_evaluaciones} realizadas</span>
           </div>
-          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
-            <span className="text-[10px] font-bold text-slate-500 uppercase block">GPCs Evaluadas</span>
-            <span className="text-xl font-extrabold text-slate-900">{gpcKeys.length} guías</span>
+          <div className="bg-[#f0f4f9] p-4 rounded-[20px]">
+            <span className="text-xs text-[#747775] block">GPCs Evaluadas</span>
+            <span className="text-2xl font-normal text-emerald-600 font-heading mt-1 block">{gpcKeys.length} guías</span>
           </div>
         </div>
       </div>
+
     </div>
   );
 }

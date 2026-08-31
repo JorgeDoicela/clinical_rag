@@ -4,9 +4,8 @@
       "id": "case_dengue_01",
       "guia_asociada": "dengue",
       "titulo": "Paciente febril con signos de alarma por Dengue",
-      "imagen_url": "/static/images/dengue_hemograma.png",
-      "enunciado": "Paciente femenina de 24 años de edad, procedente de Guayaquil, acude por presentar fiebre elevada de 3 días de evolución, dolor retroocular intenso, mialgias y artralgias. Desde hace 12 horas presenta dolor abdominal continuo e intenso, vómitos persistentes (4 en 6 horas) y somnolencia. Examen físico: PA 90/60 mmHg, FC 112 bpm, llenado capilar 3 segundos, petequias en extremidades inferiores. Se adjunta el informe del hemograma de laboratorio.",
-      "pregunta": "Clasifique la severidad del caso según la GPC del MSP Ecuador y describa la conducta terapéutica inmediata (esquema de reposición de líquidos, monitoreo y criterios de hospitalización).",
+      "enunciado": "Paciente femenina de 24 años de edad, procedente de Guayaquil, acude a emergencias por presentar fiebre elevada de 3 días de evolución, dolor retroocular intenso, mialgias y artralgias. Desde hace 12 horas presenta dolor abdominal continuo e intenso, vómitos persistentes (4 en 6 horas) y somnolencia. Examen físico: PA 90/60 mmHg, FC 112 bpm, llenado capilar 3 segundos, petequias en extremidades inferiores. Laboratorio: Leucocitos 3,100/mm³, Plaquetas 68,000/mm³, Hematocrito 48% (hemoconcentración marcada).",
+      "pregunta": "Clasifique la severidad del caso según la GPC del MSP Ecuador y describa la conducta terapéutica inmediata (esquema de reposición de líquidos con cristaloides a 5-7 ml/kg/h, monitoreo estricto de diuresis/signos vitales y criterios de hospitalización).",
       "nivel_esperado": "pregrado_avanzado",
       "fragmento_gpc_ideal_id": "dengue_chunk_004"
     },
@@ -14,8 +13,8 @@
       "id": "case_preeclampsia_01",
       "guia_asociada": "preeclampsia",
       "titulo": "Gestante con Trastorno Hipertensivo y Signos de Criterio de Severidad",
-      "enunciado": "Gestante de 32 semanas por FUM, 28 años de edad, acude al servicio de urgencias por cefalea holocraneana intensa de inicio reciente, fosfenos y epigastralgia en barra. Examen físico: PA 165/110 mmHg tomada en dos ocasiones separadas por 15 minutos. Reflejos osteotendinosos +++/++++. EGO: Proteinuria cualitativa con tirilla de +++.",
-      "pregunta": "Identifique el diagnóstico específico según la GPC del MSP, establezca el manejo farmacológico inmediato para la prevención de eclampsia (dosis de ataque y mantenimiento) y la conducta antihipertensiva de emergencia.",
+      "enunciado": "Gestante de 32 semanas por FUM, 28 años de edad, acude al servicio de urgencias por presentar cefalea holocraneana intensa de inicio reciente, fosfenos y epigastralgia en barra. Examen físico: PA 165/110 mmHg tomada en dos ocasiones separadas por 15 minutos en decúbito lateral izquierdo. Reflejos osteotendinosos exaltados (+++/++++). Examen de orina: Proteinuria cualitativa con tirilla de +++.",
+      "pregunta": "Identifique el diagnóstico específico según la GPC de Trastornos Hipertensivos del MSP Ecuador, establezca el manejo farmacológico inmediato para la prevención de eclampsia (Sulfato de Magnesio: esquema Zuspan con dosis de ataque de 4g IV en 20 minutos y mantenimiento de 1g/h) y la conducta antihipertensiva de emergencia (Nifedipino oral o Hidralazina IV).",
       "nivel_esperado": "pregrado_avanzado",
       "fragmento_gpc_ideal_id": "preeclampsia_chunk_002"
     },
@@ -23,17 +22,17 @@
       "id": "case_diabetes_01",
       "guia_asociada": "diabetes_t2",
       "titulo": "Paciente con Diabetes Mellitus Tipo 2 y descontrol glucémico inicial",
-      "enunciado": "Paciente masculino de 52 años, diagnóstico reciente de Diabetes Mellitus Tipo 2, IMC 31.5 kg/m². Acude a control tras 3 meses de cambios en el estilo de vida. Laboratorio actual: HbA1c 8.8%, Glucemia en ayunas 185 mg/dL, Función renal (eGFR) 85 ml/min/1.73m², sin proteinuria.",
-      "pregunta": "Determine si el paciente cumple meta terapéutica y proponga el esquema de tratamiento farmacológico inicial (monoterapia o terapia dual) acorde a la GPC del MSP Ecuador.",
+      "enunciado": "Paciente masculino de 52 años, diagnóstico reciente de Diabetes Mellitus Tipo 2, IMC 31.5 kg/m². Acude a control tras 3 meses de cambios terapéuticos en el estilo de vida. Laboratorio actual: HbA1c 8.8%, Glucemia plasmática en ayunas 185 mg/dL, Función renal con tasa de filtrado glomerular estimada (eGFR) 85 ml/min/1.73m², sin microalbuminuria.",
+      "pregunta": "Determine si el paciente cumple meta terapéutica según la GPC de DM2 del MSP Ecuador (meta HbA1c < 7.0%) y proponga el esquema de tratamiento farmacológico inicial (terapia combinada oral dual con Metformina escalonada hasta 2000 mg/día más un segundo agente al encontrarse HbA1c > 1.5% sobre la meta).",
       "nivel_esperado": "pregrado_intermedio",
       "fragmento_gpc_ideal_id": "diabetes_chunk_005"
     },
     {
       "id": "case_hemorragia_01",
       "guia_asociada": "hemorragia_posparto",
-      "titulo": "Hemorragia Posparto Inmediata por Atonía Uterina",
-      "enunciado": "Paciente de 22 años, primigesta, finaliza parto vaginal hace 20 minutos tras un trabajo de parto prolongado. Presenta sangrado transvaginal activo rutilante estimado en 800 ml. Al examen físico: útero flácido, supraumbilical, sin contracción evidente tras alumbramiento. PA 85/50 mmHg, FC 125 bpm.",
-      "pregunta": "Aplique el protocolo del Código Rojo / Hemorragia Posparto de la GPC del MSP Ecuador: mencione la causa probable (regla de las 4T), la primera maniobra no farmacológica y los medicamentos uterotónicos de primera línea con sus dosis.",
+      "titulo": "Hemorragia Posparto Inmediata por Atonía Uterina (Código Rojo)",
+      "enunciado": "Paciente de 22 años, primigesta, finaliza parto vaginal hace 20 minutos tras trabajo de parto prolongado. Presenta sangrado transvaginal activo rutilante estimado en 800 ml. Al examen físico: útero flácido, supraumbilical, sin globo de seguridad de Pinard tras alumbramiento completo de placenta y membranas. Signos vitales: PA 85/50 mmHg, FC 125 bpm, llenado capilar 4 segundos.",
+      "pregunta": "Aplique el protocolo del Código Rojo / Hemorragia Posparto de la GPC del MSP Ecuador: identifique la causa etiológica según la regla de las 4T (Tono), la primera maniobra no farmacológica (masaje uterino bimanual continuo) y los medicamentos uterotónicos de primera línea normados (Oxitocina infusión y Misoprostol 800 mcg sublingual/rectal).",
       "nivel_esperado": "pregrado_avanzado",
       "fragmento_gpc_ideal_id": "hemorragia_chunk_001"
     },
@@ -41,49 +40,64 @@
       "id": "case_tb_01",
       "guia_asociada": "gp_tuberculosis-1",
       "titulo": "Sintomático Respiratorio con Sospecha de Tuberculosis Pulmonar Sensible",
-      "enunciado": "Paciente masculino de 35 años, acude al centro de salud por presentar tos con expectoración mucopurulenta de 3 semanas de evolución, sudores nocturnos, astenia, hiporexia y pérdida ponderal de 5 kg. Al examen físico: pálido, afebril al momento, IMC 18.5 kg/m², murmullo vesicular disminuido en ápex pulmonar derecho. Se solicita baciloscopía seriada de esputo y prueba molecular GeneXpert MTB/RIF.",
-      "pregunta": "Defina la definición operacional del paciente (Sintomático Respiratorio) según la GPC del MSP Ecuador, el algoritmo diagnóstico microbiológico/molecular de primera línea y el esquema posológico estándar del tratamiento acortado estrictamente supervisado (DOTS/TAES) en fase inicial y de consolidación.",
+      "enunciado": "Paciente masculino de 35 años, acude al centro de salud por presentar tos con expectoración mucopurulenta de 3 semanas de evolución (mayor a 15 días), sudores nocturnos, astenia, hiporexia y pérdida de peso de 5 kg. Examen físico: pálido, IMC 18.5 kg/m², murmullo vesicular disminuido con estertores en ápex pulmonar derecho. Se solicita baciloscopía seriada de esputo y prueba molecular GeneXpert MTB/RIF.",
+      "pregunta": "Defina la condición operacional del paciente (Sintomático Respiratorio) según la GPC de Tuberculosis del MSP Ecuador, el algoritmo diagnóstico microbiológico/molecular de primera línea y el esquema de tratamiento acortado estrictamente supervisado (TAES/DOTS: fase inicial 2HRZE y fase de consolidación 4HR).",
       "nivel_esperado": "pregrado_avanzado"
     },
     {
       "id": "case_vih_01",
       "guia_asociada": "gpc_vih_acuerdo_ministerial05-07-2019",
       "titulo": "Diagnóstico Nuevo de Infección por VIH y Protocolo de Inicio de TARV",
-      "enunciado": "Paciente masculino de 29 años de edad, se realiza prueba rápida screening para VIH con resultado reactivo, confirmado por ensayo inmunoabsorbente / Western Blot. Conteo de Linfocitos CD4: 210 células/mm³, Carga Viral VIH-1: 120,000 copias/ml. Ausencia de infecciones oportunistas activas al momento de la evaluación.",
-      "pregunta": "Identifique los criterios de inicio inmediato del Tratamiento Antirretroviral (TARV) según el Acuerdo Ministerial de la GPC del MSP Ecuador, el esquema antirretroviral preferente de primera línea basado en Inhibidores de la Integrasa (INSTI) / Tenofovir / Lamivudina y la indicación de profilaxis primaria contra Pneumocystis jirovecii.",
+      "enunciado": "Paciente masculino de 29 años, acude con prueba rápida de screening para VIH reactiva, confirmada por ensayo inmunoabsorbente / Western Blot. Laboratorio: Recuento de Linfocitos CD4: 210 células/mm³, Carga Viral VIH-1: 120,000 copias/ml. Sin evidencia de infecciones oportunistas del sistema nervioso central o pulmonar al momento de la evaluación.",
+      "pregunta": "Indique la conducta de inicio del Tratamiento Antirretroviral (TARV) según el Acuerdo Ministerial del MSP Ecuador, el esquema antirretroviral preferente de primera línea en adultos (Tenofovir + Lamivudina + Dolutegravir / TLD) y la indicación de profilaxis primaria con Cotrimoxazol (TMP-SMX) para la prevención de neumonía por Pneumocystis jirovecii.",
       "nivel_esperado": "pregrado_avanzado"
     },
     {
       "id": "case_hta_01",
       "guia_asociada": "gpc_hta192019",
       "titulo": "Paciente con Hipertensión Arterial Primaria Grado 2 y Riesgo Cardiovascular",
-      "enunciado": "Paciente femenina de 58 años, consulta para chequeo ejecutivo. Refiere cefalea ocasional matutina. Sin diagnóstico previo de hipertensión. En tres tomas separadas en días distintos presenta cifras promedio de PA 155/96 mmHg. Laboratorio: Creatinina 0.9 mg/dL, Colesterol total 230 mg/dL, Glucemia 98 mg/dL.",
-      "pregunta": "Clasifique el estadio de Hipertensión Arterial según la GPC del MSP Ecuador, determine las metas de presión arterial a alcanzar y proponga el esquema de tratamiento farmacológico inicial (monoterapia vs terapia combinada en dosis fija a dosis bajas).",
+      "enunciado": "Paciente femenina de 58 años, acude a consulta de medicina general para control preventivo. Refiere cefalea occipital matutina ocasional. En tres tomas en días distintos presenta cifras promedio de PA 155/96 mmHg. Laboratorio: Creatinina 0.9 mg/dL, Glucemia en ayunas 98 mg/dL, Colesterol total 230 mg/dL, ECG con signos leves de sobrecarga ventricular izquierda.",
+      "pregunta": "Clasifique el estadio de Hipertensión Arterial según la GPC del MSP Ecuador (HTA Grado 2), defina la meta de presión arterial (< 140/90 mmHg) y fundamente el inicio de tratamiento farmacológico de primera línea mediante terapia combinada en dosis fijas (IECA o ARA-II asociado a Calcioantagonista o Tiazida a dosis bajas).",
       "nivel_esperado": "pregrado_intermedio"
     },
     {
       "id": "case_erc_01",
       "guia_asociada": "guia_prevencion_diagnostico_tratamiento_enfermedad_renal_cronica_2018",
       "titulo": "Evaluación de Enfermedad Renal Crónica en Paciente Diabético e Hipertenso",
-      "enunciado": "Paciente masculino de 64 años, con antecedente de Diabetes Mellitus Tipo 2 e Hipertensión Arterial de 10 años de evolución. Acude a control anual de rutina. Laboratorios: Creatinina sérica 1.8 mg/dL, Tasa de Filtrado Glomerular estimada (eGFR por CKD-EPI) 38 ml/min/1.73m², Cociente Albúmina/Creatinina en orina esporádica (RAC) 180 mg/g.",
-      "pregunta": "Estadifique la Enfermedad Renal Crónica combinando la categoría de filtrado glomerular (G1 a G5) y la categoría de albuminuria (A1 a A3) según la clasificación KDIGO/MSP Ecuador, y fundamente las medidas de nefroprotección de primera línea (IECA/ARA-II, control metabólico y ajuste de fármacos de excreción renal).",
+      "enunciado": "Paciente masculino de 64 años, con antecedente de Diabetes Mellitus Tipo 2 e Hipertensión Arterial de 10 años de evolución. Acude a control anual de rutina. Laboratorios: Creatinina sérica 1.8 mg/dL, Tasa de Filtrado Glomerular estimada (eGFR por CKD-EPI) 38 ml/min/1.73m², Cociente Albúmina/Creatinina en orina aislada (RAC) 180 mg/g.",
+      "pregunta": "Estadifique la Enfermedad Renal Crónica combinando la categoría de filtrado glomerular (G3b: 30-44 ml/min) y la categoría de albuminuria (A2: 30-300 mg/g microalbuminuria) según la clasificación KDIGO adoptada por el MSP Ecuador, y describa las medidas de nefroprotección de primera línea (IECA/ARA-II, control estricto de PA y glucemia, y ajuste posológico de fármacos).",
       "nivel_esperado": "pregrado_avanzado"
     },
     {
       "id": "case_ehirn_01",
       "guia_asociada": "gpc_ehirn2019",
-      "titulo": "Recién Nacido con Sangrado Umbilical y Trastorno de Coagulación (EHIRN Clásica)",
-      "imagen_url": "/static/images/ehirn_coagulograma.png",
-      "enunciado": "Recién nacido masculino de 3 días de vida, nacido de parto fortuito en domicilio sin profilaxis neonatal de Vitamina K al nacer. La madre lo ingresa a emergencias por presentar sangrado continuo en napa a nivel del muñón umbilical de 6 horas de evolución, sumado a equimosis en zonas de presión. Al examen físico: pálido, hipotónico moderado; PA 62/36 mmHg, FC 148 bpm, FR 44 rpm. Se adjunta el informe del laboratorio de hemostasia y coagulación sanguínea neonatal realizado a su ingreso.",
-      "pregunta": "Analice el reporte de laboratorio adjunto, clasifique el tipo de Enfermedad Hemorrágica del Recién Nacido (EHIRN) según la edad de presentación (temprana, clásica o tardía) de acuerdo con la GPC del MSP Ecuador y prescriba el esquema completo de tratamiento de urgencia (dosis de fitomenadiona/vitamina K1, vía de administración y concentrado de complejo protrombínico/plasma si hay sangrado mayor).",
+      "titulo": "Recién Nacido a Término con Encefalopatía Hipóxico-Isquémica (EHI-RN)",
+      "enunciado": "Recién nacido a término (39 semanas de gestación, peso 3,200 g), producto de parto vaginal complicado con desprendimiento prematuro de placenta normoinserta y sufrimiento fetal agudo. Al nacimiento presenta líquido amniótico meconial espeso, apnea y bradicardia severa, requiriendo intubación endotraqueal y reanimación neonatal avanzada. Puntuación de APGAR: 2 al minuto 1 y 3 a los 5 minutos. A las 2 horas de vida, el neonato presenta letargia marcada, hipotonía generalizada, reflejo de succión ausente y crisis convulsivas sutiles (movimientos de pedaleo y parpadeo repetitivo). Gasometría de cordón umbilical: pH 6.95, Exceso de Bases -16 mmol/L.",
+      "pregunta": "Clasifique la gravedad de la Encefalopatía Hipóxico-Isquémica según la escala de Sarnat (EHI Moderada-Grave / Estadio II-III) de acuerdo con la GPC oficial del MSP Ecuador (2019), determine la indicación de Hipotermia Terapéutica antes de las 6 horas de vida y establezca las medidas de neuroprotección y soporte hemodinámico en la Unidad de Cuidados Intensivos Neonatales.",
       "nivel_esperado": "pregrado_avanzado"
     },
     {
       "id": "case_nac_01",
       "guia_asociada": "neumonia",
-      "titulo": "Preescolar con Neumonía Adquirida en la Comunidad Grave y Signos de Alarma",
-      "enunciado": "Paciente masculino de 3 años de edad (peso 14 kg), es traído a emergencia por su madre por presentar fiebre de 38.9 °C de 3 días de evolución, tos húmeda frecuente, decaimiento e hiporexia marcada. Desde hace 8 horas la madre nota respiración rápida y hundimiento marcado de las costillas al respirar. Examen físico: letárgico, FC 138 bpm, FR 46 rpm (taquipnea marcada para su grupo etario), SatO2 89% al aire ambiente, tiraje subcostal e intercostal evidente y aleteo nasal. A la auscultación pulmonar: estertores crepitantes y disminución del murmullo vesicular en base pulmonar derecha.",
-      "pregunta": "Identifique los signos clínicos de Neumonía Grave según la GPC de Neumonía (3 meses a 15 años) del MSP Ecuador (taquipnea por grupo etario, tiraje subcostal, hipoxemia), establezca el ámbito de tratamiento correspondiente (hospitalización inmediata) y formule el esquema de antibioticoterapia empírica parenteral de primera línea normado por el MSP con su dosificación por kg/día.",
+      "titulo": "Preescolar con Neumonía Adquirida en la Comunidad Grave y Criterios de Hospitalización",
+      "enunciado": "Paciente masculino de 3 años de edad (peso 14 kg), es traído a emergencias por su madre por presentar fiebre de 38.9 °C de 3 días de evolución, tos frecuente, hiporexia y decaimiento. Desde hace 8 horas presenta respiración rápida y dificultad respiratoria evidente. Examen físico: letárgico, FC 138 bpm, FR 46 rpm (taquipnea para grupo de 1 a 5 años: >= 40 rpm), SatO2 89% al aire ambiente, tiraje subcostal e intercostal marcado con aleteo nasal. Auscultación pulmonar: estertores crepitantes y disminución del murmullo vesicular en base pulmonar derecha.",
+      "pregunta": "Identifique los signos clínicos de Neumonía Grave según la GPC de Neumonía Pediátrica (3 meses a 15 años) del MSP Ecuador (taquipnea para la edad, tiraje subcostal, hipoxemia), establezca el ámbito de tratamiento correspondiente (hospitalización inmediata con oxigenoterapia) y prescriba el esquema de antibioticoterapia empírica parenteral de primera línea normado por el MSP (Ampicilina parenteral 150-200 mg/kg/día dividida cada 6 horas).",
+      "nivel_esperado": "pregrado_avanzado"
+    },
+    {
+      "id": "case_sepsis_neonatal_01",
+      "guia_asociada": "gpc-sepsis-neonatal",
+      "titulo": "Neonato con Sospecha de Sepsis Neonatal Temprana y Factores de Riesgo Maternos",
+      "enunciado": "Recién nacido a término de 18 horas de vida (38 semanas, peso 3,100 g), hijo de madre primigesta con antecedente de Ruptura Prematura de Membranas de 22 horas de evolución sin antibioticoterapia intraparto. La enfermera de alojamiento conjunto reporta que el bebé presenta dificultad respiratoria progresiva, quejido espiratorio audible, letargia y dificultad para alimentarse. Examen físico: Térrmica 35.8 °C (hipotermia), FC 168 bpm, FR 66 rpm (taquipnea neonatal), tiraje intercostal leve y llenado capilar 3.5 segundos.",
+      "pregunta": "Identifique la condición diagnóstica (Sepsis Neonatal Temprana) y los factores de riesgo mayores según la GPC de Sepsis Neonatal del MSP Ecuador, solicite los estudios diagnósticos de laboratorio de primera línea (Hemocultivos, Biometría hemática, Proteína C Reactiva) y formule el esquema de antibioticoterapia empírica parenteral de primera línea normado (Ampicilina 100 mg/kg/día cada 12 horas más Gentamicina 4-5 mg/kg/día dosis única diaria).",
+      "nivel_esperado": "pregrado_avanzado"
+    },
+    {
+      "id": "case_aborto_01",
+      "guia_asociada": "gpc_guia_aborto_espontaneo_incompleto_19_feb_2014",
+      "titulo": "Gestante con Metrorragia de Primer Trimestre por Aborto Incompleto",
+      "enunciado": "Paciente femenina de 23 años, secundigesta, con amenorrea de 9 semanas por FUM. Acude al servicio de urgencias por presentar dolor cólico hipogástrico de moderada a fuerte intensidad acompañado de sangrado genital rojo rutilante con eliminación de coágulos y restos tisulares desde hace 4 horas. Examen físico: PA 100/65 mmHg, FC 88 bpm, abdomen blando doloroso en hipogastrio sin signos de irritación peritoneal. Especuloscopía y tacto bimanual: orificio cervical externo e interno permeables con restos ovulares en canal cervical, útero aumentado de tamaño compatible con 8 semanas de gestación.",
+      "pregunta": "Establezca el diagnóstico clínico específico según la GPC de Manejo del Aborto del MSP Ecuador (Aborto Incompleto), determine los criterios de elección del tratamiento (manejo médico con Misoprostol vs evacuación quirúrgica mediante Aspiración Manual Endouterina - AMEU) y describa las medidas de profilaxis (inmunoglobulina anti-D en pacientes Rh negativas) y anticoncepción post-evento obstétrico.",
       "nivel_esperado": "pregrado_avanzado"
     }
   ]
