@@ -7,33 +7,41 @@ El sistema **Ateneo** implementa una arquitectura de Recuperación Aumentada por
 ```text
                                ETAPA 1: RECUPERACIÓN HÍBRIDA RRF (BGE-M3 + BM25)
 ┌─────────────────────────┐     ┌───────────────────────────┐     ┌───────────────────────────┐
-│ 60 GPC (MSP Ecuador)    │ ──► │ Extracción & Tablas MD    │ ──► │ Embeddings Densos BGE-M3  │
+│ 45+ GPC (MSP Ecuador)   │ ──► │ Extracción & Tablas MD    │ ──► │ Embeddings Densos BGE-M3  │
 │ (2013-2019 / raw_pdfs)  │     │ (pdfplumber + chunker)    │     │ (1024 dims - Fine-Tuned)  │
 └─────────────────────────┘     └───────────────────────────┘     └─────────────┬─────────────┘
                                                                                 │
                                                                                 ▼
 ┌─────────────────────────┐     ┌───────────────────────────┐     ┌───────────────────────────┐
-│ Respuesta Estudiante    │ ──► │ Consulta Híbrida (RRF)    │ ──► │ ChromaDB + Sparse BM25    │
-└─────────────────────────┘     │ Rank Fusion: k=60         │     │ (colección gpc_msp)       │
-                                └───────────────────────────┘     └─────────────┬─────────────┘
+│ Razonamiento Estudiante │ ──► │ Consulta Híbrida (RRF)    │ ──► │ ChromaDB + Sparse BM25    │
+│ (Texto o Voz es-EC)     │     │ Rank Fusion: k=60         │     │ (5,944 fragmentos normat.)│
+└─────────────────────────┘     └───────────────────────────┘     └─────────────┬─────────────┘
                                                                                 │
                                                                                 ▼
-                               ETAPA 2: EVALUACIÓN MULTIMODAL │ Fragmento Normativo Top-1 RRF
+                               ETAPA 2: FUSIÓN MULTIMODAL SIMULTÁNEA │ Fragmento Top-1 RRF
                                                                                 │
-┌─────────────────────────┐     ┌───────────────────────────┐                   │
-│ Imagen Clínica (Op)     │ ──► │ Prompt Builder Multimodal │ ◄─────────────────┘
+┌─────────────────────────┐     ┌───────────────────────────┐                  │
+│ ECG + Rx + Labs + Foto  │ ──► │ Prompt Builder Multimodal │ ◄────────────────┘
+│ (N estudios simultáneos)│     │ (prompt_builder.py)        │
 └─────────────────────────┘     └─────────────┬─────────────┘
-                                              │
+                                              │ List[Part.from_bytes] + prompt
                                               ▼
                                 ┌───────────────────────────┐
                                 │ Evaluador Gemini API      │
-                                │ (response_mime_type: JSON)│
+                                │ (1 request multimodal)    │
+                                │ response_mime_type: JSON  │
                                 └─────────────┬─────────────┘
                                               │
                                               ▼
+                                ┌───────────────────────────┐     ┌───────────────────────────┐
+                                │ Validador Pydantic        │ ──► │ SQLite + PDF Institucional │
+                                │ (EvaluationResult)        │     │ (ReportLab + SHA-256)     │
+                                └─────────────┬─────────────┘     └───────────────────────────┘
+                                              │
+                                              ▼
                                 ┌───────────────────────────┐
-                                │ Validador Pydantic        │
-                                │ + Visor PDF Interactivo   │
+                                │ FeedbackCard + Radar      │
+                                │ (4 ejes clínicos)         │
                                 └───────────────────────────┘
 ```
 

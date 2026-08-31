@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import FeedbackCard from '../components/FeedbackCard';
 import EvaluationGameLoader from '../components/EvaluationGameLoader';
+import VoiceInputButton from '../components/VoiceInputButton';
+import ImageUploadZone from '../components/ImageUploadZone';
 
 export default function CaseSolve() {
   const { id } = useParams();
@@ -23,6 +25,7 @@ export default function CaseSolve() {
 
   const [caso, setCaso] = useState(null);
   const [respuesta, setRespuesta] = useState('');
+  const [imagenes, setImagenes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [evaluating, setEvaluating] = useState(false);
   const [error, setError] = useState(null);
@@ -48,13 +51,19 @@ export default function CaseSolve() {
     setError(null);
 
     try {
-      const res = await evaluateResponse(id, respuesta);
+      // Pasar array de imagenes (puede ser vacío — el backend hace fallback al caso)
+      const res = await evaluateResponse(id, respuesta, imagenes.length > 0 ? imagenes : null);
       setResultado(res);
     } catch (err) {
       setError(err.message);
     } finally {
       setEvaluating(false);
     }
+  };
+
+  // Acumular texto dictado por voz al razonamiento existente
+  const handleVoiceTranscript = (text) => {
+    setRespuesta(prev => prev ? prev.trimEnd() + ' ' + text : text);
   };
 
   if (loading) {
@@ -177,11 +186,14 @@ export default function CaseSolve() {
             <form onSubmit={handleSubmit} className="bg-white rounded-[28px] p-6 sm:p-8 shadow-xs border-0 space-y-6">
               
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="block text-sm font-medium text-[#1f1f1f]">
+                <div className="flex items-start justify-between gap-2">
+                  <label className="block text-sm font-medium text-[#1f1f1f] pt-1">
                     Tu Razonamiento Clínico y Conducta Terapéutica
                   </label>
-                  <span className="text-xs text-[#747775]">Texto libre formativo</span>
+                  <VoiceInputButton
+                    onTranscript={handleVoiceTranscript}
+                    disabled={evaluating}
+                  />
                 </div>
 
                 <textarea
@@ -201,6 +213,15 @@ export default function CaseSolve() {
                   <span>{error}</span>
                 </div>
               )}
+
+              {/* Zona de Carga Multi-Estudio Diagnóstico */}
+              <div className="border-t border-slate-100 pt-4">
+                <ImageUploadZone
+                  files={imagenes}
+                  onChange={setImagenes}
+                  disabled={evaluating}
+                />
+              </div>
 
               {/* Botón CTA de Envío */}
               <div className="pt-2 flex justify-end">

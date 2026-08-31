@@ -1,18 +1,33 @@
 import json
 import re
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List, Tuple
 from google import genai
 from google.genai import types
 from config import GEMINI_API_KEY, GEMINI_MODEL
 from models.schemas import EvaluationResult, ClinicalCaseSchema, CitaNormativa
 from rag.prompt_builder import SYSTEM_INSTRUCTION, build_prompt
 
-def call_gemini_llm(prompt: str, imagen_bytes: Optional[bytes] = None, imagen_mime: str = "image/jpeg") -> str:
+def call_gemini_llm(
+    prompt: str,
+    imagenes_list: Optional[List[Tuple[bytes, str]]] = None,
+    # Backward compat: si se pasa imagen singular, se convierte a lista
+    imagen_bytes: Optional[bytes] = None,
+    imagen_mime: str = "image/jpeg"
+) -> str:
     """
-    Llama a la API de Google Gemini utilizando el SDK oficial `google-genai`
+    Llama a la API de Google Gemini usando el SDK oficial `google-genai`
     solicitando respuesta JSON forzada mediante response_mime_type.
-    Si se proporcionan imagen_bytes, construye un request multimodal (texto + imagen).
+    Soporta Fusión Multimodal Simultánea: envía múltiples estudios diagnósticos
+    (ECG, Rx, Labs, etc.) en un SOLO request multimodal a Gemini.
     """
+    # Normalizar a lista unificada de (bytes, mime)
+    partes_imagenes: List[Tuple[bytes, str]] = []
+    if imagenes_list:
+        partes_imagenes = imagenes_list
+    elif imagen_bytes:
+        # Backward compat: imagen singular
+        partes_imagenes = [(imagen_bytes, imagen_mime)]
+
     if not GEMINI_API_KEY:
         print("[LLM] ADVERTENCIA: GEMINI_API_KEY no configurada. Usando fallback de desarrollo local...", flush=True)
         return json.dumps({
@@ -70,10 +85,15 @@ def call_gemini_llm(prompt: str, imagen_bytes: Optional[bytes] = None, imagen_mi
     last_err = None
     for model_name in unique_models:
         try:
-            if imagen_bytes:
-                print(f"[LLM] Enviando prompt MULTIMODAL (texto + imagen) a Gemini (Modelo: {model_name})...", flush=True)
-                imagen_part = types.Part.from_bytes(data=imagen_bytes, mime_type=imagen_mime)
-                contents = [imagen_part, prompt]
+            if partes_imagenes:
+                n_estudios = len(partes_imagenes)
+                print(f"[LLM] Enviando prompt MULTIMODAL ({n_estudios} estudio(s) adjunto(s)) a Gemini (Modelo: {model_name})...", flush=True)
+                # Construir lista de parts: todas las imágenes primero, luego el texto del prompt
+                image_parts = [
+                    types.Part.from_bytes(data=img_b, mime_type=img_m)
+                    for img_b, img_m in partes_imagenes
+                ]
+                contents = image_parts + [prompt]
             else:
                 print(f"[LLM] Enviando prompt a Google Gemini API (Modelo: {model_name})...", flush=True)
                 contents = prompt
@@ -211,22 +231,29 @@ def evaluate_clinical_reasoning(
     caso: ClinicalCaseSchema,
     respuesta_estudiante: str,
     chunk: Dict[str, Any],
+    imagenes_list: Optional[List[Tuple[bytes, str]]] = None,
+    # Backward compat: parámetros singulares
     imagen_bytes: Optional[bytes] = None,
     imagen_mime: str = "image/jpeg"
 ) -> EvaluationResult:
     """
     Ejecuta el flujo completo de evaluación: prompt -> Gemini -> validación Pydantic.
-    Soporta análisis multimodal si se proporcionan imagen_bytes.
+    Soporta Fusión Multimodal Simultánea con múltiples estudios clínicos.
     Contempla 1 reintento automático en caso de error de formato.
     """
-    prompt = build_prompt(caso, respuesta_estudiante, chunk, tiene_imagen=imagen_bytes is not None)
+    # Normalizar a lista unificada (prioridad: lista > singular > ninguna)
+    if imagenes_list is None and imagen_bytes:
+        imagenes_list = [(imagen_bytes, imagen_mime)]
+
+    tiene_imagen = bool(imagenes_list)
+    prompt = build_prompt(caso, respuesta_estudiante, chunk, tiene_imagen=tiene_imagen)
 
     try:
-        raw_text = call_gemini_llm(prompt, imagen_bytes=imagen_bytes, imagen_mime=imagen_mime)
+        raw_text = call_gemini_llm(prompt, imagenes_list=imagenes_list)
         resultado = parse_and_validate_llm_json(raw_text)
     except ValueError:
         retry_prompt = prompt + "\n\nNOTA: Asegúrate estrictamente de devolver ÚNICAMENTE el objeto JSON sin bloques de código."
-        raw_text_retry = call_gemini_llm(retry_prompt, imagen_bytes=imagen_bytes, imagen_mime=imagen_mime)
+        raw_text_retry = call_gemini_llm(retry_prompt, imagenes_list=imagenes_list)
         resultado = parse_and_validate_llm_json(raw_text_retry)
 
     # Enriquecer y sincronizar la cita normativa con la metadata fidedigna del fragmento RAG

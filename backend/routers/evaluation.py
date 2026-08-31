@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Form, File, UploadFile
 from fastapi.responses import StreamingResponse
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 import json
 from pathlib import Path
 from pydantic import BaseModel
@@ -85,12 +85,13 @@ async def export_evaluation_pdf(req: ExportPdfRequest):
 async def evaluate_response(
     case_id: str = Form(...),
     respuesta_estudiante: str = Form(...),
-    imagen: Optional[UploadFile] = File(None)
+    imagenes: Optional[List[UploadFile]] = File(None)
 ):
     """
-    Recibe la respuesta del estudiante y opcionalmente una imagen clínica (hemograma,
-    radiografía, ECG, etc.), recupera el fragmento normativo de la GPC del MSP
-    y ejecuta la evaluación multimodal con Gemini devolviendo retroalimentación estructurada.
+    Recibe la respuesta del estudiante y opcionalmente múltiples estudios diagnósticos
+    simultáneos (ECG, radiografía, gasometría, hemograma, etc.) como lista de archivos.
+    Recupera el fragmento normativo de la GPC del MSP y ejecuta la evaluación
+    multimodal con Gemini devolviendo retroalimentación estructurada.
     """
     caso = get_case_by_id(case_id)
     if not caso:
@@ -99,24 +100,31 @@ async def evaluate_response(
     if not respuesta_estudiante.strip():
         raise HTTPException(status_code=400, detail="La respuesta del estudiante no puede estar vacía.")
 
-    imagen_bytes = None
-    imagen_mime = "image/png"
+    # ── Construir lista de (bytes, mime_type) para fusión multimodal ──────────
+    imagenes_bytes_list: List[tuple] = []
 
-    if imagen and imagen.filename:
-        imagen_bytes = await imagen.read()
-        imagen_mime = imagen.content_type or "image/png"
-        print(f"[ROUTER] Imagen subida por usuario recibida: {imagen.filename} ({imagen_mime}, {len(imagen_bytes)} bytes)", flush=True)
-    elif caso.imagen_url:
+    # 1. Archivos subidos por el estudiante en la sesión
+    if imagenes:
+        for img_file in imagenes:
+            if img_file and img_file.filename:
+                img_bytes = await img_file.read()
+                img_mime = img_file.content_type or "image/png"
+                imagenes_bytes_list.append((img_bytes, img_mime))
+                print(f"[ROUTER] Estudio multimodal recibido: {img_file.filename} ({img_mime}, {len(img_bytes)} bytes)", flush=True)
+
+    # 2. Fallback: imagen preconfigurada en el caso clínico (backward compat)
+    if not imagenes_bytes_list and caso.imagen_url:
         import os
         rel_path = caso.imagen_url.replace("/static/images/", "")
         local_img_path = os.path.join(os.path.dirname(__file__), "..", "cases_data", "images", rel_path)
         if os.path.exists(local_img_path):
             with open(local_img_path, "rb") as f:
-                imagen_bytes = f.read()
-            if local_img_path.lower().endswith(".jpg") or local_img_path.lower().endswith(".jpeg"):
-                imagen_mime = "image/jpeg"
-            else:
-                imagen_mime = "image/png"
+                img_bytes = f.read()
+            img_mime = "image/jpeg" if local_img_path.lower().endswith((".jpg", ".jpeg")) else "image/png"
+            imagenes_bytes_list.append((img_bytes, img_mime))
+            print(f"[ROUTER] Usando imagen preconfigurada del caso: {local_img_path}", flush=True)
+
+    print(f"[ROUTER] Total de estudios multimodales a procesar: {len(imagenes_bytes_list)}", flush=True)
 
     try:
         chunk = retrieve_relevant_chunk(
@@ -131,8 +139,7 @@ async def evaluate_response(
             caso=caso,
             respuesta_estudiante=respuesta_estudiante,
             chunk=chunk,
-            imagen_bytes=imagen_bytes,
-            imagen_mime=imagen_mime
+            imagenes_list=imagenes_bytes_list
         )
 
         try:

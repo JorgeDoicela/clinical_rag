@@ -35,21 +35,31 @@ La integración de **Búsqueda Densa (BGE-M3 Fine-Tuned)** con **Búsqueda Dispe
 
 ## 4. Líneas de Trabajo Futuro y Extensión Científica
 
-### 4.1 Re-Ranking con Cross-Encoders Biomédicos
+> **Nota de Estado (v2.0 — Agosto 2026):** Las Brechas A (Fusión Multimodal Simultánea) y C (Dictado por Voz) se cerraron en la versión actual del sistema. La Brecha B (Simulación por Fases Clínicas) constituye la principal línea de trabajo futuro.
+
+### 4.1 Simulación Dinámica por Fases Clínicas Secuenciales *(Trabajo Futuro Principal)*
+* **Estado Actual (v2.0):** El flujo de evaluación es *single-turn*: el estudiante escribe todo su razonamiento en un solo turno y recibe retroalimentación integral.
+* **Evolución Propuesta:** Dividir el proceso en 3 fases secuenciales con desbloqueo progresivo:
+  1. **Fase 1 — Anamnesis / Sospecha Diagnóstica Inicial:** El estudiante solo ve el enunciado clínico. Evalúa el razonamiento diagnóstico.
+  2. **Fase 2 — Solicitud e Interpretación de Exámenes:** Se desbloquean las imágenes (ECG, Rx, Labs). El estudiante decide qué estudios pedir y los interpreta.
+  3. **Fase 3 — Prescripción y Seguimiento:** Con el diagnóstico confirmado, se evalúa el plan terapéutico y las indicaciones de monitoreo según la GPC.
+* **Requisitos:** Estado de sesión de simulación en el backend (SQLite) y UI de progresiones de paso en el frontend.
+
+### 4.2 Re-Ranking con Cross-Encoders Biomédicos
 * **Capa de Re-ordenamiento:** Evaluar modelos de *Cross-Encoder* especializados (ej. `BAAI/bge-reranker-large` o `BioLinkBERT`) sobre el Top-10 devuelto por la Fusión RRF para refinar la ponderación en casos clínicos con múltiples comorbilidades concurrentes.
 
-### 4.2 Despliegue 100% Offline mediante LLMs Cuantizados (Edge Computing)
+### 4.3 Despliegue 100% Offline mediante LLMs Cuantizados (Edge Computing)
 * Para centros de salud rurales de Primer Nivel sin conectividad a internet:
   * Integrar LLMs clínicos de código abierto cuantizados (ej. `Llama-3-8B-Instruct`, `Meditron-7B` o `BioMistral`) ejecutados localmente mediante Ollama / vLLM (GGUF Q4_K_M).
 
-### 4.3 Validación Clínica Multicéntrica
+### 4.4 Validación Clínica Multicéntrica
 * Diseñar un estudio experimental aleatorizado controlado con cohortes de estudiantes de medicina en múltiples facultades de ciencias de la salud del Ecuador para medir la ganancia de aprendizaje (*Learning Gain*) pre y post uso de la plataforma Ateneo.
 
 ---
 
 ## 5. Generalizabilidad, Transferibilidad y Escalabilidad a Otras Áreas Médicas
 
-El sistema **Ateneo** fue concebido bajo una arquitectura completamente **modular y agnóstica al dominio clínico**, lo que garantiza su reproducción y extensión a cualquier rama de las ciencias de la salud:
+El sistema **Ateneo+** fue concebido bajo una arquitectura completamente **modular y agnóstica al dominio clínico**, lo que garantiza su reproducción y extensión a cualquier rama de las ciencias de la salud:
 
 ### 5.1 Desacoplamiento del Corpus Documental
 * **Independencia del Formato:** El pipeline de parseo matricial (`pdf_advanced_parser.py`) y segmentación contextual (`chunker.py`) procesa cualquier cuerpo de literatura biomédica sin modificaciones en el código fuente.
@@ -64,9 +74,8 @@ La estructura de evaluación formalizada en Pydantic (`EvaluationResult`) y el c
 $$\text{Evaluación del Razonamiento} = \text{Diagnóstico} + \text{Tratamiento} + \text{Prevención} + \text{Seguimiento}$$
 Esta ontología es universalmente transferible desde la atención primaria hasta subespecialidades de alta complejidad.
 
-### 5.3 Extensibilidad de la Fusión Multimodal Simultánea
-El motor multimodal de visión y lenguaje admite la integración directa de diversas modalidades diagnósticas complementarias:
+### 5.3 Extensibilidad de la Fusión Multimodal Simultánea *(Implementado en v2.0)*
+El motor multimodal (`evaluator.py`) construye una lista de `types.Part.from_bytes` con todos los estudios subidos y los envía en un único request a Gemini para correlación cruzada:
 * **Trazados Electrofisiológicos:** Electrocardiogramas (ECG de 12 derivaciones) y electroencefalogramas (EEG).
 * **Diagnóstico por Imagen:** Tomografías Computarizadas (TAC), Resonancias Magnéticas (RMN), Radiografías digitales (Rx) y Ecografías obstétricas / FAST.
 * **Laboratorio y Paraclínicos:** Gasometrías arteriales, citometría hemática, perfiles hepáticos/renales y paneles microbiológicos con antibiogramas.
-

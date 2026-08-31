@@ -61,13 +61,25 @@ export async function fetchCaseById(caseId) {
   return res.json();
 }
 
-export async function evaluateResponse(caseId, respuestaEstudiante, imagen = null) {
+/**
+ * Evalúa la respuesta del estudiante enviando el razonamiento y opcionalmente
+ * múltiples estudios diagnósticos simultáneos (ECG, Rx, Labs, etc.).
+ *
+ * @param {string} caseId - ID del caso clínico
+ * @param {string} respuestaEstudiante - Texto libre del razonamiento clínico
+ * @param {File|File[]|null} imagenes - Archivo único (backward compat) o array de archivos
+ */
+export async function evaluateResponse(caseId, respuestaEstudiante, imagenes = null) {
   const formData = new FormData();
   formData.append('case_id', caseId);
   formData.append('respuesta_estudiante', respuestaEstudiante);
 
-  if (imagen) {
-    formData.append('imagen', imagen, imagen.name);
+  // Soporte de imagen singular (backward compat) o array de imágenes
+  if (imagenes) {
+    const imagenesArray = Array.isArray(imagenes) ? imagenes : [imagenes];
+    imagenesArray.forEach((img) => {
+      formData.append('imagenes', img, img.name);
+    });
   }
 
   const res = await fetch(`${API_URL}/api/evaluate`, {
@@ -83,6 +95,8 @@ export async function evaluateResponse(caseId, respuestaEstudiante, imagen = nul
 
   return res.json();
 }
+
+
 
 /**
  * Cliente HTTP unificado con sintaxis axios-like (client.get, client.post)

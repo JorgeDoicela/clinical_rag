@@ -1,8 +1,8 @@
-# Ateneo: Plataforma de Evaluación del Razonamiento Clínico mediante RAG y Guías de Práctica Clínica del MSP Ecuador
+# Ateneo+: Simulador Clínico Multimodal Basado en IA y RAG para el Entrenamiento Formativo y Analítica del Aprendizaje Médico en Ecuador
 
-**Ateneo** es un sistema de software de nivel de producción diseñado para la evaluación formativa y cuantitativa del razonamiento clínico (diagnóstico, terapéutico, preventivo y de seguimiento) en estudiantes de ciencias de la salud. La plataforma contrasta de forma automatizada las respuestas en lenguaje natural expresadas libremente por los usuarios contra el cuerpo normativo de las Guías de Práctica Clínica (GPC) del Ministerio de Salud Pública (MSP) del Ecuador.
+**Ateneo+** es una plataforma de simulación clínica multimodal de nivel de producción diseñada para la evaluación formativa y cuantitativa del razonamiento clínico (diagnóstico, terapéutico, preventivo y de seguimiento) en estudiantes de ciencias de la salud. La plataforma contrasta de forma automatizada el razonamiento expresado libremente por el usuario — ya sea por texto o por dictado por voz — más estudios diagnósticos adjuntos (ECG, radiografías, hemogramas, gasometrías) contra el cuerpo normativo de las Guías de Práctica Clínica (GPC) del Ministerio de Salud Pública (MSP) del Ecuador.
 
-El sistema integra una arquitectura de Recuperación Aumentada por Generación (RAG) en dos etapas, utilizando un modelo recuperador denso supervisado mediante Fine-Tuning por Tripletas (*Multiple Negatives Ranking Loss*) y un Modelo de Lenguaje de Gran Escala (LLM) multimodal forzado a producir respuestas estructuradas en sintaxis JSON estricta mediante validación Pydantic.
+El sistema integra una arquitectura de Recuperación Aumentada por Generación (RAG) Híbrida en dos etapas, utilizando un modelo recuperador denso supervisado mediante Fine-Tuning por Tripletas (*Multiple Negatives Ranking Loss*) y un Motor de Fusión Multimodal Simultánea que envía múltiples estudios diagnósticos en un solo request a Gemini Vision API para su correlación cruzada anclada en las GPC.
 
 ---
 
@@ -15,11 +15,12 @@ El sistema integra una arquitectura de Recuperación Aumentada por Generación (
 | **Base Vectorial** | ChromaDB | `0.6.3` | Almacenamiento persistente de vectores densos con búsqueda por similitud de distancia coseno. |
 | **Embeddings Base** | `BAAI/bge-m3` | `SentenceTransformers 3.3.1` | Encoder denso bidireccional de 1,024 dimensiones con ventana contextual de 8,192 tokens. |
 | **Modelo Fine-Tuned** | `ateneo-bge-m3-ecuador` | Local / Custom | Modelo ajustado mediante pérdida MNRL sobre 480 tripletas clínicas de GPCs del MSP Ecuador. |
-| **Evaluador LLM** | Google Gemini API | `google-genai 0.1.0+` | Invocación multimodal autorregresiva (`gemini-3.5-flash` / `gemini-2.5-flash`) con `response_mime_type="application/json"`. |
-| **Persistencia Relacional** | SQLite3 | Native | Almacenamiento transaccional de historial de evaluaciones, analítica B2B y salas de Ateneo sincrónicas. |
+| **Evaluador LLM** | Google Gemini API | `google-genai 0.1.0+` | Fusión Multimodal Simultánea: envío de múltiples estudios diagnósticos (ECG+Rx+Labs) en un solo request con `response_mime_type="application/json"`. |
+| **Persistencia Relacional** | SQLite3 | Native | Almacenamiento transaccional de historial de evaluaciones, analítica B2B y salas de Ateneo sincónicas. |
 | **Seguridad & Auth** | PyJWT / Passlib | `2.13.0` / `1.7.4` | Autenticación basada en JWT (algoritmo HS256) y hashing de contraseñas mediante PBKDF2/bcrypt. |
-| **Frontend UI** | React / Vite | `18.3.1` / `6.0.5` | Single Page Application (SPA) y Progressive Web App (PWA) con React Router DOM v6 y soporte nativo `Ctrl+Click`. |
+| **Frontend UI** | React / Vite | `18.3.1` / `6.0.5` | SPA y PWA con soporte nativo `Ctrl+Click` multi-pestaña y diseño responsivo Ateneo+ Design System. |
 | **Estilos & Iconos** | Tailwind CSS / Lucide | `3.4.17` / `0.469.0` | Sistema de diseño de alta precisión con paleta de colores fríos e iconografía vectorial plana. |
+| **Dictado por Voz** | Web Speech API | Nativa (Chrome/Edge) | Reconocimiento de voz en tiempo real (`es-EC`) para dictado clínico, transcripción acumulada al razonamiento. |
 | **Visualización Gráfica** | Recharts | `2.15.0` | Gráficos de radar de competencias, tendencias temporales y distribución analítica de cohortes. |
 | **Generación de Reportes** | ReportLab | `4.2.5` | Exportación de dictámenes clínicos formativos en PDF institucional con sello criptográfico SHA-256. |
 
@@ -33,12 +34,12 @@ clinical_rag/
 │   ├── auth/
 │   │   └── security.py          # Autenticación JWT (HS256), hashing PBKDF2/bcrypt y control RBAC
 │   ├── cases_data/
-│   │   ├── cases.json           # Banco de casos clínicos simulados y metadatos de nivel esperado
+│   │   ├── cases.json           # Banco de 12+ casos clínicos calibrados con ChromaDB (GPCs MSP)
 │   │   └── images/              # Recursos gráficos estáticos (radiografías, hemogramas, ECG, etc.)
 │   ├── data/
 │   │   ├── ateneo-bge-m3-ecuador/ # Pesos compilados del modelo de embeddings ajustado (1024 dims)
-│   │   ├── chroma_db/           # Base de datos vectorial persistente ChromaDB (colección gpc_msp)
-│   │   ├── history.db           # Base relacional SQLite (evaluaciones guardadas y salas de Ateneo)
+│   │   ├── chroma_db/           # Base de datos vectorial (5,944 fragmentos normativos de 45+ GPCs MSP)
+│   │   ├── history.db           # Base relacional SQLite (evaluaciones y salas de Ateneo)
 │   │   ├── ft_dataset.json      # Dataset de entrenamiento con 480 tripletas clínicas (Query, Pos, Neg)
 │   │   └── raw_pdfs/            # Archivos PDF normativos oficiales de las GPC del MSP Ecuador
 │   ├── ingestion/
@@ -48,53 +49,66 @@ clinical_rag/
 │   │   ├── run_ingestion.py     # Pipeline principal de ingesta masiva y chunks sembrados de respaldo
 │   │   ├── create_ft_dataset.py # Algoritmo de generación de tripletas supervisadas para Fine-Tuning
 │   │   ├── train_fine_tuning.py # Script de entrenamiento local mediante SentenceTransformers y MNRL
-│   │   └── colab_fine_tuning.ipynb # Notebook Jupyter para entrenamiento supervisado en GPU Cloud T4
+│   │   └── colab_fine_tuning.ipynb # Notebook para entrenamiento supervisado en GPU Cloud T4
 │   ├── models/
 │   │   ├── schemas.py           # Modelos Pydantic (EvaluationResult, CitaNormativa, UserRole, etc.)
 │   │   ├── clinical_case.py     # Gestor de lectura e instanciación de casos clínicos desde JSON
 │   │   ├── history_db.py        # DAO para persistencia relacional en SQLite y algoritmos de analítica
-│   │   └── room_session.py      # Gestor de salas sincrónicas colaborativas y analítica de consenso
+│   │   └── room_session.py      # Gestor de salas sincónicas colaborativas y analítica de consenso
 │   ├── rag/
-│   │   ├── retriever.py         # Motor de búsqueda vectorial denso con filtrado por guía y fallback
-│   │   ├── prompt_builder.py    # Constructor de prompts estructurados y directivas multimodales
-│   │   └── evaluator.py         # Cliente Gemini API, fallback defensivo y algoritmo de reparación de JSON
+│   │   ├── retriever.py         # Motor de búsqueda vectorial denso híbrido RRF (BGE-M3 + BM25, k=60)
+│   │   ├── prompt_builder.py    # Constructor de prompts estructurados con directivas multimodales
+│   │   └── evaluator.py         # Motor de Fusión Multimodal: múltiples Part.from_bytes en 1 request Gemini
 │   ├── routers/
 │   │   ├── auth.py              # Endpoints de inicio de sesión, verificación de token y catálogo de usuarios
 │   │   ├── cases.py             # Endpoints de consulta de casos clínicos activos
-│   │   ├── evaluation.py        # Endpoint de evaluación RAG (soporta texto e imágenes multipart/form-data)
-│   │   ├── history.py           # Endpoints de historial del estudiante y analítica de cohorte B2B
-│   │   └── collaboration.py     # Endpoints de gestión y participación en salas de Ateneo sincrónicas
+│   │   ├── evaluation.py        # POST /api/evaluate con List[UploadFile] para fusión multimodal simultánea
+│   │   ├── history.py           # Endpoints de historial del estudiante, analítica B2B y exportación PDF
+│   │   └── collaboration.py     # Endpoints de gestión y participación en salas de Ateneo sincónicas
+│   ├── services/
+│   │   └── pdf_report_generator.py # Generador de dictámen PDF institucional con logo, SHA-256 y semáforo IBF
 │   ├── tests/
 │   │   ├── test_cases_fixture.json # Banco de 15 casos de prueba anotados con fragmento ideal
 │   │   ├── run_metrics.py       # Runner de benchmark automatizado (Hit@1, validez JSON, latencia)
 │   │   └── resultados_metricas.json # Reporte cuantitativo de salida del benchmark
 │   ├── config.py                # Variables de entorno y resolución dinámica del modelo local
-│   ├── main.py                  # Inicialización FastAPI, middleware CORS y precalentamiento asíncrono
+│   ├── main.py                  # Inicialización FastAPI, CORS, telemetría silenciada y precalentamiento
 │   ├── requirements.txt         # Lista estricta de dependencias Python
 │   └── Dockerfile               # Configuración de contenedor Python 3.11-slim con PyTorch
 ├── docs/                        # Documentación técnica y académica detallada
-│   ├── ARQUITECTURA_RAG_Y_FINE_TUNING.md # Especificación del RAG en 2 etapas, Transformer y MNRL
-│   ├── GUIA_FINE_TUNING_COLAB_Y_METRICAS.md # Guía de entrenamiento en GPU T4 y benchmark empírico
-│   ├── GUIA_INGESTA_Y_CASOS.md  # Especificación de esquemas Pydantic, API REST y SQLite
-│   ├── METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md # Protocolo de reproducibilidad y métricas
-│   ├── DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md # Análisis crítico, limitaciones y líneas de desarrollo
-│   └── PUBLICACION_Y_PRESENTACION_CONGRESO.md # Síntesis de hallazgos y guion de presentación ejecutiva
-├── frontend/                    # Aplicación cliente React + Vite (SPA/PWA)
-│   ├── public/                  # Favicon y assets estáticos de la PWA
-│   ├── src/
-│   │   ├── api/client.js        # Cliente Axios configurado con interceptor de Tokens Bearer JWT
-│   │   ├── components/          # Componentes visuales (FeedbackCard, SkillRadarChart, Analytics)
-│   │   ├── context/AuthContext.jsx # Proveedor global del estado de autenticación y sesión
-│   │   ├── pages/               # Vistas principales (Login, CaseList, CaseSolve, AteneoRoom, Dashboards)
-│   │   ├── App.jsx              # Router principal con rutas protegidas por RBAC
-│   │   ├── main.jsx             # Punto de entrada de React 18 DOM
-│   │   └── index.css            # Configuración de Tailwind CSS y fuentes tipográficas
-│   ├── vite.config.js           # Configuración de Vite, proxy de desarrollo y plugin PWA
-│   ├── package.json             # Dependencias de JavaScript (React, Tailwind, Recharts, Lucide)
-│   └── Dockerfile               # Configuración de contenedor Nginx de producción para la SPA
+│   ├── ARQUITECTURA_RAG_Y_FINE_TUNING.md
+│   ├── ESTADO_SISTEMA_V2.md         # [NUEVO] Madurez por componente, brechas cerradas y trabajo futuro
+│   ├── DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md
+│   ├── GUIA_FINE_TUNING_COLAB_Y_METRICAS.md
+│   ├── GUIA_INGESTA_Y_CASOS.md
+│   ├── GUIA_PASO_A_PASO_ENTRENAMIENTO_Y_PROXIMOS_PASOS.md
+│   ├── METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md
+│   ├── PROTOCOLO_A100_MLOPS_Y_GROUND_TRUTH.md
+│   ├── PUBLICACION_Y_PRESENTACION_CONGRESO.md
+│   └── CUANTIZACION_Y_DESPLIEGUE_AWS.md
+├── frontend/                    # Aplicación cliente React + Vite (SPA/PWA) — Ateneo+ Design System
+│   ├── public/                  # Favicon, ateneo.png (imagotipo oficial) y manifest.webmanifest
+│   └── src/
+│       ├── api/client.js        # Cliente HTTP con soporte multi-imagen (File[]) y Bearer JWT
+│       ├── components/
+│       │   ├── VoiceInputButton.jsx   # [NUEVO v2.0] Dictado clínico por voz (Web Speech API, es-EC)
+│       │   ├── ImageUploadZone.jsx    # [NUEVO v2.0] Galería drag&drop multi-estudio con badges ECG/Rx/Lab
+│       │   ├── FeedbackCard.jsx       # Tarjeta de retroalimentación formativa y exportación PDF
+│       │   ├── SkillRadarChart.jsx    # Radar de competencias clínicas en 4 ejes (Recharts)
+│       │   ├── CoordinatorAnalytics.jsx # Panel B2B para directores académicos
+│       │   ├── ReasoningTrends.jsx    # Evolución longitudinal del puntaje del estudiante
+│       │   ├── EvaluationGameLoader.jsx # Loader animado multimodal durante evaluación RAG
+│       │   └── PdfViewerModal.jsx     # Visor interactivo del PDF oficial con salto a página normativa
+│       ├── context/AuthContext.jsx # Proveedor global del estado de autenticación y sesión
+│       ├── pages/
+│       │   ├── CaseList.jsx           # Vista principal Google Workspace 3-Zone con Ctrl+Click
+│       │   └── CaseSolve.jsx          # Vista split-screen: voz + multi-imagen + evaluación RAG
+│       ├── App.jsx                # Router principal con rutas protegidas por RBAC
+│       ├── main.jsx               # Punto de entrada de React 18 DOM
+│       └── index.css              # Tailwind CSS y fuentes tipográficas (Google Sans / Plus Jakarta Sans)
 ├── docker-compose.yml           # Orquestación multicontenedor (Backend + Frontend) con soporte GPU
+├── ideas.md                     # Visión, brechas identificadas y roadmap técnico del sistema
 └── README.md                    # Documentación principal de entrada del proyecto
-```
 
 ---
 
