@@ -20,7 +20,7 @@ El pipeline combina búsqueda densa basada en **`BAAI/bge-m3`** (1,024 dims) y b
 
 ---
 
-## 2. Síntesis de Métricas de Rendimiento ([resultados_metricas.json](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/tests/resultados_metricas.json) & [tabla_resultados_paper.tex](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/tests/tabla_resultados_paper.tex))
+## 2. Síntesis de Métricas de Rendimiento ([../backend/tests/resultados_metricas.json](../backend/tests/resultados_metricas.json) & [../backend/tests/tabla_resultados_paper.tex](../backend/tests/tabla_resultados_paper.tex))
 
 | Métrica Evaluada | Resultado | Método de Medición y Validación |
 | :--- | :---: | :--- |
@@ -34,7 +34,7 @@ El pipeline combina búsqueda densa basada en **`BAAI/bge-m3`** (1,024 dims) y b
 
 ---
 
-## 3. Tabla II del Paper: Estudio de Ablación Arquitectónica ([tabla_ablacion_paper.tex](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/tests/tabla_ablacion_paper.tex))
+## 3. Tabla II del Paper: Estudio de Ablación Arquitectónica ([../backend/tests/tabla_ablacion_paper.tex](../backend/tests/tabla_ablacion_paper.tex))
 
 ```latex
 \begin{table*}[t]

@@ -125,7 +125,7 @@ clinical_rag/
    source venv/bin/activate
    ```
 
-3. Instalar las dependencias fijadas en [requirements.txt](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/requirements.txt):
+3. Instalar las dependencias fijadas en [requirements.txt](backend/requirements.txt):
    ```bash
    pip install --upgrade pip
    pip install -r requirements.txt
@@ -177,7 +177,7 @@ clinical_rag/
 
 ### 4.1 Indexación de Guías de Práctica Clínica (PDFs)
 Para incorporar nuevos documentos en formato PDF emitidos por el MSP Ecuador:
-1. Colocar los archivos PDF dentro del directorio [backend/data/raw_pdfs/](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/raw_pdfs).
+1. Colocar los archivos PDF dentro del directorio [backend/data/raw_pdfs/](backend/data/raw_pdfs).
 2. Ejecutar la pipeline de extracción, chunking e indexación vectorial:
    ```bash
    cd backend
@@ -185,15 +185,15 @@ Para incorporar nuevos documentos en formato PDF emitidos por el MSP Ecuador:
    ```
 
 ### 4.2 Recreación del Dataset y Ajuste Supervisado
-1. Generar el dataset supervisado de 480 tripletas clínicas mediante [create_ft_dataset.py](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/ingestion/create_ft_dataset.py):
+1. Generar el dataset supervisado de 480 tripletas clínicas mediante [create_ft_dataset.py](backend/ingestion/create_ft_dataset.py):
    ```bash
    python ingestion/create_ft_dataset.py
    ```
-2. Cargar el notebook [colab_fine_tuning.ipynb](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/ingestion/colab_fine_tuning.ipynb) junto con el archivo [ft_dataset.json](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/ft_dataset.json) en **Google Colab** configurado con aceleradora **NVIDIA GPU T4** (15.3 GB VRAM).
+2. Cargar el notebook [colab_fine_tuning.ipynb](backend/ingestion/colab_fine_tuning.ipynb) junto con el archivo [ft_dataset.json](backend/data/ft_dataset.json) en **Google Colab** configurado con aceleradora **NVIDIA GPU T4** (15.3 GB VRAM).
 3. Tras completarse las 3 épocas (720 iteraciones), descargar el archivo resultante `ateneo-bge-m3-ecuador.zip` y descomprimirlo en:
    `backend/data/ateneo-bge-m3-ecuador/`
 
-> ℹ️ **Resolución Automática del Modelo:** El archivo [config.py](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/config.py#L16-L20) detecta si la carpeta `backend/data/ateneo-bge-m3-ecuador/` contiene los pesos compilados (`config.json`, `model.safetensors`). De existir, los carga automáticamente; en su ausencia, conmuta hacia el modelo base multilingüe `BAAI/bge-m3`.
+> ℹ️ **Resolución Automática del Modelo:** El archivo [config.py](backend/config.py) detecta si la carpeta `backend/data/ateneo-bge-m3-ecuador/` contiene los pesos compilados (`config.json`, `model.safetensors`). De existir, los carga automáticamente; en su ausencia, conmuta hacia el modelo base multilingüe `BAAI/bge-m3`.
 
 ---
 
@@ -220,8 +220,8 @@ Los artefactos binarios pesados (los pesos de 2.27 GB del modelo y la base vecto
 docker compose up --build -d
 ```
 
-### 5.2 Despliegue con Aceleración Hardware por GPU NVIDIA
-Si el servidor de despliegue posee tarjeta gráfica NVIDIA y la herramienta `nvidia-container-toolkit` instalada, el servicio backend aprovechará la GPU habilitando la sección `reservations` en [docker-compose.yml](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docker-compose.yml):
+### 5.3 Despliegue con Aceleración Hardware por GPU NVIDIA
+Si el servidor de despliegue posee tarjeta gráfica NVIDIA y la herramienta `nvidia-container-toolkit` instalada, el servicio backend aprovechará la GPU habilitando la sección `reservations` en [docker-compose.yml](docker-compose.yml):
 ```yaml
 services:
   backend:
@@ -236,7 +236,7 @@ services:
               capabilities: [gpu]
 ```
 
-### 5.3 Ingesta Nativa Contenerizada (Recomendación de Producción)
+### 5.4 Ingesta Nativa Contenerizada (Recomendación de Producción)
 Para prevenir errores de deserialización en ChromaDB causados por incompatibilidades entre esquemas de SQLite del Host (Windows/macOS) y Linux:
 ```bash
 # 1. Detener el contenedor del backend
@@ -256,13 +256,13 @@ docker compose up -d
 
 ## 6. Validación de Métricas Benchmark y Búsqueda Híbrida
 
-Para ejecutar el banco de pruebas cuantitativo que valida el rendimiento del sistema mediante Búsqueda Híbrida (Dense BGE-M3 + Sparse BM25 con Reciprocal Rank Fusion - RRF) y exportar automáticamente la tabla formal en LaTeX para el paper mediante [run_metrics.py](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/tests/run_metrics.py):
+Para ejecutar el banco de pruebas cuantitativo que valida el rendimiento del sistema mediante Búsqueda Híbrida (Dense BGE-M3 + Sparse BM25 con Reciprocal Rank Fusion - RRF) y exportar automáticamente la tabla formal en LaTeX para el paper mediante [run_metrics.py](backend/tests/run_metrics.py):
 ```bash
 cd backend
 python tests/run_metrics.py
 ```
 
-### Resumen de Métricas Obtenidas ([resultados_metricas.json](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/tests/resultados_metricas.json) & [tabla_resultados_paper.tex](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/tests/tabla_resultados_paper.tex))
+### Resumen de Métricas Obtenidas ([resultados_metricas.json](backend/tests/resultados_metricas.json) & [tabla_resultados_paper.tex](backend/tests/tabla_resultados_paper.tex))
 * **Precisión de Recuperación Top-1 (Hit@1)**: **`100.0%`**
 * **Precisión en Top-3 / Top-5 (Hit@3 / Hit@5)**: **`100.0%` / `100.0%`**
 * **Mean Reciprocal Rank (MRR@5)**: **`1.0000`**
@@ -277,13 +277,13 @@ python tests/run_metrics.py
 
 Para revisar los detalles metodológicos profundos y la especificación completa del sistema, consultar los siguientes archivos en la carpeta `docs/`:
 
-* [PROTOCOLO_A100_MLOPS_Y_GROUND_TRUTH.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/PROTOCOLO_A100_MLOPS_Y_GROUND_TRUTH.md): Arquitectura MLOps en GPU NVIDIA A100, precisión BF16/TF32, contrato de datos de Ground Truth desacoplado y Fusión Recíproca de Rangos (RRF).
-* [GUIA_PASO_A_PASO_ENTRENAMIENTO_Y_PROXIMOS_PASOS.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/GUIA_PASO_A_PASO_ENTRENAMIENTO_Y_PROXIMOS_PASOS.md): Manual operativo paso a paso para ingesta acelerada en A100, generación de tablas LaTeX y migración en Docker.
-* [ARQUITECTURA_RAG_Y_FINE_TUNING.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/ARQUITECTURA_RAG_Y_FINE_TUNING.md): Especificación matemática de Búsqueda Híbrida RRF, Transformer bidireccional, pérdida MNRL, tablas Markdown y visor de PDFs.
-* [GUIA_INGESTA_Y_CASOS.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/GUIA_INGESTA_Y_CASOS.md): Esquemas de datos Pydantic, endpoints OpenAPI REST, organización por carpetas de año y visor modal.
-* [METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md): Protocolo de división de datos *Document-Level Out-of-Distribution*, prevención de *Data Leakage* y generador de tablas LaTeX para artículos científicos.
-* [GUIA_FINE_TUNING_COLAB_Y_METRICAS.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/GUIA_FINE_TUNING_COLAB_Y_METRICAS.md): Justificación matemática de Large Batch Size ($B=32$), pérdida MNRL y suite de pruebas del benchmark.
-* [PUBLICACION_Y_PRESENTACION_CONGRESO.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/PUBLICACION_Y_PRESENTACION_CONGRESO.md): Síntesis de hallazgos técnicos, Tablas I y II en LaTeX y guion de 10 diapositivas para congreso internacional.
-* [CUANTIZACION_Y_DESPLIEGUE_AWS.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/CUANTIZACION_Y_DESPLIEGUE_AWS.md): Cuantización ONNX/INT8, arquitectura serverless y despliegue elástico en AWS ECS/Fargate.
-* [DESIGN_SYSTEM.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/DESIGN_SYSTEM.md): Tokens del sistema de diseño visual, componentes UI React, Recharts, visor interactivo y configuración PWA.
-* [DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md): Análisis crítico de resultados, discusión contra evaluadores zero-shot, limitaciones y trabajo futuro.
+* [PROTOCOLO_A100_MLOPS_Y_GROUND_TRUTH.md](docs/PROTOCOLO_A100_MLOPS_Y_GROUND_TRUTH.md): Arquitectura MLOps en GPU NVIDIA A100, precisión BF16/TF32, contrato de datos de Ground Truth desacoplado y Fusión Recíproca de Rangos (RRF).
+* [GUIA_PASO_A_PASO_ENTRENAMIENTO_Y_PROXIMOS_PASOS.md](docs/GUIA_PASO_A_PASO_ENTRENAMIENTO_Y_PROXIMOS_PASOS.md): Manual operativo paso a paso para ingesta acelerada en A100, generación de tablas LaTeX y migración en Docker.
+* [ARQUITECTURA_RAG_Y_FINE_TUNING.md](docs/ARQUITECTURA_RAG_Y_FINE_TUNING.md): Especificación matemática de Búsqueda Híbrida RRF, Transformer bidireccional, pérdida MNRL, tablas Markdown y visor de PDFs.
+* [GUIA_INGESTA_Y_CASOS.md](docs/GUIA_INGESTA_Y_CASOS.md): Esquemas de datos Pydantic, endpoints OpenAPI REST, organización por carpetas de año y visor modal.
+* [METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md](docs/METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md): Protocolo de división de datos *Document-Level Out-of-Distribution*, prevención de *Data Leakage* y generador de tablas LaTeX para artículos científicos.
+* [GUIA_FINE_TUNING_COLAB_Y_METRICAS.md](docs/GUIA_FINE_TUNING_COLAB_Y_METRICAS.md): Justificación matemática de Large Batch Size ($B=32$), pérdida MNRL y suite de pruebas del benchmark.
+* [PUBLICACION_Y_PRESENTACION_CONGRESO.md](docs/PUBLICACION_Y_PRESENTACION_CONGRESO.md): Síntesis de hallazgos técnicos, Tablas I y II en LaTeX y guion de 10 diapositivas para congreso internacional.
+* [CUANTIZACION_Y_DESPLIEGUE_AWS.md](docs/CUANTIZACION_Y_DESPLIEGUE_AWS.md): Cuantización ONNX/INT8, arquitectura serverless y despliegue elástico en AWS ECS/Fargate.
+* [DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md): Tokens del sistema de diseño visual, componentes UI React, Recharts, visor interactivo y configuración PWA.
+* [DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md](docs/DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md): Análisis crítico de resultados, discusión contra evaluadores zero-shot, limitaciones y trabajo futuro.

@@ -39,7 +39,7 @@ El sistema **Ateneo** implementa una arquitectura de Recuperación Aumentada por
 
 ---
 
-## 2. Motor de Búsqueda Híbrida y Reciprocal Rank Fusion (RRF) ([backend/rag/retriever.py](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/rag/retriever.py))
+## 2. Motor de Búsqueda Híbrida y Reciprocal Rank Fusion (RRF) ([../backend/rag/retriever.py](../backend/rag/retriever.py))
 
 Para superar las limitaciones del suavizado semántico en términos médicos exactos (fármacos, dosis como *"500 mg"* o acrónimos como *"CURB-65"*), Ateneo implementa **Reciprocal Rank Fusion**:
 
@@ -59,7 +59,7 @@ Los fragmentos se ordenan de forma descendente según su $\text{RRF\_Score}$, ga
 
 ---
 
-## 3. Extracción Estructurada de Tablas Clínicas en Markdown ([backend/ingestion/pdf_advanced_parser.py](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/ingestion/pdf_advanced_parser.py))
+## 3. Extracción Estructurada de Tablas Clínicas en Markdown ([../backend/ingestion/pdf_advanced_parser.py](../backend/ingestion/pdf_advanced_parser.py))
 
 Para preservar el 100% de la información contenida en matrices de dosis, esquemas terapéuticos y clasificaciones de severidad, el parser avanzado utiliza **`pdfplumber`**:
 
@@ -87,6 +87,6 @@ Donde:
 
 ---
 
-## 5. Integración con Visor Interactivo en Frontend ([frontend/src/components/PdfViewerModal.jsx](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/frontend/src/components/PdfViewerModal.jsx))
+## 5. Integración con Visor Interactivo en Frontend ([../frontend/src/components/PdfViewerModal.jsx](../frontend/src/components/PdfViewerModal.jsx))
 
 Cada cita normativa generada por el evaluador se vincula al endpoint `/api/cases/pdf-location/{guia_id}`. El frontend en React permite abrir el visor de PDF oficial con salto directo `#page={pagina}`, permitiendo la auditoría instantánea de la fuente oficial en vivo durante congresos o sesiones docentes.

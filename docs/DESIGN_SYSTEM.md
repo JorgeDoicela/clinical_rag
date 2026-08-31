@@ -11,7 +11,7 @@ La interfaz gráfica de Ateneo implementa el paradigma **"Clínico Minimalista &
 * **Entorno de Lectura Médica Prolongada:** Aplicación de superficies neutras frías (`slate-50`, `bg-white`) con un contraste tipográfico riguroso para prevenir fatiga visual en análisis de casos clínicos extensos.
 * **Prohibición Estricta de Emojis:** Queda prohibido el uso de caracteres emoji en cualquier componente o mensaje de la interfaz gráfica para mantener un tono estrictamente académico e institucional.
 * **Iconografía Vectorial Plana:** Se utiliza exclusivamente la librería `lucide-react`. Los iconos se renderizan planos, sin bordes circulares sintéticos, sombreados artificiales ni contenedores estridentes.
-* **Disposición Split-Screen (Antiapilamiento):** Diseño de pantalla dividida en 2 columnas principales en la vista de resolución de casos ([backend/frontend/src/pages/CaseSolve.jsx](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/frontend/src/pages/CaseSolve.jsx)):
+* **Disposición Split-Screen (Antiapilamiento):** Diseño de pantalla dividida en 2 columnas principales en la vista de resolución de casos ([../frontend/src/pages/CaseSolve.jsx](../frontend/src/pages/CaseSolve.jsx)):
   - **Columna Izquierda (50%):** Enunciado del caso clínico, preámbulo, imagen médica estática e indicación de la GPC de referencia.
   - **Columna Derecha (50%):** Pregunta evaluativa, área de redacción en texto libre, zona de carga de archivos (drag & drop) y botón de envío.
 
@@ -57,14 +57,14 @@ La interfaz gráfica de Ateneo implementa el paradigma **"Clínico Minimalista &
 
 La interfaz incluye cuatro componentes principales basados en la librería `recharts`:
 
-1. **`SkillRadarChart.jsx` ([frontend/src/components/SkillRadarChart.jsx](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/frontend/src/components/SkillRadarChart.jsx)):** Renderiza un gráfico de radar pentagonal (`ResponsiveContainer` + `RadarChart`) trazando la puntuación de desempeño (0 a 100) en los 4 ejes clínicos estandarizados: **Diagnóstico**, **Tratamiento**, **Prevención** y **Seguimiento**.
-2. **`ReasoningTrends.jsx` ([frontend/src/components/ReasoningTrends.jsx](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/frontend/src/components/ReasoningTrends.jsx)):** Renderiza un gráfico de áreas y líneas (`AreaChart`) que ilustra la evolución longitudinal del puntaje del estudiante a lo largo del tiempo agrupado por GPC.
-3. **`CoordinatorAnalytics.jsx` ([frontend/src/components/CoordinatorAnalytics.jsx](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/frontend/src/components/CoordinatorAnalytics.jsx)):** Panel B2B para directores académicos que muestra el ranking de brechas colectivas institucionales mediante barras horizontales (`BarChart`).
-4. **`FeedbackCard.jsx` ([frontend/src/components/FeedbackCard.jsx](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/frontend/src/components/FeedbackCard.jsx)):** Renderiza la tarjeta de retroalimentación cualitativa/cuantitativa con aciertos, omisiones, cita normativa y competencias deficientes.
+1. **`SkillRadarChart.jsx` ([../frontend/src/components/SkillRadarChart.jsx](../frontend/src/components/SkillRadarChart.jsx)):** Renderiza un gráfico de radar pentagonal (`ResponsiveContainer` + `RadarChart`) trazando la puntuación de desempeño (0 a 100) en los 4 ejes clínicos estandarizados: **Diagnóstico**, **Tratamiento**, **Prevención** y **Seguimiento**.
+2. **`ReasoningTrends.jsx` ([../frontend/src/components/ReasoningTrends.jsx](../frontend/src/components/ReasoningTrends.jsx)):** Renderiza un gráfico de áreas y líneas (`AreaChart`) que ilustra la evolución longitudinal del puntaje del estudiante a lo largo del tiempo agrupado por GPC.
+3. **`CoordinatorAnalytics.jsx` ([../frontend/src/components/CoordinatorAnalytics.jsx](../frontend/src/components/CoordinatorAnalytics.jsx)):** Panel B2B para directores académicos que muestra el ranking de brechas colectivas institucionales mediante barras horizontales (`BarChart`).
+4. **`FeedbackCard.jsx` ([../frontend/src/components/FeedbackCard.jsx](../frontend/src/components/FeedbackCard.jsx)):** Renderiza la tarjeta de retroalimentación cualitativa/cuantitativa con aciertos, omisiones, cita normativa y competencias deficientes.
 
 ---
 
-## 5. Configuración de Progressive Web App (PWA) ([frontend/vite.config.js](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/frontend/vite.config.js))
+## 5. Configuración de Progressive Web App (PWA) ([../frontend/vite.config.js](../frontend/vite.config.js))
 
 La aplicación web está empaquetada como PWA mediante `vite-plugin-pwa`:
 * **Manifiesto Web:** `name: 'Ateneo - Evaluación de Razonamiento Clínico'`, `short_name: 'Ateneo RAG'`.

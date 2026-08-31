@@ -36,7 +36,7 @@ $$\mathcal{L}_{\text{MNRL}} = -\log \frac{e^{\text{sim}(q_i, p_i^+) / \tau}}{\su
 
 ## 3. Protocolo de Ejecución en Google Colab Pro
 
-1. Abrir el notebook [backend/ingestion/colab_fine_tuning.ipynb](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/ingestion/colab_fine_tuning.ipynb) en **Google Colab**.
+1. Abrir el notebook [../backend/ingestion/colab_fine_tuning.ipynb](../backend/ingestion/colab_fine_tuning.ipynb) en **Google Colab**.
 2. Seleccionar el tipo de entorno de ejecución: **Entorno de ejecución > Cambiar tipo de entorno de ejecución > GPU A100** (o GPU V100/T4).
 3. Subir a la raíz del entorno los archivos generados en `backend/data/`:
    * `train_triplets.json` (Conjunto de entrenamiento 70%)
@@ -52,4 +52,4 @@ $$\mathcal{L}_{\text{MNRL}} = -\log \frac{e^{\text{sim}(q_i, p_i^+) / \tau}}{\su
 
 ## 4. Detección Automática de los Pesos en Producción
 
-El archivo [config.py](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/config.py#L16-L20) detecta la presencia de `backend/data/ateneo-bge-m3-ecuador/config.json`. Al existir, conmuta de forma automática todas las consultas del RAG hacia el modelo optimizado sin requerir configuraciones manuales.
+El archivo [../backend/config.py](../backend/config.py) detecta la presencia de `backend/data/ateneo-bge-m3-ecuador/config.json`. Al existir, conmuta de forma automática todas las consultas del RAG hacia el modelo optimizado sin requerir configuraciones manuales.

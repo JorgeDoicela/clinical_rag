@@ -142,5 +142,5 @@ class ONNXDenseRetriever:
 
 ## 5. Matriz de Decisiones Metodológicas (Paper vs. AWS)
 
-* **Para el Artículo Científico / Tesis:** Utilizar la versión **FP16 Nativa** ([backend/data/ateneo-bge-m3-ecuador/](file:///home/jorge/Proyectos/clinical_rag/backend/data/ateneo-bge-m3-ecuador)). Esto previene cualquier cuestionamiento de revisores respecto a distorsión de espacios latentes.
+* **Para el Artículo Científico / Tesis:** Utilizar la versión **FP16 Nativa** ([../backend/data/ateneo-bge-m3-ecuador/](../backend/data/ateneo-bge-m3-ecuador)). Esto previene cualquier cuestionamiento de revisores respecto a distorsión de espacios latentes.
 * **Para Despliegue B2B / Producción AWS:** Exportar a **ONNX INT8**, reduciendo los costos operativos de infraestructura en mas de un **65% mensual** sin impacto perceptible en la experiencia de usuario.

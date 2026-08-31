@@ -36,7 +36,7 @@ Para evitar la sobreestimación del rendimiento causada por la memorización del
 
 ## 3. Auditoría de Cero Fuga de Datos (*Data Leakage Prevention*)
 
-El script de auditoría ([backend/ingestion/dataset_validator.py](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/ingestion/dataset_validator.py)) certifica matemáticamente las siguientes condiciones de validez:
+El script de auditoría ([../backend/ingestion/dataset_validator.py](../backend/ingestion/dataset_validator.py)) certifica matemáticamente las siguientes condiciones de validez:
 1. **Intersección Vacía de Guías Clínicas:**
    $$\text{Guias}(\text{Train}) \cap \text{Guias}(\text{Test}) = \emptyset, \quad \text{Guias}(\text{Train}) \cap \text{Guias}(\text{Val}) = \emptyset$$
 2. **Cero Coincidencia Textual:** Ningún fragmento normativo positivo ($p^+$) presente en el conjunto de validación o prueba existe dentro del conjunto de entrenamiento.
@@ -97,15 +97,15 @@ if torch.cuda.is_available():
 
 ## 8. Resultados Experimentales Consolidados (GPU NVIDIA A100)
 
-Los artefactos LaTeX generados automáticamente por el pipeline se encuentran preservados en [`docs/`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs):
+Los artefactos LaTeX generados automáticamente por el pipeline se encuentran preservados en [`docs/`](./):
 
-### Tabla I: Rendimiento Cuantitativo de Recuperación ([docs/tabla_resultados_paper.tex](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/tabla_resultados_paper.tex))
+### Tabla I: Rendimiento Cuantitativo de Recuperación ([tabla_resultados_paper.tex](tabla_resultados_paper.tex))
 * **In-Distribution ($N=15$):** $\text{Hit@1}=73.3\%$, $\text{Hit@5}=73.3\%$, $\text{MRR@5}=0.7333$.
 * **Out-of-Distribution ($N=10$):** $\text{Hit@1}=\mathbf{100.0\%}$, $\text{Hit@5}=\mathbf{100.0\%}$, $\text{MRR@5}=\mathbf{1.0000}$.
 * **Global Completo ($N=25$):** $\text{Hit@1}=\mathbf{84.0\%}$, $\text{Hit@5}=\mathbf{84.0\%}$, $\text{MRR@5}=\mathbf{0.8400}$, $\text{NDCG@5}=\mathbf{0.8400}$.
 * **Latencias:** Mediana $P_{50}=89.59\text{ ms}$, Percentil $P_{95}=111.94\text{ ms}$.
 
-### Tabla II: Estudio de Ablación Arquitectónica ([docs/tabla_ablacion_paper.tex](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/tabla_ablacion_paper.tex))
+### Tabla II: Estudio de Ablación Arquitectónica ([tabla_ablacion_paper.tex](tabla_ablacion_paper.tex))
 | Variante Arquitectónica | $\text{Hit@1}$ | $\text{Hit@5}$ | $\text{MRR@5}$ | $\text{NDCG@5}$ | Latencia $P_{50}$ |
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | 1. Sparse BM25 Solo (Sin Embeddings) | 84.0% | 84.0% | 0.8400 | 0.8400 | 62.5 ms |

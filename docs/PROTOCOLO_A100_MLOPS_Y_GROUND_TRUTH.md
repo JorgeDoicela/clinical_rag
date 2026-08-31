@@ -32,7 +32,7 @@ graph TD
 
 ---
 
-## 2. Contrato de Datos: Ground Truth Canónico Desacoplado ([backend/data/seed_chunks.json](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/seed_chunks.json))
+## 2. Contrato de Datos: Ground Truth Canónico Desacoplado ([../backend/data/seed_chunks.json](../backend/data/seed_chunks.json))
 
 Los fragmentos canónicos de referencia (*Ground Truth*) están desacoplados del código fuente de ingesta para garantizar máxima modularidad y extensibilidad:
 
@@ -68,7 +68,7 @@ Los fragmentos canónicos de referencia (*Ground Truth*) están desacoplados del
 
 ---
 
-## 3. Extensión y Generación Asistida por IA ([backend/scripts/generate_seed_chunks_ai.py](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/scripts/generate_seed_chunks_ai.py))
+## 3. Extensión y Generación Asistida por IA ([../backend/scripts/generate_seed_chunks_ai.py](../backend/scripts/generate_seed_chunks_ai.py))
 
 Para incorporar nuevas anclas normativas de Ground Truth sin editar código Python:
 
@@ -77,13 +77,13 @@ Para incorporar nuevas anclas normativas de Ground Truth sin editar código Pyth
 py backend/scripts/generate_seed_chunks_ai.py
 ```
 
-El script valida automáticamente los códigos CIE-10 contra el catálogo maestro [`backend/data/catalogo_cie10_gpc.json`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/catalogo_cie10_gpc.json) e inserta o actualiza el fragmento preservando la integridad del formato JSON.
+El script valida automáticamente los códigos CIE-10 contra el catálogo maestro [`../backend/data/catalogo_cie10_gpc.json`](../backend/data/catalogo_cie10_gpc.json) e inserta o actualiza el fragmento preservando la integridad del formato JSON.
 
 ---
 
 ## 4. Pipeline Experimental y Publicación Científica
 
-El notebook maestro [`backend/ingestion/colab_ingesta_benchmark_a100.ipynb`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/ingestion/colab_ingesta_benchmark_a100.ipynb) genera directamente los artefactos formales requeridos por los revisores de congresos:
+El notebook maestro [`../backend/ingestion/colab_ingesta_benchmark_a100.ipynb`](../backend/ingestion/colab_ingesta_benchmark_a100.ipynb) genera directamente los artefactos formales requeridos por los revisores de congresos:
 
 ### 4.1 Fusión Recíproca de Rangos (RRF $k=60$)
 Combina las fortalezas de la recuperación léxica (BM25Okapi) y semántica supervisada (BGE-M3 MNRL):

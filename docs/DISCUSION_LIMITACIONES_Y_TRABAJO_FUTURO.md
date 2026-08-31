@@ -21,7 +21,7 @@ La integración de **Búsqueda Densa (BGE-M3 Fine-Tuned)** con **Búsqueda Dispe
 ## 2. Mitigación de Limitaciones de Ingesta Mediante OCR Defensivo
 
 * **Desafío Histórico:** En documentos antiguos del MSP (2013-2015) resguardados como escaneos sin capa de texto seleccionable, la extracción directa con bibliotecas estándar de PDF fallaba.
-* **Solución Implementada ([backend/ingestion/ocr_service.py](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/ingestion/ocr_service.py)):** Se implementó un pipeline de **OCR Defensivo Multinivel** que detecta páginas con baja densidad de texto (< 50 caracteres) pero con imágenes incrustadas, renderizándolas a 180 DPI en memoria y transcribiendo su contenido clínico mediante OCR local y visión multimodal de alta precisión (Gemini Vision API), preservando tablas y algoritmos diagnósticos.
+* **Solución Implementada ([../backend/ingestion/ocr_service.py](../backend/ingestion/ocr_service.py)):** Se implementó un pipeline de **OCR Defensivo Multinivel** que detecta páginas con baja densidad de texto (< 50 caracteres) pero con imágenes incrustadas, renderizándolas a 180 DPI en memoria y transcribiendo su contenido clínico mediante OCR local y visión multimodal de alta precisión (Gemini Vision API), preservando tablas y algoritmos diagnósticos.
 
 ---
 

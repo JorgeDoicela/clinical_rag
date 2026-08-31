@@ -6,7 +6,7 @@ Esta guía detalla el procedimiento exacto paso a paso para que tú o cualquier 
 
 ## 1. Estructura de los Datasets de Entrenamiento
 
-Los datasets ubicados en [`backend/data/`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data) fueron generados y auditados matemáticamente con **Cero Fuga de Datos (*Document-Level Out-of-Distribution*)**:
+Los datasets ubicados en [`../backend/data/`](../backend/data) fueron generados y auditados matemáticamente con **Cero Fuga de Datos (*Document-Level Out-of-Distribution*)**:
 
 | Archivo | Cantidad de Tripletas | % del Corpus | Rol en la Investigación |
 | :--- | :---: | :---: | :--- |
@@ -36,7 +36,7 @@ Los datasets ubicados en [`backend/data/`](file:///c:/Users/DESARROLLADOR/Deskto
 
 ### Paso 1: Abrir el Notebook en Google Colab
 1. Ve a [Google Colab](https://colab.research.google.com/).
-2. Haz clic en **Subir (Upload)** y selecciona el archivo [`backend/ingestion/colab_fine_tuning.ipynb`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/ingestion/colab_fine_tuning.ipynb).
+2. Haz clic en **Subir (Upload)** y selecciona el archivo [`../backend/ingestion/colab_fine_tuning.ipynb`](../backend/ingestion/colab_fine_tuning.ipynb).
 
 ### Paso 2: Seleccionar la GPU A100
 1. En el menú superior de Colab: **Entorno de ejecución > Cambiar tipo de entorno de ejecución**.
@@ -66,7 +66,7 @@ Al finalizar la última celda, el notebook generará y descargará automáticame
 1. Descomprime el archivo descargado `ateneo-bge-m3-ecuador.zip`.
 2. Coloca la carpeta resultante en:
    `backend/data/ateneo-bge-m3-ecuador/`
-3. ¡Listo! El sistema [config.py](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/config.py) detectará los nuevos pesos y conmutará automáticamente todas las búsquedas hacia el modelo afinado con las 45 Guías del MSP.
+3. ¡Listo! El sistema [../backend/config.py](../backend/config.py) detectará los nuevos pesos y conmutará automáticamente todas las búsquedas hacia el modelo afinado con las 45 Guías del MSP.
 
 ---
 
@@ -76,9 +76,9 @@ Tienes 2 opciones para ejecutar la ingesta masiva de PDFs y los benchmarks cient
 
 ### Opción A: Aceleración Élite en GPU NVIDIA A100 + Google Drive (Recomendada - Cero Esperas)
 Para evitar lentitudes en el navegador y desconexiones por inactividad:
-1. Sube el archivo [`ateneo_colab_bundle.zip`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/ateneo_colab_bundle.zip) a tu **Google Drive** en la carpeta `Mi unidad > Proyectos > Ateneo`.
+1. Sube el archivo [`../ateneo_colab_bundle.zip`](../ateneo_colab_bundle.zip) a tu **Google Drive** en la carpeta `Mi unidad > Proyectos > Ateneo`.
 2. Abre en [Google Colab](https://colab.research.google.com/) el notebook maestro:
-   [`backend/ingestion/colab_ingesta_benchmark_a100.ipynb`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/ingestion/colab_ingesta_benchmark_a100.ipynb).
+   [`../backend/ingestion/colab_ingesta_benchmark_a100.ipynb`](../backend/ingestion/colab_ingesta_benchmark_a100.ipynb).
 3. Selecciona **GPU A100** y presiona `Ctrl + F9` (**Ejecutar todas**).
 4. El notebook:
    * Monta Google Drive y transfiere el archivo en 2 segundos a 1 Gbps+.
