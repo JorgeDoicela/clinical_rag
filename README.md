@@ -141,8 +141,19 @@ clinical_rag/
 │   │   ├── PROTOCOLO_A100_MLOPS_Y_GROUND_TRUTH.md # Pipeline MLOps
 │   │   └── CUANTIZACION_Y_DESPLIEGUE_AWS.md # Cuantización y despliegue cloud
 │   │
-│   └── 4_pdf_compilado/                  # DOCUMENTO PDF UNIFICADO
-│       └── COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf # Documento consolidado de 3 páginas con tablas y figuras
+│   ├── 4_pdf_compilado/                  # DOCUMENTO PDF UNIFICADO
+│   │   └── COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf # Documento consolidado de 3 páginas con tablas y figuras
+│   │
+│   └── 5_capturas_sistema/               # EVIDENCIA VISUAL DE LA PLATAFORMA EN EJECUCIÓN
+│       ├── GUIA_VISUAL_DEL_SISTEMA.md    # Manual visual explicativo de cada módulo y pantalla
+│       ├── 01_autenticacion_usuario.png  # Pantalla de acceso RBAC
+│       ├── 02_catalogo_y_recomendacion_zdp.png # Catálogo y recomendador ZDP
+│       ├── 03_grafo_espacio_conocimiento_kst.png # Modal del grafo de competencias KST
+│       ├── 04_resolucion_multimodal_rx_dictado.png # Caso de neumonía con Rx y dictado por voz
+│       ├── 05_simulacion_dinamica_fases_clinicas.png # Stepper de simulación por fases
+│       ├── 06_panel_docente_analitica_ibf.png # Dashboard B2B con IBF de cohorte y alertas
+│       ├── 07_panel_docente_deficiencias_institucionales.png # Top deficiencias curriculares
+│       └── 08_perfil_estudiante_radar_competencias.png # Radar de competencias Recharts
 │
 ├── backend/                              # SERVICIOS BACKEND FASTAPI (PYTHON 3.11)
 │   ├── adaptive/                         # Motor de Currículo Adaptativo (KST, BKT y ZDP)

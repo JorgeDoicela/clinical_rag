@@ -7,6 +7,7 @@
       "enunciado": "Paciente femenina de 24 años de edad, procedente de Guayaquil, acude a emergencias por presentar fiebre elevada de 3 días de evolución, dolor retroocular intenso, mialgias y artralgias. Desde hace 12 horas presenta dolor abdominal continuo e intenso, vómitos persistentes (4 en 6 horas) y somnolencia. Examen físico: PA 90/60 mmHg, FC 112 bpm, llenado capilar 3 segundos, petequias en extremidades inferiores. Laboratorio: Leucocitos 3,100/mm³, Plaquetas 68,000/mm³, Hematocrito 48% (hemoconcentración marcada).",
       "pregunta": "Clasifique la severidad del caso según la GPC del MSP Ecuador y describa la conducta terapéutica inmediata (esquema de reposición de líquidos con cristaloides a 5-7 ml/kg/h, monitoreo estricto de diuresis/signos vitales y criterios de hospitalización).",
       "nivel_esperado": "pregrado_avanzado",
+      "imagen_url": "/static/images/dengue_hemograma.png",
       "fragmento_gpc_ideal_id": "dengue_chunk_004",
       "competencias_activadas": [
         "semiologia_anamnesis",
@@ -152,6 +153,7 @@
       "enunciado": "Recién nacido a término (39 semanas de gestación, peso 3,200 g), producto de parto vaginal complicado con desprendimiento prematuro de placenta normoinserta y sufrimiento fetal agudo. Al nacimiento presenta líquido amniótico meconial espeso, apnea y bradicardia severa, requiriendo intubación endotraqueal y reanimación neonatal avanzada. Puntuación de APGAR: 2 al minuto 1 y 3 a los 5 minutos. A las 2 horas de vida, el neonato presenta letargia marcada, hipotonía generalizada, reflejo de succión ausente y crisis convulsivas sutiles (movimientos de pedaleo y parpadeo repetitivo). Gasometría de cordón umbilical: pH 6.95, Exceso de Bases -16 mmol/L.",
       "pregunta": "Clasifique la gravedad de la Encefalopatía Hipóxico-Isquémica según la escala de Sarnat (EHI Moderada-Grave / Estadio II-III) de acuerdo con la GPC oficial del MSP Ecuador (2019), determine la indicación de Hipotermia Terapéutica antes de las 6 horas de vida y establezca las medidas de neuroprotección y soporte hemodinámico en la Unidad de Cuidados Intensivos Neonatales.",
       "nivel_esperado": "pregrado_avanzado",
+      "imagen_url": "/static/images/ehirn_coagulograma.png",
       "competencias_activadas": [
         "semiologia_anamnesis",
         "correlacion_multimodal",
@@ -165,6 +167,7 @@
       "enunciado": "Paciente masculino de 3 años de edad (peso 14 kg), es traído a emergencias por su madre por presentar fiebre de 38.9 °C de 3 días de evolución, tos frecuente, hiporexia y decaimiento. Desde hace 8 horas presenta respiración rápida y dificultad respiratoria evidente. Examen físico: letárgico, FC 138 bpm, FR 46 rpm (taquipnea para grupo de 1 a 5 años: >= 40 rpm), SatO2 89% al aire ambiente, tiraje subcostal e intercostal marcado con aleteo nasal. Auscultación pulmonar: estertores crepitantes y disminución del murmullo vesicular en base pulmonar derecha.",
       "pregunta": "Identifique los signos clínicos de Neumonía Grave según la GPC de Neumonía Pediátrica (3 meses a 15 años) del MSP Ecuador (taquipnea para la edad, tiraje subcostal, hipoxemia), establezca el ámbito de tratamiento correspondiente (hospitalización inmediata con oxigenoterapia) y prescriba el esquema de antibioticoterapia empírica parenteral de primera línea normado por el MSP (Ampicilina parenteral 150-200 mg/kg/día dividida cada 6 horas).",
       "nivel_esperado": "pregrado_avanzado",
+      "imagen_url": "/static/images/neumonia_rx.png",
       "competencias_activadas": [
         "semiologia_anamnesis",
         "examenes_complementarios",
