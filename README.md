@@ -73,7 +73,6 @@ clinical_rag/
 │   └── Dockerfile               # Configuración de contenedor Python 3.11-slim con PyTorch
 ├── docs/                        # Documentación técnica y académica detallada
 │   ├── ARQUITECTURA_RAG_Y_FINE_TUNING.md # Especificación del RAG en 2 etapas, Transformer y MNRL
-│   ├── DESIGN_SYSTEM.md         # Tokens de diseño visual, arquitectura UI/UX y configuración PWA
 │   ├── GUIA_FINE_TUNING_COLAB_Y_METRICAS.md # Guía de entrenamiento en GPU T4 y benchmark empírico
 │   ├── GUIA_INGESTA_Y_CASOS.md  # Especificación de esquemas Pydantic, API REST y SQLite
 │   ├── METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md # Protocolo de reproducibilidad y métricas
@@ -285,5 +284,4 @@ Para revisar los detalles metodológicos profundos y la especificación completa
 * [GUIA_FINE_TUNING_COLAB_Y_METRICAS.md](docs/GUIA_FINE_TUNING_COLAB_Y_METRICAS.md): Justificación matemática de Large Batch Size ($B=32$), pérdida MNRL y suite de pruebas del benchmark.
 * [PUBLICACION_Y_PRESENTACION_CONGRESO.md](docs/PUBLICACION_Y_PRESENTACION_CONGRESO.md): Síntesis de hallazgos técnicos, Tablas I y II en LaTeX y guion de 10 diapositivas para congreso internacional.
 * [CUANTIZACION_Y_DESPLIEGUE_AWS.md](docs/CUANTIZACION_Y_DESPLIEGUE_AWS.md): Cuantización ONNX/INT8, arquitectura serverless y despliegue elástico en AWS ECS/Fargate.
-* [DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md): Tokens del sistema de diseño visual, componentes UI React, Recharts, visor interactivo y configuración PWA.
 * [DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md](docs/DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md): Análisis crítico de resultados, discusión contra evaluadores zero-shot, limitaciones y trabajo futuro.
