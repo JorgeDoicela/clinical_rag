@@ -19,12 +19,31 @@ app = FastAPI(
     version="1.0.0"
 )
 
-allowed_origins_raw = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173")
-allowed_origins = [origin.strip() for origin in allowed_origins_raw.split(",") if origin.strip()]
+# ALLOWED_ORIGINS en .env controla los orígenes permitidos.
+# - Para pruebas locales/LAN: dejar vacío o poner IPs específicas.
+# - Para Cloudflare Tunnel o AWS: agregar '*' para regex abierto.
+_origins_env = os.getenv("ALLOWED_ORIGINS", "")
+_open_cors = _origins_env.strip() == "*"
+
+if _open_cors:
+    # Modo abierto: acepta cualquier origen (Cloudflare Tunnel / producción cloud)
+    _allow_origins = []
+    _origin_regex = r"^https?://.*"
+else:
+    # Modo seguro (por defecto): orígenes locales + los configurados en .env
+    _static_origins = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+    ]
+    _extra = [o.strip() for o in _origins_env.split(",") if o.strip() and o.strip() != "*"]
+    _allow_origins = _static_origins + _extra
+    _origin_regex = r"^https?://192\.168\.[0-9]+\.[0-9]+:[0-9]+$"
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=_allow_origins,
+    allow_origin_regex=_origin_regex,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

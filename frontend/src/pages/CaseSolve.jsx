@@ -173,10 +173,7 @@ export default function CaseSolve() {
     }
   };
 
-  // Acumular texto dictado por voz al razonamiento existente
-  const handleVoiceTranscript = (text) => {
-    setRespuesta(prev => prev ? prev.trimEnd() + ' ' + text : text);
-  };
+
 
   if (loading) {
     return (
@@ -371,7 +368,8 @@ export default function CaseSolve() {
                     }
                   </label>
                   <VoiceInputButton
-                    onTranscript={handleVoiceTranscript}
+                    value={respuesta}
+                    onChange={setRespuesta}
                     disabled={evaluating}
                   />
                 </div>

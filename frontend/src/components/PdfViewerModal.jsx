@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, ExternalLink, FileText, Download, Maximize2, Minimize2, AlertCircle, Loader2 } from 'lucide-react';
-import client from '../api/client';
+import client, { API_URL } from '../api/client';
 
 export default function PdfViewerModal({ isOpen, onClose, guiaId, pagina = 1, seccion = "" }) {
   const [pdfUrl, setPdfUrl] = useState(null);
@@ -17,8 +17,7 @@ export default function PdfViewerModal({ isOpen, onClose, guiaId, pagina = 1, se
 
     client.get(`/cases/pdf-location/${encodeURIComponent(guiaId)}`)
       .then(res => {
-        const backendBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-        const fullUrl = `${backendBase}${res.data.pdf_url}#page=${pagina}`;
+        const fullUrl = `${API_URL}${res.data.pdf_url}#page=${pagina}`;
         setPdfUrl(fullUrl);
         setFilename(res.data.filename);
         setLoading(false);

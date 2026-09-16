@@ -1,4 +1,19 @@
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const getBaseApiUrl = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  if (typeof window !== 'undefined') {
+    // Si estamos navegando por HTTPS (ej. Cloudflare Tunnel), usamos rutas relativas con el proxy de Vite
+    if (window.location.protocol === 'https:') {
+      return '';
+    }
+    const host = window.location.hostname;
+    return `http://${host}:8000`;
+  }
+  return 'http://localhost:8000';
+};
+
+export const API_URL = getBaseApiUrl();
 
 export function getAuthHeaders(headers = {}) {
   const token = localStorage.getItem('ateneo_token');

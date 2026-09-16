@@ -82,14 +82,63 @@ Algoritmo de auditoría que comprueba que cada acierto u omisión generado por l
 
 El entorno completo (Backend FastAPI + Frontend React/Vite + Base Vectorial ChromaDB + Pesos Fine-Tuned + SQLite) se ejecuta de forma contenerizada:
 
+### 3.1 Configuración Previa: Variables de Entorno
+
+Copia el archivo de ejemplo y completa tu API Key de Google Gemini:
+
 ```bash
+cp backend/.env.example backend/.env
+```
+
+Edita `backend/.env` y configura la variable `ALLOWED_ORIGINS` según tu escenario:
+
+| Valor de `ALLOWED_ORIGINS` | Comportamiento | Cuándo usarlo |
+| :--- | :--- | :--- |
+| *(vacío)* | Solo `localhost` y red local `192.168.x.x` | Pruebas seguras en LAN |
+| `*` | Acepta cualquier origen | Cloudflare Tunnel, AWS, demos públicas |
+| `https://ateneo.tudominio.com` | Solo ese dominio exacto | Producción con dominio propio |
+
+### 3.2 Levantar los Contenedores
+
+```bash
+# Primera vez o tras cambios en el código:
+docker compose up -d --build
+
+# Siguientes levantamientos (sin reconstruir):
 docker compose up -d
 ```
 
-### URLs de Acceso:
-* **Aplicación Web Cliente (Frontend):** [`http://localhost:5173`](http://localhost:5173)
-* **API REST & Swagger UI (Backend):** [`http://localhost:8000/docs`](http://localhost:8000/docs)
-* **Endpoint de Salud (Healthcheck):** [`http://localhost:8000/health`](http://localhost:8000/health)
+### 3.3 URLs de Acceso
+
+#### Modo Local (solo tu máquina):
+* **Frontend:** [`http://localhost:5173`](http://localhost:5173)
+* **Swagger UI:** [`http://localhost:8000/docs`](http://localhost:8000/docs)
+* **Healthcheck:** [`http://localhost:8000/health`](http://localhost:8000/health)
+
+#### Modo Red Local (LAN — cualquier PC/celular en la misma red):
+
+Obtén la IP de tu máquina con `ipconfig` (Windows) o `ip a` (Linux). Ejemplo con IP `192.168.7.202`:
+
+* **Frontend:** `http://192.168.7.202:5173`
+* **Swagger UI:** `http://192.168.7.202:8000/docs`
+
+> **Nota Windows:** Asegúrate de abrir los puertos en el Firewall:
+> ```powershell
+> New-NetFirewallRule -DisplayName "Ateneo RAG LAN" -Direction Inbound -LocalPort 5173,8000 -Protocol TCP -Action Allow
+> ```
+
+#### Modo Público con SSL/HTTPS (Cloudflare Tunnel — sin configurar router):
+
+Con el ejecutable `cloudflared` descargado, ejecuta:
+
+```bash
+./cloudflared tunnel --url http://localhost:5173
+```
+
+Cloudflare generará una URL pública con certificado HTTPS gratuito válido, tipo:
+`https://xxxxx.trycloudflare.com`
+
+> Requiere `ALLOWED_ORIGINS=*` en `backend/.env` para que el navegador acepte las peticiones desde el dominio público.
 
 ---
 
