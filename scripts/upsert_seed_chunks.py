@@ -1,14 +1,21 @@
 import json
 import os
 import sys
+from pathlib import Path
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT_DIR = Path(__file__).resolve().parent.parent
+BACKEND_DIR = ROOT_DIR / "backend"
+if not (BACKEND_DIR / "config.py").exists() and Path("/app/config.py").exists():
+    BACKEND_DIR = Path("/app")
+    ROOT_DIR = Path("/")
+
+sys.path.insert(0, str(BACKEND_DIR))
 
 from rag.retriever import get_embedding_model, get_chroma_client
 
 def main():
-    seed_path = os.path.join(os.path.dirname(__file__), "..", "data", "seed_chunks.json")
-    if not os.path.exists(seed_path):
+    seed_path = BACKEND_DIR / "data" / "seed_chunks.json"
+    if not seed_path.exists():
         print(f"Error: {seed_path} no existe.")
         return
 

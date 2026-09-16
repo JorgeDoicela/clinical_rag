@@ -10,6 +10,7 @@ services:
     volumes:
       - ./backend:/app
       - ./docs:/docs
+      - ./scripts:/scripts
     env_file:
       - ./backend/.env
     healthcheck:
@@ -36,3 +37,6 @@ services:
       backend:
         condition: service_healthy
     restart: unless-stopped
+
+
+

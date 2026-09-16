@@ -129,16 +129,27 @@ Obtén la IP de tu máquina con `ipconfig` (Windows) o `ip a` (Linux). Ejemplo c
 
 #### Modo Público con SSL/HTTPS (Cloudflare Tunnel — sin configurar router):
 
-Con el ejecutable `cloudflared` descargado, ejecuta:
+Para compartir el sistema en demostraciones públicas con certificado HTTPS válido sin abrir puertos en el router:
 
-```bash
-./cloudflared tunnel --url http://localhost:5173
-```
+1. **Asegúrate de que el proyecto esté corriendo en Docker:**
+   ```powershell
+   docker compose up -d
+   ```
 
-Cloudflare generará una URL pública con certificado HTTPS gratuito válido, tipo:
-`https://xxxxx.trycloudflare.com`
+2. **Ejecuta el túnel desde una terminal de PowerShell:**
+   ```powershell
+   & "$HOME\Downloads\Cloudfare\cloudflared.exe" tunnel --url http://localhost:5173
+   ```
+   *(En Linux / Mac: `./cloudflared tunnel --url http://localhost:5173`)*
 
-> Requiere `ALLOWED_ORIGINS=*` en `backend/.env` para que el navegador acepte las peticiones desde el dominio público.
+3. **Acceso:**
+   Cloudflare generará una URL pública con HTTPS gratuito válido visible directamente en la consola:
+   `https://xxxxx.trycloudflare.com`
+
+4. **Para finalizar la sesión pública:**
+   Basta con presionar **`Ctrl + C`** en la ventana de PowerShell para cerrar el túnel de inmediato sin afectar los contenedores locales.
+
+> **Nota de Configuración:** Requiere `ALLOWED_ORIGINS=*` en `backend/.env`. El frontend de Vite automáticamente proxifica las peticiones `/api` y `/static` hacia el backend en Docker, garantizando navegación fluida por HTTPS.
 
 ---
 

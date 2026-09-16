@@ -17,7 +17,8 @@ from reportlab.lib.units import inch
 
 import shutil
 
-DOCS_DIR = Path(__file__).resolve().parent.parent.parent / "docs"
+ROOT_DIR = Path(__file__).resolve().parent.parent
+DOCS_DIR = ROOT_DIR / "docs"
 OUTPUT_DIR = DOCS_DIR / "4_pdf_compilado"
 OUTPUT_PDF = OUTPUT_DIR / "COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf"
 ROOT_PDF = DOCS_DIR / "COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf"

@@ -7,18 +7,19 @@ from pathlib import Path
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-OUTPUT_ZIP = BASE_DIR.parent / "ateneo_colab_bundle.zip"
+ROOT_DIR = Path(__file__).resolve().parent.parent
+BACKEND_DIR = ROOT_DIR / "backend"
+OUTPUT_ZIP = ROOT_DIR / "ateneo_colab_bundle.zip"
 
 print(f"[ATENEO MLOps] Preparando paquete maestro para Google Colab A100...", flush=True)
-print(f"Ruta base del proyecto: {BASE_DIR}", flush=True)
+print(f"Ruta base del proyecto: {ROOT_DIR}", flush=True)
 
 ITEMS_TO_INCLUDE = [
-    ("data/raw_pdfs", BASE_DIR / "data" / "raw_pdfs"),
-    ("data/ateneo-bge-m3-ecuador", BASE_DIR / "data" / "ateneo-bge-m3-ecuador"),
-    ("data/catalogo_cie10_gpc.json", BASE_DIR / "data" / "catalogo_cie10_gpc.json"),
-    ("data/seed_chunks.json", BASE_DIR / "data" / "seed_chunks.json"),
-    ("test_cases_fixture.json", BASE_DIR / "tests" / "test_cases_fixture.json")
+    ("data/raw_pdfs", BACKEND_DIR / "data" / "raw_pdfs"),
+    ("data/ateneo-bge-m3-ecuador", BACKEND_DIR / "data" / "ateneo-bge-m3-ecuador"),
+    ("data/catalogo_cie10_gpc.json", BACKEND_DIR / "data" / "catalogo_cie10_gpc.json"),
+    ("data/seed_chunks.json", BACKEND_DIR / "data" / "seed_chunks.json"),
+    ("test_cases_fixture.json", BACKEND_DIR / "tests" / "test_cases_fixture.json")
 ]
 
 with zipfile.ZipFile(OUTPUT_ZIP, "w", zipfile.ZIP_DEFLATED) as zipf:
@@ -33,7 +34,6 @@ with zipfile.ZipFile(OUTPUT_ZIP, "w", zipfile.ZIP_DEFLATED) as zipf:
         elif src_path.is_dir():
             print(f"  + Agregando carpeta: {arc_prefix}/", flush=True)
             for root, dirs, files in os.walk(src_path):
-                # Omitir checkpoints temporales si existen
                 if "checkpoints" in root:
                     continue
                 for f in files:

@@ -8,9 +8,16 @@ from typing import Dict, Any, List
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-SEED_FILE = BASE_DIR / "data" / "seed_chunks.json"
-CATALOG_FILE = BASE_DIR / "data" / "catalogo_cie10_gpc.json"
+ROOT_DIR = Path(__file__).resolve().parent.parent
+BACKEND_DIR = ROOT_DIR / "backend"
+if not (BACKEND_DIR / "config.py").exists() and Path("/app/config.py").exists():
+    BACKEND_DIR = Path("/app")
+    ROOT_DIR = Path("/")
+
+sys.path.insert(0, str(BACKEND_DIR))
+
+SEED_FILE = BACKEND_DIR / "data" / "seed_chunks.json"
+CATALOG_FILE = BACKEND_DIR / "data" / "catalogo_cie10_gpc.json"
 
 def add_seed_chunk(chunk_id: str, guia_fuente: str, pagina: int, seccion: str, ano_publicacion: int, texto: str, cie10_codigo: str = None, especialidad: str = None, grupo_etario: str = "Población General"):
     """
@@ -46,24 +53,16 @@ def add_seed_chunk(chunk_id: str, guia_fuente: str, pagina: int, seccion: str, a
         "texto": texto.strip()
     }
 
-    # Reemplazar si ya existe o agregar al final
-    existing_idx = next((i for i, c in enumerate(seeds) if c["chunk_id"] == chunk_id), None)
-    if existing_idx is not None:
-        seeds[existing_idx] = new_chunk
-        print(f"[SEED GENERATOR] Fragmento '{chunk_id}' actualizado en seed_chunks.json.")
-    else:
-        seeds.append(new_chunk)
-        print(f"[SEED GENERATOR] Nuevo fragmento '{chunk_id}' agregado exitosamente (Total: {len(seeds)}).")
+    # Reemplazar si existe chunk_id, si no agregar
+    filtered = [s for s in seeds if s["chunk_id"] != chunk_id]
+    filtered.append(new_chunk)
 
+    SEED_FILE.parent.mkdir(parents=True, exist_ok=True)
     with open(SEED_FILE, "w", encoding="utf-8") as f:
-        json.dump(seeds, f, indent=2, ensure_ascii=False)
+        json.dump(filtered, f, indent=2, ensure_ascii=False)
+
+    print(f"[OK] Seed chunk '{chunk_id}' agregado/actualizado exitosamente en {SEED_FILE.name}")
+    print(f"     Guía: {guia_fuente} | CIE-10: {final_cie10} ({final_cie_desc}) | Esp: {final_esp}")
 
 if __name__ == "__main__":
-    print("=== GENERADOR Y GESTOR DE SEED CHUNKS CANÓNICOS (GROUND TRUTH) ===")
-    print(f"Ruta del archivo: {SEED_FILE}")
-    if SEED_FILE.exists():
-        with open(SEED_FILE, "r", encoding="utf-8") as f:
-            current = json.load(f)
-        print(f"Fragmentos canónicos actualmente registrados: {len(current)}")
-        for c in current:
-            print(f"  - [{c['chunk_id']}] {c['guia_fuente']} (Pág {c['pagina']}) - CIE-10: {c['cie10_codigo']}")
+    print(f"Total de seed chunks actuales: {len(json.load(open(SEED_FILE, encoding='utf-8'))) if SEED_FILE.exists() else 0}")

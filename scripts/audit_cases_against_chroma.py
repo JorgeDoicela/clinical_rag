@@ -1,9 +1,15 @@
-import json
 import os
 import sys
+from pathlib import Path
 
-# Agregar ruta backend
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Resolver ruta de backend e importaciones
+ROOT_DIR = Path(__file__).resolve().parent.parent
+BACKEND_DIR = ROOT_DIR / "backend"
+if not (BACKEND_DIR / "config.py").exists() and Path("/app/config.py").exists():
+    BACKEND_DIR = Path("/app")
+    ROOT_DIR = Path("/")
+
+sys.path.insert(0, str(BACKEND_DIR))
 
 from rag.retriever import retrieve_relevant_chunk, get_chroma_client
 from models.clinical_case import load_all_cases
