@@ -337,4 +337,11 @@ docker compose exec backend python scripts/generate_paper_tables_pdf.py
 
 ---
 
+
+---
+
+## 9. Acceso Remoto Seguro (Cloudflare Tunnel)
+
+Para la exposicion segura del sistema en entornos de demostracion y evaluacion remota bajo el dominio oficial https://ateneo.doicela.dev, consultar la guia completa de infraestructura y despliegue en:
+* [docs/DESPLIEGUE_Y_ACCESO_CLOUDFLARE_TUNNEL.md](docs/DESPLIEGUE_Y_ACCESO_CLOUDFLARE_TUNNEL.md)
 *Desarrollado para la investigación en educación médica formativa basada en inteligencia artificial en Ecuador.*
