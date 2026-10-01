@@ -1,12 +1,12 @@
 # Manual de Pruebas Automatizadas, Suites de Integración y Benchmarks
 
-Este documento describe la arquitectura de pruebas automatizadas de **Ateneo+**, los comandos para su ejecución bajo demanda y la interpretación de los artefactos generados para el artículo científico.
+Este documento describe la arquitectura de pruebas automatizadas de **Ateneo+**, los comandos para su ejecución bajo demanda (en local y Docker) y la interpretación de los artefactos generados para el artículo científico.
 
 ---
 
 ## 1. Pirámide de Pruebas Automatizadas
 
-El sistema organiza sus pruebas en 4 niveles complementarios:
+El sistema organiza sus pruebas en 4 niveles complementarios que garantizan la integridad técnica, seguridad, usabilidad y rigor científico:
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -14,6 +14,8 @@ El sistema organiza sus pruebas en 4 niveles complementarios:
 │ • run_metrics.py (25 casos, Hit@1, MRR@5, NDCG@5, latencias P50/P95)        │
 │ • run_ablation_study.py (Ablación BM25 vs Dense Base vs RAG Híbrido)        │
 │ • run_faithfulness_benchmark.py (Fidelidad normativa y anti-alucinación)    │
+│ • run_kst_simulation.py (Simulación longitudinal de trayectorias BKT)       │
+│ • run_ibf_figure.py (Generación de curvas de brecha formativa por cohorte)  │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ NIVEL 3: PRUEBAS DE MODELADO PSICOMÉTRICO Y CURRÍCULO ADAPTATIVO            │
 │ • test_adaptive_curriculum.py (Topología KST 7 nodos, BKT, ZDP)            │
@@ -21,76 +23,112 @@ El sistema organiza sus pruebas en 4 niveles complementarios:
 │ • pilot_study_analyzer.py (Ganancia de aprendizaje de Hake y Wilcoxon)     │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ NIVEL 2: PRUEBAS DE INTEGRACIÓN HTTP DE API REST (FASTAPI TESTCLIENT)       │
+│ • test_auth_security.py (Seguridad criptográfica, JWT y roles RBAC)         │
 │ • test_api_endpoints.py (Rutas /auth, /cases, /history, /adaptive, /rooms)  │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ NIVEL 1: VALIDACIÓN DE RECUPERACIÓN DETERMINISTA Y GENERADORES BINARIOS     │
+│ NIVEL 1: PRUEBAS DE FRONTEND Y GENERADORES DETERMINISTAS                    │
+│ • Vitest + React Testing Library (12 suites, 44 tests de interfaz y estado) │
 │ • test_multimodal_and_cases.py (12 casos ChromaDB, PDF ReportLab SHA-256)   │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 2. Catálogo de Scripts de Prueba Disponibles
+## 2. Catálogo de Pruebas de Frontend (Vitest + React Testing Library)
 
-### 2.1 Orquestador Maestro Rápido (`backend/tests/run_all_tests.py`)
-Ejecuta de forma secuencial las suites de modelado adaptativo, diferenciadores y análisis de ganancia de Hake:
+El frontend dispone de 12 suites de prueba y 44 especificaciones unitarias y de integración que convalidan el árbol de componentes, la accesibilidad, el manejo de estado y el estándar de diseño:
+
+### 2.1 Ejecución en Entorno Local
 ```bash
+cd frontend
+npm test
+```
+
+### 2.2 Ejecución en Contenedor Docker
+```bash
+docker compose exec frontend npm test
+```
+
+### 2.3 Detalle de Suites Frontend
+| Archivo de Prueba | Componente Evaluado | Casos de Prueba Verificados |
+|:---|:---|:---|
+| `src/__tests__/client.test.js` | Capa de API y red | Contratos HTTP, inyección de tokens JWT, headers y serialización multipart para estudios paraclínicos. |
+| `src/__tests__/FeedbackCard.test.jsx` | Dictamen clínico | Renderizado de citas normativas MSP, Faithfulness Score y verificación de regla cero emojis. |
+| `src/__tests__/AdaptiveNextCase.test.jsx` | Recomendación KST | Selección de caso en Zona de Desarrollo Próximo (ZDP) y justificación pedagógica en tiempo real. |
+| `src/__tests__/PhaseFeedbackCard.test.jsx` | Simulación secuencial | Evaluación progresiva por fases (Anamnesis, Paraclínicos y Terapéutica). |
+| `src/__tests__/VoiceInputButton.test.jsx` | Dictado por voz | Integración con Web Speech API y modo de degradación controlada (fallback). |
+| `src/__tests__/SkillRadarChart.test.jsx` | Radar de competencias | Renderizado vectorial SVG de 4 ejes clínicos normativos. |
+| `src/__tests__/ProtectedRoute.test.jsx` | Seguridad RBAC | Control de acceso por roles (Alumno, Docente y Administrador) y redirección segura. |
+| `src/__tests__/ImageUploadZone.test.jsx` | Fusión multimodal | Carga y previsualización de estudios diagnósticos (ECG, Rx de Tórax y Laboratorios). |
+| `src/__tests__/Login.test.jsx` | Autenticación | Flujo de autenticación en dos pasos estilo Google Accounts con campos de etiqueta flotante animada. |
+| `src/__tests__/AdminDashboard.test.jsx` | Panel administrativo | Gestión de usuarios, sincronización de identidades y privilegios de cohorte. |
+| `src/__tests__/CoordinatorAnalytics.test.jsx` | Analítica institucional | Panel B2B de inteligencia formativa, visualización de brechas de cohorte e IBF. |
+| `src/__tests__/KnowledgeSpaceGraph.test.jsx` | Topología KST | Grafo interactivo de prerrequisitos, ordenamiento topológico y modales reactivos. |
+
+---
+
+## 3. Catálogo de Pruebas de Backend y Modelado Matemático
+
+### 3.1 Orquestador Maestro Consolidado (`backend/tests/run_all_tests.py`)
+Ejecuta de forma estructurada las 6 suites maestras del backend:
+```bash
+# Entorno local (con venv activo)
+backend/.venv/Scripts/python backend/tests/run_all_tests.py
+
+# En entorno Docker
 docker compose exec backend python tests/run_all_tests.py
 ```
 
-### 2.2 Suite de Currículo Adaptativo (`backend/tests/test_adaptive_curriculum.py`)
-Valida la topología del grafo KST, la actualización de probabilidades de dominio BKT ($P(L_{t+1})$) ante aciertos/fallos, la detección de la Zona de Desarrollo Próximo y los endpoints `/api/adaptive/*`:
+### 3.2 Batería Estándar con Pytest
+Ejecuta la suite de 21 especificaciones con recolección de aserciones:
 ```bash
-docker compose exec backend python tests/test_adaptive_curriculum.py
+backend/.venv/Scripts/pytest backend/tests/ -v
 ```
 
-### 2.3 Suite de Diferenciadores Científicos (`backend/tests/test_paper_differentiators.py`)
-Valida el algoritmo de cálculo de Faithfulness Score, el Índice de Brecha Formativa (IBF) por cohorte y los endpoints B2B:
-```bash
-docker compose exec backend python tests/test_paper_differentiators.py
-```
-
-### 2.4 Analizador de Ganancia de Aprendizaje (`backend/tests/pilot_study_analyzer.py`)
-Procesa el dataset piloto (`resultados_pilot.csv`), calcula la ganancia normalizada de Hake ($g$) y el estadístico $t$ pareado, y exporta la Tabla IV en LaTeX:
-```bash
-docker compose exec backend python tests/pilot_study_analyzer.py
-```
-
-### 2.5 Suite de Integración de Endpoints HTTP (`backend/tests/test_api_endpoints.py`)
-Ejecuta una batería completa de pruebas sobre las rutas de FastAPI mediante `TestClient`:
-```bash
-docker compose exec backend python tests/test_api_endpoints.py
-```
-
-### 2.6 Validación de Casos Clínicos y Multimodal (`backend/tests/test_multimodal_and_cases.py`)
-Verifica la recuperación exacta de los 12 casos del catálogo contra ChromaDB, la generación de PDFs institucionales y la evaluación multi-imagen con Gemini Vision:
-```bash
-docker compose exec backend python tests/test_multimodal_and_cases.py
-```
-
-### 2.7 Benchmark Cuantitativo del Paper (`backend/tests/run_metrics.py`)
-Ejecuta la evaluación experimental completa sobre los 25 casos In-Distribution y Out-of-Distribution, generando la Tabla I en LaTeX (`tabla_resultados_paper.tex`):
-```bash
-docker compose exec backend python tests/run_metrics.py
-```
+### 3.3 Detalle de Suites Backend
+| Archivo de Prueba | Dominio Evaluado | Detalle de Validación |
+|:---|:---|:---|
+| `test_auth_security.py` | Seguridad y RBAC | Hashing Bcrypt, ciclo de vida de tokens JWT (HMAC-SHA256) y validación de usuarios demo. |
+| `test_adaptive_curriculum.py` | Currículo Adaptativo | Grafo KST (7 competencias), actualización bayesiana BKT ($P(L)$), motor de recomendación en ZDP y endpoints `/api/adaptive/*`. |
+| `test_paper_differentiators.py` | Métricas Científicas | Algoritmo de cálculo de Faithfulness Score, cálculo de IBF global y por eje, y endpoints de analítica B2B. |
+| `pilot_study_analyzer.py` | Análisis Inferencial | Procesamiento de `resultados_pilot.csv`, cálculo de ganancia de Hake ($g=0.74$), $t$-test pareado y exportación de Tabla IV LaTeX. |
+| `test_api_endpoints.py` | Integración HTTP | Pruebas de endpoints FastAPI (Auth, Cases, Benchmark, History, Salas Colaborativas, PDF y Fases). |
+| `test_multimodal_and_cases.py` | Casos GPC y Multimodal | Recuperación de los 12 casos del MSP, evaluación multi-imagen con Gemini Vision y generación de reportes PDF con sello SHA-256. |
 
 ---
 
-## 3. Artefactos LaTeX Generados para el Paper
+## 4. Scripts de Simulación y Generación de Evidencias Científicas
 
-| Archivo Generado | Tabla del Paper | Métrica Central Reportada |
-|:---|:---:|:---|
-| `docs/tabla_resultados_paper.tex` | **Tabla I** | Rendimiento IR (Hit@1, Hit@5, MRR@5, NDCG@5, Latencias) |
-| `docs/tabla_ablacion_paper.tex` | **Tabla II** | Estudio de Ablación Arquitectónica (Sparse vs Dense vs Híbrido) |
-| `docs/tabla_faithfulness_paper.tex` | **Tabla III** | Fidelidad Normativa RAG (Faithfulness Score vs Baseline) |
-| `docs/tabla_pilot_study_paper.tex` | **Tabla IV** | Ganancia de Aprendizaje de Hake ($g$) Pre-Test vs Post-Test |
+| Script | Descripción | Artefactos Exportados |
+|:---|:---|:---|
+| `run_kst_simulation.py` | Simulación longitudinal BKT comparativa (Ruta Fija vs KST Adaptativa) | `docs/figura_kst_trajectory.png` (300 DPI)<br>`docs/tabla_kst_bkt_paper.tex`<br>`backend/tests/resultados_kst_simulation.json` |
+| `run_ibf_figure.py` | Generación de visualización de cohorte en 4 ejes clínicos con umbral normativo | `docs/figura_ibf_cohorte.png` (300 DPI)<br>`backend/tests/resultados_ibf_figure.json` |
+| `run_faithfulness_benchmark.py` | Benchmark de anclaje normativo de las 12 GPCs frente a fragmentos normativos | `docs/tabla_faithfulness_paper.tex`<br>`backend/tests/resultados_faithfulness.json` |
+| `run_metrics.py` | Evaluación cuantitativa completa del pipeline RAG (Hit@1, MRR@5, NDCG@5, Latencias) | `backend/tests/tabla_resultados_paper.tex`<br>`backend/tests/resultados_metricas.json` |
+| `pilot_study_analyzer.py` | Análisis inferencial del estudio piloto con ganancia de aprendizaje | `docs/figura_learning_gain.png` (300 DPI)<br>`docs/tabla_pilot_study_paper.tex` |
 
 ---
 
-## 4. Verificación de Compilación de Frontend
+## 5. Artefactos LaTeX y Figuras de Publicación
 
-Para compilar y convalidar la ausencia de errores de sintaxis, hooks o tipos en el cliente React 18:
+| Artefacto Generado | Ubicación | Elemento en Artículo Científico |
+|:---|:---|:---|
+| `tabla_resultados_paper.tex` | `docs/1_tablas_latex/` | **Tabla I:** Rendimiento de Recuperación y Generación del Pipeline RAG |
+| `tabla_ablacion_paper.tex` | `docs/1_tablas_latex/` | **Tabla II:** Estudio de Ablación Arquitectónica (Sparse vs Dense vs Híbrido) |
+| `tabla_faithfulness_paper.tex` | `docs/1_tablas_latex/` | **Tabla III:** Evaluación de Fidelidad Normativa (Anti-Alucinación) |
+| `tabla_pilot_study_paper.tex` | `docs/1_tablas_latex/` | **Tabla IV:** Ganancia de Aprendizaje Normalizada de Hake ($g$) |
+| `tabla_kst_bkt_paper.tex` | `docs/1_tablas_latex/` | **Tabla V:** Comparativa de Dominio Final BKT por Competencia Clínica |
+| `figura_learning_gain.png` | `docs/2_figuras_300dpi/` | **Figura 1:** Distribución Pre-Test vs Post-Test y Ganancia de Hake |
+| `figura_ibf_cohorte.png` | `docs/2_figuras_300dpi/` | **Figura 2:** Índice de Brecha Formativa (IBF) por Eje Clínico con Umbral |
+| `figura_kst_trajectory.png` | `docs/2_figuras_300dpi/` | **Figura 3:** Trayectoria Longitudinal de Dominio $P(L)$ según KST/BKT |
+
+---
+
+## 6. Verificación de Compilación del Frontend (Producción)
+
+Para validar la ausencia de errores de sintaxis, dependencias o tipos en el cliente React 18:
 ```bash
-docker compose exec frontend npm run build
+cd frontend
+npm run build
 ```
-Salida esperada: 1,600+ módulos transformados, 0 errores de compilación y generación de service worker PWA.
+Salida esperada: Módulos transformados sin errores de compilación y empaquetado optimizado con soporte PWA.
