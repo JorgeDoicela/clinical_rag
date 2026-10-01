@@ -256,9 +256,9 @@ export default function FeedbackCard({ result, studentAnswer, onReset }) {
                 : 'bg-rose-50/70 text-rose-900 border border-rose-100'
             }`}>
               <span className="font-semibold">
-                {result.faithfulness_score >= 0.80 ? '✓ Alto Grounding Normativo' :
-                 result.faithfulness_score >= 0.60 ? '⚠ Grounding Moderado' :
-                 '✗ Bajo Grounding — Riesgo de Deriva Normativa'}
+                {result.faithfulness_score >= 0.80 ? 'Alto Grounding Normativo' :
+                 result.faithfulness_score >= 0.60 ? 'Grounding Moderado' :
+                 'Bajo Grounding — Riesgo de Deriva Normativa'}
               </span>
               <span className="ml-2 opacity-75">
                 {result.faithfulness_score >= 0.80

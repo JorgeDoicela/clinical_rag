@@ -162,8 +162,8 @@ export default function CoordinatorAnalytics() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-            {ibfData.ejes_analiticos?.map((eje) => (
-              <div key={eje.eje_id} className="p-4 rounded-[20px] bg-slate-50 border border-slate-100 space-y-2">
+            {ibfData.ejes_analiticos?.map((eje, idx) => (
+              <div key={eje.eje_id || eje.key || eje.nombre || idx} className="p-4 rounded-[20px] bg-slate-50 border border-slate-100 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-slate-700 truncate">{eje.nombre}</span>
                   <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${

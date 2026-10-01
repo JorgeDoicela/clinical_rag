@@ -16,10 +16,9 @@ from adaptive.curriculum_engine import (
     detect_zone_of_proximal_development,
     select_optimal_next_case
 )
-from fastapi.testclient import TestClient
-from main import app
+from tests.client_helper import get_test_client
 
-client = TestClient(app)
+client = get_test_client()
 
 def test_knowledge_space_topology():
     print("\n" + "="*70)

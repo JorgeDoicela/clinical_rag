@@ -31,15 +31,29 @@ from tests.pilot_study_analyzer import calculate_learning_gains, generate_latex_
 
 def run_full_verification_pipeline():
     start_time = time.time()
+    suite_results = []
     print("\n" + "="*80)
     print(" EJECUTANDO ORQUESTADOR MAESTRO DE PRUEBAS AUTOMATIZADAS - ATENEO+")
     print("="*80)
     
-    suite_results = []
-    
-    # 1. Módulo Adaptativo KST & BKT
+    # 1. Seguridad Criptográfica y Autenticación RBAC
     try:
-        print("\n--- [SUITE 1/4] MOTOR DE CURRÍCULO ADAPTATIVO (KST + BKT + ZDP) ---")
+        print("\n--- [SUITE 1/6] SEGURIDAD CRIPTOGRÁFICA, TOKENS JWT Y ROLES RBAC ---")
+        from tests.test_auth_security import (
+            test_password_hashing,
+            test_jwt_token_lifecycle,
+            test_demo_users_database
+        )
+        test_password_hashing()
+        test_jwt_token_lifecycle()
+        test_demo_users_database()
+        suite_results.append({"suite": "Seguridad y RBAC", "status": "PASS", "detalles": "Bcrypt, JWT HMAC-SHA256 y roles validados"})
+    except Exception as e:
+        suite_results.append({"suite": "Seguridad y RBAC", "status": "FAIL", "detalles": str(e)})
+
+    # 2. Módulo Adaptativo KST & BKT
+    try:
+        print("\n--- [SUITE 2/6] MOTOR DE CURRÍCULO ADAPTATIVO (KST + BKT + ZDP) ---")
         test_knowledge_space_topology()
         test_bayesian_knowledge_tracing()
         test_curriculum_engine_recommendation()
@@ -48,9 +62,9 @@ def run_full_verification_pipeline():
     except Exception as e:
         suite_results.append({"suite": "Motor Adaptativo KST/BKT", "status": "FAIL", "detalles": str(e)})
 
-    # 2. Módulo de Diferenciadores (Faithfulness & IBF)
+    # 3. Módulo de Diferenciadores (Faithfulness & IBF)
     try:
-        print("\n--- [SUITE 2/4] DIFERENCIADORES CIENTÍFICOS (FAITHFULNESS SCORE & IBF) ---")
+        print("\n--- [SUITE 3/6] DIFERENCIADORES CIENTÍFICOS (FAITHFULNESS SCORE & IBF) ---")
         test_faithfulness_scorer()
         test_learning_analytics_ibf()
         test_new_api_routes()
@@ -58,9 +72,9 @@ def run_full_verification_pipeline():
     except Exception as e:
         suite_results.append({"suite": "Diferenciadores Científicos", "status": "FAIL", "detalles": str(e)})
 
-    # 3. Estudio Piloto de Ganancia de Aprendizaje
+    # 4. Estudio Piloto de Ganancia de Aprendizaje
     try:
-        print("\n--- [SUITE 3/4] ESTUDIO PILOTO (HAKE LEARNING GAIN & TABLA IV LATEX) ---")
+        print("\n--- [SUITE 4/6] ESTUDIO PILOTO (HAKE LEARNING GAIN & TABLA IV LATEX) ---")
         pilot_res = calculate_learning_gains()
         generate_latex_table(pilot_res)
         suite_results.append({
@@ -70,6 +84,46 @@ def run_full_verification_pipeline():
         })
     except Exception as e:
         suite_results.append({"suite": "Estudio Piloto de Ganancia", "status": "FAIL", "detalles": str(e)})
+
+    # 5. Integración de Endpoints HTTP FastAPI
+    try:
+        print("\n--- [SUITE 5/6] INTEGRACIÓN ENDPOINTS HTTP FASTAPI ---")
+        from tests.test_api_endpoints import (
+            test_health_check,
+            test_auth_endpoints,
+            test_cases_endpoints,
+            test_scientific_benchmark_endpoint,
+            test_history_and_analytics_endpoints,
+            test_collaboration_rooms_endpoints,
+            test_pdf_export_endpoint,
+            test_phase_evaluation_endpoint
+        )
+        test_health_check()
+        test_auth_endpoints()
+        test_cases_endpoints()
+        test_scientific_benchmark_endpoint()
+        test_history_and_analytics_endpoints()
+        test_collaboration_rooms_endpoints()
+        test_pdf_export_endpoint()
+        test_phase_evaluation_endpoint()
+        suite_results.append({"suite": "Integración Endpoints HTTP", "status": "PASS", "detalles": "8 endpoints validados (RBAC, Evaluador, Colaboración)"})
+    except Exception as e:
+        suite_results.append({"suite": "Integración Endpoints HTTP", "status": "FAIL", "detalles": str(e)})
+
+    # 6. Validación de Casos Clínicos y Reportes
+    try:
+        print("\n--- [SUITE 6/6] CASOS CLÍNICOS, FUSIÓN MULTIMODAL Y REPORTES PDF ---")
+        from tests.test_multimodal_and_cases import (
+            test_all_12_cases_retrieval,
+            test_pdf_generation,
+            test_multimodal_fusion_evaluation
+        )
+        test_all_12_cases_retrieval()
+        test_pdf_generation()
+        test_multimodal_fusion_evaluation()
+        suite_results.append({"suite": "Fusión Multimodal y Casos GPC", "status": "PASS", "detalles": "12 casos MSP y firma SHA-256 validados"})
+    except Exception as e:
+        suite_results.append({"suite": "Fusión Multimodal y Casos GPC", "status": "FAIL", "detalles": str(e)})
 
     elapsed = time.time() - start_time
     
@@ -90,6 +144,7 @@ def run_full_verification_pipeline():
     else:
         print(" ESTADO GLOBAL: SE DETECTARON FALLOS EN LA SUITE")
     print("="*80 + "\n")
+    sys.exit(0 if all_passed else 1)
 
 if __name__ == "__main__":
     run_full_verification_pipeline()

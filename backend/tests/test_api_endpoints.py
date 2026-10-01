@@ -1,14 +1,13 @@
 import sys
 from pathlib import Path
-from fastapi.testclient import TestClient
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from main import app
 from auth.security import init_demo_users
+from tests.client_helper import get_test_client
 
 init_demo_users()
-client = TestClient(app)
+client = get_test_client()
 
 def test_health_check():
     response = client.get("/health")

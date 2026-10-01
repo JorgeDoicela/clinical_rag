@@ -5,10 +5,9 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from evaluation.faithfulness_scorer import calculate_faithfulness_score
 from models.learning_analytics import calculate_cohort_ibf, IBF_CRITICAL_THRESHOLD, IBF_MODERATE_THRESHOLD
-from fastapi.testclient import TestClient
-from main import app
+from tests.client_helper import get_test_client
 
-client = TestClient(app)
+client = get_test_client()
 
 def test_faithfulness_scorer():
     print("\n" + "="*70)
