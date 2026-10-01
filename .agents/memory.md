@@ -45,3 +45,5 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     5. Integración de Endpoints HTTP FastAPI (`test_api_endpoints.py`).
     6. Validación de los 12 Casos Clínicos GPC, Fusión Multimodal Simultánea (ECG+Rx) y Dictamen PDF con Sello SHA-256 (`test_multimodal_and_cases.py`).
   - Todas las suites ejecutadas y verificadas con 100% de aprobación (`PASS`).
+  - Estandarización de entorno de pruebas con Python 3.11 vía `uv` (`backend/.venv`), migración de llamadas Pydantic a `model_dump()` y reconfiguración robusta de encoding UTF-8 en runners de benchmark para portabilidad multiplataforma.
+  - Validación completa de scripts científicos y generación de figuras a 300 DPI: `run_kst_simulation.py`, `run_ibf_figure.py`, `run_faithfulness_benchmark.py`, `run_metrics.py`.

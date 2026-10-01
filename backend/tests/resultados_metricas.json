@@ -23,12 +23,13 @@
   },
   "metrics_llm": {
     "total_evaluados": 25,
-    "tasa_exito_json_porcentaje": 100.0
+    "tasa_exito_json_porcentaje": 100.0,
+    "faithfulness_score_promedio": 0.854
   },
   "latencias": {
-    "latencia_promedio_segundos": 22.45,
-    "latencia_p50_segundos": 11.19,
-    "latencia_p95_segundos": 66.09
+    "latencia_promedio_segundos": 4.03,
+    "latencia_p50_segundos": 3.68,
+    "latencia_p95_segundos": 7.93
   },
   "detalles": [
     {
@@ -39,8 +40,9 @@
       "hit_1": true,
       "retrieved_top_chunk_id": "dengue_chunk_004",
       "json_valido": true,
-      "score": 8.8,
-      "latencia_segundos": 66.091
+      "score": 10.0,
+      "faithfulness_score": 1.0,
+      "latencia_segundos": 7.927
     },
     {
       "test_id": "test_02",
@@ -50,8 +52,9 @@
       "hit_1": true,
       "retrieved_top_chunk_id": "dengue_chunk_004",
       "json_valido": true,
-      "score": 1.5,
-      "latencia_segundos": 28.295
+      "score": 1.0,
+      "faithfulness_score": 0.75,
+      "latencia_segundos": 2.579
     },
     {
       "test_id": "test_03",
@@ -61,8 +64,9 @@
       "hit_1": true,
       "retrieved_top_chunk_id": "preeclampsia_chunk_002",
       "json_valido": true,
-      "score": 8.2,
-      "latencia_segundos": 36.097
+      "score": 9.5,
+      "faithfulness_score": 1.0,
+      "latencia_segundos": 2.972
     },
     {
       "test_id": "test_04",
@@ -72,8 +76,9 @@
       "hit_1": true,
       "retrieved_top_chunk_id": "preeclampsia_chunk_002",
       "json_valido": true,
-      "score": 1.2,
-      "latencia_segundos": 8.166
+      "score": 1.0,
+      "faithfulness_score": 0.75,
+      "latencia_segundos": 3.833
     },
     {
       "test_id": "test_05",
@@ -83,8 +88,9 @@
       "hit_1": true,
       "retrieved_top_chunk_id": "diabetes_chunk_005",
       "json_valido": true,
-      "score": 8.0,
-      "latencia_segundos": 7.384
+      "score": 8.5,
+      "faithfulness_score": 1.0,
+      "latencia_segundos": 2.533
     },
     {
       "test_id": "test_06",
@@ -94,8 +100,9 @@
       "hit_1": true,
       "retrieved_top_chunk_id": "diabetes_chunk_005",
       "json_valido": true,
-      "score": 1.5,
-      "latencia_segundos": 8.844
+      "score": 1.0,
+      "faithfulness_score": 1.0,
+      "latencia_segundos": 2.953
     },
     {
       "test_id": "test_07",
@@ -105,8 +112,9 @@
       "hit_1": true,
       "retrieved_top_chunk_id": "guía_de_hemorragia_postparto_p19_3",
       "json_valido": true,
-      "score": 7.5,
-      "latencia_segundos": 10.165
+      "score": 4.5,
+      "faithfulness_score": 0.6,
+      "latencia_segundos": 5.407
     },
     {
       "test_id": "test_08",
@@ -116,8 +124,9 @@
       "hit_1": true,
       "retrieved_top_chunk_id": "guía_de_hemorragia_postparto_p17_1",
       "json_valido": true,
-      "score": 1.2,
-      "latencia_segundos": 10.659
+      "score": 0.0,
+      "faithfulness_score": 0.6667,
+      "latencia_segundos": 2.983
     },
     {
       "test_id": "test_09",
@@ -127,8 +136,9 @@
       "hit_1": true,
       "retrieved_top_chunk_id": "neumonia_chunk_001",
       "json_valido": true,
-      "score": 2.5,
-      "latencia_segundos": 12.417
+      "score": 4.5,
+      "faithfulness_score": 1.0,
+      "latencia_segundos": 3.685
     },
     {
       "test_id": "test_10",
@@ -139,7 +149,8 @@
       "retrieved_top_chunk_id": "neumonia_chunk_001",
       "json_valido": true,
       "score": 1.0,
-      "latencia_segundos": 20.985
+      "faithfulness_score": 1.0,
+      "latencia_segundos": 3.22
     },
     {
       "test_id": "test_11",
@@ -149,8 +160,9 @@
       "hit_1": true,
       "retrieved_top_chunk_id": "gpc_ehirn2019_p15_1",
       "json_valido": true,
-      "score": 5.0,
-      "latencia_segundos": 64.178
+      "score": 1.0,
+      "faithfulness_score": 0.0,
+      "latencia_segundos": 3.336
     },
     {
       "test_id": "test_12",
@@ -160,8 +172,9 @@
       "hit_1": true,
       "retrieved_top_chunk_id": "gpc_hta192019_p37_1",
       "json_valido": true,
-      "score": 8.5,
-      "latencia_segundos": 35.295
+      "score": 5.0,
+      "faithfulness_score": 1.0,
+      "latencia_segundos": 2.724
     },
     {
       "test_id": "test_13",
@@ -171,8 +184,9 @@
       "hit_1": true,
       "retrieved_top_chunk_id": "gp_tuberculosis_1_p61_1",
       "json_valido": true,
-      "score": 7.0,
-      "latencia_segundos": 8.204
+      "score": 4.5,
+      "faithfulness_score": 1.0,
+      "latencia_segundos": 3.932
     },
     {
       "test_id": "test_14",
@@ -182,8 +196,9 @@
       "hit_1": true,
       "retrieved_top_chunk_id": "gpc_vih_acuerdo_ministerial05_07_2019_p16_1",
       "json_valido": true,
-      "score": 6.8,
-      "latencia_segundos": 11.359
+      "score": 4.5,
+      "faithfulness_score": 1.0,
+      "latencia_segundos": 2.873
     },
     {
       "test_id": "test_15",
@@ -191,10 +206,11 @@
       "tipo_split": "in_distribution",
       "retrieval_rank": 1,
       "hit_1": true,
-      "retrieved_top_chunk_id": "gp_tuberculosis_1_p68_2",
+      "retrieved_top_chunk_id": "gpc_anomalias_de_insercion_placentaria_2017_p20_2",
       "json_valido": true,
       "score": 0.0,
-      "latencia_segundos": 8.101
+      "faithfulness_score": 1.0,
+      "latencia_segundos": 3.894
     },
     {
       "test_id": "test_16",
@@ -204,8 +220,9 @@
       "hit_1": true,
       "retrieved_top_chunk_id": "gpc_sepsis_neonatal_p35_1",
       "json_valido": true,
-      "score": 8.0,
-      "latencia_segundos": 9.336
+      "score": 9.5,
+      "faithfulness_score": 1.0,
+      "latencia_segundos": 3.463
     },
     {
       "test_id": "test_17",
@@ -215,8 +232,9 @@
       "hit_1": false,
       "retrieved_top_chunk_id": "gpc_ruptura_prematura_de_membranas_2015_p33_1",
       "json_valido": true,
-      "score": 10.0,
-      "latencia_segundos": 6.201
+      "score": 8.0,
+      "faithfulness_score": 0.75,
+      "latencia_segundos": 3.901
     },
     {
       "test_id": "test_18",
@@ -226,8 +244,9 @@
       "hit_1": false,
       "retrieved_top_chunk_id": "gpc_ruptura_prematura_de_membranas_2015_p18_1",
       "json_valido": true,
-      "score": 8.2,
-      "latencia_segundos": 8.448
+      "score": 8.5,
+      "faithfulness_score": 0.6,
+      "latencia_segundos": 3.793
     },
     {
       "test_id": "test_19",
@@ -237,8 +256,9 @@
       "hit_1": false,
       "retrieved_top_chunk_id": "gpc_artitis_reumatoide_p26_1",
       "json_valido": true,
-      "score": 8.0,
-      "latencia_segundos": 11.19
+      "score": 8.5,
+      "faithfulness_score": 0.8,
+      "latencia_segundos": 2.47
     },
     {
       "test_id": "test_20",
@@ -249,7 +269,8 @@
       "retrieved_top_chunk_id": "guía_dolor_lumbar_16012017_p27_1",
       "json_valido": true,
       "score": 8.5,
-      "latencia_segundos": 11.582
+      "faithfulness_score": 0.8,
+      "latencia_segundos": 6.741
     },
     {
       "test_id": "test_21",
@@ -259,8 +280,9 @@
       "hit_1": true,
       "retrieved_top_chunk_id": "guía_de_fenilcetonuria_p16_1",
       "json_valido": true,
-      "score": 7.5,
-      "latencia_segundos": 110.983
+      "score": 9.0,
+      "faithfulness_score": 1.0,
+      "latencia_segundos": 5.325
     },
     {
       "test_id": "test_22",
@@ -270,8 +292,9 @@
       "hit_1": false,
       "retrieved_top_chunk_id": "diagnóstico_y_tratamiento_del_acné_16012017_p21_1",
       "json_valido": true,
-      "score": 8.2,
-      "latencia_segundos": 24.11
+      "score": 9.0,
+      "faithfulness_score": 0.8333,
+      "latencia_segundos": 3.061
     },
     {
       "test_id": "test_23",
@@ -282,7 +305,8 @@
       "retrieved_top_chunk_id": "linfoma_hodgkin_p19_1",
       "json_valido": true,
       "score": 6.5,
-      "latencia_segundos": 8.642
+      "faithfulness_score": 1.0,
+      "latencia_segundos": 4.93
     },
     {
       "test_id": "test_24",
@@ -292,8 +316,9 @@
       "hit_1": false,
       "retrieved_top_chunk_id": "gpc_dolor_oncológico_p32_1",
       "json_valido": true,
-      "score": 6.2,
-      "latencia_segundos": 10.12
+      "score": 10.0,
+      "faithfulness_score": 1.0,
+      "latencia_segundos": 8.073
     },
     {
       "test_id": "test_25",
@@ -304,7 +329,8 @@
       "retrieved_top_chunk_id": "61069_msp_guía_depresion_20180228_d_p37_1",
       "json_valido": true,
       "score": 8.0,
-      "latencia_segundos": 24.376
+      "faithfulness_score": 0.8,
+      "latencia_segundos": 4.026
     }
   ]
 }

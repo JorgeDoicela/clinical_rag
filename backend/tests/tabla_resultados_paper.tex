@@ -1,24 +1,24 @@
 % ==============================================================================
 % TABLA I: RESULTADOS DEL BENCHMARK EXPERIMENTAL DE ATENEO RAG (MSP ECUADOR)
 % Generada automáticamente para publicación en Revista Indexada / Congreso Médico
+% Faithfulness Score añadido (Diferenciador 3 — Anti-Alucinación Normativa)
 % ==============================================================================
 \begin{table}[htbp]
 \centering
-\caption{Evaluación Cuantitativa del Pipeline RAG Híbrido sobre Guías Clínicas del MSP Ecuador}
+\caption{Evaluación Cuantitativa del Pipeline RAG Híbrido + Faithfulness Score sobre Guías Clínicas del MSP Ecuador}
 \label{tab:ateneo_rag_results}
-\begin{tabular}{lcccc}
+\begin{tabular}{lccccc}
 \toprule
-\textbf{Escenario de Evaluación} & \textbf{Hit@1 $\uparrow$} & \textbf{Hit@3 $\uparrow$} & \textbf{Hit@5 $\uparrow$} & \textbf{MRR@5 $\uparrow$} \\
+\textbf{Escenario} & \textbf{Hit@1 $\uparrow$} & \textbf{Hit@3 $\uparrow$} & \textbf{MRR@5 $\uparrow$} & \textbf{NDCG@5 $\uparrow$} & \textbf{Faith. $\uparrow$} \\
 \midrule
-In-Distribution (GPCs Entrenamiento) & 100.0\% & 100.0\% & 100.0\% & \textbf{1.0000} \\
-Out-of-Distribution (GPCs Ciegas Test) & 50.0\% & 50.0\% & 50.0\% & \textbf{0.5000} \\
+In-Distribution (GPCs Entrenamiento) & 100.0\% & 100.0\% & \textbf{1.0000} & 1.0000 & --- \\
+Out-of-Distribution (Ciego) & 50.0\% & 50.0\% & \textbf{0.5000} & 0.5000 & --- \\
 \midrule
-\textbf{Rendimiento Global Completo} & \textbf{80.0\%} & \textbf{80.0\%} & \textbf{80.0\%} & \textbf{0.8000} \\
+\textbf{Global (todos los casos)} & \textbf{80.0\%} & \textbf{80.0\%} & \textbf{0.8000} & \textbf{0.8000} & \textbf{0.8540} \\
 \midrule
-Normalized DCG Global (NDCG@5)       & \multicolumn{4}{c}{\textbf{0.8000}} \\
-Convalidez Sintáctica JSON (LLM)      & \multicolumn{4}{c}{100.0\% (25/25)} \\
-Latencia Mediana ($P_{50}$)          & \multicolumn{4}{c}{11.19 segundos} \\
-Latencia Percentil 95 ($P_{95}$)     & \multicolumn{4}{c}{66.09 segundos} \\
+Convalidez Sintáctica JSON (LLM) & \multicolumn{5}{c}{100.0\% (25/25)} \\
+Latencia Mediana ($P_{50}$)     & \multicolumn{5}{c}{3.68 segundos} \\
+Latencia Percentil 95 ($P_{95}$) & \multicolumn{5}{c}{7.93 segundos} \\
 \bottomrule
 \end{tabular}
 \end{table}

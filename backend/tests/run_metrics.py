@@ -7,6 +7,11 @@ import os
 from pathlib import Path
 from statistics import mean, median
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 random.seed(42)

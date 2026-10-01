@@ -5,10 +5,16 @@ Referencia científica: Hake (1998), Interactive-engagement versus traditional m
 """
 
 import os
+import sys
 import csv
 import math
 from pathlib import Path
 from typing import List, Dict, Any
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 DATA_PATH = Path(__file__).resolve().parent.parent / "data" / "pilot_study" / "resultados_pilot.csv"
 OUTPUT_TEX_PATH = Path(__file__).resolve().parent.parent.parent / "docs" / "tabla_pilot_study_paper.tex"

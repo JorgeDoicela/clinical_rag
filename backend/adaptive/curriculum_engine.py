@@ -120,7 +120,7 @@ def select_optimal_next_case(student_id: str) -> Dict[str, Any]:
         )
 
     return {
-        "case": best_case.dict() if best_case else None,
+        "case": (best_case.model_dump() if hasattr(best_case, "model_dump") else best_case.dict()) if best_case else None,
         "competencia_objetivo": {
             "id": target_comp_id,
             "nombre": target_comp_meta["nombre"],

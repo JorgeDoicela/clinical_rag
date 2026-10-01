@@ -1,0 +1,28 @@
+% ==============================================================================
+% TABLA V: ESTADO BKT POR COMPETENCIA — RUTA FIJA vs RUTA KST ADAPTATIVA
+% Simulación de 10 sesiones clínicas (Ateneo+)
+% Generada automáticamente por run_kst_simulation.py
+% ==============================================================================
+\begin{table}[htbp]
+\centering
+\caption{Tabla V: Probabilidad de Dominio BKT por Competencia Clínica — Estado Final tras 10 Sesiones de Simulación}
+\label{tab:bkt_competencias}
+\begin{tabular}{lcccccr}
+\toprule
+\textbf{Competencia Clínica} & \textbf{$L_0$} & \textbf{$P$(Fija)} & \textbf{Nivel Fija} & \textbf{$P$(KST)} & \textbf{Nivel KST} & \textbf{$\Delta$KST} \\
+\midrule
+Semiología & 0.40 & 0.978 & \textbf{Dominado} & \textbf{0.847} & \textbf{Dominado} & -0.131 \\
+Dx Diferencial & 0.30 & 0.987 & \textbf{Dominado} & \textbf{0.990} & \textbf{Dominado} & \textbf{+0.003} \\
+Exámenes & 0.25 & 0.725 & En Progreso & \textbf{0.961} & \textbf{Dominado} & \textbf{+0.236} \\
+Correlación & 0.15 & 0.273 & Sin Iniciar & \textbf{0.990} & \textbf{Dominado} & \textbf{+0.717} \\
+Dx Final & 0.30 & 0.962 & \textbf{Dominado} & \textbf{0.990} & \textbf{Dominado} & \textbf{+0.028} \\
+Tratamiento & 0.20 & 0.644 & En Progreso & \textbf{0.990} & \textbf{Dominado} & \textbf{+0.346} \\
+Seguimiento & 0.25 & 0.678 & En Progreso & \textbf{0.990} & \textbf{Dominado} & \textbf{+0.312} \\
+\bottomrule
+\end{tabular}
+\vspace{1mm}
+\begin{minipage}{\linewidth}
+\footnotesize
+\textit{Nota:} $L_0$ = probabilidad a priori de dominio (Corbett \& Anderson, 1994). Umbral de dominio: $P \ge 0.75$. Simulación de 10 sesiones clínicas consecutivas. La Ruta KST asigna casos que activan exactamente la Zona de Desarrollo Próximo (ZDP, Vygotsky 1978) de cada estudiante.
+\end{minipage}
+\end{table}
