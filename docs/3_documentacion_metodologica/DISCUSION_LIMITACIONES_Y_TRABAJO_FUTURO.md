@@ -35,13 +35,9 @@ La integración de **Búsqueda Densa (BGE-M3 Fine-Tuned)** con **Búsqueda Dispe
 
 ## 4. Líneas de Trabajo Futuro y Extensión Científica
 
-### 4.1 Simulación Dinámica por Fases Clínicas Secuenciales *(Trabajo Futuro Principal)*
-* **Estado Actual:** El flujo de evaluación es *single-turn*: el estudiante escribe su razonamiento clínico y recibe retroalimentación integral.
-* **Evolución Propuesta:** Dividir el proceso en 3 fases secuenciales con desbloqueo progresivo:
-  1. **Fase 1 — Anamnesis / Sospecha Diagnóstica Inicial:** El estudiante solo ve el enunciado clínico. Evalúa el razonamiento diagnóstico.
-  2. **Fase 2 — Solicitud e Interpretación de Exámenes:** Se desbloquean las imágenes (ECG, Rx, Labs). El estudiante decide qué estudios pedir y los interpreta.
-  3. **Fase 3 — Prescripción y Seguimiento:** Con el diagnóstico confirmado, se evalúa el plan terapéutico y las indicaciones de monitoreo según la GPC.
-* **Requisitos:** Estado de sesión de simulación en el backend (SQLite) y UI de progresiones de paso en el frontend.
+### 4.1 Extensión de Simulación Dinámica a Ramificaciones Clínicas No Lineales
+* **Implementación Actual en Ateneo+:** El motor de simulación clínica secuencial se encuentra plenamente operativo en 3 etapas progresivas (Fase 1: Anamnesis $\rightarrow$ Fase 2: Paraclínicos $\rightarrow$ Fase 3: Terapéutica) mediante `POST /api/evaluate/phase` y `SimulationStepper.jsx`.
+* **Evolución Propuesta (Árboles Decisionales):** Extender el motor determinista hacia árboles de decisión no lineales donde decisiones iatrogénicas o dosificaciones incorrectas alteren la condición fisiológica del paciente simulado en tiempo real en fases posteriores.
 
 ### 4.2 Re-Ranking con Cross-Encoders Biomédicos
 * **Capa de Re-ordenamiento:** Evaluar modelos de *Cross-Encoder* especializados (ej. `BAAI/bge-reranker-large` o `BioLinkBERT`) sobre el Top-10 devuelto por la Fusión RRF para refinar la ponderación en casos clínicos con múltiples comorbilidades concurrentes.

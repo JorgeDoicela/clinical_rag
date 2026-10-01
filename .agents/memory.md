@@ -46,4 +46,11 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     6. Validación de los 12 Casos Clínicos GPC, Fusión Multimodal Simultánea (ECG+Rx) y Dictamen PDF con Sello SHA-256 (`test_multimodal_and_cases.py`).
   - Todas las suites ejecutadas y verificadas con 100% de aprobación (`PASS`).
   - Estandarización de entorno de pruebas con Python 3.11 vía `uv` (`backend/.venv`), migración de llamadas Pydantic a `model_dump()` y reconfiguración robusta de encoding UTF-8 en runners de benchmark para portabilidad multiplataforma.
-  - Validación completa de scripts científicos y generación de figuras a 300 DPI: `run_kst_simulation.py`, `run_ibf_figure.py`, `run_faithfulness_benchmark.py`, `run_metrics.py`.
+* **Auditoría Integral de Sistema y Documentación Metodológica:**
+  - Se verificó la totalidad del árbol documental (`README.md`, `docs/`, `docs/3_documentacion_metodologica/`, `docs/1_tablas_latex/`, `docs/5_capturas_sistema/`).
+  - Se corrigió la discrepancia de motor vectorial en [docs/DESPLIEGUE_Y_ACCESO_CLOUDFLARE_TUNNEL.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/DESPLIEGUE_Y_ACCESO_CLOUDFLARE_TUNNEL.md) (reemplazo de Qdrant por ChromaDB).
+  - Se actualizó el estado de la simulación por fases en [docs/3_documentacion_metodologica/DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/3_documentacion_metodologica/DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md) para reflejar su implementación activa en `POST /api/evaluate/phase` y `SimulationStepper.jsx`, proyectando hacia árboles de decisión no lineales.
+  - Ejecución en vivo de suites de pruebas con 100% de éxito:
+    * Backend: 6 suites maestras aprobadas en 37s (`tests/run_all_tests.py`).
+    * Frontend: 12 suites y 44 tests aprobados (`vitest run`).
+    * Compilación de producción: `vite build` completado sin errores (1,604 módulos, PWA habilitada).

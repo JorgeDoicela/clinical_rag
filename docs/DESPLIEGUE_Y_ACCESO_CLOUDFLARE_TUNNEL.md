@@ -37,7 +37,7 @@ El trafico hacia Ateneo Clinical RAG ingresa a traves del borde de Cloudflare y 
 * **Servicio de Destino Local:** `http://localhost:5173` (o `http://127.0.0.1:5173`)
 * **Contenedores de Aplicacion:**
   * `clinical_rag_v2-frontend-1`: Puerto host `5173:5173` (React + Vite)
-  * `clinical_rag_v2-backend-1`: Puerto host `8000:8000` (FastAPI / PyTorch / Qdrant)
+  * `clinical_rag_v2-backend-1`: Puerto host `8000:8000` (FastAPI / PyTorch / ChromaDB)
 * **Resolucion Interna de la API:** El servidor de desarrollo Vite incluye un proxy configurado en `vite.config.js` que redirige automaticamente las peticiones a `/api` y `/static` hacia `http://backend:8000`. De esta forma, el tunel solo necesita apuntar al puerto del frontend (`5173`).
 
 ---
