@@ -3,6 +3,10 @@ from datetime import datetime
 from typing import List, Dict, Any, Optional
 from modules.analytics_history.models import EvaluationHistoryModel
 from modules.analytics_history.repository import HistoryRepository
+from core.logger import get_logger
+
+logger = get_logger("ateneo.analytics_history")
+
 
 
 class AnalyticsHistoryService:
@@ -173,7 +177,8 @@ class AnalyticsHistoryService:
 
         for rec in demo_records:
             self.repository.create(rec)
-        print("[ANALYTICS_SERVICE] Sembrado de evaluaciones representativas completado.", flush=True)
+        logger.info("Sembrado de evaluaciones representativas completado.", extra={"action": "demo_evaluations_seeded", "count": len(demo_records)})
+
 
     def save_evaluation(
         self,
@@ -182,13 +187,24 @@ class AnalyticsHistoryService:
         case_id: str,
         guia_asociada: str,
         case_title: str,
-        eval_result: Dict[str, Any]
+        eval_result: Dict[str, Any],
+        cohorte_id: Optional[str] = None,
+        tiempo_segundos: Optional[float] = None,
+        tenant_id: str = "tenant_default"
     ) -> int:
-        timestamp = datetime.utcnow().isoformat()
+        now_dt = datetime.utcnow()
 
         competencias = eval_result.get("competencias_deficientes", [])
         if hasattr(competencias, "__iter__") and not isinstance(competencias, (list, str)):
             competencias = [c.dict() if hasattr(c, "dict") else c for c in competencias]
+
+        faithfulness = eval_result.get("faithfulness_score")
+        if faithfulness is None:
+            cita = eval_result.get("cita_normativa")
+            faithfulness = 1.0 if cita and (isinstance(cita, dict) and cita.get("guia")) else 0.8
+
+        resolved_cohorte = eval_result.get("cohorte_id") or cohorte_id or "cohorte_2026_medicina"
+        resolved_tiempo = float(eval_result.get("tiempo_segundos") or tiempo_segundos or 180.0)
 
         record = EvaluationHistoryModel(
             user_id=user_id,
@@ -198,19 +214,23 @@ class AnalyticsHistoryService:
             case_title=case_title,
             score=float(eval_result.get("score", 0.0)),
             score_max=int(eval_result.get("score_max", 10)),
+            faithfulness_score=float(faithfulness),
+            cohorte_id=resolved_cohorte,
+            tiempo_segundos=resolved_tiempo,
+            tenant_id=tenant_id or "tenant_default",
             aciertos_json=json.dumps(eval_result.get("aciertos", []), ensure_ascii=False),
             omisiones_json=json.dumps(eval_result.get("omisiones", []), ensure_ascii=False),
             competencias_json=json.dumps(competencias if isinstance(competencias, list) else [], ensure_ascii=False),
             cita_normativa_json=json.dumps(eval_result.get("cita_normativa", {}), ensure_ascii=False),
             retroalimentacion_general=eval_result.get("retroalimentacion_general", ""),
-            timestamp=timestamp
+            timestamp=now_dt
         )
 
         saved = self.repository.create(record)
         return saved.id
 
-    def get_user_history(self, user_identifier: str, limit: int = 50) -> List[Dict[str, Any]]:
-        records = self.repository.get_by_user(user_identifier, limit=limit)
+    def get_user_history(self, user_identifier: str, limit: int = 50, tenant_id: Optional[str] = None) -> List[Dict[str, Any]]:
+        records = self.repository.get_by_user(user_identifier, limit=limit, tenant_id=tenant_id)
         history = []
         for r in records:
             history.append({
@@ -222,18 +242,19 @@ class AnalyticsHistoryService:
                 "case_title": r.case_title,
                 "score": r.score,
                 "score_max": r.score_max,
+                "tenant_id": getattr(r, "tenant_id", "tenant_default"),
                 "aciertos": json.loads(r.aciertos_json),
                 "omisiones": json.loads(r.omisiones_json),
                 "competencias_deficientes": json.loads(r.competencias_json),
                 "cita_normativa": json.loads(r.cita_normativa_json),
-                "retroalimentacion_general": r.retroalimentacion_general,
-                "timestamp": r.timestamp
+                "timestamp": r.timestamp.isoformat() if hasattr(r.timestamp, "isoformat") else str(r.timestamp)
             })
         return history
 
-    def get_student_advanced_analytics(self, user_identifier: str) -> Dict[str, Any]:
-        history = self.get_user_history(user_identifier, limit=100)
+    def get_student_advanced_analytics(self, user_identifier: str, tenant_id: Optional[str] = None) -> Dict[str, Any]:
+        history = self.get_user_history(user_identifier, limit=100, tenant_id=tenant_id)
         total_evals = len(history)
+
 
         if total_evals == 0:
             return {
@@ -320,11 +341,17 @@ class AnalyticsHistoryService:
             "radar_competencias": radar_competencias
         }
 
-    def analyze_coordinator_cohort_analytics(self, cohorte_id: Optional[str] = None) -> Dict[str, Any]:
-        records = self.repository.get_all()
-        total_evals = len(records)
-        estudiantes = set()
+    def analyze_coordinator_cohort_analytics(self, cohorte_id: Optional[str] = None, tenant_id: Optional[str] = None) -> Dict[str, Any]:
+        # 1. Agregación SQL nativa de alto rendimiento con aislamiento por tenant
+        cohort_stats = self.repository.get_cohort_summary_stats(cohorte_id=cohorte_id, tenant_id=tenant_id)
+        total_evals = cohort_stats["total_evaluaciones"]
+        total_estudiantes = cohort_stats["total_estudiantes"] or 15
+        promedio_score = cohort_stats["promedio_score"]
+        promedio_faithfulness = cohort_stats["promedio_faithfulness"]
+
+        records = self.repository.get_all(tenant_id=tenant_id)
         evaluaciones_por_usuario: Dict[str, List[Dict[str, Any]]] = {}
+
 
         rows = []
         for r in records:
@@ -335,17 +362,16 @@ class AnalyticsHistoryService:
                 "case_id": r.case_id,
                 "guia_asociada": r.guia_asociada,
                 "score": r.score,
+                "faithfulness_score": r.faithfulness_score,
+                "tiempo_segundos": r.tiempo_segundos,
                 "omisiones_json": r.omisiones_json,
                 "competencias_json": r.competencias_json
             }
             rows.append(item)
             u_email = r.user_email
-            estudiantes.add(u_email)
             if u_email not in evaluaciones_por_usuario:
                 evaluaciones_por_usuario[u_email] = []
             evaluaciones_por_usuario[u_email].append(item)
-
-        total_estudiantes = len(estudiantes) if estudiantes else 15
 
         brechas_modulo: Dict[str, int] = {
             "Dosificación Pediátrica & EHIRN": 0,
@@ -436,6 +462,8 @@ class AnalyticsHistoryService:
             "cohorte_nombre": "Cohorte Medicina 2026-A (Internado Rotativo)",
             "total_estudiantes_activos": total_estudiantes,
             "total_evaluaciones_registradas": total_evals,
+            "promedio_score_cohorte": promedio_score,
+            "promedio_faithfulness_score": promedio_faithfulness,
             "insight_principal": f"El {pct_falla_pediatria}% de tus estudiantes falla en el módulo de dosificación pediátrica e hidratación parenteral.",
             "porcentaje_falla_pediatria": pct_falla_pediatria,
             "modulos_analizados": [

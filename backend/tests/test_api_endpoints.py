@@ -180,7 +180,7 @@ def test_phase_evaluation_endpoint():
         "fase_numero": 1,
         "respuesta_estudiante": "Sospecha de Hipertensión Arterial Grado 2 según la GPC del MSP. Presenta cifras tensionales de 155/96 mmHg en repetidas ocasiones."
     })
-    assert res.status_code == 200
+    assert res.status_code == 200, f"Expected 200, got {res.status_code}: {res.text}"
     phase_res = res.json()
     assert phase_res["fase_numero"] == 1
     assert "score_fase" in phase_res
@@ -196,7 +196,7 @@ def test_socratic_turn_endpoint():
         "historial": []
     }
     res = client.post("/api/evaluate/socratic-turn", json=payload)
-    assert res.status_code == 200
+    assert res.status_code == 200, f"Expected 200, got {res.status_code}: {res.text}"
     assert "text/event-stream" in res.headers.get("content-type", "")
     assert len(res.content) > 0
     print("  [PASS] POST /api/evaluate/socratic-turn -> 200 OK (Streaming SSE Verificado)")

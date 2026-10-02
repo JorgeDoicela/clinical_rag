@@ -36,7 +36,7 @@ La integración de **Búsqueda Densa (BGE-M3 Fine-Tuned)** con **Búsqueda Dispe
 ## 4. Líneas de Trabajo Futuro y Extensión Científica
 
 ### 4.1 Extensión de Simulación Dinámica a Ramificaciones Clínicas No Lineales
-* **Implementación Actual en Ateneo+:** El motor de simulación clínica secuencial se encuentra plenamente operativo en 3 etapas progresivas (Fase 1: Anamnesis $\rightarrow$ Fase 2: Paraclínicos $\rightarrow$ Fase 3: Terapéutica) mediante `POST /api/evaluate/phase` y `SimulationStepper.jsx`.
+* **Implementación Actual en Ateneo+:** El motor de simulación clínica secuencial se encuentra plenamente operativo en 3 etapas progresivas (Fase 1: Anamnesis $\rightarrow$ Fase 2: Paraclínicos $\rightarrow$ Fase 3: Terapéutica) mediante `POST /api/evaluate/phase` y `SimulationStepper.tsx`.
 * **Evolución Propuesta (Árboles Decisionales):** Extender el motor determinista hacia árboles de decisión no lineales donde decisiones iatrogénicas o dosificaciones incorrectas alteren la condición fisiológica del paciente simulado en tiempo real en fases posteriores.
 
 ### 4.2 Re-Ranking con Cross-Encoders Biomédicos

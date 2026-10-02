@@ -125,8 +125,9 @@ class ONNXDenseRetriever:
    git clone https://github.com/JorgeDoicela/clinical_rag.git
    cd clinical_rag
    
-   # Crear .env con la API Key de Gemini
-   echo "GEMINI_API_KEY=tu_api_key_aqui" > backend/.env
+   # Crear .env con la API Key de Gemini (raíz del proyecto)
+   cp .env.example .env
+   # Configurar GEMINI_API_KEY en .env
    
    # Desplegar contenedores aislados
    docker compose up --build -d

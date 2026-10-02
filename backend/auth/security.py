@@ -90,6 +90,8 @@ def get_current_user(
         )
 
     user_record = user_repo.get_by_email(email.lower())
+    token_tenant_id = payload.get("tenant_id")
+
     if not user_record:
         # Fallback defensivo a memoria únicamente si la tabla está vacía en tests unitarios sintéticos
         fallback = DEMO_USERS_DB.get(email.lower())
@@ -99,11 +101,13 @@ def get_current_user(
                 detail="Usuario no encontrado o inactivo",
                 headers={"WWW-Authenticate": "Bearer"}
             )
+        resolved_tenant = token_tenant_id or getattr(fallback, "tenant_id", "tenant_default") or "tenant_default"
         return UserResponse(
             id=fallback.id,
             email=fallback.email,
             nombre=fallback.nombre,
-            rol=fallback.rol
+            rol=fallback.rol,
+            tenant_id=resolved_tenant
         )
 
     if not user_record.activo:
@@ -113,12 +117,21 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"}
         )
 
+    resolved_tenant = token_tenant_id or getattr(user_record, "tenant_id", "tenant_default") or "tenant_default"
     return UserResponse(
         id=user_record.id,
         email=user_record.email,
         nombre=user_record.nombre,
-        rol=UserRole(user_record.rol)
+        rol=UserRole(user_record.rol),
+        tenant_id=resolved_tenant
     )
+
+
+def get_current_tenant_id(current_user: UserResponse = Depends(get_current_user)) -> str:
+    """
+    Inyección de dependencia que resuelve el tenant_id garantizado del usuario autenticado.
+    """
+    return getattr(current_user, "tenant_id", "tenant_default") or "tenant_default"
 
 
 def get_optional_current_user(
@@ -147,3 +160,4 @@ def require_roles(allowed_roles: List[UserRole]):
             )
         return current_user
     return role_checker
+

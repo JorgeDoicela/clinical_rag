@@ -1,4 +1,5 @@
-import { defineConfig } from 'vite'
+/// <reference types="vitest" />
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
@@ -53,8 +54,6 @@ export default defineConfig({
     include: ['src/__tests__/**/*.{test,spec}.{js,jsx,ts,tsx}'],
     exclude: ['e2e/**', 'node_modules/**'],
     pool: 'forks',
-    forks: {
-      singleFork: true,
-    },
+    maxWorkers: 1,
   }
 })

@@ -7,6 +7,10 @@ from config import GEMINI_API_KEY, GEMINI_MODEL
 from services.llm_gateway import llm_gateway, AllModelsExhaustedException, FatalLLMException
 from models.schemas import EvaluationResult, ClinicalCaseSchema, CitaNormativa, PhaseEvaluationResult
 from rag.prompt_builder import SYSTEM_INSTRUCTION, build_prompt, build_phase_prompt
+from rag.security_guard import security_guard
+from core.logger import get_logger
+
+logger = get_logger("ateneo.rag.evaluator")
 
 def call_gemini_llm(
     prompt: str,
@@ -27,8 +31,9 @@ def call_gemini_llm(
         partes_imagenes = [(imagen_bytes, imagen_mime)]
 
     if not GEMINI_API_KEY:
-        print("[LLM] ADVERTENCIA: GEMINI_API_KEY no configurada. Usando fallback de desarrollo local...", flush=True)
+        logger.warning("GEMINI_API_KEY no configurada. Usando fallback de desarrollo local...", extra={"action": "gemini_api_key_missing"})
         return json.dumps({
+
             "score": 8.0,
             "score_max": 10,
             "aciertos": [
@@ -66,13 +71,14 @@ def call_gemini_llm(
         )
         return result.text
     except AllModelsExhaustedException as exc:
-        print(f"[LLM] ALERTA RESILIENCIA: {exc}. Activando fallback formativo de respaldo...", flush=True)
+        logger.warning(f"ALERTA RESILIENCIA: {exc}. Activando fallback formativo de respaldo...", extra={"action": "llm_all_models_exhausted_fallback"})
     except FatalLLMException as fatal:
-        print(f"[LLM] ERROR CRÍTICO AUTENTICACIÓN: {fatal}. Activando fallback formativo de respaldo...", flush=True)
+        logger.error(f"ERROR CRÍTICO AUTENTICACIÓN: {fatal}. Activando fallback formativo de respaldo...", extra={"action": "llm_fatal_auth_fallback"})
 
     # Si la cuota gratuita de la API se agotó temporalmente en todos los modelos, usar fallback defensivo formativo
-    print("[LLM] Cuota gratuita de Gemini agotada temporalmente. Devolviendo evaluación formativa de respaldo...", flush=True)
+    logger.warning("Cuota gratuita de Gemini agotada temporalmente. Devolviendo evaluación formativa de respaldo...", extra={"action": "llm_quota_exhausted_fallback"})
     return json.dumps({
+
         "score": 7.5,
         "score_max": 10,
         "aciertos": [
@@ -156,6 +162,14 @@ def _normalize_competencias_deficientes(data: dict) -> dict:
     data["competencias_deficientes"] = normalized
     return data
 
+def _unwrap_root_envelope(data: Any) -> Any:
+    """Desenvuelve el objeto raíz si Gemini lo encapsula en 'evaluacion', 'resultado', etc."""
+    if isinstance(data, dict):
+        for candidate_key in ["evaluacion", "evaluation", "resultado", "result", "dictamen"]:
+            if candidate_key in data and isinstance(data[candidate_key], dict):
+                return data[candidate_key]
+    return data
+
 def parse_and_validate_llm_json(raw_text: str) -> EvaluationResult:
     """
     Limpia defensivamente y valida mediante Pydantic el JSON devuelto por Gemini.
@@ -170,21 +184,24 @@ def parse_and_validate_llm_json(raw_text: str) -> EvaluationResult:
     # Intento 1: parseo directo
     try:
         data = json.loads(cleaned)
+        data = _unwrap_root_envelope(data)
         data = _normalize_cita_normativa(data)
         data = _normalize_competencias_deficientes(data)
         return EvaluationResult(**data)
     except json.JSONDecodeError as e:
-        print(f"[PARSER] JSON inválido ({e}), intentando reparación por truncamiento...", flush=True)
+        logger.warning(
+            "JSON invalido, intentando reparacion por truncamiento",
+            extra={"action": "json_parse_retry", "error": str(e)}
+        )
 
     # Intento 2: reparar truncamiento y reintentar
     try:
         repaired = _repair_truncated_json(cleaned)
         data = json.loads(repaired)
+        data = _unwrap_root_envelope(data)
         data = _normalize_cita_normativa(data)
         data = _normalize_competencias_deficientes(data)
-        print("[PARSER] JSON reparado exitosamente tras truncamiento.", flush=True)
-        return EvaluationResult(**data)
-        print("[PARSER] JSON reparado exitosamente tras truncamiento.", flush=True)
+        logger.info("JSON reparado exitosamente tras truncamiento", extra={"action": "json_repaired"})
         return EvaluationResult(**data)
     except Exception as e:
         raise ValueError(f"Fallo al parsear o validar la respuesta de Gemini a JSON: {e}. Raw: {raw_text[:200]}")
@@ -210,8 +227,24 @@ def evaluate_clinical_reasoning(
     tiene_imagen = bool(imagenes_list)
     n_imagenes = len(imagenes_list) if imagenes_list else 0
     mime_types = [m for _, m in imagenes_list] if imagenes_list else []
+    # 1. Blindaje clínico contra prompt injection y sanitización de entrada
+    scan = security_guard.inspect_input(respuesta_estudiante)
+    if not scan.is_safe:
+        logger.warning(
+            "Intento de Prompt Injection neutralizado, penalizando con 0.0",
+            extra={
+                "action": "security_injection_blocked",
+                "attack_type": scan.attack_type,
+                "detected_pattern": scan.detected_pattern
+            }
+        )
+        return security_guard.build_security_violation_evaluation(
+            attack_type=scan.attack_type,
+            detected_pattern=scan.detected_pattern
+        )
+
     prompt = build_prompt(
-        caso, respuesta_estudiante, chunk,
+        caso, scan.sanitized_text, chunk,
         tiene_imagen=tiene_imagen,
         n_imagenes=n_imagenes,
         mime_types=mime_types,
@@ -253,9 +286,19 @@ def evaluate_clinical_reasoning(
         resultado.total_claims       = fs_data["total_claims"]
         resultado.grounded_claims    = fs_data["grounded_claims"]
         resultado.grounding_level    = fs_data["grounding_level"]
-        print(f"[EVAL] Faithfulness Score calculado: {fs_data['faithfulness_score']:.3f} ({fs_data['grounding_level']})", flush=True)
+        logger.info(
+            "Faithfulness Score calculado",
+            extra={
+                "action": "faithfulness_calculated",
+                "faithfulness_score": fs_data["faithfulness_score"],
+                "grounding_level": fs_data["grounding_level"]
+            }
+        )
     except Exception as fs_err:
-        print(f"[EVAL] Error al calcular faithfulness score: {fs_err}", flush=True)
+        logger.error(
+            "Error al calcular faithfulness score",
+            extra={"action": "faithfulness_error", "error": str(fs_err)}
+        )
 
     return resultado
 
@@ -273,10 +316,28 @@ def evaluate_phase_reasoning(
     tiene_imagen = bool(imagenes_list)
     n_imagenes = len(imagenes_list) if imagenes_list else 0
     mime_types = [m for _, m in imagenes_list] if imagenes_list else []
+    # 1. Blindaje clínico contra prompt injection y sanitización de entrada en fases
+    scan = security_guard.inspect_input(respuesta_estudiante)
+    if not scan.is_safe:
+        logger.warning(
+            "Intento de Prompt Injection en fase clinica neutralizado",
+            extra={
+                "action": "security_injection_blocked",
+                "fase_numero": fase_numero,
+                "attack_type": scan.attack_type,
+                "detected_pattern": scan.detected_pattern
+            }
+        )
+        return security_guard.build_security_violation_phase_evaluation(
+            fase_numero=fase_numero,
+            attack_type=scan.attack_type,
+            detected_pattern=scan.detected_pattern
+        )
+
     prompt = build_phase_prompt(
         caso=caso,
         fase_numero=fase_numero,
-        respuesta_estudiante=respuesta_estudiante,
+        respuesta_estudiante=scan.sanitized_text,
         chunk=chunk,
         historial_previo=historial_previo,
         tiene_imagen=tiene_imagen,

@@ -5,6 +5,10 @@ from typing import List, Tuple, Optional, Dict, Any
 from google import genai
 from google.genai import types
 from core.config import settings
+from core.logger import get_logger
+
+logger = get_logger("ateneo.llm_gateway")
+
 
 
 class CircuitStatus(str, Enum):
@@ -75,7 +79,7 @@ class ResilientLLMGateway:
         if status == CircuitStatus.OPEN:
             if now >= cooldown_until:
                 self._circuit_states[model_name] = CircuitStatus.HALF_OPEN
-                print(f"[LLM_GATEWAY] Cooldown vencido para '{model_name}'. Estado: HALF_OPEN (probando recuperación)...", flush=True)
+                logger.info(f"Cooldown vencido para '{model_name}'. Estado: HALF_OPEN (probando recuperación)...", extra={"action": "circuit_half_open", "model": model_name})
                 return True
             return False
 
@@ -87,7 +91,7 @@ class ResilientLLMGateway:
     def _record_success(self, model_name: str):
         prev_status = self._circuit_states.get(model_name, CircuitStatus.CLOSED)
         if prev_status != CircuitStatus.CLOSED:
-            print(f"[LLM_GATEWAY] Modelo '{model_name}' recuperado con éxito. Circuito RESTABLECIDO a CLOSED.", flush=True)
+            logger.info(f"Modelo '{model_name}' recuperado con éxito. Circuito RESTABLECIDO a CLOSED.", extra={"action": "circuit_closed", "model": model_name})
         self._circuit_states[model_name] = CircuitStatus.CLOSED
         self._opened_until.pop(model_name, None)
 
@@ -110,13 +114,82 @@ class ResilientLLMGateway:
             )
         )
 
-        print(
-            f"[LLM_GATEWAY] Circuito ABIERTO para '{model_name}' durante {cooldown}s. "
-            f"Causa: {summary}. Detalle: {error}",
-            flush=True
+        logger.warning(
+            f"Circuito ABIERTO para '{model_name}' durante {cooldown}s. Causa: {summary}. Detalle: {error}",
+            extra={"action": "circuit_opened", "model": model_name, "cooldown_seconds": cooldown, "cause": summary}
         )
 
+
+    def get_circuit_breakers_status(self) -> Dict[str, Any]:
+        """
+        Retorna el estado de observabilidad de los Circuit Breakers para cada modelo en la cascada.
+        Calcula tiempos de cooldown restantes y estados efectivos (CLOSED, OPEN, HALF_OPEN).
+        """
+        models_cascade = settings.get_models_cascade()
+        now = time.time()
+        models_report: Dict[str, Any] = {}
+        open_count = 0
+        half_open_count = 0
+
+        for model_name in models_cascade:
+            raw_status = self._circuit_states.get(model_name, CircuitStatus.CLOSED)
+            cooldown_until = self._opened_until.get(model_name)
+
+            if raw_status == CircuitStatus.OPEN:
+                if cooldown_until and now >= cooldown_until:
+                    effective_status = CircuitStatus.HALF_OPEN
+                    remaining = 0.0
+                    half_open_count += 1
+                else:
+                    effective_status = CircuitStatus.OPEN
+                    remaining = max(0.0, round((cooldown_until or now) - now, 2))
+                    open_count += 1
+            elif raw_status == CircuitStatus.HALF_OPEN:
+                effective_status = CircuitStatus.HALF_OPEN
+                remaining = 0.0
+                half_open_count += 1
+            else:
+                effective_status = CircuitStatus.CLOSED
+                remaining = 0.0
+
+            models_report[model_name] = {
+                "status": effective_status.value,
+                "cooldown_remaining_seconds": remaining,
+                "cooldown_until": cooldown_until,
+            }
+
+        total_models = len(models_cascade)
+        if open_count == total_models:
+            global_status = "EXHAUSTED"
+        elif open_count > 0 or half_open_count > 0:
+            global_status = "DEGRADED"
+        else:
+            global_status = "OPERATIONAL"
+
+        return {
+            "status": global_status,
+            "total_models": total_models,
+            "active_models": total_models - open_count,
+            "cooldown_configured_seconds": settings.gemini_circuit_cooldown_seconds,
+            "models": models_report,
+        }
+
+    def set_circuit_state(self, model_name: str, status: CircuitStatus, cooldown_seconds: Optional[float] = None):
+        """Asigna manualmente el estado de un circuito (útil para auditoría, telemetría y pruebas)."""
+        self._circuit_states[model_name] = status
+        if status == CircuitStatus.OPEN:
+            cd = cooldown_seconds if cooldown_seconds is not None else settings.gemini_circuit_cooldown_seconds
+            self._opened_until[model_name] = time.time() + cd
+        elif status == CircuitStatus.CLOSED:
+            self._opened_until.pop(model_name, None)
+
+    def reset_all_circuits(self):
+        """Restablece todos los circuitos al estado operativo normal (CLOSED)."""
+        self._circuit_states.clear()
+        self._opened_until.clear()
+
     def generate(
+
         self,
         prompt: str,
         imagenes_list: Optional[List[Tuple[bytes, str]]] = None,
@@ -162,7 +235,7 @@ class ResilientLLMGateway:
                 continue
 
             try:
-                print(f"[LLM_GATEWAY] Invocando modelo '{model_name}' (Intento {idx + 1}/{len(models_cascade)})...", flush=True)
+                logger.info(f"Invocando modelo '{model_name}' (Intento {idx + 1}/{len(models_cascade)})...", extra={"action": "llm_invoke_attempt", "model": model_name, "attempt": idx + 1})
                 response = client.models.generate_content(
                     model=model_name,
                     contents=contents,
@@ -173,7 +246,8 @@ class ResilientLLMGateway:
 
                 fallback_occurred = (model_name != primary_model)
                 if fallback_occurred:
-                    print(f"[LLM_GATEWAY] Fallback exitoso: Petición resuelta por modelo de respaldo '{model_name}'.", flush=True)
+                    logger.info(f"Fallback exitoso: Petición resuelta por modelo de respaldo '{model_name}'.", extra={"action": "llm_fallback_success", "model": model_name, "primary_model": primary_model})
+
 
                 attempts.append({"model": model_name, "status": "SUCCESS"})
                 return LLMGenerationResult(
@@ -217,8 +291,9 @@ class ResilientLLMGateway:
                 continue
 
             try:
-                print(f"[LLM_GATEWAY STREAM] Invocando stream con '{model_name}' (Intento {idx + 1}/{len(models_cascade)})...", flush=True)
+                logger.info(f"Invocando stream con '{model_name}' (Intento {idx + 1}/{len(models_cascade)})...", extra={"action": "llm_stream_attempt", "model": model_name, "attempt": idx + 1})
                 response_stream = client.models.generate_content_stream(
+
                     model=model_name,
                     contents=prompt,
                     config=gen_config

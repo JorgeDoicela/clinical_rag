@@ -46,6 +46,48 @@ class AuthService:
                 "nombre": "Estudiante María José Silva",
                 "rol": UserRole.ALUMNO.value,
                 "password": os.getenv("DEMO_ALUMNO_PASSWORD", "Alumno123!")
+            },
+            {
+                "id": "usr_estudiante_002",
+                "email": "juan.perez@ateneo.edu.ec",
+                "nombre": "Estudiante Juan Pérez",
+                "rol": UserRole.ALUMNO.value,
+                "password": os.getenv("DEMO_ALUMNO_PASSWORD", "Alumno123!")
+            },
+            {
+                "id": "usr_estudiante_003",
+                "email": "carolina.mendoza@ateneo.edu.ec",
+                "nombre": "Estudiante Carolina Mendoza",
+                "rol": UserRole.ALUMNO.value,
+                "password": os.getenv("DEMO_ALUMNO_PASSWORD", "Alumno123!")
+            },
+            {
+                "id": "usr_estudiante_004",
+                "email": "mateo.torres@ateneo.edu.ec",
+                "nombre": "Estudiante Mateo Torres",
+                "rol": UserRole.ALUMNO.value,
+                "password": os.getenv("DEMO_ALUMNO_PASSWORD", "Alumno123!")
+            },
+            {
+                "id": "usr_estudiante_005",
+                "email": "sofia.gallegos@ateneo.edu.ec",
+                "nombre": "Estudiante Sofía Gallegos",
+                "rol": UserRole.ALUMNO.value,
+                "password": os.getenv("DEMO_ALUMNO_PASSWORD", "Alumno123!")
+            },
+            {
+                "id": "usr_estudiante_006",
+                "email": "david.moreno@ateneo.edu.ec",
+                "nombre": "Estudiante David Moreno",
+                "rol": UserRole.ALUMNO.value,
+                "password": os.getenv("DEMO_ALUMNO_PASSWORD", "Alumno123!")
+            },
+            {
+                "id": "usr_estudiante_007",
+                "email": "valeria.castro@ateneo.edu.ec",
+                "nombre": "Estudiante Valeria Castro",
+                "rol": UserRole.ALUMNO.value,
+                "password": os.getenv("DEMO_ALUMNO_PASSWORD", "Alumno123!")
             }
         ]
 
@@ -58,6 +100,7 @@ class AuthService:
                 rol=u["rol"],
                 hashed_password=get_password_hash(u["password"]),
                 activo=True,
+                tenant_id="tenant_default",
                 created_at=now
             )
             self.repository.create(record)
@@ -73,13 +116,15 @@ class AuthService:
             raise PermissionError("La cuenta de usuario está desactivada")
 
         role_enum = UserRole(user_record.rol)
+        resolved_tenant = getattr(user_record, "tenant_id", "tenant_default") or "tenant_default"
         user_domain = User(
             id=user_record.id,
             email=user_record.email,
             nombre=user_record.nombre,
             rol=role_enum,
             hashed_password=user_record.hashed_password,
-            activo=user_record.activo
+            activo=user_record.activo,
+            tenant_id=resolved_tenant
         )
 
         access_token = create_access_token(user_domain)
@@ -87,7 +132,8 @@ class AuthService:
             id=user_record.id,
             email=user_record.email,
             nombre=user_record.nombre,
-            rol=role_enum
+            rol=role_enum,
+            tenant_id=resolved_tenant
         )
 
         return TokenResponse(
@@ -96,14 +142,16 @@ class AuthService:
             user=user_res
         )
 
-    def list_users(self) -> List[UserResponse]:
-        records = self.repository.get_all()
+    def list_users(self, tenant_id: Optional[str] = None) -> List[UserResponse]:
+        records = self.repository.get_all(tenant_id=tenant_id)
         return [
             UserResponse(
                 id=u.id,
                 email=u.email,
                 nombre=u.nombre,
-                rol=UserRole(u.rol)
+                rol=UserRole(u.rol),
+                tenant_id=getattr(u, "tenant_id", "tenant_default") or "tenant_default"
             )
             for u in records
         ]
+

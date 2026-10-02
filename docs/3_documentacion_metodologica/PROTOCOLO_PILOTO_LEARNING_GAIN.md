@@ -71,4 +71,4 @@ docker compose exec backend python tests/pilot_study_analyzer.py
 ```
 
 * **Dataset de Entrada:** `backend/data/pilot_study/resultados_pilot.csv`
-* **Artefacto de Publicación:** `docs/tabla_pilot_study_paper.tex`
+* **Artefacto de Publicación:** `docs/1_tablas_latex/tabla_pilot_study_paper.tex`

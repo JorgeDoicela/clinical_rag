@@ -88,13 +88,26 @@ class ClinicalCaseSchema(BaseModel):
     modo_simulacion: Optional[str] = "single_turn" # "single_turn" | "fases"
     fases: Optional[List[PhaseSchema]] = None
     competencias_activadas: Optional[List[str]] = None
+    tenant_id: Optional[str] = "tenant_default"
+
+
+class TenantSchema(BaseModel):
+    id: str
+    codigo: str
+    nombre_institucional: str
+    dominio_email: str
+    gpc_activas: List[str] = Field(default_factory=list)
+    activo: bool = True
+
 
 from enum import Enum
+
 
 class UserRole(str, Enum):
     ADMINISTRADOR = "administrador"
     DOCENTE = "docente"
     ALUMNO = "alumno"
+
 
 class User(BaseModel):
     id: str
@@ -103,20 +116,26 @@ class User(BaseModel):
     rol: UserRole
     hashed_password: str
     activo: bool = True
+    tenant_id: str = "tenant_default"
+
 
 class LoginRequest(BaseModel):
     email: str
     password: str
+
 
 class UserResponse(BaseModel):
     id: str
     email: str
     nombre: str
     rol: UserRole
+    tenant_id: str = "tenant_default"
+
 
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserResponse
+
 
 

@@ -26,30 +26,36 @@ El sistema organiza sus pruebas en 4 niveles complementarios que garantizan la i
 │ • test_auth_security.py (Seguridad criptográfica, JWT y roles RBAC)         │
 │ • test_api_endpoints.py (Rutas /auth, /cases, /history, /adaptive, /rooms)  │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ NIVEL 1: PRUEBAS DE FRONTEND Y GENERADORES DETERMINISTAS                    │
-│ • Vitest + React Testing Library (12 suites, 44 tests de interfaz y estado) │
+│ NIVEL 1: PRUEBAS DE FRONTEND, TIEMPO REAL Y E2E                             │
+│ • Vitest + React Testing Library (16 suites, 72 tests de interfaz y estado) │
+│ • Playwright E2E Multi-Navegador (15 tests en Chrome, Edge y Mobile Pixel 5)│
 │ • test_multimodal_and_cases.py (12 casos ChromaDB, PDF ReportLab SHA-256)   │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 2. Catálogo de Pruebas de Frontend (Vitest + React Testing Library)
+## 2. Catálogo de Pruebas de Frontend (Vitest + React Testing Library & Playwright)
 
-El frontend dispone de 12 suites de prueba y 44 especificaciones unitarias y de integración que convalidan el árbol de componentes, la accesibilidad, el manejo de estado y el estándar de diseño:
+El frontend dispone de 16 suites de prueba y 72 especificaciones unitarias y de integración en Vitest, junto con 4 suites E2E multi-navegador en Playwright (15 pruebas), que convalidan el árbol de componentes, accesibilidad, manejo de estado, resiliencia offline y estándar de diseño:
 
-### 2.1 Ejecución en Entorno Local
+### 2.1 Ejecución de Pruebas Unitarias e Integración (Vitest)
 ```bash
 cd frontend
 npm test
 ```
-
-### 2.2 Ejecución en Contenedor Docker
+En contenedor Docker:
 ```bash
 docker compose exec frontend npm test
 ```
 
-### 2.3 Detalle de Suites Frontend
+### 2.2 Ejecución de Pruebas End-to-End Multi-Navegador (Playwright)
+```bash
+cd frontend
+npx playwright test
+```
+
+### 2.3 Detalle de Suites Frontend (Vitest 5)
 | Archivo de Prueba | Componente Evaluado | Casos de Prueba Verificados |
 |:---|:---|:---|
 | `src/__tests__/client.test.js` | Capa de API y red | Contratos HTTP, inyección de tokens JWT, headers y serialización multipart para estudios paraclínicos. |
@@ -64,6 +70,10 @@ docker compose exec frontend npm test
 | `src/__tests__/AdminDashboard.test.jsx` | Panel administrativo | Gestión de usuarios, sincronización de identidades y privilegios de cohorte. |
 | `src/__tests__/CoordinatorAnalytics.test.jsx` | Analítica institucional | Panel B2B de inteligencia formativa, visualización de brechas de cohorte e IBF. |
 | `src/__tests__/KnowledgeSpaceGraph.test.jsx` | Topología KST | Grafo interactivo de prerrequisitos, ordenamiento topológico y modales reactivos. |
+| `src/__tests__/SocraticDebrief.test.jsx` | Diálogo Socrático SSE | Streaming continuo de debriefing clínico multiturno, parseo SSE y cancelación con AbortController. |
+| `src/__tests__/AteneoRealtimeCollab.test.jsx` | Salas WebSockets | Conexión bidireccional, sincronización de hipótesis diagnósticas y presencia activa en vivo. |
+| `src/__tests__/ClinicalStudyViewer.test.jsx` | Visor Canvas GPU | Lienzo acelerado a 60 FPS, paneo, zoom, calibrador ECG milimétrico y ventana radiológica. |
+| `src/__tests__/OfflineSync.test.tsx` | Resiliencia Offline | Persistencia IndexedDB (`ateneo_offline_v1`), cola de salida Outbox y sincronización automática. |
 
 ---
 

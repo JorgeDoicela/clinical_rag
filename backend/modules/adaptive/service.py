@@ -57,7 +57,7 @@ class AdaptiveCurriculumService:
                     records_dict.append({
                         "score": r.score,
                         "competencias_deficientes": comp_def,
-                        "timestamp": r.timestamp
+                        "timestamp": r.timestamp.isoformat() if hasattr(r.timestamp, "isoformat") else str(r.timestamp)
                     })
                 state = project_knowledge_state_from_history(records_dict)
             else:

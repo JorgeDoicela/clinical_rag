@@ -38,9 +38,16 @@ class CaseRepository:
             logger.error("Error al leer archivo canónico de casos clínicos: %s", e)
             return []
 
-    def _load_from_db(self) -> List[ClinicalCaseSchema]:
+    def _load_from_db(self, tenant_id: Optional[str] = None) -> List[ClinicalCaseSchema]:
         def _query_db(db: Session) -> List[ClinicalCaseSchema]:
-            db_cases = db.query(ClinicalCaseModel).all()
+            query = db.query(ClinicalCaseModel)
+            if tenant_id:
+                query = query.filter(
+                    (ClinicalCaseModel.tenant_id == tenant_id) |
+                    (ClinicalCaseModel.tenant_id == "tenant_default") |
+                    (ClinicalCaseModel.tenant_id.is_(None))
+                )
+            db_cases = query.all()
             result = []
             for row in db_cases:
                 result.append(ClinicalCaseSchema(
@@ -54,7 +61,8 @@ class CaseRepository:
                     fragmento_gpc_ideal_id=row.fragmento_gpc_ideal_id,
                     modo_simulacion=row.modo_simulacion or "single_turn",
                     fases=row.fases,
-                    competencias_activadas=row.competencias_activadas
+                    competencias_activadas=row.competencias_activadas,
+                    tenant_id=getattr(row, "tenant_id", "tenant_default") or "tenant_default"
                 ))
             return result
 
@@ -68,8 +76,8 @@ class CaseRepository:
                 logger.warning("Base de datos no disponible para casos dinámicos: %s", e)
                 return []
 
-    def get_all(self, reload: bool = False) -> List[ClinicalCaseSchema]:
-        if self._cache is not None and not reload:
+    def get_all(self, reload: bool = False, tenant_id: Optional[str] = None) -> List[ClinicalCaseSchema]:
+        if self._cache is not None and not reload and tenant_id is None:
             return self._cache
 
         # 1. Cargar casos canónicos de JSON
@@ -77,23 +85,31 @@ class CaseRepository:
         cases_map = {c.id: c for c in json_cases}
 
         # 2. Cargar y sobreescribir/extender con casos dinámicos de BD
-        db_cases = self._load_from_db()
+        db_cases = self._load_from_db(tenant_id=tenant_id)
         for c in db_cases:
             cases_map[c.id] = c
 
-        self._cache = list(cases_map.values())
-        return self._cache
+        results = list(cases_map.values())
+        if tenant_id is None:
+            self._cache = results
+        return results
 
-    def get_by_id(self, case_id: str) -> Optional[ClinicalCaseSchema]:
-        cases = self.get_all()
+    def get_by_id(self, case_id: str, tenant_id: Optional[str] = None) -> Optional[ClinicalCaseSchema]:
+        cases = self.get_all(tenant_id=tenant_id)
         for c in cases:
             if c.id == case_id:
                 return c
         return None
 
-    def save_case(self, case: ClinicalCaseSchema, creado_por: Optional[str] = None) -> ClinicalCaseSchema:
+    def save_case(
+        self,
+        case: ClinicalCaseSchema,
+        creado_por: Optional[str] = None,
+        tenant_id: Optional[str] = None
+    ) -> ClinicalCaseSchema:
         """Persiste un caso clínico en la base de datos relacional e invalida el caché."""
         fases_dump = [f.model_dump() if hasattr(f, "model_dump") else f for f in (case.fases or [])]
+        resolved_tenant = tenant_id or getattr(case, "tenant_id", "tenant_default") or "tenant_default"
         
         def _persist(db: Session):
             db_case = db.query(ClinicalCaseModel).filter(ClinicalCaseModel.id == case.id).first()
@@ -108,6 +124,7 @@ class CaseRepository:
                 db_case.modo_simulacion = case.modo_simulacion
                 db_case.fases = fases_dump
                 db_case.competencias_activadas = case.competencias_activadas
+                db_case.tenant_id = resolved_tenant
                 if creado_por:
                     db_case.creado_por = creado_por
             else:
@@ -123,7 +140,8 @@ class CaseRepository:
                     modo_simulacion=case.modo_simulacion,
                     fases=fases_dump,
                     competencias_activadas=case.competencias_activadas,
-                    creado_por=creado_por
+                    creado_por=creado_por,
+                    tenant_id=resolved_tenant
                 )
                 db.add(db_case)
             db.commit()
@@ -133,6 +151,7 @@ class CaseRepository:
         else:
             with get_db_context() as db:
                 _persist(db)
+
 
         # Invalidar caché en memoria
         self._cache = None

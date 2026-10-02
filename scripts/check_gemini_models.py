@@ -97,13 +97,13 @@ PRICING_TABLE = {
 
 def benchmark_models():
     if not GEMINI_API_KEY:
-        print("[-] GEMINI_API_KEY no configurada. Verifica backend/.env")
+        print("[-] GEMINI_API_KEY no configurada. Verifica .env en la raíz del proyecto")
         return
 
     client = genai.Client(api_key=GEMINI_API_KEY)
     
     print("\n" + "=" * 95)
-    print("📊 COMPARADOR DE MODELOS GEMINI DISPONIBLES & PRECIOS ESTIMADOS (GOOGLE AI STUDIO)")
+    print("COMPARADOR DE MODELOS GEMINI DISPONIBLES & PRECIOS ESTIMADOS (GOOGLE AI STUDIO)")
     print("=" * 95)
     print(f"{'MODELO':<28} | {'TIER':<18} | {'INPUT / 1M':<10} | {'OUTPUT / 1M':<11} | {'ESTADO / LATENCIA'}")
     print("-" * 95)

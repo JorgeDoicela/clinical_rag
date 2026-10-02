@@ -21,25 +21,34 @@ from routers.auth import router as auth_router
 from routers.history import router as history_router
 from routers.collaboration import router as collaboration_router
 from routers.adaptive import router as adaptive_router
+from routers.health import router as health_router
 
 from contextlib import asynccontextmanager
 from core.config import settings
 from core.database import init_database
+from core.logger import setup_structured_logging, get_logger
+
+setup_structured_logging()
+logger = get_logger("ateneo.main")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("[STARTUP] Inicializando base de datos relacional (SQLAlchemy)...", flush=True)
+    logger.info("Inicializando base de datos relacional (SQLAlchemy)...", extra={"action": "database_init"})
     init_database()
-    print("[STARTUP] Servidor FastAPI de Ateneo iniciado correctamente.", flush=True)
+    logger.info("Servidor FastAPI de Ateneo iniciado correctamente.", extra={"action": "server_started"})
     import asyncio
     def _preload():
         try:
             from rag.retriever import get_embedding_model
             get_embedding_model()
         except Exception as e:
-            print(f"[STARTUP] Error al precargar modelo: {e}", flush=True)
-    asyncio.create_task(asyncio.to_thread(_preload))
+            logger.error(f"Error al precargar modelo de embeddings: {e}", extra={"action": "embedding_preload_error"})
+    from core.background_worker import background_worker
+    background_worker.start()
     yield
+    background_worker.shutdown()
+
+
 
 app = FastAPI(
     title="Ateneo API - Evaluación del Razonamiento Clínico mediante RAG",
@@ -96,13 +105,7 @@ app.include_router(evaluation_router)
 app.include_router(history_router)
 app.include_router(collaboration_router)
 app.include_router(adaptive_router)
-
-
-
-
-@app.get("/health", tags=["Health"])
-async def health_check():
-    return {"status": "ok", "project": "Ateneo", "version": "1.0.0"}
+app.include_router(health_router)
 
 if __name__ == "__main__":
     import uvicorn

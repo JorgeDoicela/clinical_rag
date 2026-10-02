@@ -39,7 +39,7 @@ class AppSettings(BaseModel):
     database_url: str = Field(
         default_factory=lambda: os.getenv(
             "DATABASE_URL",
-            f"sqlite:///{BASE_DIR / 'data' / 'history.db'}"
+            f"sqlite:///{BASE_DIR / 'data' / 'ateneo_clinical.db'}"
         )
     )
 
@@ -66,6 +66,31 @@ class AppSettings(BaseModel):
             "ALLOWED_ORIGINS",
             "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173"
         )
+    )
+
+    # Rate Limiting & Cuotas Defensivas
+    rate_limit_enabled: bool = Field(
+        default_factory=lambda: os.getenv("RATE_LIMIT_ENABLED", "true").lower() in ("true", "1", "yes")
+    )
+    rate_limit_requests_per_minute: int = Field(
+        default_factory=lambda: int(os.getenv("RATE_LIMIT_REQUESTS_PER_MINUTE", "60"))
+    )
+    rate_limit_inference_per_minute: int = Field(
+        default_factory=lambda: int(os.getenv("RATE_LIMIT_INFERENCE_PER_MINUTE", "20"))
+    )
+
+    # Caché Semántica y Léxica RAG
+    rag_cache_enabled: bool = Field(
+        default_factory=lambda: os.getenv("RAG_CACHE_ENABLED", "true").lower() in ("true", "1", "yes")
+    )
+    rag_cache_max_entries: int = Field(
+        default_factory=lambda: int(os.getenv("RAG_CACHE_MAX_ENTRIES", "2000"))
+    )
+    rag_cache_ttl_seconds: int = Field(
+        default_factory=lambda: int(os.getenv("RAG_CACHE_TTL_SECONDS", "3600"))
+    )
+    rag_cache_similarity_threshold: float = Field(
+        default_factory=lambda: float(os.getenv("RAG_CACHE_SIMILARITY_THRESHOLD", "0.98"))
     )
 
     # Propiedades calculadas / validadas

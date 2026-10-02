@@ -113,6 +113,7 @@ def _get_http_title(status_code: int) -> str:
         405: "Method Not Allowed",
         409: "Conflict",
         422: "Unprocessable Entity",
+        429: "Too Many Requests",
         500: "Internal Server Error",
         502: "Bad Gateway",
         503: "Service Unavailable",

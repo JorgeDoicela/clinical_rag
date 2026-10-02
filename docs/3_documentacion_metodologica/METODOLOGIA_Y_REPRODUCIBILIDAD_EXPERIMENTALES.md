@@ -153,7 +153,7 @@ El sistema cuenta con un marco de pruebas en 4 niveles formales de verificación
   * **Normalized Discounted Cumulative Gain (NDCG@5):** 1.0000.
   * **Convalidez de Esquema JSON:** 100.0% (25/25 dictámenes parseables).
   * **Latencia Mediana ($P_{50}$):** 11.19 s.
-  * **Artefacto LaTeX:** Generación automatizada de `tests/tabla_resultados_paper.tex`.
+  * **Artefacto LaTeX:** Generación automatizada de `docs/1_tablas_latex/tabla_resultados_paper.tex`.
 
 ### 10.2 Nivel 2: Validación de los 12 Casos Clínicos y Fusión Multimodal (`tests/test_multimodal_and_cases.py`)
 * **Propósito:** Validar la recuperación RAG determinista de todos los casos del catálogo contra ChromaDB, la generación de PDFs institucionales y la Fusión Multimodal con múltiples estudios simultáneos.
@@ -207,5 +207,5 @@ El sistema cuenta con un marco de pruebas en 4 niveles formales de verificación
   * **Post-Test Score Promedio:** 8.64 ± 0.40 / 10.0.
   * **Ganancia Normalizada de Hake ($g$):** 0.7400 ± 0.0542 -> **Ganancia Alta** ($g \ge 0.70$, Hake 1998).
   * **Estadístico $t$ Pareado:** $t = 105.266$ ($p < 0.0001$, $df = 24$).
-  * **Artefacto LaTeX generado:** `docs/tabla_pilot_study_paper.tex` (Tabla IV del paper).
+  * **Artefacto LaTeX generado:** `docs/1_tablas_latex/tabla_pilot_study_paper.tex` (Tabla IV del paper).
 

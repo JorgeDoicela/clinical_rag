@@ -6,6 +6,10 @@ from sentence_transformers import SentenceTransformer
 import sentence_transformers.models
 from rank_bm25 import BM25Okapi
 from config import CHROMA_PERSIST_PATH, EMBEDDING_MODEL_NAME
+from rag.cache_manager import rag_cache_manager
+from core.logger import get_logger
+
+logger = get_logger("ateneo.rag.retriever")
 
 # Compatibilidad defensiva para rutas de importación heredadas de sentence_transformers
 if "sentence_transformers.base" not in sys.modules:
@@ -26,10 +30,11 @@ _BM25_CORPUS_METAS = None
 def get_embedding_model(model_name: str = EMBEDDING_MODEL_NAME) -> SentenceTransformer:
     global _MODEL_CACHE
     if model_name not in _MODEL_CACHE:
-        print(f"[RAG] Cargando modelo de embeddings ({model_name})...", flush=True)
+        logger.info(f"Cargando modelo de embeddings ({model_name})...", extra={"action": "load_embedding_model_start", "model_name": model_name})
         _MODEL_CACHE[model_name] = SentenceTransformer(model_name)
-        print(f"[RAG] Modelo '{model_name}' listo.", flush=True)
+        logger.info(f"Modelo de embeddings '{model_name}' listo.", extra={"action": "load_embedding_model_done", "model_name": model_name})
     return _MODEL_CACHE[model_name]
+
 
 def get_chroma_client(persist_path: str = CHROMA_PERSIST_PATH) -> chromadb.PersistentClient:
     global _CHROMA_CLIENT
@@ -71,9 +76,10 @@ def get_bm25_index():
                         "texto": docs[i],
                         "metadata": metas[i] if metas else {}
                     })
-                print(f"[RAG HYBRID] Índice Sparse BM25 construido con {len(docs)} fragmentos.", flush=True)
+                logger.info(f"Índice Sparse BM25 construido con {len(docs)} fragmentos.", extra={"action": "bm25_index_built", "fragment_count": len(docs)})
         except Exception as e:
-            print(f"[RAG HYBRID] BM25 Index no disponible temporalmente: {e}", flush=True)
+            logger.warning(f"BM25 Index no disponible temporalmente: {e}", extra={"action": "bm25_index_unavailable"})
+
     return _BM25_INDEX, _BM25_CORPUS_METAS
 
 def _normalize_guide_name(text: str) -> str:
@@ -118,6 +124,16 @@ def retrieve_top_k_chunks(
     - mode='dense_only': Solo Búsqueda Densa
     - mode='sparse_only': Solo Búsqueda BM25
     """
+    # 0. Búsqueda en capa de Caché LRU Semántica / Léxica
+    cached_result = rag_cache_manager.get(
+        guia_filtro=guia_filtro,
+        query=query,
+        top_k=top_k,
+        retrieval_mode=retrieval_mode
+    )
+    if cached_result is not None:
+        return cached_result
+
     client = get_chroma_client()
 
     try:
@@ -125,7 +141,8 @@ def retrieve_top_k_chunks(
         if collection.count() == 0:
             raise ValueError("Colección ChromaDB vacía.")
     except Exception as e:
-        print(f"[RAG WARNING] Error al acceder a ChromaDB: {e}. Intentando reparación de schema...", flush=True)
+        logger.warning(f"Error al acceder a ChromaDB: {e}. Intentando reparación de schema...", extra={"action": "chroma_schema_repair"})
+
         try:
             import sqlite3
             con = sqlite3.connect(f"{CHROMA_PERSIST_PATH}/chroma.sqlite3")
@@ -250,6 +267,16 @@ def retrieve_top_k_chunks(
             "distancia": 0.0,
             "rrf_score": 1.0
         })
+
+    # Guardar en caché LRU RAG para acelerar consultas subsecuentes
+    if retrieved:
+        rag_cache_manager.set(
+            guia_filtro=guia_filtro,
+            query=query,
+            top_k=top_k,
+            retrieval_mode=retrieval_mode,
+            data=retrieved
+        )
 
     return retrieved
 

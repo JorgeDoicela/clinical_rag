@@ -26,23 +26,44 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
+def resolve_tenant_from_email_domain(email: str) -> str:
+    """
+    Resuelve el identificador de tenant a partir del dominio del correo institucional.
+    Si el dominio no está mapeado, degrada defensivamente a 'tenant_default'.
+    """
+    if not email or "@" not in email:
+        return "tenant_default"
+    domain = email.split("@")[-1].strip().lower()
+    domain_map = {
+        "ateneo.edu.ec": "tenant_default",
+        "uce.edu.ec": "tenant_uce",
+        "usfq.edu.ec": "tenant_usfq",
+        "msp.gob.ec": "tenant_msp"
+    }
+    return domain_map.get(domain, "tenant_default")
+
+
 def create_access_token(user: User, expires_delta: Optional[datetime.timedelta] = None) -> str:
-    """Emite un token JWT firmado criptográficamente con los claims del usuario."""
+    """Emite un token JWT firmado criptográficamente con los claims del usuario y tenant institucional."""
     now = datetime.datetime.now(datetime.timezone.utc)
     if expires_delta:
         expire = now + expires_delta
     else:
         expire = now + datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
+    tenant_id = getattr(user, "tenant_id", None) or resolve_tenant_from_email_domain(user.email)
+
     to_encode = {
         "sub": user.email,
         "id": user.id,
         "nombre": user.nombre,
         "rol": user.rol.value if hasattr(user.rol, "value") else str(user.rol),
+        "tenant_id": tenant_id,
         "exp": expire
     }
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
 
 
 def decode_access_token(token: str) -> dict:

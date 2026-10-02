@@ -5,9 +5,8 @@ from modules.collaboration.dependencies import get_collaboration_service
 from modules.collaboration.service import CollaborationService
 from modules.collaboration.connection_manager import connection_manager
 from modules.cases.dependencies import get_case_service
-from modules.cases.service import CaseService
-from rag.retriever import retrieve_relevant_chunk
-from rag.evaluator import evaluate_clinical_reasoning
+from modules.evaluation.dependencies import get_evaluation_service
+from modules.evaluation.service import EvaluationService
 from auth.security import get_optional_current_user, UserResponse
 
 logger = logging.getLogger(__name__)
@@ -28,10 +27,17 @@ async def create_ateneo_room(
     try:
         real_docente_id = current_user.id if current_user else docente_id
         real_docente_nombre = current_user.nombre if current_user else docente_nombre
-        room = collab_service.create_room(case_id, real_docente_id, real_docente_nombre)
+        target_tenant_id = getattr(current_user, "tenant_id", "tenant_default") if current_user else "tenant_default"
+        room = collab_service.create_room(
+            case_id=case_id,
+            docente_id=real_docente_id,
+            docente_nombre=real_docente_nombre,
+            tenant_id=target_tenant_id
+        )
         return room
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
 
 @router.post("/join")
 async def join_ateneo_room(
@@ -117,7 +123,7 @@ async def submit_ateneo_answer(
     user_email: str = Form(...),
     respuesta_estudiante: str = Form(...),
     collab_service: CollaborationService = Depends(get_collaboration_service),
-    case_service: CaseService = Depends(get_case_service)
+    evaluation_service: EvaluationService = Depends(get_evaluation_service)
 ):
     """
     Estudiante envía su razonamiento dentro de la sala de Ateneo.
@@ -127,22 +133,16 @@ async def submit_ateneo_answer(
     if not room:
         raise HTTPException(status_code=404, detail=f"La sala '{room_code}' no existe.")
 
-    caso = case_service.get_case(room["case_id"])
-    if not caso:
-        raise HTTPException(status_code=404, detail="Caso clínico no encontrado.")
-
-    # Recuperación RAG
-    chunk = retrieve_relevant_chunk(
-        query=respuesta_estudiante,
-        guia_filtro=caso.guia_asociada
-    )
-
-    # Evaluación LLM Gemini
-    resultado_eval = evaluate_clinical_reasoning(
-        caso=caso,
-        respuesta_estudiante=respuesta_estudiante,
-        chunk=chunk
-    )
+    # Evaluación RAG y LLM delegada íntegramente en EvaluationService
+    try:
+        resultado_eval = evaluation_service.evaluate_reasoning(
+            case_id=room["case_id"],
+            student_answer=respuesta_estudiante
+        )
+    except ValueError as val_err:
+        raise HTTPException(status_code=404, detail=str(val_err))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error en evaluación de la sala: {str(e)}")
 
     # Actualizar estado de respuesta del estudiante en la sala
     eval_dict = resultado_eval.model_dump() if hasattr(resultado_eval, "model_dump") else resultado_eval.dict()

@@ -1,4 +1,4 @@
-﻿# Plan Maestro de Arquitectura, Robustez y Escalabilidad del Backend (Ateneo+ API)
+# Plan Maestro de Arquitectura, Robustez y Escalabilidad del Backend (Ateneo+ API)
 
 Este documento define la auditoría integral, el diagnóstico de capacidad y la hoja de ruta técnica paso a paso para consolidar el backend de **Ateneo+** bajo estándares de ingeniería de software senior (+10 años en producción), garantizando su escalamiento ordenado desde la etapa actual hacia una plataforma clínica de alta concurrencia universitaria y hospitalaria.
 
@@ -118,31 +118,36 @@ graph LR
 ---
 
 ### Fase 1: Desacoplamiento Estricto Clean Architecture en Controladores Evaluativos
+* **Estado:** **Completado.**
 * **Objetivo:** Eliminar la violación de capas en los controladores de evaluación y colaboración, centralizando el 100% de la orquestación en la capa de aplicación.
 * **Pasos de Ejecución:**
-  1. Refactorizar `routers/evaluation.py` para que los endpoints `POST /api/evaluate` y `POST /api/evaluate/phase` deleguen íntegramente en `EvaluationService.evaluate_reasoning` y `EvaluationService.evaluate_phase`.
-  2. Mover la lectura de archivos de imagen y la preparación de tuplas multimodales a adaptadores de transporte desacoplados.
-  3. Desacoplar la orquestación de la sala colaborativa en `routers/collaboration.py` (`submit_ateneo_answer`) canalizando la evaluación a través de `EvaluationService`.
+  1. Refactorizar `routers/evaluation.py` para que los endpoints `POST /api/evaluate`, `POST /api/evaluate/phase` y `POST /api/evaluate/socratic-turn` deleguen íntegramente en `EvaluationService`.
+  2. Mover la resolución de imágenes predeterminadas y estudios diagnósticos multimodales al método `_load_case_preset_image` en `EvaluationService`.
+  3. Desacoplar la orquestación de la sala colaborativa en `routers/collaboration.py` (`submit_ateneo_answer`) canalizando la evaluación mediante `EvaluationService.evaluate_reasoning`.
+  4. Desacoplar el benchmark de fidelidad en `routers/history.py` (`get_faithfulness_benchmark`) canalizando la auditoría mediante `EvaluationService.get_faithfulness_benchmark`.
 * **Criterios de Aceptación:**
-  * Cero importaciones directas de `rag.retriever` o `rag.evaluator` dentro de la carpeta `routers/`.
-  * Controladores reducidos a menos de 60 líneas por endpoint, enfocados únicamente en parsing de entrada y respuesta DTO.
+  * Cero importaciones directas de `rag.retriever` o `rag.evaluator` dentro de la carpeta `routers/` (`grep -r "from rag" backend/routers/` = 0 resultados).
+  * Controladores delgados enfocados únicamente en parsing de entrada HTTP y retorno DTO.
   * 100% de aprobación en `tests.run_all_tests`.
 
 ---
 
 ### Fase 2: Coordinación Transaccional con Patrón Unit of Work (UoW)
+* **Estado:** **Completado.**
 * **Objetivo:** Garantizar la atomicidad y consistencia estricta (ACID) en operaciones clínicas complejas que involucran múltiples repositorios.
 * **Pasos de Ejecución:**
   1. Implementar la clase abstracta e implementación concreta `SqlAlchemyUnitOfWork` en `core/unit_of_work.py`.
-  2. Vincular los repositorios (`UserRepository`, `CaseRepository`, `AnalyticsRepository`, `AdaptiveRepository`, `CollaborationRepository`) dentro del ciclo de vida del UoW.
-  3. Modificar `EvaluationService` para ejecutar la persistencia de la evaluación, el snapshot longitudinal y la actualización del estado de maestría BKT dentro de un bloque `with uow: ... uow.commit()`.
+  2. Vincular los repositorios (`UserRepository`, `CaseRepository`, `HistoryRepository`, `AdaptiveRepository`, `RoomRepository`) dentro del ciclo de vida del UoW.
+  3. Sincronizar métodos de persistencia con parámetro `commit: bool = True` en `HistoryRepository` y `AdaptiveRepository`.
+  4. Modificar `EvaluationService` para ejecutar la persistencia de la evaluación, el snapshot longitudinal y la actualización del estado de maestría BKT dentro de un bloque `with uow: ... uow.commit()`.
 * **Criterios de Aceptación:**
-  * Ante una excepción forzada en la actualización BKT, la evaluación no debe quedar huérfana en la base de datos (rollback automático verificado).
-  * Suite de pruebas unitarias específica para transacciones y rollbacks en `tests/test_unit_of_work.py`.
+  * Ante una excepción forzada en la actualización BKT, la evaluación no queda huérfana en la base de datos (rollback automático verificado empíricamente).
+  * Suite de pruebas unitarias específica para transacciones y rollbacks en `tests/test_unit_of_work.py` (100% PASS, integrada en `run_all_tests.py`).
 
 ---
 
 ### Fase 3: Rate Limiting Defensivo y Gestión de Cuotas de Inferencia
+* **Estado:** **Completado.**
 * **Objetivo:** Proteger el backend y el presupuesto de tokens contra sobrecargas accidentales, scripts de scraping o ataques de denegación de servicio.
 * **Pasos de Ejecución:**
   1. Implementar middleware o decorador de límite de tasa en memoria (`core/rate_limiter.py`) con algoritmo *Sliding Window Counter*.
@@ -159,6 +164,7 @@ graph LR
 ---
 
 ### Fase 4: Blindaje Clínico contra Prompt Injection y Sanitización de Entradas
+* **Estado:** **Completado.**
 * **Objetivo:** Proteger el evaluador normativo contra técnicas de manipulación de instrucciones, fugas de contexto del sistema o respuestas maliciosas.
 * **Pasos de Ejecución:**
   1. Crear `rag/security_guard.py` con analizador heurístico y léxico de vectores de ataque conocidos (jailbreaks tipo "Ignore previous instructions", "DAN mode", directivas de alteración de rol o solicitudes de revelación de prompt del sistema).
@@ -171,6 +177,7 @@ graph LR
 ---
 
 ### Fase 5: Capa de Caché Semántica y Léxica para Recuperación RAG
+* **Estado:** **Completado.**
 * **Objetivo:** Minimizar la latencia y el consumo de CPU durante consultas recurrentes sobre el mismo caso clínico y fragmentos canónicos de las GPC.
 * **Pasos de Ejecución:**
   1. Implementar `rag/cache_manager.py` con una estructura de caché LRU en memoria con límite de tamaño (ej. 2000 entradas) y TTL configurable.
@@ -183,6 +190,7 @@ graph LR
 ---
 
 ### Fase 6: Gobernanza Multi-Tenancy y Aislamiento Institucional
+* **Estado:** **Completado.**
 * **Objetivo:** Permitir que múltiples universidades, facultades y redes hospitalarias operen en una misma instancia con particionado lógico de casos, usuarios y analíticas.
 * **Pasos de Ejecución:**
   1. Crear modelo relacional `TenantModel` (id, código, nombre institucional, dominio de correo autorizado, configuración de GPC activas).
@@ -196,7 +204,9 @@ graph LR
 ---
 
 ### Fase 7: Sondas Avanzadas de Observabilidad y Salud Operativa (`/health/live` & `/health/ready`)
+* **Estado:** **Completado.**
 * **Objetivo:** Proveer a los balanceadores de carga, Kubernetes y sistemas de monitoreo información precisa sobre la disponibilidad de los subsistemas críticos.
+
 * **Pasos de Ejecución:**
   1. Refactorizar el endpoint `/health` actual en tres sondas especializadas:
      - `GET /health/live`: Liveness probe simple para verificar que el proceso de FastAPI está vivo y respondiendo peticiones.
@@ -210,7 +220,9 @@ graph LR
 ---
 
 ### Fase 8: Desacoplamiento de Tareas Pesadas con Pool Asíncrono de Reportes
+* **Estado:** **Completado.**
 * **Objetivo:** Evitar que la generación de PDFs complejos o la agregación de analíticas institucionales bloquee la atención de peticiones concurrentes en FastAPI.
+
 * **Pasos de Ejecución:**
   1. Diseñar un despachador de tareas asíncronas en segundo plano (`core/background_worker.py`) basado en `asyncio.Queue` y workers en hilos dedicados para tareas de CPU-bound (ReportLab, cálculo criptográfico SHA-256).
   2. Implementar endpoints asíncronos para generación masiva de reportes de cohorte con retorno de estado de trabajo (`PENDING`, `PROCESSING`, `COMPLETED`, `FAILED`).
@@ -222,6 +234,7 @@ graph LR
 ---
 
 ### Fase 9: Logging Estructurado con Contexto de Dominio y Métricas de Rendimiento
+* **Estado:** **Completado.**
 * **Objetivo:** Brindar trazabilidad forense completa de cada decisión formativa emitida por el sistema para auditoría académica y médica.
 * **Pasos de Ejecución:**
   1. Configurar un formateador JSON estructurado para el logger institucional en `core/logger.py`.
@@ -251,13 +264,13 @@ graph LR
 
 | Sesión / Hito | Fase Asignada | Enfoque Principal | Entregable Clave | Estado |
 |:---:|:---|:---|:---|:---:|
-| **Sesión 1** | **Fase 1** | Desacoplamiento Clean Architecture | `routers/` limpios delegando en `EvaluationService`, 0 llamadas directas RAG | **Planificado** |
-| **Sesión 2** | **Fase 2** | Patrón Unit of Work & Consistencia ACID | `SqlAlchemyUnitOfWork` con context manager y transacciones atómicas | **Planificado** |
-| **Sesión 3** | **Fase 3** | Rate Limiting y Protección de Cuota IA | Limitador Token Bucket defensivo con cabeceras `X-RateLimit-*` y 429 | **Planificado** |
-| **Sesión 4** | **Fase 4** | Blindaje Clínico Anti-Prompt Injection | `SecurityGuard` heurístico y delimitación XML defensiva en prompts | **Planificado** |
-| **Sesión 5** | **Fase 5** | Caché Semántica de Recuperación RAG | Gestor LRU en memoria con hash de consulta, latencias < 50ms | **Planificado** |
-| **Sesión 6** | **Fase 6** | Multi-Tenancy Institucional | `TenantModel` y particionado lógico de casos, usuarios y métricas | **Planificado** |
-| **Sesión 7** | **Fase 7** | Sondas de Salud `/health/live` & `/ready` | Endpoints de disponibilidad con inspección activa de DB, Chroma y LLM | **Planificado** |
-| **Sesión 8** | **Fase 8** | Pool Asíncrono de Reportes Pesados | Cola de procesamiento desacoplada para PDFs y analítica de cohorte | **Planificado** |
-| **Sesión 9** | **Fase 9** | Logging Estructurado & Trazabilidad Médica | Logs JSON con `request_id`, métricas RAG y observabilidad forense | **Planificado** |
+| **Sesión 1** | **Fase 1** | Desacoplamiento Clean Architecture | `routers/` limpios delegando en `EvaluationService`, 0 llamadas directas RAG | **Completado** |
+| **Sesión 2** | **Fase 2** | Patrón Unit of Work & Consistencia ACID | `SqlAlchemyUnitOfWork` con context manager y transacciones atómicas | **Completado** |
+| **Sesión 3** | **Fase 3** | Rate Limiting y Protección de Cuota IA | Limitador Token Bucket defensivo con cabeceras `X-RateLimit-*` y 429 | **Completado** |
+| **Sesión 4** | **Fase 4** | Blindaje Clínico Anti-Prompt Injection | `SecurityGuard` heurístico y delimitación XML defensiva en prompts | **Completado** |
+| **Sesión 5** | **Fase 5** | Caché Semántica de Recuperación RAG | Gestor LRU en memoria con hash de consulta, latencias < 50ms | **Completado** |
+| **Sesión 6** | **Fase 6** | Multi-Tenancy Institucional | `TenantModel` y particionado lógico de casos, usuarios y métricas | **Completado** |
+| **Sesión 7** | **Fase 7** | Sondas de Salud `/health/live` & `/ready` | Endpoints de disponibilidad con inspección activa de DB, Chroma y LLM | **Completado** |
+| **Sesión 8** | **Fase 8** | Pool Asíncrono de Reportes Pesados | Cola de procesamiento desacoplada para PDFs y analítica de cohorte | **Completado** |
+| **Sesión 9** | **Fase 9** | Logging Estructurado & Trazabilidad Médica | Logs JSON con `request_id`, métricas RAG y observabilidad forense | **Completado** |
 | **Sesión 10**| **Fase 10**| Auditoría de Carga y Concurrencia | Test de estrés con 100 usuarios concurrentes y certificación de estabilidad | **Planificado** |

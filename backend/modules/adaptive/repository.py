@@ -22,7 +22,7 @@ class AdaptiveRepository:
         except Exception:
             return None
 
-    def save_mastery(self, user_id: str, state: Dict[str, float]) -> None:
+    def save_mastery(self, user_id: str, state: Dict[str, float], commit: bool = True) -> None:
         now = datetime.datetime.utcnow().isoformat()
         state_str = json.dumps(state, ensure_ascii=False)
         record = self.db.query(StudentMasteryModel).filter(StudentMasteryModel.user_id == user_id).first()
@@ -36,7 +36,10 @@ class AdaptiveRepository:
                 updated_at=now
             )
             self.db.add(record)
-        self.db.commit()
+        if commit:
+            self.db.commit()
+        else:
+            self.db.flush()
 
     def get_snapshots(self, user_id: str) -> List[Dict[str, Any]]:
         records = (
@@ -55,11 +58,11 @@ class AdaptiveRepository:
                 "session_num": r.session_num,
                 "score_obtained": r.score_obtained,
                 "state": state,
-                "timestamp": r.timestamp
+                "timestamp": r.timestamp.isoformat() if hasattr(r.timestamp, "isoformat") else str(r.timestamp)
             })
         return results
 
-    def add_snapshot(self, user_id: str, session_num: int, score: float, state: Dict[str, float]) -> None:
+    def add_snapshot(self, user_id: str, session_num: int, score: float, state: Dict[str, float], commit: bool = True) -> None:
         now = datetime.datetime.utcnow().isoformat()
         record = StudentSnapshotModel(
             user_id=user_id,
@@ -69,4 +72,7 @@ class AdaptiveRepository:
             timestamp=now
         )
         self.db.add(record)
-        self.db.commit()
+        if commit:
+            self.db.commit()
+        else:
+            self.db.flush()

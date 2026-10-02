@@ -2,8 +2,9 @@
 Entidad relacional para Casos Clínicos persistidos en base de datos.
 Permite a los docentes crear, versionar y publicar casos dinámicos institucionales.
 """
-from sqlalchemy import Column, String, Text, JSON, DateTime, func
-from core.database import Base
+from sqlalchemy import Column, String, Text, JSON, ForeignKey, func
+from core.database import Base, SafeDateTime
+from modules.auth.models import UserModel, TenantModel  # noqa: F401
 
 
 class ClinicalCaseModel(Base):
@@ -20,6 +21,15 @@ class ClinicalCaseModel(Base):
     modo_simulacion = Column(String(32), default="single_turn")
     fases = Column(JSON, nullable=True)
     competencias_activadas = Column(JSON, nullable=True)
-    creado_por = Column(String(64), nullable=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    creado_por = Column(String(100), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    tenant_id = Column(
+        String(50),
+        ForeignKey("tenants.id", ondelete="SET NULL"),
+        nullable=True,
+        default="tenant_default",
+        server_default="tenant_default",
+        index=True
+    )
+    created_at = Column(SafeDateTime, server_default=func.now())
+    updated_at = Column(SafeDateTime, onupdate=func.now())
+

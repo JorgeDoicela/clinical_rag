@@ -304,3 +304,241 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     * `PLAN_ESCALABILIDAD_BACKEND.md`: Sección §0 de dependencias inter-plan agregada. B1 expandido a 3 archivos. B9 (print en producción) agregado.
     * `PLAN_ESCALABILIDAD_BASE_DE_DATOS.md`: Sección §0 de dependencias inter-plan agregada. Nota de variabilidad en conteo de registros.
     * `PLAN_ESCALABILIDAD_FRONTEND.md`: Sección §0 de dependencias inter-plan agregada.
+* **Auditoría Integral Completa del Proyecto y Documentación Línea a Línea (/goal - 2026-10-02):**
+  - **Revisión Exhaustiva Línea a Línea del Árbol Documental:**
+    * Auditados: `README.md` (388 líneas), `PLAN_ESCALABILIDAD_FRONTEND.md` (431 líneas), `PLAN_ESCALABILIDAD_BACKEND.md` (264 líneas), `PLAN_ESCALABILIDAD_BASE_DE_DATOS.md` (418 líneas), 15 documentos metodológicos en `docs/3_documentacion_metodologica/`, `GUIA_VISUAL_DEL_SISTEMA.md` en `docs/5_capturas_sistema/` y `DESPLIEGUE_Y_ACCESO_CLOUDFLARE_TUNNEL.md` en `docs/6_despliegue_y_operaciones/`.
+  - **Corrección Quirúrgica de Inconsistencias Documentales:**
+    * `METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md`: Normalizadas rutas canónicas de tablas LaTeX hacia `docs/1_tablas_latex/tabla_resultados_paper.tex` y `docs/1_tablas_latex/tabla_pilot_study_paper.tex`.
+    * `PROTOCOLO_PILOTO_LEARNING_GAIN.md`: Actualizada ruta de exportación hacia `docs/1_tablas_latex/tabla_pilot_study_paper.tex`.
+    * `DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md`: Sincronizada extensión del stepper a `SimulationStepper.tsx`.
+    * `MANUAL_DE_PRUEBAS_Y_BENCHMARKS.md`: Actualizado inventario frontend a 16 suites y 72 tests unitarios en Vitest (incorporando `SocraticDebrief`, `AteneoRealtimeCollab`, `ClinicalStudyViewer` y `OfflineSync`) más 4 suites y 15 tests E2E en Playwright.
+    * `PUBLICACION_Y_PRESENTACION_CONGRESO.md`: Enlazadas tablas de resultados y ablación hacia `docs/1_tablas_latex/`.
+    * `CUANTIZACION_Y_DESPLIEGUE_AWS.md`: Corregida instrucción de creación de `.env` para apuntar a la raíz del proyecto bajo el estándar 12-factor.
+    * `scripts/check_gemini_models.py`: Eliminado emoji decorativo `📊` y actualizada referencia hacia `.env` en la raíz.
+  - **Refuerzo y Blindaje de Aserciones en Pruebas Backend:**
+    * `backend/tests/run_all_tests.py`: Incorporado `traceback.print_exc()` y formateo estructurado `f"{type(e).__name__}: {e}" if str(e) else type(e).__name__` para erradicar diagnósticos mudos ante excepciones.
+    * `backend/tests/test_api_endpoints.py`: Añadidos mensajes explícitos de estado HTTP `f"Expected 200, got {res.status_code}: {res.text}"` en endpoints evaluativos y socráticos.
+  - **Certificación Empírica en Vivo (100% PASS):**
+    * Backend: 6 suites maestras aprobadas al 100% PASS en 50.98s (`tests/run_all_tests.py`).
+    * Frontend Typecheck: `tsc --noEmit` completado con 0 errores en TypeScript 5 estricto.
+    * Frontend Unit Tests: 16 suites y 72 pruebas unitarias aprobadas al 100% PASS en Vitest (9.64s).
+    * Frontend Production Build: `vite build` generado exitosamente en 4.51s con Service Worker PWA activo.
+    * Cero emojis verificados en la totalidad del código fuente y documentación.
+* **Sesión BD-1 (Fase 2 de Base de Datos) — Consolidación de Modelos Relacionales (2026-10-02):**
+  - **Refactorización de Modelos Relacionales en SQLAlchemy 2.0:**
+    * `UserModel`: Migrado `created_at` a `SafeDateTime` (`DateTime(timezone=True)`) con `server_default=func.now()`.
+    * `EvaluationHistoryModel`: Agregada clave foránea formal `ForeignKey("users.id", ondelete="CASCADE")`, columnas directas indexadas `faithfulness_score: Float`, `cohorte_id: String(50)` y `tiempo_segundos: Float`, marca temporal `SafeDateTime` y dos índices compuestos `ix_eval_user_created` e `ix_eval_cohort_guide`.
+    * `AteneoRoomModel`: Agregada `ForeignKey("users.id", ondelete="RESTRICT")` en `docente_id`, columna `created_at: SafeDateTime` y `updated_at: SafeDateTime` con `onupdate=func.now()`.
+    * `StudentMasteryModel`: Clave foránea `ForeignKey("users.id", ondelete="CASCADE")` y `updated_at: SafeDateTime`.
+    * `StudentSnapshotModel`: Clave foránea `ForeignKey("users.id", ondelete="CASCADE")`, marca temporal `SafeDateTime` e índice compuesto `ix_snapshot_user_session` (`user_id`, `session_num`).
+    * `ClinicalCaseModel`: Clave foránea `ForeignKey("users.id", ondelete="SET NULL")` en `creado_por` vinculada a `users.id`, y `SafeDateTime` en marcas temporales.
+  - **Defensiva Arquitectónica:** Creado `SafeDateTime(TypeDecorator)` en `core/database.py` que acepta tanto objetos `datetime` nativos como cadenas ISO-8601 defensivamente, previniendo excepciones de dialecto SQLite.
+  - **Verificación Empírica y Cero Regresiones:**
+    * Backend: 6 suites maestras aprobadas al 100% PASS en 20.75s (`tests/run_all_tests.py`).
+    * Frontend: `npm run typecheck` limpio (0 errores) y 16 suites Vitest (72 tests PASS) aprobadas al 100% en 8.65s.
+* **Sesión BD-2 (Fase 3 de Base de Datos) — Migración Determinística e Integridad Referencial (2026-10-02):**
+  - **Script de Migración Determinístico (`scripts/migrate_history_to_ateneo_clinical.py`):**
+    * Migración completa de todos los datos históricos existentes desde `data/history.db` hacia la base de datos normalizada `data/ateneo_clinical.db`.
+    * Cero pérdida de información: 9 usuarios, 33/33 evaluaciones históricas (poblando `faithfulness_score`, `cohorte_id`, `tiempo_segundos`), 52/52 salas colaborativas, 1/1 estado psicométrico BKT de maestría y 1/1 snapshots longitudinales.
+    * Sincronización de identidades de cohorte en `backend/modules/auth/service.py` (`usr_estudiante_002` a `usr_estudiante_007`) para garantizar integridad referencial estricta y resolver la causa raíz de usuarios huérfanos.
+  - **Integridad Referencial y Blindaje FK:**
+    * `PRAGMA foreign_key_check` ejecutado en destino con resultado de 0 violaciones.
+    * Verificación empírica de rechazo con `IntegrityError` ante inserciones arbitrarias con `user_id` inexistente.
+    * Estandarización de `database_url` default en `backend/core/config.py` apuntando a `ateneo_clinical.db`.
+  - **Verificación Empírica y Cero Regresiones:**
+    * Backend: 6 suites maestras aprobadas al 100% PASS en 47.32s (`tests/run_all_tests.py`).
+    * Frontend: `npm run typecheck` limpio (0 errores) y 16 suites Vitest (72 tests PASS) aprobadas al 100% en 6.98s.
+* **Sesión BD-3 (Fase 4 de Base de Datos) — Sincronización de Repositorios y Consultas Nativas (2026-10-02):**
+  - **Sincronización de Persistencia Directa en `HistoryRepository` y `AnalyticsHistoryService`:**
+    * `save_evaluation`: Persistencia directa de las columnas normalizadas de primer orden (`faithfulness_score`, `cohorte_id`, `tiempo_segundos`) eliminando dependencias de blobs JSON no indexados.
+    * `get_cohort_summary_stats`: Nueva consulta SQL agregada nativa (`func.avg`, `func.count`, `func.distinct`) ejecutada en una única sentencia atómica.
+    * `get_guide_breakdown_stats`: Agrupación nativa SQL sobre `guia_asociada` optimizada por el índice compuesto `ix_eval_cohort_guide`.
+    * `analyze_coordinator_cohort_analytics`: Refactorizado para consumir directamente las métricas agregadas SQL sin sobrecarga de bucles Python en memoria.
+  - **Sincronización de `RoomRepository`:**
+    * Métodos `get_active_rooms` (filtrado nativo por estados `espera` y `discusion`) y `get_by_docente`.
+    * Gestión uniforme de timestamps de servidor (`created_at`, `updated_at`).
+  - **Verificación Empírica y Cero Regresiones:**
+    * Backend: 6 suites maestras aprobadas al 100% PASS en 47.45s (`tests/run_all_tests.py`).
+    * Frontend: `npm run typecheck` limpio (0 errores) y 16 suites Vitest (72 tests PASS) aprobadas al 100% en 16.03s.
+* **Sesión BD-4 (Fase 5 de Base de Datos) — Certificación Integral de Regresión y Cierre del Bloque 1 (2026-10-02):**
+  - **Auditoría de Integridad Física y Relacional:**
+    * `PRAGMA integrity_check` retornó `ok` en `backend/data/ateneo_clinical.db`.
+    * `PRAGMA foreign_key_check` retornó 0 violaciones referenciales.
+  - **Batería Integral de Pruebas de Regresión (100% PASS):**
+    * Backend: 6 suites maestras aprobadas al 100% PASS en 32.66s (`run_all_tests.py`), cubriendo RBAC, topología KST/BKT, IBF y Faithfulness Score, Hake Gain ($g=0.74$), integración HTTP de 10 endpoints y casos clínicos con sello criptográfico SHA-256.
+    * Frontend Vitest: 16 suites y 72 tests unitarios e integrados aprobados al 100% PASS en 8.38s (`vitest run`).
+    * Frontend Typecheck: `tsc --noEmit` completado con 0 errores en TypeScript 5 estricto.
+    * Frontend Build PWA: `vite build` completado exitosamente en 8.34s generando bundle limpio con Service Worker PWA (`dist/sw.js`) y 26 activos precacheados.
+    * Playwright E2E: 15/15 pruebas aprobadas al 100% PASS en 21.0s sobre los 3 canales de visualización (Google Chrome, Microsoft Edge y emulación móvil Pixel 5).
+  - **Certificación de Planes y Hoja de Ruta:**
+    * `PLAN_ESCALABILIDAD_BASE_DE_DATOS.md` actualizado: Fases 1, 2, 3, 4 y 5 marcadas como **COMPLETADAS**.
+    * `HOJA_DE_RUTA_EJECUCION_SESIONES.md` actualizado: **Bloque 1: Base de Datos** completado al 100% (4 de 4 sesiones).
+    * Bloque 2 (Backend) queda habilitado para inicio con la Sesión BE-1 (Fase 1: Desacoplamiento Clean Architecture en routers).
+* **Sesión BE-1 (Fase 1 de Backend) — Desacoplamiento Clean Architecture en Controladores (2026-10-02):**
+  - **Erradicación de la Violación B1 en Capa de Presentación:**
+    * Eliminadas todas las importaciones directas de `from rag.retriever import ...` y `from rag.evaluator import ...` en `routers/evaluation.py`, `routers/collaboration.py` y `routers/history.py`.
+    * Verificación cuantitativa: `grep -r "from rag" backend/routers/` = 0 resultados.
+  - **Centralización en Capa de Aplicación (`EvaluationService`):**
+    * `evaluate_reasoning`: Resuelve imágenes locales predeterminadas (`_load_case_preset_image`), orquesta recuperación RAG, ejecuta evaluación LLM multimodal y persiste de forma automática en historial y motor BKT.
+    * `evaluate_phase`: Orquesta la evaluación de fases clínicas secuenciales con recuperación RAG acotada.
+    * `generate_socratic_turn_stream`: Generador SSE nativo desacoplado del controlador HTTP.
+    * `get_faithfulness_benchmark`: Encapsula la auditoría de fidelidad normativa RAG sin acoplamiento en `routers/history.py`.
+    * En `routers/collaboration.py`: `submit_ateneo_answer` delega íntegramente la evaluación de consenso en `EvaluationService.evaluate_reasoning`.
+  - **Verificación Empírica y Cero Regresiones:**
+    * Backend: 6 suites maestras aprobadas al 100% PASS en 19.27s (`tests/run_all_tests.py`).
+    * Frontend: 16 suites y 72 tests unitarios aprobados al 100% PASS en Vitest (6.38s).
+    * `PLAN_ESCALABILIDAD_BACKEND.md` y `HOJA_DE_RUTA_EJECUCION_SESIONES.md` actualizados: Sesión BE-1 **COMPLETADA**.
+* **Sesión BE-2 (Fase 2 de Backend) — Coordinación Transaccional con Unit of Work (ACID) (2026-10-02):**
+  - **Patrón Unit of Work en Persistencia Relacional (`backend/core/unit_of_work.py`):**
+    * Interfaces `AbstractUnitOfWork` y `SqlAlchemyUnitOfWork` implementadas con context managers.
+    * Agrupación de repositorios de dominio bajo la misma sesión transaccional: `users`, `cases`, `history`, `adaptive` y `rooms`.
+    * Rollback automático ante cualquier excepción no capturada en el bloque `with uow:`.
+  - **Sincronización Transaccional en Repositorios:**
+    * `HistoryRepository.create(record, commit=False)` permite delegar el commit definitivo al UoW.
+    * `AdaptiveRepository.save_mastery(..., commit=False)` y `add_snapshot(..., commit=False)` sincronizados para atomicidad multi-entidad.
+  - **Atomicidad en `EvaluationService`:**
+    * Persistencia de evaluación, snapshot longitudinal y actualización psicométrica BKT consolidadas dentro de un bloque `with uow: ... uow.commit()`. Erradica estados huérfanos o inconsistencias psicométricas ante fallos parciales.
+  - **Blindaje y Resiliencia en Inferencia LLM:**
+    * Incorporado `_unwrap_root_envelope` en `backend/rag/evaluator.py` para normalizar respuestas cuando modelos fundacionales devuelven diccionarios anidados (`{"evaluacion": ...}`).
+  - **Verificación Empírica y Cero Regresiones:**
+    * Suite unitaria dedicada `tests/test_unit_of_work.py`: 100% PASS (commit atómico y rollback automático ante error inducido).
+    * Suite maestra de backend `run_all_tests.py`: 6/6 suites maestras aprobadas al 100% PASS (28.95s).
+    * Frontend: 16 suites y 72 tests unitarios aprobados al 100% PASS en Vitest (9.97s).
+    * `PLAN_ESCALABILIDAD_BACKEND.md` y `HOJA_DE_RUTA_EJECUCION_SESIONES.md` actualizados: Sesión BE-2 **COMPLETADA**.
+* **Sesión BE-3 (Fase 3 de Backend) — Rate Limiting Defensivo y Gestión de Cuotas de Inferencia (2026-10-02):**
+  - **Limitador de Ventana Deslizante Thread-Safe (`backend/core/rate_limiter.py`):**
+    * Clase `SlidingWindowRateLimiter` con algoritmo Sliding Window en memoria y exclusión mutua mediante `threading.Lock`.
+    * Resolución inteligente de identidad de cliente (`resolve_client_key`): prioriza claims de usuario autenticado vía JWT (`usr:<sub/user_id>`) y fallback a dirección IP (`ip:<client_ip>`).
+    * Inyección de dependencias `RateLimitGuard` para FastAPI con perfiles diferenciados:
+      - Inferencia LLM (`rate_limit_inference`): 10 peticiones/minuto.
+      - Exportación de PDF institucional (`rate_limit_export`): 15 peticiones/minuto.
+      - Rutas estándar y lectura (`rate_limit_standard`): 60 peticiones/minuto.
+  - **Estandarización de Cabeceras HTTP RFC y Formato RFC 7807:**
+    * Inyección de cabeceras `X-RateLimit-Limit`, `X-RateLimit-Remaining` y `X-RateLimit-Reset` en respuestas HTTP.
+    * Propagación de cabeceras garantizada en `CorrelationIdMiddleware` (`core/middleware.py`) a través de `request.state.rate_limit_headers` para compatibilidad con streaming (`StreamingResponse`).
+    * Ante excedente de cuota: bloqueo estricto con HTTP 429 *Too Many Requests*, cabecera `Retry-After` y payload RFC 7807 (`ProblemDetails`).
+  - **Protección de Controladores Evaluativos (`backend/routers/evaluation.py`):**
+    * Endpoints pesados (`/api/evaluate`, `/api/evaluate/phase`, `/api/evaluate/socratic-turn`, `/api/evaluate/export-pdf`) protegidos con dependencias `Depends(rate_limit_...)`.
+  - **Verificación Empírica y Cero Regresiones:**
+    * Suite unitaria `tests/test_rate_limiter.py`: 100% PASS (ventana deslizante, decrecimiento de remaining, reinicio tras expiración y bloqueo HTTP 429 con RFC 7807).
+    * Integrado en Suite 1 del orquestador maestro `run_all_tests.py`: 6/6 suites maestras del backend aprobadas al 100% PASS (54.46s).
+    * Frontend: 16 suites y 72 tests unitarios aprobados al 100% PASS en Vitest (12.50s).
+    * `PLAN_ESCALABILIDAD_BACKEND.md` y `HOJA_DE_RUTA_EJECUCION_SESIONES.md` actualizados: Sesión BE-3 **COMPLETADA**.
+* **Sesión BE-4 (Fase 4 de Backend) — Blindaje Clínico contra Prompt Injection y Sanitización de Entradas (2026-10-02):**
+  - **Guardia de Seguridad Heurístico y Léxico (`backend/rag/security_guard.py`):**
+    * Clase `PromptSecurityGuard` con patrones compilados para anulación de instrucciones (`instruction_override`), secuestro de rol / modo DAN (`roleplay_hijack`), fuga del prompt del sistema (`prompt_leaking`), coerción de calificación (`grade_coercion`) y evasión de delimitadores (`delimiter_smuggling`).
+    * Sanitización profunda sin falsos positivos en notación clínica legítima (`<`, `>`, signos vitales, gasometrías, fórmulas y esquemas farmacológicos).
+    * Delimitación segura de entrada con etiquetas XML `<student_clinical_argument>` en `rag/prompt_builder.py` y refuerzo de la directiva inmutable 10 en `SYSTEM_INSTRUCTION`.
+    * Dictamen punitivo formal (`build_security_violation_evaluation` y `build_security_violation_phase_evaluation`): nota 0.0/10, cita a código de ética médica MSP y bloqueo de fases clínicas sin llamada a modelos externos.
+    * Blindaje en diálogo pedagógico: `generate_security_violation_socratic_stream` para el debriefing socrático.
+  - **Intercepción y Protección en Evaluador y Servicio:**
+    * `evaluate_clinical_reasoning` y `evaluate_phase_reasoning` en `backend/rag/evaluator.py` interceptan la entrada del estudiante antes de cualquier invocación LLM.
+    * `generate_socratic_turn_stream` en `backend/modules/evaluation/service.py` intercepta réplicas adversarias.
+  - **Verificación Empírica y Cero Regresiones:**
+    * Suite unitaria `tests/test_prompt_security.py`: 100% PASS (11 vectores adversarios detectados, 6 casos clínicos complejos sin falsos positivos, neutralización de tags y evaluaciones punitivas verificadas).
+    * Integrado en Suite 1 del orquestador maestro `run_all_tests.py`: 6/6 suites maestras del backend aprobadas al 100% PASS (77.18s).
+    * Frontend: 16 suites y 72 tests unitarios aprobados al 100% PASS en Vitest (12.86s).
+    * `PLAN_ESCALABILIDAD_BACKEND.md` y `HOJA_DE_RUTA_EJECUCION_SESIONES.md` actualizados: Sesión BE-4 **COMPLETADA**.
+* **Sesión BE-5 (Fase 5 de Backend) — Capa de Caché Semántica y Léxica para RAG (2026-10-02):**
+  - **Caché LRU en Memoria Thread-Safe (`backend/rag/cache_manager.py`):**
+    * Implementada clase `RAGCacheManager` con almacén LRU basado en `OrderedDict`, expiración TTL y exclusión mutua mediante `threading.RLock`.
+    * Claves hash determinísticas SHA-256 de la tupla normalizada `(guia_filtro, query_normalizada, top_k, mode)`.
+    * Algoritmo de similitud léxica basado en `difflib.SequenceMatcher` con umbral configurable (98%) para reuso seguro entre variaciones menores de puntuación.
+    * Invarianza y aislamiento garantizados mediante copia profunda (`copy.deepcopy`) en lectura y escritura.
+  - **Integración con Configuración y Recuperador RAG (`backend/rag/retriever.py`):**
+    * Variables añadidas en `backend/core/config.py`: `rag_cache_enabled`, `rag_cache_max_entries`, `rag_cache_ttl_seconds`, `rag_cache_similarity_threshold`.
+    * Consulta atómica de caché al inicio de `retrieve_top_k_chunks`, y almacenamiento automático de chunks recuperados tras BGE-M3/BM25/ChromaDB.
+  - **Verificación Empírica y Benchmark Cuantitativo:**
+    * Suite unitaria `backend/tests/test_rag_cache.py`: 100% PASS (Hit/Miss, normalización, similitud léxica, LRU eviction, TTL expiration, thread-safety, latencia e invarianza).
+    * Benchmark empírico validado: Consulta en frío (195.22ms) vs Consulta en caliente (0.04ms) — reducción del 99.98% de latencia.
+    * Incorporado en Suite 3 de `backend/tests/run_all_tests.py`: tiempo total de pruebas de backend optimizado de 77s a 29.98s.
+    * 6/6 suites maestras del backend aprobadas al 100% PASS (29.98s); 16 suites de frontend aprobadas al 100% PASS (72 tests, 23.89s).
+    * `PLAN_ESCALABILIDAD_BACKEND.md` y `HOJA_DE_RUTA_EJECUCION_SESIONES.md` actualizados: Sesión BE-5 **COMPLETADA**.
+* **Sesión BE-6 (Fase 6 de Backend) — Gobernanza Multi-Tenancy Institucional Lógica (2026-10-02):**
+  - **Modelado Relacional y Particionado Lógico (`backend/modules/auth/models.py` y entidades clave):**
+    * Modelo `TenantModel` formalizado con tabla `tenants` (`id`, `codigo`, `nombre_institucional`, `dominio_email`, `gpc_activas_json`, `activo`, `created_at`, `updated_at`).
+    * Columna `tenant_id` y restricción de clave foránea formal vinculada a `tenants.id` en `UserModel`, `ClinicalCaseModel`, `EvaluationHistoryModel` y `AteneoRoomModel`.
+    * Índice compuesto de alto rendimiento `ix_eval_tenant_cohort` (`tenant_id`, `cohorte_id`) en `EvaluationHistoryModel`.
+  - **Aislamiento en Autenticación, JWT y Repositorios:**
+    * Extracción y validación del claim `tenant_id` en JWT (`core/security.py` y `auth/security.py`).
+    * Función determinística de mapeo de dominio `resolve_tenant_from_email_domain` (`ateneo.edu.ec`, `uce.edu.ec`, `usfq.edu.ec`, `msp.gob.ec`).
+    * Creación de `TenantRepository` con compatibilidad para Unit of Work (`commit=False` / `flush`).
+    * Filtrado estricto por `tenant_id` en `HistoryRepository`, `CaseRepository`, `RoomRepository` y `UserRepository`.
+    * Atomicidad y propagación en `AbstractUnitOfWork` y `SqlAlchemyUnitOfWork` (`self.tenants = TenantRepository(...)`).
+  - **Propagación en Servicios de Dominio y Controladores:**
+    * Servicios `AnalyticsHistoryService`, `CollaborationService` y `EvaluationService` actualizados para aislar registros clínicos, salas activas y analíticas de cohorte según la institución del usuario autenticado.
+    * Controladores `routers/evaluation.py`, `routers/history.py` y `routers/collaboration.py` inyectando `current_user.tenant_id`.
+  - **Migración Determinística e Integridad Relacional:**
+    * `scripts/migrate_history_to_ateneo_clinical.py` adaptado para sembrar `tenant_default` y asignar `tenant_id="tenant_default"` a todas las entidades existentes.
+    * Migración determinística ejecutada sobre `backend/data/ateneo_clinical.db`: 9 usuarios, 33 evaluaciones, 52 salas, 1 BKT, 1 snapshot.
+    * Integridad certificada: `PRAGMA foreign_key_check` = 0 violaciones, `PRAGMA integrity_check` = ok.
+  - **Verificación Empírica y Cero Regresiones:**
+    * Suite unitaria `tests/test_multi_tenancy.py`: 100% PASS (7/7 tests: lookup, JWT claims, aislamiento de usuarios, analíticas de cohorte, salas, catálogo de casos y atomicidad UoW).
+    * Integrado en Suite 1 del orquestador maestro `run_all_tests.py`: 6/6 suites maestras del backend aprobadas al 100% PASS (54.22s).
+    * `PLAN_ESCALABILIDAD_BACKEND.md` y `HOJA_DE_RUTA_EJECUCION_SESIONES.md` actualizados: Sesión BE-6 **COMPLETADA**.
+* **Sesión BE-7 (Fase 7 de Backend) — Sondas Avanzadas de Observabilidad (`/health/live` & `/health/ready`) (2026-10-02):**
+  - **Sondas de Salud Especializadas (`backend/routers/health.py`):**
+    * `GET /health/live`: Liveness probe de respuesta ultrarrápida (< 5ms) que reporta `status: healthy`, tiempo de actividad (`uptime_seconds`), timestamp UTC e información de servicio.
+    * `GET /health/ready`: Readiness probe activa (< 30ms) que audita:
+      - Base de datos relacional mediante `SELECT 1` con `engine.connect()`.
+      - Almacén vectorial ChromaDB mediante `client.heartbeat()` y conteo de documentos GPC.
+      - Memoria RAM del host (`total_mb`, `available_mb`, `used_percent` vía `psutil`).
+      - Si DB o ChromaDB fallan, conmuta de forma determinística a HTTP 503 *Service Unavailable* con detalle del subsistema inoperativo.
+    * `GET /health/circuit-breakers`: Estado en tiempo real de los disyuntores de modelos LLM Gemini (`OPERATIONAL`, `DEGRADED`, `EXHAUSTED`), estado por modelo (`CLOSED`, `OPEN`, `HALF_OPEN`) y temporizadores de cooldown restantes.
+    * `GET /health`: Endpoint raíz compatible que lista las sondas disponibles y retorna `status: ok` para herramientas heredadas.
+  - **Inspección Dinámica en `ResilientLLMGateway` (`backend/core/llm_gateway.py`):**
+    * Métodos `get_circuit_breakers_status()`, `set_circuit_state()` y `reset_all_circuits()` añadidos para observabilidad granular y pruebas sin alterar el flujo de inferencia.
+  - **Integración en `backend/main.py`:**
+    * Router `health_router` montado en la aplicación FastAPI; eliminado el endpoint estático previo.
+  - **Verificación Empírica y Cero Regresiones:**
+    * Suite unitaria `backend/tests/test_health_probes.py`: 100% PASS (7/7 tests: contrato raíz, liveness ultrarrápido, readiness en warm-up < 10ms, fallo inducido en SQLite con 503, fallo inducido en ChromaDB con 503, estados de circuit breakers y recuperación HALF_OPEN).
+    * Integrado en Suite 1 del orquestador maestro `run_all_tests.py`: 6/6 suites maestras del backend aprobadas al 100% PASS (39.50s).
+    * `PLAN_ESCALABILIDAD_BACKEND.md` y `HOJA_DE_RUTA_EJECUCION_SESIONES.md` actualizados: Sesión BE-7 **COMPLETADA**.
+* **Sesión BE-8 (Fase 8 de Backend) — Pool Asíncrono de Reportes y Tareas Pesadas (2026-10-02):**
+  - **Despachador en Segundo Plano y ThreadPoolExecutor (`backend/core/background_worker.py`):**
+    * Clase `BackgroundWorkerPool` con `ThreadPoolExecutor(max_workers=4)` desacoplando tareas pesadas de CPU (ReportLab, cálculo criptográfico SHA-256) del bucle de eventos de FastAPI.
+    * Gestión thread-safe de estados (`PENDING`, `PROCESSING`, `COMPLETED`, `FAILED`, `CANCELLED`), artefactos binarios en memoria y metadatos de ejecución.
+    * Métodos no bloqueantes `submit_task` (asíncrono) y `submit_task_sync` (síncrono), `get_task`, `get_artifact`, `cancel_task` y `clear`.
+  - **Generación Institucional de Reportes de Cohorte (`backend/services/pdf_report_generator.py`):**
+    * Función `generate_cohort_analytics_pdf` implementada con ReportLab: cabecera institucional, metadata de cohorte/tenant, KPIs ejecutivos, desglose IBF por los 4 ejes clínicos normativos, distribución de desempeño y sello criptográfico SHA-256.
+  - **Endpoints Asíncronos en Controladores Evaluativos e Historial:**
+    * `backend/routers/evaluation.py`: `POST /api/evaluate/export-pdf-async` (HTTP 202 Accepted), `GET /tasks/{task_id}` y `GET /tasks/{task_id}/download`.
+    * `backend/routers/history.py`: `POST /api/history/export-cohort-pdf-async` (HTTP 202 Accepted), `GET /tasks/{task_id}` y `GET /tasks/{task_id}/download`.
+    * Preservados intactos los endpoints sincrónicos `POST /api/evaluate/export-pdf` y `POST /api/history/export-pdf` para descargas individuales directas.
+  - **Ciclo de Vida en `backend/main.py`:**
+    * Invocación de `background_worker.start()` y `background_worker.shutdown()` dentro del context manager `lifespan`.
+  - **Verificación Empírica y Cero Regresiones:**
+    * Suite unitaria y de estrés `backend/tests/test_background_tasks.py`: 100% PASS (6/6 tests: ciclo de vida unitario, captura limpia de fallos, flujo HTTP completo de evaluación, flujo HTTP completo de cohorte, validación de errores 404/400).
+    * Prueba de estrés concurrente: 10 reportes PDF pesados generados en ráfaga paralela en 2.22s sin bloquear el bucle de eventos ni incrementar la latencia de endpoints clínicos.
+    * Integrado en Suite 1 del orquestador maestro `run_all_tests.py`: 6/6 suites maestras del backend aprobadas al 100% PASS (41.20s).
+    * Frontend: 16 suites y 72 tests unitarios aprobados al 100% PASS en Vitest (8.09s); `tsc --noEmit` completado con 0 errores.
+    * `PLAN_ESCALABILIDAD_BACKEND.md` y `HOJA_DE_RUTA_EJECUCION_SESIONES.md` actualizados: Sesión BE-8 **COMPLETADA**.
+* **Sesión BE-9 (Fase 9 de Backend) — Logging Estructurado OpenTelemetry y Cero `print()` (2026-10-02):**
+  - **Módulo de Logging Estructurado (`backend/core/logger.py`):**
+    * Clase `StructuredJsonFormatter` que transforma cada registro de logging en una línea JSON estructurada con campos canónicos: `timestamp` (ISO-8601 UTC), `level`, `logger`, `message`, `module`, `function`, `line`.
+    * Inyección contextual automática mediante `contextvars`: `request_id`, `user_id`, `tenant_id`.
+    * Extracción y tipado de atributos adicionales enviados en `extra={"action": ..., "latency_ms": ...}`.
+    * Función recursiva `redact_sensitive_data`: enmascara de forma transparente Bearer tokens JWT (`Bearer [REDACTED_JWT_TOKEN]`), Google Gemini API Keys (`AIza[REDACTED_API_KEY]`) y claves sensibles en diccionarios y listas (`password`, `token`, `secret`, `access_token`, etc. sustituidos por `[REDACTED_SECRET]`).
+    * Configuración global mediante `setup_structured_logging(level=logging.INFO)` y helper tipado `get_logger(name)`.
+  - **Integración con Middleware y Contexto HTTP:**
+    * Actualizado `backend/core/middleware.py` para sincronizar `request_id_ctx` con el UUID emitido en la cabecera `X-Request-ID`.
+    * Inicialización formal de `setup_structured_logging()` en el ciclo de vida `lifespan` de `backend/main.py`.
+  - **Erradicación Total de `print()` en Runtime de Producción:**
+    * Sustituidos todos los `print(` por loggers estructurados con metadatos contextuales en:
+      - `backend/modules/collaboration/service.py` (2 erradicados)
+      - `backend/modules/analytics_history/service.py` (1 erradicado)
+      - `backend/main.py` (3 erradicados)
+      - `backend/core/llm_gateway.py` (6 erradicados)
+      - `backend/rag/retriever.py` (5 erradicados)
+      - `backend/rag/evaluator.py` (6 erradicados)
+    * Auditoría con ripgrep certifica exactamente **0 `print(`** en el servidor de producción.
+  - **Verificación Empírica y Cero Regresiones:**
+    * Suite unitaria `backend/tests/test_structured_logging.py`: 100% PASS (4/4 tests: formato JSON, propagación de contextvars, ofuscación de credenciales JWT/API-keys/passwords y cabecera X-Request-ID en middleware).
+    * Integrado en la nueva Suite 7 del orquestador maestro `run_all_tests.py`: 7/7 suites maestras del backend aprobadas al 100% PASS (38.45s).
+    * Frontend: 16 suites y 72 tests unitarios aprobados al 100% PASS en Vitest (5.07s); `tsc --noEmit` completado con 0 errores.
+    * `PLAN_ESCALABILIDAD_BACKEND.md` y `HOJA_DE_RUTA_EJECUCION_SESIONES.md` actualizados: Sesión BE-9 **COMPLETADA**.
+
+
+
+
+

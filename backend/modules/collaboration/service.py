@@ -6,6 +6,10 @@ from typing import Dict, List, Any, Optional
 from modules.collaboration.models import AteneoRoomModel
 from modules.collaboration.repository import RoomRepository
 from modules.cases.service import CaseService
+from core.logger import get_logger
+
+logger = get_logger("ateneo.collaboration")
+
 
 
 class CollaborationService:
@@ -76,6 +80,7 @@ class CollaborationService:
             docente_id=room_data["docente_id"],
             docente_nombre=room_data["docente_nombre"],
             estado=room_data["estado"],
+            tenant_id=room_data.get("tenant_id", "tenant_default") or "tenant_default",
             data_json=json.dumps(room_data, ensure_ascii=False),
             updated_at=now
         )
@@ -92,7 +97,8 @@ class CollaborationService:
         case_id: str,
         docente_id: str,
         docente_nombre: str,
-        custom_code: Optional[str] = None
+        custom_code: Optional[str] = None,
+        tenant_id: str = "tenant_default"
     ) -> Dict[str, Any]:
         caso = self.case_service.get_case(case_id)
         if not caso:
@@ -108,6 +114,8 @@ class CollaborationService:
         room_data = {
             "room_code": room_code,
             "case_id": caso.id,
+            "tenant_id": tenant_id or "tenant_default",
+
             "case_title": caso.titulo,
             "case_enunciado": caso.enunciado,
             "case_pregunta": caso.pregunta,
@@ -134,7 +142,8 @@ class CollaborationService:
                     room = json.loads(db_record.data_json)
                     self._memory_cache[code] = room
                 except Exception as e:
-                    print(f"[COLLAB_SERVICE] Error al deserializar sala {code}: {e}", flush=True)
+                    logger.error(f"Error al deserializar sala {code}: {e}", extra={"action": "room_deserialization_error", "room_code": code})
+
 
         if room:
             room["analitica_consenso"] = self.calculate_room_analytics(room)
@@ -272,4 +281,5 @@ class CollaborationService:
         }
         room1["analitica_consenso"] = self.calculate_room_analytics(room1)
         self._save_to_storage(room1)
-        print("[COLLAB_SERVICE] Salas de demostración sembradas exitosamente con SQLAlchemy.", flush=True)
+        logger.info("Salas de demostración sembradas exitosamente con SQLAlchemy.", extra={"action": "demo_rooms_seeded"})
+

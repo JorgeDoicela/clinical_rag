@@ -113,5 +113,5 @@ async def create_clinical_case(
     """
     Crea o actualiza un caso clínico dinámico en la base de datos relacional.
     """
-    creator_id = current_user.id if current_user else "docente_demo"
+    creator_id = current_user.id if current_user else "usr_docente_001"
     return case_service.create_case(case, creado_por=creator_id)
