@@ -237,6 +237,7 @@ clinical_rag/
 │   │   ├── cases/                        # Catálogo de casos clínicos y paraclínicos (Repo + Service)
 │   │   ├── adaptive/                     # Currículo adaptativo KST, BKT y selección ZDP (Service)
 │   │   ├── evaluation/                   # Orquestación de evaluación RAG y reportes PDF (Service)
+│   │   ├── collaboration/                # Salas sincrónicas de Ateneo en tiempo real (Models + Repo + Service)
 │   │   └── auth/                         # Identidad, autenticación y perfiles (Service)
 │   ├── routers/                          # CONTROLADORES REST DE LA API (THIN CONTROLLERS CON DEPENDS)
 │   │   ├── auth.py                       # Autenticación JWT y catálogo de usuarios

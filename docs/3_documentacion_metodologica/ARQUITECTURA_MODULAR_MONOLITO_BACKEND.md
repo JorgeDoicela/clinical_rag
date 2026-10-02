@@ -102,6 +102,12 @@ backend/
 │   │   ├── service.py                  # EvaluationService
 │   │   └── dependencies.py             # get_evaluation_service()
 │   │
+│   ├── collaboration/                  # Salas sincrónicas de Ateneo en tiempo real
+│   │   ├── models.py                   # Entidad AteneoRoomModel
+│   │   ├── repository.py               # RoomRepository
+│   │   ├── service.py                  # CollaborationService (analítica de consenso)
+│   │   └── dependencies.py             # get_collaboration_service()
+│   │
 │   └── auth/                           # Identidad y emisión de credenciales
 │       ├── service.py                  # AuthService
 │       └── dependencies.py             # get_auth_service()

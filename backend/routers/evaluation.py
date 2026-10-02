@@ -1,17 +1,20 @@
-from fastapi import APIRouter, HTTPException, Form, File, UploadFile
+from fastapi import APIRouter, HTTPException, Form, File, UploadFile, Depends
 from fastapi.responses import StreamingResponse
 from typing import Optional, Dict, Any, List
 import json
 from pathlib import Path
 from pydantic import BaseModel
 
-from models.clinical_case import get_case_by_id
+from modules.cases.dependencies import get_case_service
+from modules.cases.service import CaseService
+from modules.evaluation.dependencies import get_evaluation_service
+from modules.evaluation.service import EvaluationService
 from rag.retriever import retrieve_relevant_chunk
 from rag.evaluator import evaluate_clinical_reasoning, evaluate_phase_reasoning
 from models.schemas import EvaluationResult, PhaseEvaluationResult
-from services.pdf_report_generator import generate_clinical_feedback_pdf
 
 router = APIRouter(prefix="/api/evaluate", tags=["Evaluación RAG"])
+
 
 class ExportPdfRequest(BaseModel):
     case_id: str
@@ -20,6 +23,7 @@ class ExportPdfRequest(BaseModel):
     guia_asociada: Optional[str] = "MSP Ecuador"
     student_answer: Optional[str] = ""
     eval_result: Dict[str, Any]
+
 
 @router.get("/benchmark-scientific")
 async def get_scientific_benchmark() -> Dict[str, Any]:
@@ -57,13 +61,17 @@ async def get_scientific_benchmark() -> Dict[str, Any]:
         "dataset_integrity": dataset_integrity
     }
 
+
 @router.post("/export-pdf")
-async def export_evaluation_pdf(req: ExportPdfRequest):
+async def export_evaluation_pdf(
+    req: ExportPdfRequest,
+    evaluation_service: EvaluationService = Depends(get_evaluation_service)
+):
     """
     Genera y descarga en tiempo real el informe formativo clínico en PDF institucional.
     """
     try:
-        pdf_buffer = generate_clinical_feedback_pdf(
+        pdf_buffer = evaluation_service.generate_pdf_report(
             student_name=req.student_name,
             case_title=req.case_title,
             case_id=req.case_id,
@@ -71,7 +79,7 @@ async def export_evaluation_pdf(req: ExportPdfRequest):
             eval_result=req.eval_result,
             student_answer=req.student_answer
         )
-        
+
         filename = f"Informe_Clinico_Ateneo_{req.case_id}.pdf"
         return StreamingResponse(
             pdf_buffer,
@@ -81,11 +89,14 @@ async def export_evaluation_pdf(req: ExportPdfRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generando PDF institucional: {str(e)}")
 
+
 @router.post("", response_model=EvaluationResult)
 async def evaluate_response(
     case_id: str = Form(...),
     respuesta_estudiante: str = Form(...),
-    imagenes: Optional[List[UploadFile]] = File(None)
+    imagenes: Optional[List[UploadFile]] = File(None),
+    case_service: CaseService = Depends(get_case_service),
+    evaluation_service: EvaluationService = Depends(get_evaluation_service)
 ):
     """
     Recibe la respuesta del estudiante y opcionalmente múltiples estudios diagnósticos
@@ -93,17 +104,16 @@ async def evaluate_response(
     Recupera el fragmento normativo de la GPC del MSP y ejecuta la evaluación
     multimodal con Gemini devolviendo retroalimentación estructurada.
     """
-    caso = get_case_by_id(case_id)
+    caso = case_service.get_case(case_id)
     if not caso:
         raise HTTPException(status_code=404, detail=f"Caso clínico '{case_id}' no encontrado.")
 
     if not respuesta_estudiante.strip():
         raise HTTPException(status_code=400, detail="La respuesta del estudiante no puede estar vacía.")
 
-    # ── Construir lista de (bytes, mime_type) para fusión multimodal ──────────
+    # Construir lista de (bytes, mime_type) para fusión multimodal
     imagenes_bytes_list: List[tuple] = []
 
-    # 1. Archivos subidos por el estudiante en la sesión
     if imagenes:
         for img_file in imagenes:
             if img_file and img_file.filename:
@@ -112,7 +122,6 @@ async def evaluate_response(
                 imagenes_bytes_list.append((img_bytes, img_mime))
                 print(f"[ROUTER] Estudio multimodal recibido: {img_file.filename} ({img_mime}, {len(img_bytes)} bytes)", flush=True)
 
-    # 2. Fallback: imagen preconfigurada en el caso clínico (backward compat)
     if not imagenes_bytes_list and caso.imagen_url:
         import os
         rel_path = caso.imagen_url.replace("/static/images/", "")
@@ -143,14 +152,14 @@ async def evaluate_response(
         )
 
         try:
-            from models.history_db import save_evaluation_record
-            save_evaluation_record(
+            eval_dict = resultado.model_dump() if hasattr(resultado, "model_dump") else resultado.dict()
+            evaluation_service.analytics_service.save_evaluation(
                 user_id="usr_alumno_001",
                 user_email="alumno@ateneo.edu.ec",
                 case_id=case_id,
                 guia_asociada=caso.guia_asociada,
                 case_title=caso.titulo,
-                eval_result=resultado.dict()
+                eval_result=eval_dict
             )
         except Exception as db_err:
             print(f"[ROUTER] Error secundario al guardar historial en DB: {db_err}", flush=True)
@@ -159,26 +168,27 @@ async def evaluate_response(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error durante el procesamiento del LLM: {str(e)}")
 
+
 @router.post("/phase", response_model=PhaseEvaluationResult)
 async def evaluate_phase_response(
     case_id: str = Form(...),
     fase_numero: int = Form(...),
     respuesta_estudiante: str = Form(...),
     historial_previo: Optional[str] = Form(""),
-    imagenes: Optional[List[UploadFile]] = File(None)
+    imagenes: Optional[List[UploadFile]] = File(None),
+    case_service: CaseService = Depends(get_case_service)
 ):
     """
     Evalúa una fase clínica secuencial individual (1: Anamnesis, 2: Estudios Paraclínicos, 3: Tratamiento).
     Devuelve la retroalimentación formativa de la fase y desbloquea los datos para el siguiente hito clínico.
     """
-    caso = get_case_by_id(case_id)
+    caso = case_service.get_case(case_id)
     if not caso:
         raise HTTPException(status_code=404, detail=f"Caso clínico '{case_id}' no encontrado.")
 
     if not respuesta_estudiante.strip():
         raise HTTPException(status_code=400, detail="La respuesta del estudiante en esta fase no puede estar vacía.")
 
-    # Construir lista de bytes de imágenes adjuntas en esta fase
     imagenes_bytes_list: List[tuple] = []
     if imagenes:
         for img_file in imagenes:
@@ -187,7 +197,6 @@ async def evaluate_phase_response(
                 img_mime = img_file.content_type or "image/png"
                 imagenes_bytes_list.append((img_bytes, img_mime))
 
-    # Recuperar chunk normativo enfocado
     try:
         query_rag = f"{respuesta_estudiante} {caso.titulo}"
         chunk = retrieve_relevant_chunk(
@@ -209,4 +218,3 @@ async def evaluate_phase_response(
         return resultado_fase
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error durante la evaluación de la fase con LLM: {str(e)}")
-
