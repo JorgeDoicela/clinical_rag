@@ -4,18 +4,34 @@ Este documento establece el diagnóstico forense, el modelo entidad-relación no
 
 ---
 
+## 0. Dependencias con Otros Planes
+
+Este plan define la base del sistema. Ninguno de los otros planes puede ejecutar sus fases avanzadas sin que las fases de este plan esten completadas:
+
+| Fase de este Plan | Desbloquea en Backend | Desbloquea en Frontend |
+|:------------------|:----------------------|:-----------------------|
+| **Fase 1** (PRAGMA + WAL) | Precondicion de Fase 2 Backend (UoW) | No afecta directamente |
+| **Fase 2** (FK + DateTime + indices) | Precondicion de Fase 2 Backend (UoW) y Fase 6 Backend (Multi-Tenancy) | No afecta directamente |
+| **Fase 3** (Migracion de datos) | Desbloquea Fase 6 Backend | No afecta directamente |
+| **Fase 4** (Repositorios) | Desbloquea metricas nativas en Fases 4-5 Backend | Fase 11 Frontend (analytics avanzado) |
+| **Fase 5** (Regresion completa) | Certificacion de integridad | Certificacion de contrato de API |
+
+**Orden canonico:** BD (Fases 1-5) > Backend (Fases 1-10) > Frontend Bloque C (Fases 11-16)
+
+---
+
 ## 1. Diagnóstico Forense del Esquema Actual
 
 ### 1.1. Inventario de Tablas y Registros Físicos (`backend/data/history.db`)
 
-| Tabla | Registros | Clave Primaria | Relaciones Formales (FK) | Índices Compuestos |
-|:------|:----------|:---------------|:-------------------------|:-------------------|
-| **`users`** | 3 | `id` (VARCHAR 100) | Ninguna | Ninguno |
-| **`evaluation_history`** | 33 | `id` (INTEGER AUTO) | Ninguna (posee `user_id` sin FK) | Ninguno |
-| **`ateneo_rooms`** | 25 | `room_code` (TEXT) | Ninguna (posee `docente_id` sin FK) | Ninguno |
-| **`student_mastery`** | 1 | `user_id` (VARCHAR 100) | Ninguna (posee `user_id` sin FK) | Ninguno |
-| **`student_learning_snapshots`** | 1 | `id` (INTEGER AUTO) | Ninguna (posee `user_id` sin FK) | Ninguno |
-| **`clinical_cases`** | 0 | `id` (VARCHAR 64) | Ninguna (posee `creado_por` sin FK) | Ninguno |
+| Tabla | Registros | Clave Primaria | Estado FK en SQLAlchemy | Timestamps | Índices Compuestos |
+|:------|:----------|:---------------|:------------------------|:-----------|:-------------------|
+| **`users`** | 3 | `id` (VARCHAR 100) | Ninguna FK externa | `created_at` como `String(50)` | Ninguno |
+| **`evaluation_history`** | >= 33 (variable con el uso) | `id` (INTEGER AUTO) | `user_id`: `String(100)` sin FK formal | `timestamp` como `String(50)` | Ninguno |
+| **`ateneo_rooms`** | 25 | `room_code` (TEXT) | `docente_id`: `String(100)` sin FK formal | `updated_at` como `String(50)`, sin `created_at` | Ninguno |
+| **`student_mastery`** | 1 | `user_id` (VARCHAR 100) | `user_id`: PK como `String(100)` sin FK formal | `updated_at` como `String(50)` | Ninguno |
+| **`student_learning_snapshots`** | 1 | `id` (INTEGER AUTO) | `user_id`: `String(100)` sin FK formal | `timestamp` como `String(50)` | Ninguno |
+| **`clinical_cases`** | 0 | `id` (VARCHAR 64) | `creado_por`: `String(100)` sin FK formal | `created_at` / `updated_at` como `DateTime` | Ninguno |
 
 ### 1.2. Diagrama del Estado Actual (Modelos Desconectados)
 
@@ -28,49 +44,49 @@ erDiagram
         VARCHAR rol
         VARCHAR hashed_password
         BOOLEAN activo
-        VARCHAR created_at
+        STRING created_at "String(50) — no DateTime"
     }
 
     EVALUATION_HISTORY {
         INTEGER id PK
-        TEXT user_id "Sin FK a USERS"
-        TEXT user_email
-        TEXT case_id
-        TEXT guia_asociada
-        TEXT case_title
-        REAL score
+        STRING user_id "String(100) — sin FK SQLAlchemy"
+        STRING user_email
+        STRING case_id
+        STRING guia_asociada
+        STRING case_title
+        FLOAT score
         INTEGER score_max
         TEXT aciertos_json
         TEXT omisiones_json
         TEXT competencias_json
         TEXT cita_normativa_json
         TEXT retroalimentacion_general
-        TEXT timestamp
+        STRING timestamp "String(50) — no DateTime"
     }
 
     ATENEO_ROOMS {
-        TEXT room_code PK
-        TEXT case_id
-        TEXT docente_id "Sin FK a USERS"
-        TEXT docente_nombre
-        TEXT estado
+        STRING room_code PK
+        STRING case_id
+        STRING docente_id "String(100) — sin FK SQLAlchemy"
+        STRING docente_nombre
+        STRING estado
         TEXT data_json
-        TEXT updated_at
+        STRING updated_at "String(50) — sin created_at"
     }
 
     STUDENT_MASTERY {
-        VARCHAR user_id PK "Sin FK a USERS"
+        STRING user_id PK "String(100) — sin FK SQLAlchemy"
         TEXT state_json
-        VARCHAR updated_at
+        STRING updated_at "String(50) — no DateTime"
     }
 
     STUDENT_LEARNING_SNAPSHOTS {
         INTEGER id PK
-        VARCHAR user_id "Sin FK a USERS"
+        STRING user_id "String(100) — sin FK SQLAlchemy"
         INTEGER session_num
         FLOAT score_obtained
         TEXT state_json
-        VARCHAR timestamp
+        STRING timestamp "String(50) — no DateTime"
     }
 
     CLINICAL_CASES {
@@ -85,8 +101,8 @@ erDiagram
         VARCHAR modo_simulacion
         JSON fases
         JSON competencias_activadas
-        VARCHAR creado_por "Sin FK a USERS"
-        DATETIME created_at
+        VARCHAR creado_por "String(100) — sin FK SQLAlchemy"
+        DATETIME created_at "DateTime nativo — unico modelo correcto"
         DATETIME updated_at
     }
 ```
@@ -298,41 +314,104 @@ Almacena casos clínicos dinámicos creados institucionalmente por docentes en l
 ## 4. Plan de Ejecución por Fases (Paso a Paso sin Parches)
 
 ### Fase 1: Habilitación de Integridad Referencial en el Motor
-1. Actualizar `backend/core/database.py`:
-   - Configurar listener para ejecutar `PRAGMA foreign_keys=ON;` en SQLite cada vez que se establece una conexión (junto con el modo WAL ya activo).
-   - Estandarizar la ruta por defecto de la base de datos hacia `backend/data/ateneo_clinical.db` (preservando migración automática transparente desde `history.db` para no perder los datos existentes).
+* **Estado:** **Completado.**
+* **Pasos de Ejecución:**
+  1. Actualizar `backend/core/database.py`:
+     - Configurar listener para ejecutar `PRAGMA foreign_keys=ON;` en SQLite cada vez que se establece una conexión (junto con el modo WAL ya activo).
+     - Estandarizar la ruta por defecto de la base de datos hacia `backend/data/ateneo_clinical.db` (preservando migración automática transparente desde `history.db` para no perder los datos existentes).
+* **Criterios de Aceptación:**
+  * `PRAGMA foreign_keys` retorna `1` en cada conexión SQLite abierta por SQLAlchemy.
+  * Suite completa del backend aprueba al 100% (`uv run python -m tests.run_all_tests`).
 
 ### Fase 2: Refactorización de Modelos Relacionales (SQLAlchemy 2.0)
-1. Actualizar `modules/auth/models.py`:
-   - Migrar `created_at` a `DateTime(timezone=True)` con `func.now()`.
-2. Actualizar `modules/analytics_history/models.py`:
-   - Agregar `ForeignKey("users.id", ondelete="CASCADE")` a `user_id`.
-   - Agregar columnas de primer orden: `faithfulness_score: Float`, `cohorte_id: String(50)`, `tiempo_segundos: Float`.
-   - Migrar `timestamp` a `DateTime(timezone=True)`.
-   - Crear índices compuestos `ix_eval_user_created` e `ix_eval_cohort_guide`.
-3. Actualizar `modules/collaboration/models.py`:
-   - Agregar `ForeignKey("users.id", ondelete="RESTRICT")` a `docente_id`.
-   - Migrar `updated_at` a `DateTime(timezone=True)`.
-4. Actualizar `modules/adaptive/models.py`:
-   - Agregar `ForeignKey("users.id", ondelete="CASCADE")` a `StudentMasteryModel.user_id` y `StudentSnapshotModel.user_id`.
-   - Migrar fechas a `DateTime(timezone=True)`.
-   - Crear índice compuesto `ix_snapshot_user_session` en `student_learning_snapshots`.
-5. Actualizar `modules/cases/models.py`:
-   - Agregar `ForeignKey("users.id", ondelete="SET NULL")` a `creado_por`.
+* **Estado:** **Planificado.**
+* **Pasos de Ejecución:**
+  1. Actualizar `modules/auth/models.py`:
+     - Migrar `created_at` a `DateTime(timezone=True)` con `func.now()`.
+  2. Actualizar `modules/analytics_history/models.py`:
+     - Agregar `ForeignKey("users.id", ondelete="CASCADE")` a `user_id`.
+     - Agregar columnas de primer orden: `faithfulness_score: Float`, `cohorte_id: String(50)`, `tiempo_segundos: Float`.
+     - Migrar `timestamp` a `DateTime(timezone=True)`.
+     - Crear índices compuestos `ix_eval_user_created` e `ix_eval_cohort_guide`.
+  3. Actualizar `modules/collaboration/models.py`:
+     - Agregar columna `created_at: DateTime(timezone=True)` con `server_default=func.now()` (actualmente ausente — solo existe `updated_at`).
+     - Agregar `ForeignKey("users.id", ondelete="RESTRICT")` a `docente_id`.
+     - Migrar `updated_at` a `DateTime(timezone=True)` con `onupdate=func.now()`.
+  4. Actualizar `modules/adaptive/models.py`:
+     - Agregar `ForeignKey("users.id", ondelete="CASCADE")` a `StudentMasteryModel.user_id` y `StudentSnapshotModel.user_id`.
+     - Migrar fechas a `DateTime(timezone=True)`.
+     - Crear índice compuesto `ix_snapshot_user_session` en `student_learning_snapshots`.
+  5. Actualizar `modules/cases/models.py`:
+     - Agregar `ForeignKey("users.id", ondelete="SET NULL")` a `creado_por`.
+* **Criterios de Aceptación:**
+  * `alembic check` (o inspección directa del esquema) confirma que todas las tablas poseen FK declaradas con las políticas `ON DELETE` correctas.
+  * Índices compuestos `ix_eval_user_created`, `ix_eval_cohort_guide` e `ix_snapshot_user_session` presentes en el esquema.
+  * 6 suites maestras del backend aprobadas al 100% (`uv run python -m tests.run_all_tests`).
 
 ### Fase 3: Migración de Datos y Preservación de Registros Existentes
-1. Crear un script de migración determinístico que:
-   - Cree la base de datos con el nuevo esquema normalizado.
-   - Migre los 3 usuarios, 33 evaluaciones, 25 salas y estados psicométricos existentes en `history.db` garantizando que no se pierda ningún dato histórico.
-   - Verifique que la integridad referencial sea 100% válida.
+* **Estado:** **Planificado.**
+* **Pasos de Ejecución:**
+  1. Crear el script de migración determinístico `backend/scripts/migrate_history_to_ateneo_clinical.py` que:
+     - Cree la base de datos con el nuevo esquema normalizado (`ateneo_clinical.db`).
+     - Migre los 3 usuarios, 33 evaluaciones, 25 salas y estados psicométricos existentes en `history.db` garantizando que no se pierda ningún dato histórico.
+     - Verifique que la integridad referencial sea 100% válida tras la migración (ejecutando `PRAGMA foreign_key_check`).
+* **Criterios de Aceptación:**
+  * El script migra todos los registros existentes sin pérdida de datos (recuento de filas idéntico antes y después).
+  * `PRAGMA foreign_key_check` retorna 0 violaciones en el nuevo esquema.
+  * La base de datos resultante rechaza correctamente inserciones con `user_id` no existente.
 
 ### Fase 4: Sincronización de Repositorios de Dominio
-1. Actualizar `HistoryRepository`:
-   - Sincronizar inserciones para poblar `faithfulness_score` y `cohorte_id` como columnas directas.
-   - Optimizar consultas de analítica de coordinadores (`analyze_coordinator_cohort_analytics`) para utilizar agregaciones SQL nativas (`func.avg`) sobre las nuevas columnas indexadas.
+* **Estado:** **Planificado.**
+* **Pasos de Ejecución:**
+  1. Actualizar `HistoryRepository`:
+     - Sincronizar inserciones para poblar `faithfulness_score` y `cohorte_id` como columnas directas.
+     - Optimizar consultas de analítica de coordinadores (`analyze_coordinator_cohort_analytics`) para utilizar agregaciones SQL nativas (`func.avg`) sobre las nuevas columnas indexadas.
+* **Criterios de Aceptación:**
+  * Las inserciones en `evaluation_history` persisten `faithfulness_score` y `cohorte_id` como columnas de primer orden (verificable con `SELECT faithfulness_score FROM evaluation_history LIMIT 1`).
+  * El endpoint `GET /api/history/ibf-cohort` ejecuta una única consulta SQL agregada nativa (sin bucles Python), verificable en los logs de SQLAlchemy con `echo=True`.
+  * Latencia de la consulta de cohorte inferior a 200ms bajo 50 registros de evaluación.
+  * 6 suites maestras del backend aprobadas al 100%.
 
 ### Fase 5: Verificación Integral de Regresión
-1. Ejecutar la suite completa de pruebas del backend (`uv run python -m tests.run_all_tests`).
-2. Validar que las 6 suites aprueben al 100% con las nuevas restricciones de llaves foráneas e índices.
-3. Ejecutar la suite de pruebas del frontend (`npm run test`) para constatar cero alteraciones en los contratos del cliente.
-4. Actualizar `.agents/memory.md`.
+* **Estado:** **Planificado.**
+* **Pasos de Ejecución:**
+  1. Ejecutar la suite completa de pruebas del backend (`uv run python -m tests.run_all_tests`).
+  2. Validar que las 6 suites aprueben al 100% con las nuevas restricciones de llaves foráneas e índices.
+  3. Ejecutar la suite de pruebas del frontend (`npm run test`) para constatar cero alteraciones en los contratos del cliente.
+  4. Actualizar `.agents/memory.md`.
+* **Criterios de Aceptación:**
+  * Las 6 suites maestras del backend aprobadas al 100% (`uv run python -m tests.run_all_tests`).
+  * 16 suites y 72 pruebas unitarias del frontend aprobadas al 100% (`npm run test`).
+  * 15/15 pruebas E2E Playwright aprobadas (`npm run test:e2e`).
+  * Cero errores de TypeScript (`npm run typecheck`).
+  * `PRAGMA integrity_check` retorna `ok` en la nueva base de datos.
+
+---
+
+## 5. Infraestructura ya Implementada (Línea Base)
+
+| Componente | Ubicación | Estado | Notas |
+|:-----------|:----------|:------:|:------|
+| `PRAGMA foreign_keys=ON` en listener SQLAlchemy | `backend/core/database.py` | **Completado** | Activo en modo SQLite |
+| Modo WAL activo (`journal_mode=WAL`) | `backend/core/database.py` | **Completado** | `PRAGMA synchronous=NORMAL` también activo |
+| `UserModel` con campos base | `backend/modules/auth/models.py` | **Completado** | Sin `updated_at` ni FK |
+| `EvaluationHistoryModel` sin columnas de primer orden | `backend/modules/analytics_history/models.py` | **Incompleto** | Sin `faithfulness_score`, `cohorte_id`, `tiempo_segundos`. `timestamp` como `String(50)` |
+| `AteneoRoomModel` sin FK ni `created_at` | `backend/modules/collaboration/models.py` | **Incompleto** | Sin `created_at`. `updated_at` como `String(50)` |
+| `StudentMasteryModel` y `StudentSnapshotModel` sin FK | `backend/modules/adaptive/models.py` | **Incompleto** | `timestamp` como `String(50)` |
+| `ClinicalCaseModel` con `DateTime` nativo | `backend/modules/cases/models.py` | **Parcial** | Único modelo con `DateTime` pero sin FK formal con `ON DELETE` |
+| FK formales con `ON DELETE` en todos los modelos | Todos los módulos | **Pendiente** | Fase 2: agregar `ForeignKey("users.id", ondelete=...)` |
+| Índices compuestos (`ix_eval_user_created`, etc.) | `evaluation_history`, `student_learning_snapshots` | **Pendiente** | Fase 2 |
+| Timestamps como `DateTime(timezone=True)` | Todos los modelos excepto `ClinicalCaseModel` | **Pendiente** | Fase 2: migrar de `String(50)` a `DateTime` |
+| Columnas de primer orden (`faithfulness_score`, `cohorte_id`, `tiempo_segundos`) | `evaluation_history` | **Pendiente** | Fase 2 |
+
+---
+
+## 6. Matriz de Seguimiento por Sesiones
+
+| Sesión / Hito | Fase Asignada | Enfoque Principal | Entregable Clave | Estado |
+|:---:|:---|:---|:---|:---:|
+| **Sesión 1** | **Fase 1** | Integridad Referencial en Motor SQLite | `PRAGMA foreign_keys=ON` en listener + ruta `ateneo_clinical.db` | **Completado** |
+| **Sesión 2** | **Fase 2** | Refactorización de Modelos Relacionales | FK estrictas con `ON DELETE` + índices compuestos + columnas de primer orden | **Planificado** |
+| **Sesión 3** | **Fase 3** | Migración Determinística de Datos | Script `migrate_history_to_ateneo_clinical.py` + `PRAGMA foreign_key_check` | **Planificado** |
+| **Sesión 4** | **Fase 4** | Sincronización de Repositorios | Inserción de `faithfulness_score`, `cohorte_id` y consultas SQL nativas agregadas | **Planificado** |
+| **Sesión 5** | **Fase 5** | Verificación Integral de Regresión | 6 suites backend + 72 tests frontend + 15 Playwright E2E al 100% | **Planificado** |

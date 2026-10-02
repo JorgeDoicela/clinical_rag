@@ -50,7 +50,7 @@ stateDiagram-v2
 
 ---
 
-## 3. Especificación del ResilientLLMGateway (`backend/services/llm_gateway.py`)
+## 3. Especificación del ResilientLLMGateway (`backend/core/llm_gateway.py`)
 
 ### 3.1 Estados del Circuito (`CircuitStatus`)
 
@@ -104,6 +104,6 @@ En sistemas de evaluación médica y simulación formativa, la jerarquía de con
 
 Para garantizar la reproducibilidad y eliminar la deuda técnica por duplicidad:
 
-* **Raíz Única:** Todo el stack (`docker-compose.yml`, FastAPI en host o contenedor, Vite Frontend) lee de un único archivo [.env](file:///home/jorge/Escritorio/Proyectos/Ateneo/clinical_rag/.env).
-* **Validación Tipada con Pydantic:** [backend/config.py](file:///home/jorge/Escritorio/Proyectos/Ateneo/clinical_rag/backend/config.py) implementa `AppSettings`, validando tipos, rutas absolutas resueltas (`Path(__file__).resolve().parent`) y configuración de CORS antes de permitir peticiones HTTP.
-* **Orquestación en Docker:** [docker-compose.yml](file:///home/jorge/Escritorio/Proyectos/Ateneo/clinical_rag/docker-compose.yml) inyecta las variables con `env_file: - .env` e implementa `start_period: 30s` en el healthcheck del backend para acomodar la carga del modelo transformer `BAAI/bge-m3` (2.2 GB) sin marcar estados insalubres falsos.
+* **Raíz Única:** Todo el stack (`docker-compose.yml`, FastAPI en host o contenedor, Vite Frontend) lee de un único archivo [.env](.env).
+* **Validación Tipada con Pydantic:** [backend/core/config.py](backend/core/config.py) implementa `AppSettings`, validando tipos, rutas absolutas resueltas (`Path(__file__).resolve().parent`) y configuración de CORS antes de permitir peticiones HTTP.
+* **Orquestación en Docker:** [docker-compose.yml](docker-compose.yml) inyecta las variables con `env_file: - .env` e implementa `start_period: 30s` en el healthcheck del backend para acomodar la carga del modelo transformer `BAAI/bge-m3` (2.2 GB) sin marcar estados insalubres falsos.

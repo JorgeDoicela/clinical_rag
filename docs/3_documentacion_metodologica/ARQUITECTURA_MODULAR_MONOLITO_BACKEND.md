@@ -118,6 +118,7 @@ backend/
 │   │   ├── models.py                   # Entidad AteneoRoomModel
 │   │   ├── repository.py               # RoomRepository
 │   │   ├── service.py                  # CollaborationService (analítica de consenso)
+│   │   ├── connection_manager.py       # Gestor de conexiones WebSocket y presencia
 │   │   └── dependencies.py             # get_collaboration_service()
 │   │
 │   └── auth/                           # Identidad, autenticación y perfiles
@@ -201,16 +202,16 @@ La capa de base de datos discrimina automáticamente entre entornos de desarroll
 
 ## 7. Plan Maestro de Escalabilidad Backend (10 Fases)
 
-Para la evolución sistemática del backend hacia arquitectura limpia estricta, desacoplamiento de infraestructura y preparación para clústeres de alta demanda, consultar la especificación viva:
+Para la evolución sistemática del backend hacia arquitectura limpia estricta, desacoplamiento transaccional y preparación para clústeres de alta demanda, consultar la especificación viva:
 * Documento maestro: `PLAN_ESCALABILIDAD_BACKEND.md`
 * Fases planificadas:
-  1. Fase 1: Arquitectura Limpia Estricta y Desacoplamiento de Base de Datos.
-  2. Fase 2: Robustecimiento de Seguridad, Autenticación y Contexto RBAC.
-  3. Fase 3: RAG Híbrido Avanzado, Reranking y Validación Estricta de Citas GPC.
-  4. Fase 4: Persistencia Relacional Híbrida del Catálogo de Casos y Paraclínicos.
-  5. Fase 5: Motor Adaptativo KST, BKT y ZDP Basado en Dominio Clínico.
-  6. Fase 6: Canales WebSocket y Streaming de Respuestas LLM (SSE).
-  7. Fase 7: Resiliencia de Infraestructura, Rate Limiting y Cache Multinivel.
-  8. Fase 8: Reportes Clínicos PDF y Analítica Longitudinal de Cohortes.
-  9. Fase 9: Observabilidad Integral, Telemetría OpenTelemetry y Trazabilidad RAG.
-  10. Fase 10: Auditoría Integral de Pruebas, Cobertura y Benchmarks de Concurrencia.
+  1. Fase 1: Desacoplamiento Clean Architecture en Controladores Evaluativos.
+  2. Fase 2: Coordinación Transaccional con Patrón Unit of Work (UoW) y Consistencia ACID.
+  3. Fase 3: Rate Limiting Defensivo y Gestión de Cuotas de Inferencia LLM (Token Bucket).
+  4. Fase 4: Blindaje Clínico contra Prompt Injection y Sanitización de Entradas.
+  5. Fase 5: Capa de Caché Semántica y Léxica para Recuperación RAG (LRU Hash).
+  6. Fase 6: Gobernanza Multi-Tenancy y Aislamiento Institucional.
+  7. Fase 7: Sondas Avanzadas de Observabilidad y Salud Operativa (`/health/live` & `/health/ready`).
+  8. Fase 8: Desacoplamiento de Tareas Pesadas con Pool Asíncrono de Reportes.
+  9. Fase 9: Logging Estructurado con Contexto de Dominio y Métricas de Rendimiento.
+  10. Fase 10: Auditoría de Carga, Concurrencia y Resistencia al Fallo.

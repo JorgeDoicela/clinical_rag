@@ -175,7 +175,7 @@ La autenticación se implementa mediante JWT Bearer (HS256, `python-jose`). El m
 
 ### 8.2 Salas de Ateneo Sincrónicas (`routers/collaboration.py`)
 
-Las salas de discusión colaborativa permiten a múltiples estudiantes resolver el mismo caso clínico simultáneamente. El motor de consenso agrega las respuestas individuales y genera retroalimentación grupal comparativa con el fragmento normativo del MSP. Cada sala posee un código de acceso único de 6 caracteres (alfanumérico), persistencia en SQLite y estado de sesión gestionado por `models/room_session.py`.
+Las salas de discusión colaborativa permiten a múltiples estudiantes resolver el mismo caso clínico simultáneamente. El motor de consenso agrega las respuestas individuales y genera retroalimentación grupal comparativa con el fragmento normativo del MSP. Cada sala posee un código de acceso único de 6 caracteres (alfanumérico), persistencia relacional administrada por `RoomRepository` (`backend/modules/collaboration/repository.py`) sobre `AteneoRoomModel` en SQLAlchemy y fachada de compatibilidad en `models/room_session.py`.
 
 ### 8.3 Índice de Brecha Formativa Institucional (IBF) y Alertas Docentes
 
@@ -183,5 +183,5 @@ El motor IBF (`models/learning_analytics.py`) calcula la distancia entre el rend
 
 $$\text{IBF}_e = \max\left(0, 1 - \frac{\overline{\text{Score}}_{\text{cohorte}, e}}{8.0}\right)$$
 
-Cuando $\text{IBF} > 0.40$, el sistema genera automáticamente una alerta de intervención curricular prioritaria para el coordinador académico visible en `CoordinatorAnalytics.jsx`.
+Cuando $\text{IBF} > 0.40$, el sistema genera automáticamente una alerta de intervención curricular prioritaria para el coordinador académico visible en `CoordinatorAnalytics.tsx`.
 

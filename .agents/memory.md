@@ -252,9 +252,55 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
   - **Consolidación en `PLAN_ESCALABILIDAD_BACKEND.md`:**
     * Reestructurado en 10 fases de ingeniería senior con criterios de aceptación e hitos por sesión.
     * Cero emojis, tono técnico, sobrio, fáctico y verificable.
-* **Sincronización Integral de Documentación Técnica Viva (Docs-as-Code):**
-  - **Sincronización en `README.md`:** Árbol completo del frontend actualizado (`e2e/`, `core/storage/`, `core/realtime/`, `ClinicalStudyViewer.tsx`), inclusión de comandos reproducibles para Vitest (`npm test`, 16 suites / 72 tests) y Playwright (`npx playwright test`, 15 tests E2E multi-navegador).
-  - **Sincronización en `ARQUITECTURA_MODULAR_FRONTEND.md`:** Adición formal de las secciones 8 y 9 documentando debriefing socrático (SSE), salas colaborativas (WebSockets), visor diagnóstico acelerado en Canvas HTML5 (60 FPS), resiliencia hospitalaria offline-first (IndexedDB + Outbox Pattern) y automatización E2E con métricas Core Web Vitals.
-  - **Sincronización en `ARQUITECTURA_MODULAR_MONOLITO_BACKEND.md`:** Diagrama Mermaid de capas y dependencias actualizado con `ConnectionManager`, canales WebSocket `/ws/{room_code}`, streaming SSE y enlace vinculante hacia el Plan Maestro en 10 Fases (`PLAN_ESCALABILIDAD_BACKEND.md`).
-  - **Consistencia Total de Código y Documentación:** 100% de coherencia fáctica entre los contratos en el código fuente y las especificaciones técnicas del repositorio.
-
+* **Auditoría Exhaustiva de Proyecto y Sincronización Línea a Línea de Documentación (/goal):**
+  - **Revisión Integral de Código y Contratos:**
+    * Frontend: Ejecución y verificación en vivo de TypeScript 5 estricto (`tsc --noEmit`, 0 errores), Vitest 5 (16 suites, 72 pruebas unitarias aprobadas al 100%) y Playwright E2E multi-navegador (15 pruebas aprobadas en Google Chrome, Microsoft Edge y Mobile Pixel 5).
+    * Backend: Ejecución y verificación en vivo de las 6 suites maestras en `backend/tests/run_all_tests.py` (100% PASS en 38.5s), cubriendo seguridad JWT/Bcrypt, motor adaptativo KST/BKT, evaluador multimodal, streaming SSE, presencia WebSocket y generación de PDF criptográfico SHA-256.
+  - **Sincronización Quirúrgica Documental:**
+    * `PLAN_ESCALABILIDAD_FRONTEND.md`: Actualizada Fase 9 (Resiliencia Hospitalaria Offline-First) de PENDIENTE a COMPLETADO, documentando la implementación de `offlineDb.ts` (IndexedDB tipado nativo), `useConnectivitySync.ts` (Outbox Pattern) e indicadores en `Navbar.tsx`.
+    * `ARQUITECTURA_MODULAR_FRONTEND.md`: Sincronizado el árbol de directorios con `eventStreamClient.ts`, `socketClient.ts`, `offlineDb.ts` y `useConnectivitySync.ts`. Actualizadas todas las referencias a componentes de `.jsx` a `.tsx`.
+    * `ARQUITECTURA_MODULAR_MONOLITO_BACKEND.md`: Incorporado `connection_manager.py` en el árbol de `backend/modules/collaboration/` y sincronizada la sección 7 con las 10 Fases activas de `PLAN_ESCALABILIDAD_BACKEND.md`.
+    * `ARQUITECTURA_RESILIENTE_LLM_Y_CONFIGURACION.md`: Normalizadas las rutas de archivo eliminando referencias absolutas a rutas de Linux locales y apuntando a `backend/core/llm_gateway.py`.
+    * `METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md`: Sincronizada la ubicación canónica de tablas LaTeX hacia `docs/1_tablas_latex/` y la cascada de fallbacks hacia `gemini-3.8-flash, gemini-3.7-flash, gemini-3.5-flash, gemini-flash-latest, gemini-flash-lite-latest`.
+    * `ARQUITECTURA_RAG_Y_FINE_TUNING.md`: Actualizada referencia de `CoordinatorAnalytics.tsx` y el soporte relacional de `RoomRepository` (SQLAlchemy).
+  - **Estado Operativo:** 100% de coherencia fáctica y operativa entre el código fuente y el acervo documental técnico.
+* **Elevación Arquitectónica y Rediseño Senior del Plan Maestro de Escalabilidad Frontend (`PLAN_ESCALABILIDAD_FRONTEND.md`):**
+  - **Diagnóstico y Trascendencia:** El documento anterior actuaba predominantemente como una bitácora de tareas concluidas (Fases 1 a 10), careciendo de visión de escala institucional, diagnóstico forense y hoja de ruta futura.
+  - **Reestructuración a Estándar Senior (+10 años):**
+    * Sección 1: Visión Arquitectónica y Proyección de Escala (10x - 100x) con diagrama Mermaid de 5 capas (Presentación, Dominio ViewModel, Estado Transversal, Transporte/Offline y Servicios Médicos Especializados).
+    * Sección 2: Diagnóstico Exhaustivo del Frontend Actual (Inventario de 10 subsistemas y métricas empíricas: 184 kB chunk, 0 errores `tsc`, 72/72 tests Vitest, 15/15 tests Playwright E2E).
+    * Sección 3: Matriz de Brechas de Escala Institucional (F1 a F8 con Severidad, Causa Raíz y Solución Arquitectónica sin parches).
+    * Sección 4: Plan Maestro en 16 Fases dividido en Bloque A (Cimientos Base - Fases 1 a 5, completado), Bloque B (Capacidades Clínicas y Tiempo Real - Fases 6 a 10, completado) y Bloque C (Grado Hospitalario y Escala Masiva - Fases 11 a 16 proyectadas: DICOM/CornerstoneJS, circuitos OSCE/ECOE cronometrados, tele-simulación WebRTC, multi-tenancy dinámico, i18n tipado y observabilidad RUM OpenTelemetry).
+    * Sección 5: Matriz de Seguimiento Integral con las 16 fases, entregables clave y estados.
+* **Sincronización de los 3 Planes Maestros de Escalabilidad (Definición Canónica):**
+  - **`PLAN_ESCALABILIDAD_FRONTEND.md`:** Consolidado en 16 fases (Bloque A + B completados, Bloque C proyectado). Es el documento de mayor madurez. Sin cambios estructurales requeridos.
+  - **`PLAN_ESCALABILIDAD_BACKEND.md`:** Corregido el desfase entre realidad e historial. Agregada la sección 5 "Infraestructura Transversal ya Implementada" que documenta lo que ya existe (`CorrelationIdMiddleware`, RFC 7807, Circuit Breaker, PRAGMA FK, lifespan moderno, logging parcial, repositorio híbrido). Las 10 fases permanecen en "Planificado" porque ninguna ha sido ejecutada formalmente.
+  - **`PLAN_ESCALABILIDAD_BASE_DE_DATOS.md`:** Completado a estándar senior. Agregados: estados por fase (Fase 1 = Completado, Fases 2-5 = Planificado), criterios de aceptación cuantitativos en todas las fases, sección 5 "Infraestructura ya Implementada" y sección 6 "Matriz de Seguimiento por Sesiones" homologada con los otros dos planes. Nombre de script de migración formalizado: `backend/scripts/migrate_history_to_ateneo_clinical.py`.
+  - **Criterio de ejecución secuencial:** BD -> Backend -> Frontend (las fases de BD son precondición para las de Backend).
+* **Auditoría Definitiva del Código (Hallazgos Verificados en Código Real):**
+  - **Backend 100% PASS** (6 suites: Seguridad RBAC, Motor KST/BKT, Científicos, Estudio Piloto, Endpoints HTTP, Multimodal) — 37.43s.
+  - **Frontend 100% PASS** (16 suites, 72 tests Vitest, 0 errores TypeScript).
+  - **Violación B1 confirmada en 3 endpoints**: `POST /api/evaluate` (líneas 144 y 152), `POST /api/evaluate/phase` (líneas 210 y 218), `POST /api/evaluate/socratic-turn` (línea 257) — todos en `backend/routers/evaluation.py`.
+  - **`AteneoRoomModel` sin `created_at`**: Solo tiene `updated_at` como `String(50)`. Se agrega en Fase 2 BD.
+  - **Ningún modelo tiene `ForeignKey` SQLAlchemy formal**: todos usan `String(100)` plano para `user_id`/`docente_id`. El PRAGMA protege a nivel de motor, no de ORM.
+  - **`EvaluationHistoryModel` sin columnas de primer orden**: falta `faithfulness_score`, `cohorte_id`, `tiempo_segundos`. Pendiente Fase 2 BD.
+  - **Bundle frontend:** `index-*.js` = 321.29 kB / 99.92 kB gzip (crecimiento justificado por Zustand v5 + TanStack v5 + Zod v4 + streaming + offline). `CaseSolve` = 66.75 kB — candidato lazy en Fase 11 Bloque C.
+  - **`ClinicalCaseModel`** es el único modelo con `DateTime` nativo (no `String`). El resto migra en Fase 2 BD.
+  - **Los 3 documentos de escalabilidad están definitivamente sincronizados** con el código real y son la fuente canónica de verdad para las implementaciones.
+* **Segunda Auditoría Definitiva — Hallazgos Adicionales No Documentados (2026-10-02):**
+  - **B1 ampliado**: La violación de capas no se limita a `evaluation.py`. Se detectaron violaciones adicionales en:
+    * `routers/collaboration.py` líneas 9-10: importa `retrieve_relevant_chunk` y `evaluate_clinical_reasoning` directamente (usado en `submit_ateneo_answer`).
+    * `routers/history.py` línea 108: importa `retrieve_relevant_chunk` dentro del endpoint `/faithfulness-benchmark`.
+    * `modules/evaluation/service.py` líneas 6-7: el servicio sí DEBE llamar a la capa RAG, pero lo hace sin pasar por el `ResilientLLMGateway` (circuit breaker). Esto es una deuda menor de la capa de dominio, NO una violación de la capa HTTP.
+    * **Criterio verificable de limpieza total:** `grep -r "from rag" backend/routers/` debe retornar 0 resultados.
+  - **B9 nuevo**: Tres llamadas a `print()` en servicios de producción detectadas:
+    * `analytics_history/service.py:176` — seed completado.
+    * `collaboration/service.py:137` — dentro de un `except` (el más crítico: silencia errores reales).
+    * `collaboration/service.py:275` — seed completado.
+    * Resolver en Fase 9 sustituyendo por `logger.info`/`logger.warning` con `logging.getLogger(__name__)`.
+  - **Registro de registros en BD**: `evaluation_history` tiene >= 33 registros (variable con el uso; 33 era el conteo del 2026-10-02). No es un número fijo.
+  - **Bundle Frontend**: El valor de 184.88 kB documentado en sesiones previas era pre-integración de Zustand v5 + TanStack v5 + Zod v4 + streaming SSE + offline IndexedDB. El valor actual correcto es **321.29 kB / 99.92 kB gzip**. El crecimiento es esperado y justificado por la incorporación de las Fases 6-10 del Bloque B.
+  - **Correcciones aplicadas a los 3 planes maestros:**
+    * `PLAN_ESCALABILIDAD_BACKEND.md`: Sección §0 de dependencias inter-plan agregada. B1 expandido a 3 archivos. B9 (print en producción) agregado.
+    * `PLAN_ESCALABILIDAD_BASE_DE_DATOS.md`: Sección §0 de dependencias inter-plan agregada. Nota de variabilidad en conteo de registros.
+    * `PLAN_ESCALABILIDAD_FRONTEND.md`: Sección §0 de dependencias inter-plan agregada.

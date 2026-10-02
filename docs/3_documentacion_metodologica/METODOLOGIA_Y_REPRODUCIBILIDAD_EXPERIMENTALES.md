@@ -97,15 +97,15 @@ if torch.cuda.is_available():
 
 ## 8. Resultados Experimentales Consolidados (GPU NVIDIA A100)
 
-Los artefactos LaTeX generados automáticamente por el pipeline se encuentran preservados en [`docs/`](./):
+Los artefactos LaTeX generados automáticamente por el pipeline se encuentran preservados en [`docs/1_tablas_latex/`](../1_tablas_latex/):
 
-### Tabla I: Rendimiento Cuantitativo de Recuperación ([tabla_resultados_paper.tex](tabla_resultados_paper.tex))
+### Tabla I: Rendimiento Cuantitativo de Recuperación ([tabla_resultados_paper.tex](../1_tablas_latex/tabla_resultados_paper.tex))
 * **In-Distribution ($N=15$):** $\text{Hit@1}=73.3\%$, $\text{Hit@5}=73.3\%$, $\text{MRR@5}=0.7333$.
 * **Out-of-Distribution ($N=10$):** $\text{Hit@1}=\mathbf{100.0\%}$, $\text{Hit@5}=\mathbf{100.0\%}$, $\text{MRR@5}=\mathbf{1.0000}$.
 * **Global Completo ($N=25$):** $\text{Hit@1}=\mathbf{84.0\%}$, $\text{Hit@5}=\mathbf{84.0\%}$, $\text{MRR@5}=\mathbf{0.8400}$, $\text{NDCG@5}=\mathbf{0.8400}$.
 * **Latencias:** Mediana $P_{50}=89.59\text{ ms}$, Percentil $P_{95}=111.94\text{ ms}$.
 
-### Tabla II: Estudio de Ablación Arquitectónica ([tabla_ablacion_paper.tex](tabla_ablacion_paper.tex))
+### Tabla II: Estudio de Ablación Arquitectónica ([tabla_ablacion_paper.tex](../1_tablas_latex/tabla_ablacion_paper.tex))
 | Variante Arquitectónica | $\text{Hit@1}$ | $\text{Hit@5}$ | $\text{MRR@5}$ | $\text{NDCG@5}$ | Latencia $P_{50}$ |
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | 1. Sparse BM25 Solo (Sin Embeddings) | 84.0% | 84.0% | 0.8400 | 0.8400 | 62.5 ms |
@@ -129,7 +129,7 @@ Para evitar el sesgo de indulgencia (*leniency bias*) y garantizar el poder disc
 | **V. Excelente / Normativo** | $8.6 - 10.0\text{ pts}$ | Razonamiento integral alineado al 100% con la GPC (diagnóstico, dosis exacta por kg/h, monitoreo y prevención). | Cero omisiones normativas. |
 
 ### 9.2 Resiliencia de Inferencia y Tolerancia a Fallos
-1. **Fallback Automático de Modelos Multimodales:** Implementación de cascada de fallback ante picos de demanda o códigos de saturación transitoria de la API (`503 UNAVAILABLE`), conmutando en milisegundos entre `gemini-3.5-flash`, `gemini-3.6-flash`, `gemini-2.5-flash` y `gemini-2.0-flash`.
+1. **Fallback Automático de Modelos Multimodales:** Implementación de cascada jerárquica con Circuit Breaker ante picos de demanda o saturación transitoria (`429` / `503`), conmutando sin latencia fantasma entre `gemini-3.8-flash`, `gemini-3.7-flash`, `gemini-3.5-flash`, `gemini-flash-latest` y `gemini-flash-lite-latest`.
 2. **Normalización de Persistencia Vectorial HNSW:** Migración de índices de ChromaDB a objetos `PersistentData` tipados con dimensión fija `dim=1024` y espacio coseno, garantizando latencias sub-segundo sin re-ingestas en tiempo de ejecución.
 3. **Aislamiento en Contenedores y Optimización de Memoria:** Configuración calibrada de cuotas en Docker y WSL2 (`memory=4GB`, `processors=4`) para prevenir paginación de disco (*swapping*) en entornos de desarrollo con recursos limitados.
 

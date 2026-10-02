@@ -1,6 +1,21 @@
-# Plan Maestro de Arquitectura, Robustez y Escalabilidad del Backend (Ateneo+ API)
+﻿# Plan Maestro de Arquitectura, Robustez y Escalabilidad del Backend (Ateneo+ API)
 
 Este documento define la auditoría integral, el diagnóstico de capacidad y la hoja de ruta técnica paso a paso para consolidar el backend de **Ateneo+** bajo estándares de ingeniería de software senior (+10 años en producción), garantizando su escalamiento ordenado desde la etapa actual hacia una plataforma clínica de alta concurrencia universitaria y hospitalaria.
+
+---
+
+## 0. Dependencias con Otros Planes
+
+Este plan no es autonomo. Su ejecucion sigue un orden de precondiciones con los otros dos planes maestros:
+
+| Fase de este Plan | Requiere | Plan de BD | Plan de Frontend |
+|:------------------|:---------|:----------:|:----------------:|
+| **Fase 1** | Independiente - ejecutar primero | BD Fase 2 puede ocurrir en paralelo | Independiente |
+| **Fase 2** (Unit of Work) | **Requiere BD Fase 2**: FK formales activas antes de UoW | BD Fase 2 completada | Independiente |
+| **Fase 6** (Multi-Tenancy) | **Requiere BD Fases 2-3** | BD Fases 2-3 completadas | Fase 14 Frontend se activa tras esta |
+| **Fase 9** (Logging) | Independiente | Independiente | Fase 16 Frontend es contraparte cliente |
+
+**Orden canonico:** BD (Fases 1-5) > Backend (Fases 1-10) > Frontend Bloque C (Fases 11-16)
 
 ---
 
@@ -73,7 +88,7 @@ graph TD
 
 | ID | Módulo | Severidad | Diagnóstico Técnico | Causa Raíz | Solución Arquitectónica (Cero Parches) |
 |:---|:-------|:----------|:--------------------|:-----------|:---------------------------------------|
-| **B1** | `routers/evaluation.py` | Alta | Violación de capas: el router invoca funciones RAG y de inferencia directamente sin pasar por `EvaluationService`. | Implementación apresurada de endpoints durante prototipado inicial que no delegó en el servicio de aplicación. | Centralizar el 100% de la lógica evaluativa dentro de `EvaluationService.evaluate_reasoning` y `evaluate_phase`. El router debe limitarse a desempaquetar parámetros HTTP y retornar DTOs. |
+| **B1** | `routers/evaluation.py`, `routers/collaboration.py`, `routers/history.py` | Alta | Violación de capas: el router invoca funciones RAG y de inferencia directamente sin pasar por `EvaluationService`. | Implementación apresurada de endpoints durante prototipado inicial que no delegó en el servicio de aplicación. | Centralizar el 100% de la lógica evaluativa dentro de `EvaluationService.evaluate_reasoning` y `evaluate_phase`. El router debe limitarse a desempaquetar parámetros HTTP y retornar DTOs. |
 | **B2** | `core/database.py` & Servicios | Alta | Ausencia de patrón Unit of Work (UoW) para transacciones multi-repositorio atómicas. | Cada repositorio o servicio ejecuta commits independientes; si falla una operación subsecuente, la base queda en estado inconsistente. | Implementar `UnitOfWork` basado en context managers que agrupe repositorios bajo una única transacción ACID explícita con rollback automático. |
 | **B3** | `routers/evaluation.py` | Alta | Ausencia de Rate Limiting defensivo en endpoints de inferencia LLM y generación de PDF. | No se configuró un limitador de tasa por usuario/IP, exponiendo el sistema a agotamiento accidental o malicioso de cuota de API. | Implementar limitador de tasa (*Token Bucket* / *Sliding Window*) con cabeceras estándar `X-RateLimit-*` y código HTTP 429 ante saturación. |
 | **B4** | `rag/prompt_builder.py` | Media | Vulnerabilidad a Prompt Injection / Jailbreaks clínicos en las respuestas abiertas de los estudiantes. | El texto del estudiante se interpola en el prompt de evaluación sin análisis previo de anomalías o directivas de escape. | Implementar un pipeline de sanitización y detección heurística de inyección de instrucciones antes del ensamblado del prompt RAG. |
@@ -81,6 +96,7 @@ graph TD
 | **B6** | `services/pdf_report_generator.py` | Media | Tareas pesadas bloquean hilos de ejecución en lugar de despacharse a un pool asíncrono no bloqueante. | La compilación de PDFs con ReportLab y firmas criptográficas SHA-256 se ejecuta sincrónicamente en la petición HTTP. | Migrar la generación masiva de reportes y exportaciones analíticas a workers desacoplados con colas asíncronas no bloqueantes. |
 | **B7** | `rag/retriever.py` | Media | Re-computación recurrente de embeddings para consultas idénticas o muy frecuentes en el mismo caso clínico. | No existe una capa de caché en memoria para vectores de consultas frecuentes o fragmentos canónicos de GPC. | Implementar caché LRU en memoria con TTL para búsquedas híbridas frecuentes, reduciendo la latencia de recuperación de 1.8s a < 50ms. |
 | **B8** | `main.py` / Sondas de Salud | Baja | Endpoint `/health` superficial que no valida la operatividad real de las dependencias externas. | Solo responde `200 OK` estático sin verificar conectividad a base de datos, colección de ChromaDB o estado del LLM Gateway. | Implementar endpoints `/health/live` (liveness) y `/health/ready` (readiness) con sondas activas a SQLite/Postgres, ChromaDB y Circuit Breakers. |
+| **B9** | `modules/analytics_history/service.py`, `modules/collaboration/service.py` | Baja | Tres llamadas directas a `print()` en produccion: `analytics_history/service.py:176`, `collaboration/service.py:137` (dentro de un `except`), `collaboration/service.py:275`. | Servicios implementados antes del estandar de logging de Fase 9. | Sustituir por `logger.warning` / `logger.info`. Resolver en Fase 9. |
 
 ---
 

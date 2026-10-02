@@ -135,7 +135,13 @@ frontend/src/
 ├── types/                                  # Contratos e interfaces de TypeScript estrictos (index.ts)
 ├── core/                                   # Capa transversal compartida (agnóstica de dominio)
 │   ├── http/
-│   │   └── httpClient.ts                   # Cliente HTTP base con Bearer JWT, serialización y control de errores
+│   │   ├── httpClient.ts                   # Cliente HTTP base con Bearer JWT, serialización y control de errores
+│   │   └── eventStreamClient.ts            # Cliente SSE para streaming continuo de debriefing socrático
+│   ├── realtime/
+│   │   └── socketClient.ts                 # Cliente WebSocket tipado con reconexión exponencial y heartbeat
+│   ├── storage/
+│   │   ├── offlineDb.ts                    # Persistencia IndexedDB nativa tipada (cases, outbox, evaluations)
+│   │   └── useConnectivitySync.ts          # Hook orquestador de sincronización de fondo (Outbox Pattern)
 │   ├── query/
 │   │   └── queryClient.ts                  # Cliente TanStack Query centralizado con políticas de resiliencia
 │   ├── ui/
@@ -210,8 +216,8 @@ frontend/src/
 ### 5.1 Módulo `auth` (Seguridad y Control de Acceso RBAC)
 * **Responsabilidad:** Inicio de sesión en dos pasos estilo Google Workspace, almacenamiento seguro del token JWT en `localStorage`, y protección de rutas según el rol del usuario (`student`, `teacher`, `admin`).
 * **Componentes Principales:**
-  - `Login.jsx`: Formulario con validación de correo institucional y contraseña mediante `FloatingLabelInput`.
-  - `ProtectedRoute.jsx`: Componente guardián que verifica autenticación y nivel de rol autorizado antes de renderizar la vista hija.
+  - `Login.tsx`: Formulario con validación de correo institucional y contraseña mediante `FloatingLabelInput`.
+  - `ProtectedRoute.tsx`: Componente guardián que verifica autenticación y nivel de rol autorizado antes de renderizar la vista hija.
 * **Cliente API:** `authApi.login(email, password)`, `authApi.logout()`, `authApi.getCurrentUser()`.
 
 ### 5.2 Módulo `cases` (Catálogo Clínico)
@@ -220,8 +226,8 @@ frontend/src/
   - Desacopla el estado de búsqueda (`searchQuery`), filtro por categoría (`activeCategory`), estado de carga y recarga asíncrona.
   - Provee la lista computada de categorías únicas deducidas de los casos disponibles.
 * **Componentes de Presentación:**
-  - `CaseCard.jsx`: Tarjeta con badges de dificultad, especialidad, tiempo estimado y botón de inicio.
-  - `CaseFilterTabs.jsx`: Píldoras de filtrado horizontal por especialidad clínica.
+  - `CaseCard.tsx`: Tarjeta con badges de dificultad, especialidad, tiempo estimado y botón de inicio.
+  - `CaseFilterTabs.tsx`: Píldoras de filtrado horizontal por especialidad clínica.
 * **Cliente API:** `casesApi.getCases()`, `casesApi.getCaseById(id)`.
 
 ### 5.3 Módulo `evaluation` (Simulador Clínico Split-Screen y Fusión Multimodal)
@@ -233,37 +239,39 @@ frontend/src/
 * **Hook de Entrada de Voz (`useVoiceRecognition`):**
   - Encapsula el ciclo de vida del reconocimiento de voz nativo (`webkitSpeechRecognition` / `SpeechRecognition`), configurando el dialecto local ecuatoriano (`es-EC`) con reinicio defensivo ante pausas de dictado y manejo de errores.
 * **Componentes de Interfaz:**
-  - `SimulationStepper.jsx`: Barra de progreso de fases con estado completado/activo y tiempo transcurrido.
-  - `ImageUploadZone.jsx`: Zona de arrastre y selección de estudios diagnósticos con etiquetado automático (Rx, ECG, Labs) y eliminación individual accesible.
-  - `VoiceInputButton.jsx`: Botón de control de dictado por voz con indicador de grabación activo.
-  - `EvaluationGameLoader.jsx`: Pantalla de carga clínica animada con recomendaciones formativas mientras se ejecuta la inferencia multimodal en el backend.
-  - `PhaseFeedbackCard.jsx`: Dictamen estructurado por fase clínica con desglose de hallazgos y botón de transición a la siguiente fase.
-  - `FeedbackCard.jsx`: Dictamen final con puntaje global, desglose por competencias, justificación basada en GPC del MSP y verificación criptográfica de fidelidad normativa (*Faithfulness Score*).
+  - `SimulationStepper.tsx`: Barra de progreso de fases con estado completado/activo y tiempo transcurrido.
+  - `ImageUploadZone.tsx`: Zona de arrastre y selección de estudios diagnósticos con etiquetado automático (Rx, ECG, Labs) y eliminación individual accesible.
+  - `VoiceInputButton.tsx`: Botón de control de dictado por voz con indicador de grabación activo.
+  - `EvaluationGameLoader.tsx`: Pantalla de carga clínica animada con recomendaciones formativas mientras se ejecuta la inferencia multimodal en el backend.
+  - `PhaseFeedbackCard.tsx`: Dictamen estructurado por fase clínica con desglose de hallazgos y botón de transición a la siguiente fase.
+  - `FeedbackCard.tsx`: Dictamen final con puntaje global, desglose por competencias, justificación basada en GPC del MSP y verificación criptográfica de fidelidad normativa (*Faithfulness Score*).
+  - `ClinicalStudyViewer.tsx`: Visor diagnóstico interactivo acelerado en Canvas HTML5 para paraclínicos (ECG y Rx) a 60 FPS con ventana radiológica y calibrador milimétrico.
+  - `SocraticDebriefModal.tsx`: Modal conversacional de tutoría socrática multiturno con streaming en tiempo real (SSE).
 
 ### 5.4 Módulo `collaboration` (Ateneo Room Sincrónico)
-* **Responsabilidad:** Salas de discusión clínica grupal donde múltiples estudiantes analizan un caso de forma concurrente, emiten votos de hipótesis diagnóstica y visualizan el consenso de la cohorte en tiempo real.
+* **Responsabilidad:** Salas de discusión clínica grupal donde múltiples estudiantes analizan un caso de forma concurrente, emiten votos de hipótesis diagnóstica y visualizan el consenso de la cohorte en tiempo real mediante WebSockets.
 * **Hook ViewModel (`useAteneoRoom`):**
-  - Implementa sondeo periódico (*polling*) a intervalos de 3,000 ms sobre `collaborationApi.getRoomStatus()`.
+  - Integra suscripción reactiva a eventos WebSocket y gestión síncrona en `useAteneoRoomStore.ts`.
   - Normaliza la distribución de votos de los participantes y calcula el porcentaje de consenso dinámicamente.
-  - Provee la función `submitVote(diagnosis)` con retroalimentación optimista inmediata.
+  - Provee la función `submitVote(diagnosis)` con retroalimentación optimista inmediata y presencia activa.
 
 ### 5.5 Módulo `adaptive` (Motor de Currículo Adaptativo)
 * **Responsabilidad:** Integrar la teoría de espacios de conocimiento (*Knowledge Space Theory - KST*) y el rastreo de conocimiento bayesiano (*Bayesian Knowledge Tracing - BKT*) para guiar al estudiante hacia la Zona de Desarrollo Próximo (ZDP).
 * **Hook ViewModel (`useAdaptiveCurriculum`):**
   - Recupera la trayectoria de aprendizaje del estudiante, probabilidad de dominio por competencia $P(L)$ y recomendación pedagógica del siguiente caso a resolver.
 * **Componentes Visuales:**
-  - `AdaptiveNextCase.jsx`: Tarjeta de recomendación con la justificación psicométrica explícita generada por el motor adaptativo.
-  - `KnowledgeSpaceGraph.jsx`: Renderizado de la red dirigida topológica de las 7 competencias médicas en SVG nativo, con coloreado según nivel de maestría alcanzado y modal interactivo de detalle.
+  - `AdaptiveNextCase.tsx`: Tarjeta de recomendación con la justificación psicométrica explícita generada por el motor adaptativo.
+  - `KnowledgeSpaceGraph.tsx`: Renderizado de la red dirigida topológica de las 7 competencias médicas en SVG nativo, con coloreado según nivel de maestría alcanzado y modal interactivo de detalle.
 
 ### 5.6 Módulo `analytics` (Analítica de Aprendizaje y Benchmarking Científico)
 * **Responsabilidad:** Monitorización longitudinal del razonamiento clínico individual y por cohortes institucionales, visualización de brechas formativas mediante el Índice de Brecha Formativa (IBF) y consulta de métricas experimentales del paper.
 * **Hook ViewModel (`useAnalytics`):**
   - Centraliza la obtención de estadísticas históricas de evaluaciones, métricas del radar de competencias y distribución del IBF institucional.
 * **Componentes Analíticos:**
-  - `SkillRadarChart.jsx`: Gráfico de radar SVG estandarizado en los 4 ejes de razonamiento clínico (Diagnóstico, Terapéutica, Paraclínicos, Normativa MSP).
-  - `ReasoningTrends.jsx`: Gráfica longitudinal de evolución de calificaciones y latencia de razonamiento.
-  - `CoordinatorAnalytics.jsx`: Panel docente B2B con identificación de brechas formativas críticas ($\text{IBF} > 0.40$), moderadas y leves, con alertas automáticas para refuerzo pedagógico.
-  - `ScientificBenchmarkView.jsx`: Consola de visualización de métricas científicas publicables (Hit@k, MRR, NDCG, Ganancia de Hake $g=0.74$, $p<0.0001$).
+  - `SkillRadarChart.tsx`: Gráfico de radar SVG estandarizado en los 4 ejes de razonamiento clínico (Diagnóstico, Terapéutica, Paraclínicos, Normativa MSP).
+  - `ReasoningTrends.tsx`: Gráfica longitudinal de evolución de calificaciones y latencia de razonamiento.
+  - `CoordinatorAnalytics.tsx`: Panel docente B2B con identificación de brechas formativas críticas ($\text{IBF} > 0.40$), moderadas y leves, con alertas automáticas para refuerzo pedagógico.
+  - `ScientificBenchmarkView.tsx`: Consola de visualización de métricas científicas publicables (Hit@k, MRR, NDCG, Ganancia de Hake $g=0.74$, $p<0.0001$).
 
 ---
 
