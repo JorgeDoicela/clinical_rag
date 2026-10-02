@@ -1,8 +1,8 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import KnowledgeSpaceGraph from '../components/KnowledgeSpaceGraph';
-import * as clientModule from '../api/client';
+import KnowledgeSpaceGraph from '../modules/adaptive/components/KnowledgeSpaceGraph';
+import { adaptiveApi } from '../modules/adaptive/api/adaptiveApi';
 
 describe('Componente KnowledgeSpaceGraph (Grafo KST)', () => {
   const mockKstData = {
@@ -26,7 +26,7 @@ describe('Componente KnowledgeSpaceGraph (Grafo KST)', () => {
   });
 
   it('debe renderizar el grafo y las competencias cuando isOpen es true', async () => {
-    vi.spyOn(clientModule, 'fetchKnowledgeState').mockResolvedValue(mockKstData);
+    vi.spyOn(adaptiveApi, 'getKnowledgeState').mockResolvedValue(mockKstData);
 
     render(<KnowledgeSpaceGraph isOpen={true} onClose={() => {}} />);
 
@@ -41,7 +41,7 @@ describe('Componente KnowledgeSpaceGraph (Grafo KST)', () => {
   });
 
   it('debe invocar onClose al hacer clic en el botón de cierre', async () => {
-    vi.spyOn(clientModule, 'fetchKnowledgeState').mockResolvedValue(mockKstData);
+    vi.spyOn(adaptiveApi, 'getKnowledgeState').mockResolvedValue(mockKstData);
     const mockClose = vi.fn();
 
     render(<KnowledgeSpaceGraph isOpen={true} onClose={mockClose} />);

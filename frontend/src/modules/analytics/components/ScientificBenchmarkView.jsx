@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Award, BarChart3, Database, FileText, CheckCircle2, Zap, Layers, Activity, Copy, Check, Sparkles, ArrowLeft } from 'lucide-react';
-import client from '../../../api/client';
+import { analyticsApi } from '../api/analyticsApi';
 
 export default function ScientificBenchmarkView() {
   const [data, setData] = useState(null);
@@ -10,9 +10,9 @@ export default function ScientificBenchmarkView() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    client.get('/evaluate/benchmark-scientific')
-      .then(res => {
-        setData(res.data);
+    analyticsApi.getScientificBenchmark()
+      .then(benchmarkData => {
+        setData(benchmarkData);
         setLoading(false);
       })
       .catch(err => {

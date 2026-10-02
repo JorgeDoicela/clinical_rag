@@ -1,8 +1,8 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import AdminDashboard from '../pages/AdminDashboard';
-import * as clientModule from '../api/client';
+import AdminDashboard from '../modules/analytics/pages/AdminDashboard';
+import { authApi } from '../modules/auth/api/authApi';
 
 describe('Página AdminDashboard (Gestión y Seguridad RBAC)', () => {
   const mockUsers = [
@@ -16,7 +16,7 @@ describe('Página AdminDashboard (Gestión y Seguridad RBAC)', () => {
   });
 
   it('debe listar los usuarios y sus roles asignados', async () => {
-    vi.spyOn(clientModule, 'getUsersApi').mockResolvedValue(mockUsers);
+    vi.spyOn(authApi, 'getUsers').mockResolvedValue(mockUsers);
 
     render(<AdminDashboard />);
 
@@ -29,7 +29,7 @@ describe('Página AdminDashboard (Gestión y Seguridad RBAC)', () => {
   });
 
   it('debe mostrar mensaje descriptivo en caso de error de red', async () => {
-    vi.spyOn(clientModule, 'getUsersApi').mockRejectedValue(new Error('Fallo en el servidor de identidades'));
+    vi.spyOn(authApi, 'getUsers').mockRejectedValue(new Error('Fallo en el servidor de identidades'));
 
     render(<AdminDashboard />);
 
@@ -39,7 +39,7 @@ describe('Página AdminDashboard (Gestión y Seguridad RBAC)', () => {
   });
 
   it('debe volver a cargar usuarios al pulsar el botón de actualizar cuentas', async () => {
-    const mockGetUsers = vi.spyOn(clientModule, 'getUsersApi').mockResolvedValue(mockUsers);
+    const mockGetUsers = vi.spyOn(authApi, 'getUsers').mockResolvedValue(mockUsers);
 
     render(<AdminDashboard />);
 

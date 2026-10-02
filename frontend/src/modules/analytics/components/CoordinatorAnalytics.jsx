@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { API_URL, getAuthHeaders } from '../../../api/client';
 import { ShieldCheck, Sparkles, AlertTriangle } from 'lucide-react';
+import { analyticsApi } from '../api/analyticsApi';
 
 export default function CoordinatorAnalytics() {
   const [analytics, setAnalytics] = useState(null);
@@ -15,19 +15,13 @@ export default function CoordinatorAnalytics() {
   const fetchCoordinatorData = async () => {
     setLoading(true);
     try {
-      const [resCoord, resIbf] = await Promise.all([
-        fetch(`${API_URL}/api/history/coordinator-analytics`, { headers: getAuthHeaders() }),
-        fetch(`${API_URL}/api/history/ibf-cohort`, { headers: getAuthHeaders() })
+      const [dataCoord, dataIbf] = await Promise.all([
+        analyticsApi.getCoordinatorAnalytics(),
+        analyticsApi.getIbfCohort()
       ]);
       
-      if (resCoord.ok) {
-        const data = await resCoord.json();
-        setAnalytics(data);
-      }
-      if (resIbf.ok) {
-        const ibf = await resIbf.json();
-        setIbfData(ibf);
-      }
+      setAnalytics(dataCoord);
+      setIbfData(dataIbf);
     } catch (err) {
       console.error('Error al cargar analítica de coordinación:', err);
 

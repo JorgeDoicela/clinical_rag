@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { loginApi, getMeApi } from '../api/client';
+import { authApi } from '../modules/auth/api/authApi';
 
 const AuthContext = createContext(null);
 
@@ -13,7 +13,7 @@ export function AuthProvider({ children }) {
       const storedToken = localStorage.getItem('ateneo_token');
       if (storedToken) {
         try {
-          const userData = await getMeApi();
+          const userData = await authApi.getMe();
           setUser(userData);
           setToken(storedToken);
         } catch (err) {
@@ -30,7 +30,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (email, password) => {
-    const data = await loginApi(email, password);
+    const data = await authApi.login(email, password);
     localStorage.setItem('ateneo_token', data.access_token);
     setToken(data.access_token);
     setUser(data.user);

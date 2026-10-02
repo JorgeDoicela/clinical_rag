@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import VoiceInputButton from '../components/VoiceInputButton';
+import VoiceInputButton from '../modules/evaluation/components/VoiceInputButton';
 import * as voiceHook from '../hooks/useVoiceRecognition';
 
 describe('Componente VoiceInputButton (Dictado Clínico por Voz)', () => {

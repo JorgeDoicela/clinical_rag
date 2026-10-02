@@ -1,8 +1,8 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import AdaptiveNextCase from '../components/AdaptiveNextCase';
-import * as clientModule from '../api/client';
+import AdaptiveNextCase from '../modules/adaptive/components/AdaptiveNextCase';
+import { adaptiveApi } from '../modules/adaptive/api/adaptiveApi';
 
 describe('Componente AdaptiveNextCase (KST & BKT)', () => {
   const mockRecommendation = {
@@ -27,13 +27,13 @@ describe('Componente AdaptiveNextCase (KST & BKT)', () => {
   });
 
   it('debe mostrar esqueleto de carga mientras obtiene la recomendación', () => {
-    vi.spyOn(clientModule, 'fetchAdaptiveNextCase').mockReturnValue(new Promise(() => {}));
+    vi.spyOn(adaptiveApi, 'getNextCase').mockReturnValue(new Promise(() => {}));
     const { container } = render(<AdaptiveNextCase onSelectCase={() => {}} />);
     expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
   });
 
   it('debe renderizar la recomendación adaptativa y la justificación pedagógica', async () => {
-    vi.spyOn(clientModule, 'fetchAdaptiveNextCase').mockResolvedValue(mockRecommendation);
+    vi.spyOn(adaptiveApi, 'getNextCase').mockResolvedValue(mockRecommendation);
     render(<AdaptiveNextCase onSelectCase={() => {}} onToggleGraph={() => {}} />);
 
     await waitFor(() => {
@@ -46,7 +46,7 @@ describe('Componente AdaptiveNextCase (KST & BKT)', () => {
   });
 
   it('debe invocar onSelectCase al pulsar el botón de resolver caso recomendado', async () => {
-    vi.spyOn(clientModule, 'fetchAdaptiveNextCase').mockResolvedValue(mockRecommendation);
+    vi.spyOn(adaptiveApi, 'getNextCase').mockResolvedValue(mockRecommendation);
     const mockSelect = vi.fn();
     render(<AdaptiveNextCase onSelectCase={mockSelect} onToggleGraph={() => {}} />);
 

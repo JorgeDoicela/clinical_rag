@@ -2,7 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import ProtectedRoute from '../components/ProtectedRoute';
+import ProtectedRoute from '../modules/auth/components/ProtectedRoute';
 import * as AuthContextModule from '../context/AuthContext';
 
 describe('Componente ProtectedRoute (Seguridad RBAC)', () => {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import ImageUploadZone from '../components/ImageUploadZone';
+import ImageUploadZone from '../modules/evaluation/components/ImageUploadZone';
 
 describe('Componente ImageUploadZone (Fusión Multimodal)', () => {
   it('debe renderizar el área de drag and drop vacía', () => {

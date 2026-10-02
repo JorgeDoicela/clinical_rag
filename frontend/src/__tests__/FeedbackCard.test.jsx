@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import FeedbackCard from '../components/FeedbackCard';
+import FeedbackCard from '../modules/evaluation/components/FeedbackCard';
 
 // Mock de useAuth
 vi.mock('../context/AuthContext', () => ({
@@ -11,12 +11,12 @@ vi.mock('../context/AuthContext', () => ({
 }));
 
 // Mock de SkillRadarChart para aislar la prueba
-vi.mock('../components/SkillRadarChart', () => ({
+vi.mock('../modules/analytics/components/SkillRadarChart', () => ({
   default: () => <div data-testid="skill-radar-mock">Mock Radar Chart</div>
 }));
 
 // Mock de PdfViewerModal
-vi.mock('../components/PdfViewerModal', () => ({
+vi.mock('../modules/evaluation/components/PdfViewerModal', () => ({
   default: () => null
 }));
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Compass, CheckCircle2, Clock, Lock, ArrowDown } from 'lucide-react';
-import { fetchKnowledgeState } from '../../../api/client';
+import { adaptiveApi } from '../api/adaptiveApi';
 
 export default function KnowledgeSpaceGraph({ isOpen, onClose }) {
   const [data, setData] = useState(null);
@@ -12,7 +12,7 @@ export default function KnowledgeSpaceGraph({ isOpen, onClose }) {
     async function loadGraph() {
       try {
         setLoading(true);
-        const res = await fetchKnowledgeState();
+        const res = await adaptiveApi.getKnowledgeState();
         if (isMounted) setData(res);
       } catch (err) {
         console.error('Error cargando estado KST:', err);

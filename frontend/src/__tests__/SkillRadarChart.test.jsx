@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import SkillRadarChart from '../components/SkillRadarChart';
+import SkillRadarChart from '../modules/analytics/components/SkillRadarChart';
 
 describe('Componente SkillRadarChart (Radar de 4 Ejes Clínicos)', () => {
   const mockCompetencias = [

@@ -109,7 +109,10 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
   - **Inyección Explícita de Estado Psicométrico en ZDP:** Se actualizó `select_optimal_next_case` en `backend/adaptive/curriculum_engine.py` para recibir `knowledge_state` de forma explícita. `AdaptiveCurriculumService` pasa el estado persistido directamente, eliminando el efecto secundario de precarga forzada en diccionarios globales mutables del módulo.
   - **Optimización de Consultas de Auth:** Se eliminó la llamada redundante a `seed_demo_users_if_needed()` en `get_auth_service` (`modules/auth/dependencies.py`), evitando ejecutar un `SELECT count(*)` en cada petición HTTP autenticada.
   - **Observabilidad en Impacto de Evaluación:** Se sustituyó el silenciamiento con `pass` en `EvaluationService` por logging estructurado con `logger.warning`, previniendo que anomalías psicométricas pasen inadvertidas.
-  - **Autenticación Opcional Estricta en Routers:** Se corrigieron los endpoints en `routers/history.py` y `routers/collaboration.py` para usar `Depends(get_optional_current_user)`, permitiendo navegación anónima con fallbacks predeterminados sin rechazos HTTP 401 indebidos.
-
+* **Consolidación de Red Modular y Erradicación de Residuos Legados (Frontend):**
+  - **Autonomía de `httpClient.js`:** Se eliminó la dependencia cruzada hacia `src/api/client.js`. `httpClient.js` resuelve de forma nativa la URL base según protocolo/entorno e inyecta dinámicamente los encabezados Bearer JWT desde `localStorage`.
+  - **Desacoplamiento Total de Dominio:** Todos los módulos (`auth`, `adaptive`, `analytics`, `cases`, `evaluation`, `collaboration`) y `AuthContext` consumen exclusivamente sus APIs de dominio tipadas en `modules/*/api/`.
+  - **Eliminación de Capas Fachada:** Se eliminaron definitivamente las carpetas `frontend/src/pages/`, `frontend/src/components/` y `frontend/src/api/` (21 archivos eliminados).
+  - **Suite de Pruebas Unitarias Directa:** Los 12 archivos de prueba en `frontend/src/__tests__/` importan y testean directamente los módulos y APIs de dominio. 44/44 tests aprobados al 100% y build de producción limpio en 2.60s.
 
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { getUsersApi } from '../../../api/client';
 import { ShieldCheck, Users, Database, Server, RefreshCw, UserCheck, GraduationCap } from 'lucide-react';
+import { authApi } from '../../auth/api/authApi';
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
@@ -11,7 +11,7 @@ export default function AdminDashboard() {
     setLoading(true);
     setError(null);
     try {
-      const data = await getUsersApi();
+      const data = await authApi.getUsers();
       setUsers(data);
     } catch (err) {
       setError(err.message || 'Error al cargar lista de usuarios');

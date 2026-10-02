@@ -1,15 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import client, {
-  getAuthHeaders,
-  loginApi,
-  getMeApi,
-  getUsersApi,
-  fetchCases,
-  fetchCaseById,
-  evaluateResponse
-} from '../api/client';
+import httpClient, { getAuthHeaders } from '../core/http/httpClient';
+import { authApi } from '../modules/auth/api/authApi';
+import { casesApi } from '../modules/cases/api/casesApi';
+import { evaluationApi } from '../modules/evaluation/api/evaluationApi';
 
-describe('Servicio API Client (Ateneo+)', () => {
+describe('Cliente HTTP Core y Capa de Red Modular (Ateneo+)', () => {
   beforeEach(() => {
     localStorage.clear();
     vi.restoreAllMocks();
@@ -27,7 +22,7 @@ describe('Servicio API Client (Ateneo+)', () => {
     expect(headers['Authorization']).toBeUndefined();
   });
 
-  it('loginApi debe enviar credenciales y retornar token y usuario', async () => {
+  it('authApi.login debe enviar credenciales y retornar token y usuario', async () => {
     const mockResponse = {
       access_token: 'fake-token',
       token_type: 'bearer',
@@ -39,12 +34,12 @@ describe('Servicio API Client (Ateneo+)', () => {
       json: async () => mockResponse
     });
 
-    const res = await loginApi('alumno@ateneo.edu.ec', 'Secret123!');
+    const res = await authApi.login('alumno@ateneo.edu.ec', 'Secret123!');
     expect(global.fetch).toHaveBeenCalledWith(
       expect.stringContaining('/api/auth/login'),
       expect.objectContaining({
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ email: 'alumno@ateneo.edu.ec', password: 'Secret123!' })
       })
     );
@@ -52,16 +47,18 @@ describe('Servicio API Client (Ateneo+)', () => {
     expect(res.user.rol).toBe('alumno');
   });
 
-  it('loginApi debe lanzar error si las credenciales son inválidas', async () => {
+  it('authApi.login debe lanzar error tipado si las credenciales son inválidas', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
+      status: 401,
+      statusText: 'Unauthorized',
       json: async () => ({ detail: 'Credenciales inválidas' })
     });
 
-    await expect(loginApi('wrong@test.com', 'badpass')).rejects.toThrow('Credenciales inválidas');
+    await expect(authApi.login('wrong@test.com', 'badpass')).rejects.toThrow('Credenciales inválidas');
   });
 
-  it('fetchCases debe listar los casos clínicos disponibles', async () => {
+  it('casesApi.getCases debe listar los casos clínicos disponibles', async () => {
     const mockCases = [
       { id: 'case_01', titulo: 'Caso Dengue' },
       { id: 'case_02', titulo: 'Caso Hipertensión' }
@@ -72,19 +69,19 @@ describe('Servicio API Client (Ateneo+)', () => {
       json: async () => mockCases
     });
 
-    const cases = await fetchCases();
+    const cases = await casesApi.getCases();
     expect(cases).toHaveLength(2);
     expect(cases[0].id).toBe('case_01');
   });
 
-  it('evaluateResponse debe construir FormData adecuadamente con imágenes', async () => {
+  it('evaluationApi.evaluateDirect debe construir FormData adecuadamente con imágenes', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ score: 9.0, aciertos: ['Diagnóstico certero'] })
     });
 
     const fakeFile = new File(['fake data'], 'ecg.png', { type: 'image/png' });
-    const res = await evaluateResponse('case_01', 'Sospecha de infarto', [fakeFile]);
+    const res = await evaluationApi.evaluateDirect('case_01', 'Sospecha de infarto', [fakeFile]);
 
     expect(global.fetch).toHaveBeenCalled();
     const fetchArgs = global.fetch.mock.calls[0];
@@ -95,14 +92,14 @@ describe('Servicio API Client (Ateneo+)', () => {
     expect(res.score).toBe(9.0);
   });
 
-  it('client.get normaliza la ruta y devuelve { data, status, ok }', async () => {
+  it('httpClient.get normaliza la ruta y devuelve { data, status, ok }', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
       json: async () => ({ status: 'ok' })
     });
 
-    const res = await client.get('/health');
+    const res = await httpClient.get('/health');
     expect(res.ok).toBe(true);
     expect(res.status).toBe(200);
     expect(res.data.status).toBe('ok');

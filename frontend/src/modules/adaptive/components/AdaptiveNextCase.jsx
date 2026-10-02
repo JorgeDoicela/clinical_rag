@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, ArrowRight, Target, Compass, ChevronRight, Layers } from 'lucide-react';
-import { fetchAdaptiveNextCase } from '../../../api/client';
+import { adaptiveApi } from '../api/adaptiveApi';
 
 export default function AdaptiveNextCase({ onSelectCase, onToggleGraph }) {
   const [recommendation, setRecommendation] = useState(null);
@@ -10,7 +10,7 @@ export default function AdaptiveNextCase({ onSelectCase, onToggleGraph }) {
     let isMounted = true;
     async function loadRecommendation() {
       try {
-        const data = await fetchAdaptiveNextCase();
+        const data = await adaptiveApi.getNextCase();
         if (isMounted) {
           setRecommendation(data);
         }

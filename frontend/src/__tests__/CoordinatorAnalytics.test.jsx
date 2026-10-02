@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import CoordinatorAnalytics from '../components/CoordinatorAnalytics';
+import CoordinatorAnalytics from '../modules/analytics/components/CoordinatorAnalytics';
 
 describe('Componente CoordinatorAnalytics (Panel B2B de Brechas e IBF)', () => {
   beforeEach(() => {

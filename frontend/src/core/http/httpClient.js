@@ -1,4 +1,26 @@
-import { API_URL, getAuthHeaders } from '../../api/client';
+export const getBaseApiUrl = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  if (typeof window !== 'undefined') {
+    if (window.location.protocol === 'https:') {
+      return '';
+    }
+    const host = window.location.hostname;
+    return `http://${host}:8000`;
+  }
+  return 'http://localhost:8000';
+};
+
+export const API_URL = getBaseApiUrl();
+
+export function getAuthHeaders(headers = {}) {
+  const token = typeof localStorage !== 'undefined' ? localStorage.getItem('ateneo_token') : null;
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
 
 /**
  * Cliente HTTP Core Unificado para Ateneo+
@@ -10,18 +32,7 @@ class HttpClient {
   }
 
   getBaseUrl() {
-    if (this.baseUrl) return this.baseUrl;
-    if (import.meta.env.VITE_API_URL) {
-      return import.meta.env.VITE_API_URL;
-    }
-    if (typeof window !== 'undefined') {
-      if (window.location.protocol === 'https:') {
-        return '';
-      }
-      const host = window.location.hostname;
-      return `http://${host}:8000`;
-    }
-    return 'http://localhost:8000';
+    return this.baseUrl || getBaseApiUrl();
   }
 
   async request(endpoint, options = {}) {
