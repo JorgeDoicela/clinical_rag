@@ -1,18 +1,19 @@
-from fastapi import APIRouter, HTTPException
-from typing import List, Dict, Any
+from fastapi import APIRouter, HTTPException, Depends
+from typing import List, Dict, Any, Optional
 from pathlib import Path
 from models.schemas import ClinicalCaseSchema
-from models.clinical_case import load_all_cases, get_case_by_id
-from config import RAW_PDFS_PATH
+from modules.cases.dependencies import get_case_service
+from modules.cases.service import CaseService
+from core.config import settings
 
 router = APIRouter(prefix="/api/cases", tags=["Casos Clínicos"])
 
 @router.get("", response_model=List[ClinicalCaseSchema])
-async def list_cases():
+async def list_cases(case_service: CaseService = Depends(get_case_service)):
     """
     Retorna la lista completa de casos clínicos simulados disponibles.
     """
-    return load_all_cases()
+    return case_service.list_cases()
 
 def _normalize_filename_key(text: str) -> str:
     import unicodedata
@@ -90,11 +91,11 @@ async def get_pdf_location(guia_id: str) -> Dict[str, Any]:
     }
 
 @router.get("/{case_id}", response_model=ClinicalCaseSchema)
-async def get_case(case_id: str):
+async def get_case(case_id: str, case_service: CaseService = Depends(get_case_service)):
     """
     Retorna el detalle de un caso clínico específico.
     """
-    caso = get_case_by_id(case_id)
+    caso = case_service.get_case(case_id)
     if not caso:
         raise HTTPException(status_code=404, detail=f"Caso clínico '{case_id}' no encontrado.")
     return caso

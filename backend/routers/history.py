@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from typing import Optional, Dict, Any, List
-from models.history_db import get_user_evaluation_history, analyze_user_trends, analyze_coordinator_cohort_analytics
+from modules.analytics_history.dependencies import get_analytics_service
+from modules.analytics_history.service import AnalyticsHistoryService
 from auth.security import get_current_user, UserResponse
 
 router = APIRouter(prefix="/api/history", tags=["Historial y Analítica de Razonamiento"])
@@ -8,18 +9,20 @@ router = APIRouter(prefix="/api/history", tags=["Historial y Analítica de Razon
 @router.get("", response_model=List[Dict[str, Any]])
 async def get_history(
     user_id: Optional[str] = Query(None, description="ID o email del usuario opcional"),
-    current_user: Optional[UserResponse] = Depends(get_current_user)
+    current_user: Optional[UserResponse] = Depends(get_current_user),
+    analytics_service: AnalyticsHistoryService = Depends(get_analytics_service)
 ):
     """
     Retorna la lista del historial de evaluaciones del estudiante.
     """
     target_user = user_id or (current_user.email if current_user else "usr_alumno_001")
-    return get_user_evaluation_history(target_user)
+    return analytics_service.get_user_history(target_user)
 
 @router.get("/trends", response_model=Dict[str, Any])
 async def get_trends(
     user_id: Optional[str] = Query(None, description="ID o email del usuario opcional"),
-    current_user: Optional[UserResponse] = Depends(get_current_user)
+    current_user: Optional[UserResponse] = Depends(get_current_user),
+    analytics_service: AnalyticsHistoryService = Depends(get_analytics_service)
 ):
     """
     Retorna las métricas de analítica de tendencias:
@@ -29,18 +32,19 @@ async def get_trends(
     - Radar de competencias por eje clínico.
     """
     target_user = user_id or (current_user.email if current_user else "usr_alumno_001")
-    return analyze_user_trends(target_user)
+    return analytics_service.get_student_advanced_analytics(target_user)
 
 @router.get("/coordinator-analytics", response_model=Dict[str, Any])
 async def get_coordinator_analytics(
-    cohorte_id: Optional[str] = Query(None, description="ID de la cohorte académica opcional")
+    cohorte_id: Optional[str] = Query(None, description="ID de la cohorte académica opcional"),
+    analytics_service: AnalyticsHistoryService = Depends(get_analytics_service)
 ):
     """
     Retorna el reporte de Inteligencia Institucional B2B para Coordinación Académica:
     - Porcentaje de falla por módulo GPC en la cohorte (ej: 'El 68% de tus estudiantes falla en...').
     - Desglose de brechas masivas por módulo y ranking de deficiencias institucionales.
     """
-    return analyze_coordinator_cohort_analytics(cohorte_id)
+    return analytics_service.analyze_coordinator_cohort_analytics(cohorte_id)
 
 @router.post("/export-pdf")
 async def export_pdf_history_alias(req: Dict[str, Any]):
@@ -82,16 +86,16 @@ async def export_pdf_history_alias(req: Dict[str, Any]):
 
 @router.get("/ibf-cohort", response_model=Dict[str, Any])
 async def get_cohort_ibf_analytics(
-    room_id: Optional[str] = Query(None, description="ID de sala o cohorte opcional")
+    room_id: Optional[str] = Query(None, description="ID de sala o cohorte opcional"),
+    analytics_service: AnalyticsHistoryService = Depends(get_analytics_service)
 ):
     """
     Retorna el cálculo formal del Índice de Brecha Formativa (IBF) por cohorte y alertas tempranas docentes.
     """
-    from models.history_db import get_user_evaluation_history
     from models.learning_analytics import calculate_cohort_ibf
     
-    # Obtener historial general de evaluaciones
-    history = get_user_evaluation_history("usr_alumno_001")
+    # Obtener historial general de evaluaciones mediante el servicio desacoplado
+    history = analytics_service.get_user_history("usr_alumno_001")
     return calculate_cohort_ibf(history)
 
 @router.get("/faithfulness-benchmark", response_model=Dict[str, Any])

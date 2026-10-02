@@ -19,25 +19,23 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# ALLOWED_ORIGINS en .env controla los orígenes permitidos.
-# - Para pruebas locales/LAN: dejar vacío o poner IPs específicas.
-# - Para Cloudflare Tunnel o AWS: agregar '*' para regex abierto.
-_origins_env = os.getenv("ALLOWED_ORIGINS", "")
-_open_cors = _origins_env.strip() == "*"
+from core.config import settings
+from core.database import init_database
+
+# Configuración de CORS según AppSettings
+_open_cors = settings.allowed_origins == ["*"]
 
 if _open_cors:
-    # Modo abierto: acepta cualquier origen (Cloudflare Tunnel / producción cloud)
     _allow_origins = []
     _origin_regex = r"^https?://.*"
 else:
-    # Modo seguro (por defecto): orígenes locales + los configurados en .env
     _static_origins = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:3000",
     ]
-    _extra = [o.strip() for o in _origins_env.split(",") if o.strip() and o.strip() != "*"]
-    _allow_origins = _static_origins + _extra
+    _extra = [o for o in settings.allowed_origins if o != "*"]
+    _allow_origins = list(set(_static_origins + _extra))
     _origin_regex = r"^https?://192\.168\.[0-9]+\.[0-9]+:[0-9]+$"
 
 app.add_middleware(
@@ -70,6 +68,8 @@ app.include_router(adaptive_router)
 
 @app.on_event("startup")
 async def startup_event():
+    print("[STARTUP] Inicializando base de datos relacional (SQLAlchemy)...", flush=True)
+    init_database()
     print("[STARTUP] Servidor FastAPI de Ateneo iniciado correctamente.", flush=True)
     # Precargar el modelo en segundo plano asíncrono para no bloquear la disponibilidad de la API
     import asyncio

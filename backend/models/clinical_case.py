@@ -1,20 +1,17 @@
-import json
-from pathlib import Path
+"""
+Módulo de compatibilidad para backend/models/clinical_case.py.
+Delega en modules/cases/service.py (Domain Service).
+"""
 from typing import List, Optional
-from config import CASES_FILE_PATH
 from models.schemas import ClinicalCaseSchema
+from modules.cases.dependencies import get_case_service
+
+_service = get_case_service()
+
 
 def load_all_cases() -> List[ClinicalCaseSchema]:
-    path = Path(CASES_FILE_PATH)
-    if not path.exists():
-        return []
-    with open(path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-        return [ClinicalCaseSchema(**item) for item in data.get("cases", [])]
+    return _service.list_cases()
+
 
 def get_case_by_id(case_id: str) -> Optional[ClinicalCaseSchema]:
-    cases = load_all_cases()
-    for c in cases:
-        if c.id == case_id:
-            return c
-    return None
+    return _service.get_case(case_id)

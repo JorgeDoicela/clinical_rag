@@ -23,6 +23,8 @@ ENV/
 .pytest_cache/
 .coverage
 *.log
+*.db-wal
+*.db-shm
 
 # ==========================================
 # 3. BASE VECTORIAL Y PESOS GIGANTES (>100MB)

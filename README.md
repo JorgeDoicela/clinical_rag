@@ -199,6 +199,7 @@ clinical_rag/
 │   │   ├── PROTOCOLO_PILOTO_LEARNING_GAIN.md # Protocolo de estudio clínico e instrumentos
 │   │   ├── ARQUITECTURA_RAG_Y_FINE_TUNING.md # Especificación técnica del recuperador híbrido
 │   │   ├── ARQUITECTURA_RESILIENTE_LLM_Y_CONFIGURACION.md # Gateway resiliente, Circuit Breaker y 12-Factor App
+│   │   ├── ARQUITECTURA_MODULAR_MONOLITO_BACKEND.md # Monolito modular, persistencia agnóstica SQLAlchemy y Repository Pattern
 │   │   ├── DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md # Análisis crítico y amenazas a la validez
 │   │   ├── PUBLICACION_Y_PRESENTACION_CONGRESO.md # Guía editorial y estructura de presentación
 │   │   ├── MANUAL_DE_PRUEBAS_Y_BENCHMARKS.md # Guía para réplica experimental
@@ -226,30 +227,35 @@ clinical_rag/
 │       └── DESPLIEGUE_Y_ACCESO_CLOUDFLARE_TUNNEL.md # Guía de túnel Cloudflare seguro (TLS 1.3)
 │
 ├── backend/                              # SERVICIOS BACKEND FASTAPI (PYTHON 3.11)
-│   ├── adaptive/                         # Motor de Currículo Adaptativo (KST, BKT y ZDP)
-│   │   ├── knowledge_space.py            # Grafo dirigido de 7 competencias clínicas (NetworkX)
-│   │   ├── knowledge_tracer.py           # Bayesian Knowledge Tracing sobre SQLite
-│   │   └── curriculum_engine.py          # Selector de casos en Zona de Desarrollo Próximo
-│   ├── evaluation/                       # Módulo de Auditoría de Fidelidad
-│   │   └── faithfulness_scorer.py        # Algoritmo de Faithfulness Score
-│   ├── models/                           # Modelos Pydantic y Capa de Persistencia
-│   │   ├── schemas.py                    # Esquemas tipados (EvaluationResult, IBFReport, etc.)
-│   │   ├── history_db.py                 # DAO SQLite para historial, analítica y salas
-│   │   ├── learning_analytics.py         # Motor de cálculo de IBF y alertas docentes
-│   │   └── clinical_case.py              # Cargador y validador de casos clínicos
-│   ├── rag/                              # Pipeline de Búsqueda y Evaluación RAG
-│   │   ├── retriever.py                  # Motor híbrido denso + sparse BM25 (RRF k=60)
-│   │   ├── prompt_builder.py             # Constructor de prompts multi-estudio y por fases
-│   │   └── evaluator.py                  # Evaluador multimodal con Gemini Vision API
-│   ├── routers/                          # Controladores REST de la API
+│   ├── core/                             # INFRAESTRUCTURA TRANSVERSAL COMPARTIDA
+│   │   ├── config.py                     # AppSettings tipado con Pydantic (12-Factor, fail-fast)
+│   │   ├── database.py                   # Motor SQLAlchemy, SessionLocal y modo WAL
+│   │   ├── llm_gateway.py                # ResilientLLMGateway con Circuit Breaker y fallback
+│   │   └── security.py                   # Criptografía JWT, hashing de contraseñas y RBAC
+│   ├── modules/                          # DOMINIOS CLÍNICOS DESACOPLADOS (MONOLITO MODULAR)
+│   │   ├── analytics_history/            # Historial, métricas de cohorte, IBF (Models + Repo + Service)
+│   │   ├── cases/                        # Catálogo de casos clínicos y paraclínicos (Repo + Service)
+│   │   ├── adaptive/                     # Currículo adaptativo KST, BKT y selección ZDP (Service)
+│   │   ├── evaluation/                   # Orquestación de evaluación RAG y reportes PDF (Service)
+│   │   └── auth/                         # Identidad, autenticación y perfiles (Service)
+│   ├── routers/                          # CONTROLADORES REST DE LA API (THIN CONTROLLERS CON DEPENDS)
 │   │   ├── auth.py                       # Autenticación JWT y catálogo de usuarios
 │   │   ├── adaptive.py                   # Endpoints KST (next-case, knowledge-state, learning-path)
 │   │   ├── cases.py                      # Banco de 12 casos clínicos oficiales
 │   │   ├── evaluation.py                 # POST /api/evaluate con soporte multi-archivo
 │   │   ├── history.py                    # Historial, IBF de cohorte y exportación PDF
 │   │   └── collaboration.py              # Salas sincrónicas de Ateneo en tiempo real
-│   ├── services/
-│   │   ├── llm_gateway.py                # Gateway de IA resiliente con Circuit Breaker y fallback
+│   ├── models/                           # Capa de compatibilidad y esquemas DTO
+│   │   ├── schemas.py                    # Esquemas tipados (EvaluationResult, IBFReport, etc.)
+│   │   ├── history_db.py                 # Fachada a modules.analytics_history (SQLAlchemy)
+│   │   ├── learning_analytics.py         # Motor de cálculo de IBF y alertas docentes
+│   │   └── clinical_case.py              # Fachada a modules.cases
+│   ├── rag/                              # Pipeline de Búsqueda y Evaluación RAG
+│   │   ├── retriever.py                  # Motor híbrido denso + sparse BM25 (RRF k=60)
+│   │   ├── prompt_builder.py             # Constructor de prompts multi-estudio y por fases
+│   │   └── evaluator.py                  # Evaluador multimodal con Gemini Vision API
+│   ├── services/                         # Fachadas de compatibilidad hacia core y generadores
+│   │   ├── llm_gateway.py                # Fachada a core.llm_gateway
 │   │   └── pdf_report_generator.py       # Generador de dictamen PDF institucional con SHA-256
 │   ├── cases_data/                       # 12 casos clínicos normativos y banco de imágenes
 │   │   ├── cases.json                    # Casos con competencias activadas y GPC asignada
