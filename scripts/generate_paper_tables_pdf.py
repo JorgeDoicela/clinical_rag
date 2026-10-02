@@ -299,13 +299,8 @@ def build_pdf_compendium():
 
     # CONSTRUIR PDF
     doc.build(story)
-    try:
-        shutil.copy2(OUTPUT_PDF, ROOT_PDF)
-    except Exception:
-        pass
 
     print(f"\n [EXITO] PDF Compendio generado en: {OUTPUT_PDF}")
-    print(f" [EXITO] Copia de respaldo en: {ROOT_PDF}")
     print(f" Tamaño del archivo: {os.path.getsize(OUTPUT_PDF):,} bytes")
 
 if __name__ == "__main__":

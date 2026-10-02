@@ -84,5 +84,15 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
   - **Capa Transversal Compartida (`frontend/src/core/`):** Abstracción común de red (`core/http/httpClient.js`) con inyección automática de Bearer JWT y control de errores, componentes visuales institucionales (`FloatingLabelInput`, `ClinicalButton`, `ClinicalCard`, `ClinicalBadge`) y layouts maestros (`Navbar`, `AppLayout`).
   - **Patrón ViewModel (Custom Hooks):** Se extrajo la lógica de negocio y los 14 estados acoplados de `CaseSolve.jsx` hacia `useCaseSolver.js` y `useVoiceRecognition.js`, de `CaseList.jsx` hacia `useCases.js`, de `AteneoRoom.jsx` hacia `useAteneoRoom.js`, de `TeacherDashboard.jsx` hacia `useAnalytics.js`, y de `AdaptiveNextCase.jsx` hacia `useAdaptiveCurriculum.js`.
   - **Optimización de Rendimiento y Code-Splitting:** Implementación de `React.lazy` y `Suspense` en `src/routes/AppRoutes.jsx`. Reducción del chunk inicial `dist/assets/index.js` de 338 kB a 184.88 kB (60.33 kB gzip, ~45% de reducción) y generación de chunks independientes para cada vista clínica.
-  - **Verificación Completa:** 12 suites y 44 pruebas unitarias aprobadas al 100% en Vitest 5 (`npm run test`), y compilación limpia en 3.7s con generación de PWA Workbox Service Worker (`dist/sw.js`). Documentación técnica formalizada en `docs/3_documentacion_metodologica/ARQUITECTURA_MODULAR_FRONTEND.md`.
+* **Auditoría de Regresión End-to-End y Reproducibilidad Científica (100% Operatividad):**
+  - **Desempaquetado de Carga Útil en APIs de Dominio:** Se normalizaron `casesApi`, `authApi`, `adaptiveApi`, `collaborationApi`, `analyticsApi` y `evaluationApi` para retornar directamente `res.data`, preservando el formato estructurado `{ data, status, ok }` de `httpClient` para las vistas de dashboard y visores de PDF.
+  - **Alineación de Contratos Form-Data:** Se sincronizó `evaluationApi` con los parámetros exactos de FastAPI (`respuesta_estudiante` e `imagenes`).
+  - **Corrección en Scripts de Reproducibilidad Científica:**
+    * `run_ablation_study.py`: Se corrigió el escape de f-strings en `\end{{tabular}}` y la ruta de exportación hacia `docs/1_tablas_latex/tabla_ablacion_paper.tex`.
+    * `run_kst_simulation.py`: Se corrigió el `NameError` de `OUTPUT_DIR` por `OUTPUT_PNG.parent`.
+    * `generate_paper_tables_pdf.py`: Se eliminó la copia duplicada en la raíz de `docs/` y se creó el enlace simbólico `backend/scripts -> ../scripts` para ejecutar `docker compose exec backend python scripts/generate_paper_tables_pdf.py` sin discrepancias de directorio.
+  - **Validación Completa en Vivo:**
+    * Backend: 6 suites maestras aprobadas al 100% en 34.7s (`tests/run_all_tests.py`), recuperación RAG en 12/12 casos clínicos y evaluación multimodal con Gemini 3.8 Flash.
+    * Frontend: 12 suites y 44 pruebas unitarias aprobadas en 6.6s (`npm run test`), build de producción completado en 3.75s (`npm run build`).
+    * Compilación oficial: Compendio PDF del paper generado con 1.34 MB en `docs/4_pdf_compilado/COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf`.
 

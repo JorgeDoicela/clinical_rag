@@ -5,18 +5,18 @@ import httpClient from '../../../core/http/httpClient';
  */
 export const authApi = {
   async login(email, password) {
-    const data = await httpClient.post('/api/auth/login', { email, password });
-    return data;
+    const res = await httpClient.post('/api/auth/login', { email, password });
+    return res.data;
   },
 
   async getMe() {
-    const data = await httpClient.get('/api/auth/me');
-    return data;
+    const res = await httpClient.get('/api/auth/me');
+    return res.data;
   },
 
   async getUsers() {
-    const data = await httpClient.get('/api/auth/users');
-    return data;
+    const res = await httpClient.get('/api/auth/users');
+    return res.data;
   }
 };
 

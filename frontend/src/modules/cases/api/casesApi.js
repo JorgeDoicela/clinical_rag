@@ -5,13 +5,13 @@ import httpClient from '../../../core/http/httpClient';
  */
 export const casesApi = {
   async getCases() {
-    const data = await httpClient.get('/api/cases');
-    return data;
+    const res = await httpClient.get('/api/cases');
+    return res.data;
   },
 
   async getCaseById(caseId) {
-    const data = await httpClient.get(`/api/cases/${caseId}`);
-    return data;
+    const res = await httpClient.get(`/api/cases/${caseId}`);
+    return res.data;
   }
 };
 

@@ -1,6 +1,6 @@
 {
-  "promedio_faithfulness_score": 0.4166,
-  "promedio_fidelidad_porcentaje": 41.66,
+  "promedio_faithfulness_score": 0.3611,
+  "promedio_fidelidad_porcentaje": 36.11,
   "total_casos_evaluados": 12,
   "casos_alto_grounding": 0,
   "detalles": [
@@ -78,11 +78,11 @@
       "case_id": "case_erc_01",
       "titulo": "Evaluación de Enfermedad Renal Crónica en Paciente Diabético e Hipertenso",
       "guia_asociada": "guia_prevencion_diagnostico_tratamiento_enfermedad_renal_cronica_2018",
-      "faithfulness_score": 0.6667,
-      "grounded_claims": 2,
+      "faithfulness_score": 0.3333,
+      "grounded_claims": 1,
       "total_claims": 3,
-      "grounded_pct": 66.7,
-      "nivel": "Moderado Grounding Normativo"
+      "grounded_pct": 33.3,
+      "nivel": "Bajo Grounding (Riesgo de Deriva)"
     },
     {
       "case_id": "case_ehirn_01",
@@ -118,10 +118,10 @@
       "case_id": "case_aborto_01",
       "titulo": "Gestante con Metrorragia de Primer Trimestre por Aborto Incompleto",
       "guia_asociada": "gpc_guia_aborto_espontaneo_incompleto_19_feb_2014",
-      "faithfulness_score": 0.3333,
-      "grounded_claims": 1,
+      "faithfulness_score": 0.0,
+      "grounded_claims": 0,
       "total_claims": 3,
-      "grounded_pct": 33.3,
+      "grounded_pct": 0.0,
       "nivel": "Bajo Grounding (Riesgo de Deriva)"
     }
   ]

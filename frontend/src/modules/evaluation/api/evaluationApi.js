@@ -4,33 +4,39 @@ import httpClient from '../../../core/http/httpClient';
  * Servicio de Red de Evaluación Clínica, RAG y Feedback
  */
 export const evaluationApi = {
-  async evaluateDirect(caseId, studentAnswer, images = null) {
+  async evaluateDirect(caseId, respuestaEstudiante, imagenes = null) {
     const formData = new FormData();
     formData.append('case_id', caseId);
-    formData.append('student_answer', studentAnswer);
+    formData.append('respuesta_estudiante', respuestaEstudiante);
 
-    if (images && images.length > 0) {
-      images.forEach((img) => {
-        formData.append('images', img);
+    if (imagenes && imagenes.length > 0) {
+      imagenes.forEach((img) => {
+        formData.append('imagenes', img, img.name);
       });
     }
 
-    const data = await httpClient.post('/api/evaluate', formData);
-    return data;
+    const res = await httpClient.post('/api/evaluate', formData);
+    return res.data;
   },
 
-  async evaluatePhase(caseId, faseNumero, respuestaEstudiante, historialPrevio = '') {
+  async evaluatePhase(caseId, faseNumero, respuestaEstudiante, historialPrevio = '', imagenes = null) {
     const formData = new FormData();
     formData.append('case_id', caseId);
-    formData.append('fase_numero', faseNumero);
+    formData.append('fase_numero', faseNumero.toString());
     formData.append('respuesta_estudiante', respuestaEstudiante);
 
     if (historialPrevio) {
       formData.append('historial_previo', historialPrevio);
     }
 
-    const data = await httpClient.post('/api/evaluate/phase', formData);
-    return data;
+    if (imagenes && imagenes.length > 0) {
+      imagenes.forEach((img) => {
+        formData.append('imagenes', img, img.name);
+      });
+    }
+
+    const res = await httpClient.post('/api/evaluate/phase', formData);
+    return res.data;
   },
 
   async exportEvaluationPdf(payload) {

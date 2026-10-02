@@ -288,7 +288,7 @@ def run_kst_simulation():
         ax2.grid(True, alpha=0.3, axis="y")
 
         plt.tight_layout()
-        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        OUTPUT_PNG.parent.mkdir(parents=True, exist_ok=True)
         plt.savefig(OUTPUT_PNG, dpi=300, bbox_inches="tight")
         plt.close()
         print(f"[PNG]  Figura generada: {OUTPUT_PNG} (300 DPI)")

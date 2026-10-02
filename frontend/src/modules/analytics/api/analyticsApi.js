@@ -5,33 +5,33 @@ import httpClient from '../../../core/http/httpClient';
  */
 export const analyticsApi = {
   async getTrends() {
-    const data = await httpClient.get('/api/history/trends');
-    return data;
+    const res = await httpClient.get('/api/history/trends');
+    return res.data;
   },
 
   async getCoordinatorAnalytics() {
-    const data = await httpClient.get('/api/history/coordinator-analytics');
-    return data;
+    const res = await httpClient.get('/api/history/coordinator-analytics');
+    return res.data;
   },
 
   async getIbfCohort() {
-    const data = await httpClient.get('/api/history/ibf-cohort');
-    return data;
+    const res = await httpClient.get('/api/history/ibf-cohort');
+    return res.data;
   },
 
   async getScientificBenchmark() {
-    const data = await httpClient.get('/api/evaluate/benchmark-scientific');
-    return data;
+    const res = await httpClient.get('/api/evaluate/benchmark-scientific');
+    return res.data;
   },
 
   async getFaithfulnessBenchmark() {
-    const data = await httpClient.get('/api/history/faithfulness-benchmark');
-    return data;
+    const res = await httpClient.get('/api/history/faithfulness-benchmark');
+    return res.data;
   },
 
   async getHistory() {
-    const data = await httpClient.get('/api/history');
-    return data;
+    const res = await httpClient.get('/api/history');
+    return res.data;
   }
 };
 
