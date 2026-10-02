@@ -1,7 +1,7 @@
 import os
 import datetime
 from typing import List, Optional
-from auth.security import (
+from core.security import (
     verify_password,
     get_password_hash,
     create_access_token,

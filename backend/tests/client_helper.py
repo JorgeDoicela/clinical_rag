@@ -18,4 +18,7 @@ def get_test_client():
 
     from fastapi.testclient import TestClient
     from main import app
+    from core.database import init_database
+    init_database()
     return TestClient(app)
+

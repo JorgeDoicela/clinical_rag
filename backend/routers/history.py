@@ -2,14 +2,14 @@ from fastapi import APIRouter, Depends, Query
 from typing import Optional, Dict, Any, List
 from modules.analytics_history.dependencies import get_analytics_service
 from modules.analytics_history.service import AnalyticsHistoryService
-from auth.security import get_current_user, UserResponse
+from auth.security import get_optional_current_user, UserResponse
 
 router = APIRouter(prefix="/api/history", tags=["Historial y Analítica de Razonamiento"])
 
 @router.get("", response_model=List[Dict[str, Any]])
 async def get_history(
     user_id: Optional[str] = Query(None, description="ID o email del usuario opcional"),
-    current_user: Optional[UserResponse] = Depends(get_current_user),
+    current_user: Optional[UserResponse] = Depends(get_optional_current_user),
     analytics_service: AnalyticsHistoryService = Depends(get_analytics_service)
 ):
     """
@@ -21,7 +21,7 @@ async def get_history(
 @router.get("/trends", response_model=Dict[str, Any])
 async def get_trends(
     user_id: Optional[str] = Query(None, description="ID o email del usuario opcional"),
-    current_user: Optional[UserResponse] = Depends(get_current_user),
+    current_user: Optional[UserResponse] = Depends(get_optional_current_user),
     analytics_service: AnalyticsHistoryService = Depends(get_analytics_service)
 ):
     """

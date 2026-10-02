@@ -1,4 +1,5 @@
 import json
+import logging
 from io import BytesIO
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple
@@ -8,6 +9,9 @@ from services.pdf_report_generator import generate_clinical_feedback_pdf
 from models.schemas import EvaluationResult, PhaseEvaluationResult
 from modules.cases.service import CaseService
 from modules.analytics_history.service import AnalyticsHistoryService
+
+logger = logging.getLogger(__name__)
+
 
 
 class EvaluationService:
@@ -61,8 +65,12 @@ class EvaluationService:
                 score_val = getattr(eval_result, "score", 0.0)
                 try:
                     self.adaptive_service.record_evaluation_impact(user_id, competencias, score_val)
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logger.warning(
+                        "[EvaluationService] No se pudo registrar el impacto BKT para estudiante '%s': %s",
+                        user_id,
+                        exc
+                    )
 
         return eval_result
 

@@ -51,15 +51,16 @@ def detect_zone_of_proximal_development(knowledge_state: Dict[str, float]) -> Li
 
     return zdp_nodes
 
-def select_optimal_next_case(student_id: str) -> Dict[str, Any]:
+def select_optimal_next_case(student_id: str, knowledge_state: Optional[Dict[str, float]] = None) -> Dict[str, Any]:
     """
     Ejecuta el algoritmo de recomendación adaptativa:
-    1. Lee el estado de dominio BKT del estudiante.
+    1. Obtiene el estado de dominio BKT del estudiante (inyectado o desde caché).
     2. Identifica las competencias en la ZDP.
     3. Puntúa los casos del catálogo según cobertura de la ZDP.
     4. Genera la justificación pedagógica en lenguaje natural.
     """
-    knowledge_state = get_student_knowledge_state(student_id)
+    if knowledge_state is None:
+        knowledge_state = get_student_knowledge_state(student_id)
     zdp_nodes = detect_zone_of_proximal_development(knowledge_state)
     all_cases = load_all_cases()
 

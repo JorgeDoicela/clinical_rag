@@ -13,14 +13,32 @@ from routers.history import router as history_router
 from routers.collaboration import router as collaboration_router
 from routers.adaptive import router as adaptive_router
 
+from contextlib import asynccontextmanager
+from core.config import settings
+from core.database import init_database
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("[STARTUP] Inicializando base de datos relacional (SQLAlchemy)...", flush=True)
+    init_database()
+    print("[STARTUP] Servidor FastAPI de Ateneo iniciado correctamente.", flush=True)
+    import asyncio
+    def _preload():
+        try:
+            from rag.retriever import get_embedding_model
+            get_embedding_model()
+        except Exception as e:
+            print(f"[STARTUP] Error al precargar modelo: {e}", flush=True)
+    asyncio.create_task(asyncio.to_thread(_preload))
+    yield
+
 app = FastAPI(
     title="Ateneo API - Evaluación del Razonamiento Clínico mediante RAG",
     description="Sistema RAG para evaluación formativa de razonamiento clínico basado en GPCs del MSP Ecuador.",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
-from core.config import settings
-from core.database import init_database
 
 # Configuración de CORS según AppSettings
 _open_cors = settings.allowed_origins == ["*"]
@@ -66,20 +84,6 @@ app.include_router(adaptive_router)
 
 
 
-@app.on_event("startup")
-async def startup_event():
-    print("[STARTUP] Inicializando base de datos relacional (SQLAlchemy)...", flush=True)
-    init_database()
-    print("[STARTUP] Servidor FastAPI de Ateneo iniciado correctamente.", flush=True)
-    # Precargar el modelo en segundo plano asíncrono para no bloquear la disponibilidad de la API
-    import asyncio
-    def _preload():
-        try:
-            from rag.retriever import get_embedding_model
-            get_embedding_model()
-        except Exception as e:
-            print(f"[STARTUP] Error al precargar modelo: {e}", flush=True)
-    asyncio.create_task(asyncio.to_thread(_preload))
 
 @app.get("/health", tags=["Health"])
 async def health_check():

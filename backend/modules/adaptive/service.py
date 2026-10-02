@@ -32,9 +32,10 @@ class AdaptiveCurriculumService:
         self.history_repository = history_repository
 
     def get_optimal_next_case(self, student_id: str) -> Dict[str, Any]:
-        # Garantizar que el estado persistido esté sincronizado antes de seleccionar caso
-        self.get_knowledge_state(student_id)
-        return select_optimal_next_case(student_id)
+        state_data = self.get_knowledge_state(student_id)
+        current_state = state_data["knowledge_state"]
+        return select_optimal_next_case(student_id, knowledge_state=current_state)
+
 
     def get_knowledge_state(self, student_id: str) -> Dict[str, Any]:
         state = None

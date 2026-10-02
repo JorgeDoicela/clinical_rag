@@ -6,7 +6,7 @@ from modules.cases.dependencies import get_case_service
 from modules.cases.service import CaseService
 from rag.retriever import retrieve_relevant_chunk
 from rag.evaluator import evaluate_clinical_reasoning
-from auth.security import get_current_user, UserResponse
+from auth.security import get_optional_current_user, UserResponse
 
 router = APIRouter(prefix="/api/ateneo", tags=["Ateneo de Sala Colaborativo"])
 
@@ -15,7 +15,7 @@ async def create_ateneo_room(
     case_id: str = Form(...),
     docente_id: str = Form("usr_docente_001"),
     docente_nombre: str = Form("Dr. Carlos Andrade (Docente)"),
-    current_user: Optional[UserResponse] = Depends(get_current_user),
+    current_user: Optional[UserResponse] = Depends(get_optional_current_user),
     collab_service: CollaborationService = Depends(get_collaboration_service)
 ):
     """
@@ -36,7 +36,7 @@ async def join_ateneo_room(
     user_email: str = Form("alumno@ateneo.edu.ec"),
     user_nombre: str = Form("Estudiante María José Silva"),
     user_rol: str = Form("alumno"),
-    current_user: Optional[UserResponse] = Depends(get_current_user),
+    current_user: Optional[UserResponse] = Depends(get_optional_current_user),
     collab_service: CollaborationService = Depends(get_collaboration_service)
 ):
     """
@@ -71,7 +71,7 @@ async def update_room_status(
     room_code: str,
     nuevo_estado: str = Form(...),
     docente_id: str = Form("usr_docente_001"),
-    current_user: Optional[UserResponse] = Depends(get_current_user),
+    current_user: Optional[UserResponse] = Depends(get_optional_current_user),
     collab_service: CollaborationService = Depends(get_collaboration_service)
 ):
     """

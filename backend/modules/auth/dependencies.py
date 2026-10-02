@@ -10,6 +10,5 @@ def get_user_repository(db: Session = Depends(get_db)) -> UserRepository:
 
 
 def get_auth_service(repo: UserRepository = Depends(get_user_repository)) -> AuthService:
-    service = AuthService(repository=repo)
-    service.seed_demo_users_if_needed()
-    return service
+    return AuthService(repository=repo)
+

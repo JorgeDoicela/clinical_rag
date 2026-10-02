@@ -101,5 +101,15 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
   - **Pureza Algorítmica en BKT:** Se refactorizó `backend/adaptive/knowledge_tracer.py` como un módulo matemático puro (sin I/O ni dependencias de base de datos). La coordinación de persistencia se trasladó a `AdaptiveCurriculumService` mediante `AdaptiveRepository` (`StudentMasteryModel`, `StudentSnapshotModel`) e `HistoryRepository`.
   - **Impacto Psicométrico en Evaluaciones:** `EvaluationService` actualiza el modelo BKT y genera snapshots longitudinales tras cada evaluación completada.
   - **Validación Completa:** 6 suites maestras del backend (100% PASS), 12 suites / 44 tests de frontend (100% PASS) y build de producción limpio en 10.74s.
+* **Auditoría Arquitectónica Senior y Erradicación de Deuda Técnica / Parches:**
+  - **Desacoplamiento Criptográfico (`backend/core/security.py`):** Se extrajo la capa de hashing y tokens JWT puros fuera de `auth/security.py`, eliminando la dependencia circular histórica entre el servicio de autenticación y las dependencias de seguridad HTTP.
+  - **Inyección Limpia en Seguridad:** Se refactorizó `get_current_user` y `get_optional_current_user` en `backend/auth/security.py` para consumir directamente `UserRepository = Depends(get_user_repository)` mediante FastAPI DI estándar, erradicando el antipatrón `Depends(lambda: None)`, las aperturas ad-hoc con `SessionLocal()` y los bloques `try/except: pass` que silenciaban `HTTPException(401)`.
+  - **Migración a FastAPI Lifespan Moderno:** Se sustituyó el decorador deprecado `@app.on_event("startup")` en `backend/main.py` por el context manager nativo `lifespan(app: FastAPI)`, integrando inicialización de BD relacional y precarga en segundo plano asíncrono.
+  - **Inicialización Defensiva en Pruebas:** Se actualizó `backend/tests/client_helper.py` para inicializar el esquema relacional (`init_database()`) en el fallback de `TestClient(app)`, garantizando ejecución determinística de tests en bases de datos efímeras o frescas.
+  - **Inyección Explícita de Estado Psicométrico en ZDP:** Se actualizó `select_optimal_next_case` en `backend/adaptive/curriculum_engine.py` para recibir `knowledge_state` de forma explícita. `AdaptiveCurriculumService` pasa el estado persistido directamente, eliminando el efecto secundario de precarga forzada en diccionarios globales mutables del módulo.
+  - **Optimización de Consultas de Auth:** Se eliminó la llamada redundante a `seed_demo_users_if_needed()` en `get_auth_service` (`modules/auth/dependencies.py`), evitando ejecutar un `SELECT count(*)` en cada petición HTTP autenticada.
+  - **Observabilidad en Impacto de Evaluación:** Se sustituyó el silenciamiento con `pass` en `EvaluationService` por logging estructurado con `logger.warning`, previniendo que anomalías psicométricas pasen inadvertidas.
+  - **Autenticación Opcional Estricta en Routers:** Se corrigieron los endpoints en `routers/history.py` y `routers/collaboration.py` para usar `Depends(get_optional_current_user)`, permitiendo navegación anónima con fallbacks predeterminados sin rechazos HTTP 401 indebidos.
+
 
 
