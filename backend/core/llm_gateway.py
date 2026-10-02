@@ -195,6 +195,54 @@ class ResilientLLMGateway:
             f"Historial de intentos: {attempts}"
         )
 
+    def generate_stream(
+        self,
+        prompt: str,
+        system_instruction: Optional[str] = None,
+        temperature: float = 0.2
+    ):
+        """
+        Transmite progresivamente tokens en streaming atravesando la cascada de modelos con Circuit Breaker.
+        Retorna un generador que emite fragmentos de texto en tiempo real para Server-Sent Events (SSE).
+        """
+        client = self._get_client()
+        models_cascade = settings.get_models_cascade()
+        config_kwargs: Dict[str, Any] = {"temperature": temperature}
+        if system_instruction:
+            config_kwargs["system_instruction"] = system_instruction
+        gen_config = types.GenerateContentConfig(**config_kwargs)
+
+        for idx, model_name in enumerate(models_cascade):
+            if not self._is_model_available(model_name):
+                continue
+
+            try:
+                print(f"[LLM_GATEWAY STREAM] Invocando stream con '{model_name}' (Intento {idx + 1}/{len(models_cascade)})...", flush=True)
+                response_stream = client.models.generate_content_stream(
+                    model=model_name,
+                    contents=prompt,
+                    config=gen_config
+                )
+
+                def _stream_iterator():
+                    try:
+                        for chunk in response_stream:
+                            if chunk.text:
+                                yield chunk.text
+                        self._record_success(model_name)
+                    except Exception as stream_err:
+                        self._record_failure(model_name, stream_err)
+                        raise
+
+                return _stream_iterator()
+
+            except FatalLLMException:
+                raise
+            except Exception as err:
+                self._record_failure(model_name, err)
+
+        raise AllModelsExhaustedException("Todos los modelos de la cascada fallaron al iniciar streaming.")
+
 
 # Singleton del Gateway para reutilización de estado del Circuit Breaker en todo el ciclo de vida del backend
 llm_gateway = ResilientLLMGateway()

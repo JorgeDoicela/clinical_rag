@@ -64,6 +64,33 @@ def test_cases_endpoints():
     assert res_404.status_code == 404
     print("  [PASS] GET /api/cases/404 -> 404 Not Found (Correcto)")
 
+    # Creación de caso dinámico institucional en base de datos
+    new_case_payload = {
+        "id": "case_test_dinamico_01",
+        "guia_asociada": "gpc_asma_2019",
+        "titulo": "Crisis Asmática Severa en Adulto Joven",
+        "enunciado": "Paciente de 24 años con disnea súbita y taquipnea.",
+        "pregunta": "¿Cuál es la conducta inicial según la GPC?",
+        "nivel_esperado": "pregrado_avanzado",
+        "modo_simulacion": "single_turn"
+    }
+    res_post = client.post("/api/cases", json=new_case_payload)
+    assert res_post.status_code == 201
+    assert res_post.json()["id"] == "case_test_dinamico_01"
+    
+    # Verificar persistencia relacional
+    res_verify = client.get("/api/cases/case_test_dinamico_01")
+    assert res_verify.status_code == 200
+    assert res_verify.json()["titulo"] == new_case_payload["titulo"]
+    
+    # Limpieza determinística
+    from core.database import get_db_context
+    from modules.cases.models import ClinicalCaseModel
+    with get_db_context() as db:
+        db.query(ClinicalCaseModel).filter(ClinicalCaseModel.id == "case_test_dinamico_01").delete()
+        db.commit()
+    print("  [PASS] POST /api/cases -> 201 Created (Persistencia Híbrida JSON+DB)")
+
 def test_scientific_benchmark_endpoint():
     res = client.get("/api/evaluate/benchmark-scientific")
     assert res.status_code == 200
@@ -161,6 +188,60 @@ def test_phase_evaluation_endpoint():
     print(f"  [PASS] POST /api/evaluate/phase -> 200 OK (Fase 1 evaluada, Score: {phase_res['score_fase']})")
 
 
+def test_socratic_turn_endpoint():
+    payload = {
+        "case_id": "case_dengue_01",
+        "omision_clinica": "Omisión de esquema de reposición hídrica parenteral",
+        "estudiante_replica": "Prioricé la hidratación oral debido a que no identifiqué signos evidentes de deshidratación grave.",
+        "historial": []
+    }
+    res = client.post("/api/evaluate/socratic-turn", json=payload)
+    assert res.status_code == 200
+    assert "text/event-stream" in res.headers.get("content-type", "")
+    assert len(res.content) > 0
+    print("  [PASS] POST /api/evaluate/socratic-turn -> 200 OK (Streaming SSE Verificado)")
+
+
+def test_collaboration_websocket_endpoint():
+    res_auth = client.post("/api/auth/login", json={
+        "email": "docente@ateneo.edu.ec",
+        "password": "Docente123!"
+    })
+    token = res_auth.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    res_create = client.post("/api/ateneo/create", data={
+        "case_id": "case_dengue_01",
+        "docente_id": "usr_docente_001",
+        "docente_nombre": "Dr. Carlos Andrade"
+    }, headers=headers)
+    assert res_create.status_code == 200
+    room_code = res_create.json()["room_code"]
+
+    with client.websocket_connect(f"/api/ateneo/ws/{room_code}") as websocket:
+        initial_msg = websocket.receive_json()
+        assert initial_msg["type"] == "ROOM_STATE_UPDATED"
+        assert initial_msg["payload"]["room_code"] == room_code
+
+        websocket.send_json({"type": "PING", "payload": {"timestamp": 123456}})
+        pong_msg = websocket.receive_json()
+        assert pong_msg["type"] == "PONG"
+
+        websocket.send_json({
+            "type": "IDENTIFY",
+            "payload": {
+                "user_id": "usr_alumno_001",
+                "nombre": "Estudiante Test",
+                "rol": "alumno"
+            }
+        })
+        join_msg = websocket.receive_json()
+        assert join_msg["type"] == "PARTICIPANT_JOINED"
+        assert join_msg["payload"]["total_conectados"] >= 1
+
+    print(f"  [PASS] WebSocket /api/ateneo/ws/{room_code} -> Conexión Bidireccional y Presencia Activa Verificada")
+
+
 if __name__ == "__main__":
     print("\n" + "#"*70)
     print(" SUITE DE PRUEBAS DE INTEGRACIÓN HTTP ENDPOINTS - ATENEO+ API")
@@ -174,6 +255,8 @@ if __name__ == "__main__":
     test_collaboration_rooms_endpoints()
     test_pdf_export_endpoint()
     test_phase_evaluation_endpoint()
+    test_socratic_turn_endpoint()
+    test_collaboration_websocket_endpoint()
     
     print("\n" + "#"*70)
     print(" TODOS LOS ENDPOINTS DE LA API FUNCIONAN CORRECTAMENTE (PASS)")

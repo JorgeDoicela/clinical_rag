@@ -38,7 +38,10 @@ def get_chroma_client(persist_path: str = CHROMA_PERSIST_PATH) -> chromadb.Persi
         os.makedirs(persist_path, exist_ok=True)
         _CHROMA_CLIENT = chromadb.PersistentClient(
             path=persist_path,
-            settings=chromadb.config.Settings(anonymized_telemetry=False)
+            settings=chromadb.config.Settings(
+                anonymized_telemetry=False,
+                chroma_product_telemetry_impl="rag.chroma_telemetry.NoOpProductTelemetry"
+            )
         )
     return _CHROMA_CLIENT
 

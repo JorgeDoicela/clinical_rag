@@ -49,6 +49,12 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: './src/setupTests.js',
+    setupFiles: './src/setupTests.ts',
+    include: ['src/__tests__/**/*.{test,spec}.{js,jsx,ts,tsx}'],
+    exclude: ['e2e/**', 'node_modules/**'],
+    pool: 'forks',
+    forks: {
+      singleFork: true,
+    },
   }
 })

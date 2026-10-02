@@ -4,7 +4,8 @@ from pathlib import Path
 from models.schemas import ClinicalCaseSchema
 from modules.cases.dependencies import get_case_service
 from modules.cases.service import CaseService
-from core.config import settings
+from core.config import settings, RAW_PDFS_PATH
+from auth.security import get_optional_current_user, UserResponse
 
 router = APIRouter(prefix="/api/cases", tags=["Casos Clínicos"])
 
@@ -28,6 +29,8 @@ async def get_pdf_location(guia_id: str) -> Dict[str, Any]:
     en todas las subcarpetas por año (2013-2019, general) con mapeo semántico de alias.
     """
     raw_dir = Path(RAW_PDFS_PATH)
+    if not raw_dir.exists():
+        raw_dir.mkdir(parents=True, exist_ok=True)
     clean_query = _normalize_filename_key(guia_id)
     
     # Mapeo de alias semánticos para casos clínicos canónicos
@@ -99,3 +102,16 @@ async def get_case(case_id: str, case_service: CaseService = Depends(get_case_se
     if not caso:
         raise HTTPException(status_code=404, detail=f"Caso clínico '{case_id}' no encontrado.")
     return caso
+
+
+@router.post("", response_model=ClinicalCaseSchema, status_code=201)
+async def create_clinical_case(
+    case: ClinicalCaseSchema,
+    current_user: Optional[UserResponse] = Depends(get_optional_current_user),
+    case_service: CaseService = Depends(get_case_service)
+):
+    """
+    Crea o actualiza un caso clínico dinámico en la base de datos relacional.
+    """
+    creator_id = current_user.id if current_user else "docente_demo"
+    return case_service.create_case(case, creado_por=creator_id)

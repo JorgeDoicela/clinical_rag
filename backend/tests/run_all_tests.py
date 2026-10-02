@@ -101,7 +101,9 @@ def run_full_verification_pipeline():
             test_history_and_analytics_endpoints,
             test_collaboration_rooms_endpoints,
             test_pdf_export_endpoint,
-            test_phase_evaluation_endpoint
+            test_phase_evaluation_endpoint,
+            test_socratic_turn_endpoint,
+            test_collaboration_websocket_endpoint
         )
         test_health_check()
         test_auth_endpoints()
@@ -111,7 +113,9 @@ def run_full_verification_pipeline():
         test_collaboration_rooms_endpoints()
         test_pdf_export_endpoint()
         test_phase_evaluation_endpoint()
-        suite_results.append({"suite": "Integración Endpoints HTTP", "status": "PASS", "detalles": "8 endpoints validados (RBAC, Evaluador, Colaboración)"})
+        test_socratic_turn_endpoint()
+        test_collaboration_websocket_endpoint()
+        suite_results.append({"suite": "Integración Endpoints HTTP", "status": "PASS", "detalles": "10 endpoints validados (RBAC, Evaluador, Streaming SSE, WebSockets, Colaboración)"})
     except Exception as e:
         suite_results.append({"suite": "Integración Endpoints HTTP", "status": "FAIL", "detalles": str(e)})
 

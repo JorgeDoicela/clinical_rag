@@ -25,9 +25,10 @@ graph TD
     subgraph Presentation_Layer [Capa de Presentación / Routers]
         R_Auth["/api/auth"]
         R_Cases["/api/cases"]
-        R_Eval["/api/evaluate"]
+        R_Eval["/api/evaluate (SSE Streaming)"]
         R_History["/api/history"]
         R_Adaptive["/api/adaptive"]
+        R_Collab["/api/ateneo (REST + WebSockets)"]
     end
 
     subgraph Domain_Services [Capa de Servicios de Dominio (Modules)]
@@ -36,11 +37,13 @@ graph TD
         S_Eval["EvaluationService"]
         S_History["AnalyticsHistoryService"]
         S_Adaptive["AdaptiveCurriculumService"]
+        S_Collab["CollaborationService"]
     end
 
     subgraph Repositories [Capa de Repositorios & Adaptadores]
         Repo_History["HistoryRepository (SQLAlchemy)"]
         Repo_Cases["CaseRepository (JSON / DB)"]
+        Repo_Collab["RoomRepository (SQLAlchemy)"]
         Gateway_LLM["ResilientLLMGateway (Circuit Breaker)"]
         Retriever_RAG["HybridRetriever (ChromaDB + BM25)"]
     end
@@ -55,6 +58,7 @@ graph TD
     R_Eval --> S_Eval
     R_History --> S_History
     R_Adaptive --> S_Adaptive
+    R_Collab --> S_Collab
 
     S_Eval --> S_Cases
     S_Eval --> S_History
@@ -63,8 +67,11 @@ graph TD
 
     S_History --> Repo_History
     S_Cases --> Repo_Cases
+    S_Collab --> Repo_Collab
 
     Repo_History --> DB_Engine
+    Repo_Cases --> DB_Engine
+    Repo_Collab --> DB_Engine
     Gateway_LLM --> Settings
     DB_Engine --> Settings
 ```
@@ -78,9 +85,11 @@ backend/
 ├── core/                               # Infraestructura transversal compartida
 │   ├── __init__.py
 │   ├── config.py                       # AppSettings (Pydantic 12-Factor, fail-fast)
-│   ├── database.py                     # Motor SQLAlchemy, SessionLocal, modo WAL
-│   ├── llm_gateway.py                  # ResilientLLMGateway con Circuit Breaker
-│   └── security.py                     # JWT, password hashing y contexto RBAC
+│   ├── database.py                     # Motor SQLAlchemy, SessionLocal, WAL y PRAGMA foreign_keys
+│   ├── llm_gateway.py                  # ResilientLLMGateway con Circuit Breaker y fallback
+│   ├── security.py                     # Criptografía JWT, hashing de contraseñas y contexto RBAC
+│   ├── middleware.py                   # CorrelationIdMiddleware (X-Request-ID y X-Process-Time)
+│   └── errors.py                       # Estandarización de errores RFC 7807 (Problem Details)
 │
 ├── modules/                            # Dominios de negocio desacoplados
 │   ├── analytics_history/              # Historial, métricas de cohorte e IBF
@@ -90,11 +99,14 @@ backend/
 │   │   └── dependencies.py             # get_analytics_service()
 │   │
 │   ├── cases/                          # Catálogo clínico y paraclínicos
-│   │   ├── repository.py               # CaseRepository (con caché en memoria)
+│   │   ├── models.py                   # Entidad ClinicalCaseModel (persistencia híbrida)
+│   │   ├── repository.py               # CaseRepository (híbrido JSON + DB)
 │   │   ├── service.py                  # CaseService
 │   │   └── dependencies.py             # get_case_service()
 │   │
 │   ├── adaptive/                       # Motor KST, BKT y currículo ZDP
+│   │   ├── models.py                   # Entidades StudentMasteryModel y StudentSnapshotModel
+│   │   ├── repository.py               # AdaptiveRepository
 │   │   ├── service.py                  # AdaptiveCurriculumService
 │   │   └── dependencies.py             # get_adaptive_service()
 │   │
@@ -108,9 +120,11 @@ backend/
 │   │   ├── service.py                  # CollaborationService (analítica de consenso)
 │   │   └── dependencies.py             # get_collaboration_service()
 │   │
-│   └── auth/                           # Identidad y emisión de credenciales
-│       ├── service.py                  # AuthService
-│       └── dependencies.py             # get_auth_service()
+│   └── auth/                           # Identidad, autenticación y perfiles
+│       ├── models.py                   # Entidad UserModel (identidad persistida)
+│       ├── repository.py               # UserRepository
+│       ├── service.py                  # AuthService (siembra demo idempotente)
+│       └── dependencies.py             # get_auth_service(), get_user_repository()
 │
 ├── routers/                            # Endpoints HTTP delegadores ultradelgados
 │   ├── auth.py
@@ -126,8 +140,12 @@ backend/
 │   └── clinical_case.py                # Facade hacia modules.cases
 │
 ├── rag/                                # Pipeline RAG híbrido (BGE-M3 + BM25)
+│   ├── retriever.py
+│   ├── prompt_builder.py
+│   ├── evaluator.py
+│   └── chroma_telemetry.py             # NoOpProductTelemetry desacoplada
 ├── tests/                              # Suites de integración y validación científica
-└── main.py                             # Ensamblador de la aplicación y ciclo de vida
+└── main.py                             # Ensamblador con ciclo de vida lifespan y error handlers
 ```
 
 ---
@@ -155,3 +173,44 @@ La capa de base de datos discrimina automáticamente entre entornos de desarroll
    * Permite inyectar dobles de prueba (*mocks/stubs*) en pruebas unitarias sin inicializar bases de datos físicas ni modelos de lenguaje pesados.
 3. **Retrocompatibilidad Total:**
    * Los módulos en `models/` (`history_db.py`, `clinical_case.py`) operan como fachadas delegadoras para garantizar que scripts de benchmark, pruebas científicas heredadas y tests de integración continúen funcionando sin requerir modificaciones.
+
+---
+
+## 6. Canales en Tiempo Real y Streaming
+
+### 6.1 Salas Colaborativas con WebSockets (`routers/collaboration.py`)
+* **Endpoint de Conexión:** `ws://localhost:8000/api/ateneo/ws/{room_code}?token={jwt_token}`.
+* **Gestor de Conexiones:** `ConnectionManager` gestiona el diccionario en memoria de conexiones vivas por sala (`Dict[str, List[WebSocket]]`).
+* **Protocolo de Eventos:**
+  - `join`: Registro de presencia y difusión a participantes.
+  - `typing`: Estado de redacción colaborativa en tiempo real.
+  - `chat`: Mensajes clínicos y deliberación diagnóstica.
+  - `vote`: Emisión de hipótesis diagnóstica para cálculo de consenso de cohorte.
+  - `leave`: Desconexión controlada y actualización del panel de miembros activos.
+
+### 6.2 Debriefing Socrático Multiturno con Server-Sent Events (`routers/evaluation.py`)
+* **Endpoint de Streaming:** `POST /api/evaluate/socratic-turn`.
+* **Mecanismo de Transporte:** `StreamingResponse(media_type="text/event-stream")`.
+* **Flujo de Ejecución:**
+  1. Validación de esquema Pydantic (`SocraticTurnRequest`).
+  2. Extracción de contexto de caso y evidencias RAG en vectorstore.
+  3. Transmisión token a token en formato `data: {"token": "..."}\n\n`.
+  4. Finalización mediante evento de control `data: [DONE]\n\n`.
+
+---
+
+## 7. Plan Maestro de Escalabilidad Backend (10 Fases)
+
+Para la evolución sistemática del backend hacia arquitectura limpia estricta, desacoplamiento de infraestructura y preparación para clústeres de alta demanda, consultar la especificación viva:
+* Documento maestro: `PLAN_ESCALABILIDAD_BACKEND.md`
+* Fases planificadas:
+  1. Fase 1: Arquitectura Limpia Estricta y Desacoplamiento de Base de Datos.
+  2. Fase 2: Robustecimiento de Seguridad, Autenticación y Contexto RBAC.
+  3. Fase 3: RAG Híbrido Avanzado, Reranking y Validación Estricta de Citas GPC.
+  4. Fase 4: Persistencia Relacional Híbrida del Catálogo de Casos y Paraclínicos.
+  5. Fase 5: Motor Adaptativo KST, BKT y ZDP Basado en Dominio Clínico.
+  6. Fase 6: Canales WebSocket y Streaming de Respuestas LLM (SSE).
+  7. Fase 7: Resiliencia de Infraestructura, Rate Limiting y Cache Multinivel.
+  8. Fase 8: Reportes Clínicos PDF y Analítica Longitudinal de Cohortes.
+  9. Fase 9: Observabilidad Integral, Telemetría OpenTelemetry y Trazabilidad RAG.
+  10. Fase 10: Auditoría Integral de Pruebas, Cobertura y Benchmarks de Concurrencia.

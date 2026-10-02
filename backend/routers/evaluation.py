@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Form, File, UploadFile, Depends
 from fastapi.responses import StreamingResponse
 from typing import Optional, Dict, Any, List
 import json
+import logging
 from pathlib import Path
 from pydantic import BaseModel
 
@@ -12,6 +13,9 @@ from modules.evaluation.service import EvaluationService
 from rag.retriever import retrieve_relevant_chunk
 from rag.evaluator import evaluate_clinical_reasoning, evaluate_phase_reasoning
 from models.schemas import EvaluationResult, PhaseEvaluationResult
+from auth.security import get_optional_current_user, UserResponse
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/evaluate", tags=["Evaluación RAG"])
 
@@ -95,6 +99,7 @@ async def evaluate_response(
     case_id: str = Form(...),
     respuesta_estudiante: str = Form(...),
     imagenes: Optional[List[UploadFile]] = File(None),
+    current_user: Optional[UserResponse] = Depends(get_optional_current_user),
     case_service: CaseService = Depends(get_case_service),
     evaluation_service: EvaluationService = Depends(get_evaluation_service)
 ):
@@ -120,7 +125,7 @@ async def evaluate_response(
                 img_bytes = await img_file.read()
                 img_mime = img_file.content_type or "image/png"
                 imagenes_bytes_list.append((img_bytes, img_mime))
-                print(f"[ROUTER] Estudio multimodal recibido: {img_file.filename} ({img_mime}, {len(img_bytes)} bytes)", flush=True)
+                logger.info("Estudio multimodal recibido: %s (%s, %d bytes)", img_file.filename, img_mime, len(img_bytes))
 
     if not imagenes_bytes_list and caso.imagen_url:
         import os
@@ -131,9 +136,9 @@ async def evaluate_response(
                 img_bytes = f.read()
             img_mime = "image/jpeg" if local_img_path.lower().endswith((".jpg", ".jpeg")) else "image/png"
             imagenes_bytes_list.append((img_bytes, img_mime))
-            print(f"[ROUTER] Usando imagen preconfigurada del caso: {local_img_path}", flush=True)
+            logger.info("Usando imagen preconfigurada del caso: %s", local_img_path)
 
-    print(f"[ROUTER] Total de estudios multimodales a procesar: {len(imagenes_bytes_list)}", flush=True)
+    logger.info("Total de estudios multimodales a procesar para caso '%s': %d", case_id, len(imagenes_bytes_list))
 
     try:
         chunk = retrieve_relevant_chunk(
@@ -153,16 +158,18 @@ async def evaluate_response(
 
         try:
             eval_dict = resultado.model_dump() if hasattr(resultado, "model_dump") else resultado.dict()
+            target_user_id = current_user.id if current_user else "usr_alumno_001"
+            target_user_email = current_user.email if current_user else "alumno@ateneo.edu.ec"
             evaluation_service.analytics_service.save_evaluation(
-                user_id="usr_alumno_001",
-                user_email="alumno@ateneo.edu.ec",
+                user_id=target_user_id,
+                user_email=target_user_email,
                 case_id=case_id,
                 guia_asociada=caso.guia_asociada,
                 case_title=caso.titulo,
                 eval_result=eval_dict
             )
         except Exception as db_err:
-            print(f"[ROUTER] Error secundario al guardar historial en DB: {db_err}", flush=True)
+            logger.warning("Error secundario al guardar historial en DB: %s", db_err)
 
         return resultado
     except Exception as e:
@@ -176,6 +183,7 @@ async def evaluate_phase_response(
     respuesta_estudiante: str = Form(...),
     historial_previo: Optional[str] = Form(""),
     imagenes: Optional[List[UploadFile]] = File(None),
+    current_user: Optional[UserResponse] = Depends(get_optional_current_user),
     case_service: CaseService = Depends(get_case_service)
 ):
     """
@@ -218,3 +226,110 @@ async def evaluate_phase_response(
         return resultado_fase
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error durante la evaluación de la fase con LLM: {str(e)}")
+
+
+class SocraticTurnRequest(BaseModel):
+    case_id: str
+    omision_clinica: str
+    estudiante_replica: str
+    historial: Optional[List[Dict[str, str]]] = []
+
+
+@router.post("/socratic-turn")
+async def socratic_turn_stream(
+    req: SocraticTurnRequest,
+    case_service: CaseService = Depends(get_case_service)
+):
+    """
+    Endpoint de streaming para debriefing socrático interactivo post-evaluación.
+    Permite interrogar al estudiante sobre omisiones clínicas sin revelar la respuesta de inmediato,
+    guiando el razonamiento formativo con anclaje estricto en la GPC del MSP mediante Server-Sent Events (SSE).
+    """
+    caso = case_service.get_case(req.case_id)
+    if not caso:
+        raise HTTPException(status_code=404, detail=f"Caso clínico '{req.case_id}' no encontrado.")
+
+    if not req.estudiante_replica.strip():
+        raise HTTPException(status_code=400, detail="La réplica del estudiante no puede estar vacía.")
+
+    # Recuperación de sustento normativo RAG para el debriefing
+    try:
+        chunk = retrieve_relevant_chunk(
+            query=f"{req.omision_clinica} {req.estudiante_replica}",
+            guia_filtro=caso.guia_asociada
+        )
+    except Exception as e:
+        chunk = None
+        logger.warning("Recuperación RAG secundaria no disponible: %s", e)
+
+    norma_texto = chunk.get("texto", "") if chunk else "Norma oficial MSP del Ecuador."
+    norma_guia = chunk.get("guia_fuente", caso.guia_asociada) if chunk else caso.guia_asociada
+    norma_pag = chunk.get("pagina", 1) if chunk else 1
+
+    prompt_socratico = f"""
+Eres un Docente Médico Tutor de Ateneo+, especialista en pedagogía clínica y medicina basada en evidencias.
+Estás conduciendo un Debriefing Socrático con un médico interno de pregrado tras una simulación clínica.
+
+CASO CLÍNICO:
+- Título: {caso.titulo}
+- Cuadro: {caso.enunciado}
+
+OMISIÓN / PUNTO CLÍNICO EN DISCUSIÓN:
+"{req.omision_clinica}"
+
+NORMA DEL MINISTERIO DE SALUD PÚBLICA (MSP ECUADOR):
+"{norma_texto}" (GPC: {norma_guia}, Pág. {norma_pag})
+
+RÉPLICA O ARGUMENTO DEL ESTUDIANTE:
+"{req.estudiante_replica}"
+
+HISTORIAL DE DIÁLOGO PREVIO:
+{json.dumps(req.historial, ensure_ascii=False)}
+
+DIRECTIVAS PEDAGÓGICAS INMUTABLES:
+1. No reveles la respuesta diagnóstica o farmacológica definitiva directamente de forma masticada.
+2. Si el estudiante se acerca al criterio de la GPC, valida su esfuerzo y hazle una pregunta de precisión clínica (dosis, monitorización, criterios de severidad o contraindicaciones).
+3. Si el estudiante persiste en un error o desconoce la norma, explícale la fisiopatología y cita sutilmente la conducta esperada según la GPC del MSP.
+4. Mantén un tono formal, sobrio, estrictamente académico y médico. Cero emojis.
+5. Tu respuesta debe tener entre 2 y 4 párrafos concisos y finalizar con una pregunta socrática de verificación formativa.
+"""
+
+    from core.llm_gateway import llm_gateway
+    from core.config import settings
+
+    def event_generator():
+        yield f"data: {json.dumps({'event': 'start', 'guia': norma_guia, 'pagina': norma_pag})}\n\n"
+
+        if not settings.gemini_api_key.strip():
+            # Fallback seguro para entorno de desarrollo local sin clave externa
+            fallback_tokens = [
+                "Has considerado adecuadamente la fisiopatología de base. ",
+                "Sin embargo, según la Guía de Práctica Clínica del MSP Ecuador, ",
+                f"en {caso.titulo} es imperativo valorar los criterios de severidad hemodinámica antes de escalar el tratamiento. ",
+                "¿Qué parámetros específicos de monitorización priorizarías en las primeras horas para justificar tu conducta?"
+            ]
+            for tok in fallback_tokens:
+                yield f"data: {json.dumps({'token': tok})}\n\n"
+        else:
+            try:
+                stream_iter = llm_gateway.generate_stream(
+                    prompt=prompt_socratico,
+                    temperature=0.3
+                )
+                for chunk_text in stream_iter:
+                    yield f"data: {json.dumps({'token': chunk_text})}\n\n"
+            except Exception as stream_err:
+                logger.error("Error en streaming socrático: %s", stream_err)
+                yield f"data: {json.dumps({'error': str(stream_err)})}\n\n"
+
+        yield f"data: {json.dumps({'done': True, 'cita_normativa': {'guia': norma_guia, 'pagina': norma_pag}})}\n\n"
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no"
+        }
+    )

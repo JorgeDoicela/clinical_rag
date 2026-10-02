@@ -24,6 +24,7 @@ if settings.is_sqlite:
         cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA journal_mode=WAL")
         cursor.execute("PRAGMA synchronous=NORMAL")
+        cursor.execute("PRAGMA foreign_keys=ON")
         cursor.close()
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -45,6 +46,25 @@ def get_db() -> Generator[Session, None, None]:
         db.close()
 
 
+from contextlib import contextmanager
+
+
+@contextmanager
+def get_db_context() -> Generator[Session, None, None]:
+    """
+    Context manager seguro para scripts, tareas asíncronas en background o servicios.
+    Garantiza rollback automático ante fallos y cierre seguro de la conexión.
+    """
+    db = SessionLocal()
+    try:
+        yield db
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        db.close()
+
+
 def init_database() -> None:
     """Crea todas las tablas declaradas en los modelos si aún no existen y siembra datos iniciales."""
     # Importar entidades para registrar sus esquemas en Base.metadata
@@ -52,6 +72,7 @@ def init_database() -> None:
     from modules.analytics_history.models import EvaluationHistoryModel
     from modules.collaboration.models import AteneoRoomModel
     from modules.adaptive.models import StudentMasteryModel, StudentSnapshotModel
+    from modules.cases.models import ClinicalCaseModel
 
     Base.metadata.create_all(bind=engine)
 

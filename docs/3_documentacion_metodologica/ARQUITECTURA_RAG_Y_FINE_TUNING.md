@@ -95,7 +95,7 @@ Donde:
 
 ---
 
-## 5. Integración con Visor Interactivo en Frontend ([../frontend/src/components/PdfViewerModal.jsx](../frontend/src/components/PdfViewerModal.jsx))
+## 5. Integración con Visor Interactivo en Frontend ([../frontend/src/modules/evaluation/components/PdfViewerModal.tsx](../frontend/src/modules/evaluation/components/PdfViewerModal.tsx))
 
 Cada cita normativa generada por el evaluador se vincula al endpoint `/api/cases/pdf-location/{guia_id}`. El frontend en React permite abrir el visor de PDF oficial con salto directo `#page={pagina}`, permitiendo la auditoría instantánea de la fuente oficial en vivo durante congresos o sesiones docentes.
 
@@ -129,10 +129,10 @@ Para superar las limitaciones del modelo estático de pregunta y respuesta únic
 * **Esquemas Pydantic (`models/schemas.py`):** `PhaseSchema` para modelar cada hito dentro del caso clínico y `PhaseEvaluationResult` para el retorno estructurado con `score_fase`, aciertos, omisiones, cita y datos de desbloqueo.
 * **Constructor de Prompts Especializado (`rag/prompt_builder.py`):** `build_phase_prompt` ajusta el contexto y la directiva evaluativa según el hito activo (sin penalizar prematuramente en Fase 1 por detalles farmacológicos de Fase 3).
 * **Endpoint Transaccional (`routers/evaluation.py`):** `POST /api/evaluate/phase` recibe el estado de la fase actual, acumula el historial previo y procesa el request multimodal.
-* **Experiencia de Usuario en Frontend (`frontend/src/components/`):**
-  * `SimulationStepper.jsx`: Componente de navegación de pasos con estados visuales (Activo, Completado con score, Bloqueado).
-  * `PhaseFeedbackCard.jsx`: Panel de retroalimentación inmediata post-fase con cita textual de la GPC y botón de avance.
-  * Al culminar la Fase 3, `CaseSolve.jsx` consolida los resultados de los tres hitos en un único `EvaluationResult` maestro, alimentando el `SkillRadarChart` y habilitando la descarga del dictamen PDF oficial.
+* **Experiencia de Usuario en Frontend (`frontend/src/modules/evaluation/`):**
+  * `SimulationStepper.tsx`: Componente de navegación de pasos con estados visuales (Activo, Completado con score, Bloqueado).
+  * `PhaseFeedbackCard.tsx`: Panel de retroalimentación inmediata post-fase con cita textual de la GPC y botón de avance.
+  * Al culminar la Fase 3, `CaseSolve.tsx` consolida los resultados de los tres hitos en un único `EvaluationResult` maestro, alimentando el `SkillRadarChart.tsx` y habilitando la descarga del dictamen PDF oficial.
 
 ---
 
@@ -155,10 +155,10 @@ Para la transición del sistema de plataforma *reactiva* (el estudiante elige ca
 | `/api/adaptive/learning-path` | GET | Trayectoria de aprendizaje: competencias dominadas, en progreso y en ZDP. |
 | `/api/adaptive/topology` | GET | Topología del grafo KST (nodos, aristas, DAG verificado) para el frontend. |
 
-### 7.3 Componentes de Interfaz (`frontend/src/components/`)
+### 7.3 Componentes de Interfaz (`frontend/src/modules/adaptive/components/`)
 
-* **[`AdaptiveNextCase.jsx`](../frontend/src/components/AdaptiveNextCase.jsx):** Tarjeta de recomendación inteligente en la vista de catálogo. Muestra la competencia objetivo ZDP, el nivel de dominio actual y la justificación pedagógica. Botón CTA navega directamente al caso.
-* **[`KnowledgeSpaceGraph.jsx`](../frontend/src/components/KnowledgeSpaceGraph.jsx):** Modal interactivo con visualización de los 7 nodos KST, badges de estado (Dominado / ZDP / Inicial) y barras de porcentaje de dominio.
+* **[`AdaptiveNextCase.tsx`](../frontend/src/modules/adaptive/components/AdaptiveNextCase.tsx):** Tarjeta de recomendación inteligente en la vista de catálogo. Muestra la competencia objetivo ZDP, el nivel de dominio actual y la justificación pedagógica. Botón CTA navega directamente al caso.
+* **[`KnowledgeSpaceGraph.tsx`](../frontend/src/modules/adaptive/components/KnowledgeSpaceGraph.tsx):** Modal interactivo con visualización de los 7 nodos KST, badges de estado (Dominado / ZDP / Inicial) y barras de porcentaje de dominio.
 
 ---
 

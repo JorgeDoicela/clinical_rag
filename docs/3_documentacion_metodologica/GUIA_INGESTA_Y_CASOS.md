@@ -74,8 +74,8 @@ Ateneo integra un catálogo maestro ([`../backend/data/catalogo_cie10_gpc.json`]
 * **Ruta:** `GET /api/cases/pdf-location/{guia_id}`
 * **Función:** Busca recursivamente en las subcarpetas de `raw_pdfs/` el archivo correspondiente a `guia_id` y devuelve su URL estática accesible (`/static/pdfs/2019/gpc_hta192019.pdf`).
 
-### 4.2 Componente Frontend ([../frontend/src/components/PdfViewerModal.jsx](../frontend/src/components/PdfViewerModal.jsx))
-* Al recibir una evaluación formativa, la tarjeta de feedback ([`../frontend/src/components/FeedbackCard.jsx`](../frontend/src/components/FeedbackCard.jsx)) incluye el botón **"Ver en Guía Oficial (Pág. X)"**.
+### 4.2 Componente Frontend ([../frontend/src/modules/evaluation/components/PdfViewerModal.tsx](../frontend/src/modules/evaluation/components/PdfViewerModal.tsx))
+* Al recibir una evaluación formativa, la tarjeta de feedback ([`../frontend/src/modules/evaluation/components/FeedbackCard.tsx`](../frontend/src/modules/evaluation/components/FeedbackCard.tsx)) incluye el botón **"Ver en Guía Oficial (Pág. X)"**.
 * Al hacer clic, abre un visor PDF integrado que salta directamente a la página exacta de la normativa (`#page={pagina}`), permitiendo auditar la fuente oficial en tiempo real.
 
 ---

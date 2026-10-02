@@ -5,6 +5,15 @@ os.environ["CHROMA_TELEMETRY"] = "False"
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from core.middleware import CorrelationIdMiddleware
+from core.errors import (
+    http_exception_handler,
+    validation_exception_handler,
+    unhandled_exception_handler
+)
 
 from routers.cases import router as cases_router
 from routers.evaluation import router as evaluation_router
@@ -64,6 +73,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(CorrelationIdMiddleware)
+
+# Estandarización de errores conforme a RFC 7807 (Problem Details)
+app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(Exception, unhandled_exception_handler)
 
 # Servir imágenes estáticas de los casos clínicos
 images_dir = os.path.join(os.path.dirname(__file__), "cases_data", "images")

@@ -229,32 +229,35 @@ clinical_rag/
 ├── backend/                              # SERVICIOS BACKEND FASTAPI (PYTHON 3.11)
 │   ├── core/                             # INFRAESTRUCTURA TRANSVERSAL COMPARTIDA
 │   │   ├── config.py                     # AppSettings tipado con Pydantic (12-Factor, fail-fast)
-│   │   ├── database.py                   # Motor SQLAlchemy, SessionLocal y modo WAL
-│   │   ├── llm_gateway.py                # ResilientLLMGateway con Circuit Breaker y fallback
-│   │   └── security.py                   # Criptografía JWT, hashing de contraseñas y RBAC
+│   │   ├── database.py                   # Motor SQLAlchemy, SessionLocal, WAL y PRAGMA foreign_keys
+│   │   ├── llm_gateway.py                # ResilientLLMGateway con Circuit Breaker y degradación gradual
+│   │   ├── security.py                   # Criptografía JWT, hashing de contraseñas y RBAC
+│   │   ├── middleware.py                 # CorrelationIdMiddleware (X-Request-ID y X-Process-Time)
+│   │   └── errors.py                     # Estandarización de errores RFC 7807 (Problem Details)
 │   ├── modules/                          # DOMINIOS CLÍNICOS DESACOPLADOS (MONOLITO MODULAR)
 │   │   ├── analytics_history/            # Historial, métricas de cohorte, IBF (Models + Repo + Service)
-│   │   ├── cases/                        # Catálogo de casos clínicos y paraclínicos (Repo + Service)
-│   │   ├── adaptive/                     # Currículo adaptativo KST, BKT y selección ZDP (Service)
+│   │   ├── cases/                        # Catálogo de casos clínicos y paraclínicos (Models + Repo + Service)
+│   │   ├── adaptive/                     # Currículo adaptativo KST, BKT y selección ZDP (Models + Repo + Service)
 │   │   ├── evaluation/                   # Orquestación de evaluación RAG y reportes PDF (Service)
 │   │   ├── collaboration/                # Salas sincrónicas de Ateneo en tiempo real (Models + Repo + Service)
-│   │   └── auth/                         # Identidad, autenticación y perfiles (Service)
+│   │   └── auth/                         # Identidad, autenticación, perfiles y siembra demo (Models + Repo + Service)
 │   ├── routers/                          # CONTROLADORES REST DE LA API (THIN CONTROLLERS CON DEPENDS)
 │   │   ├── auth.py                       # Autenticación JWT y catálogo de usuarios
-│   │   ├── adaptive.py                   # Endpoints KST (next-case, knowledge-state, learning-path)
-│   │   ├── cases.py                      # Banco de 12 casos clínicos oficiales
-│   │   ├── evaluation.py                 # POST /api/evaluate con soporte multi-archivo
+│   │   ├── adaptive.py                   # Endpoints KST (next-case, knowledge-state, learning-path, topology)
+│   │   ├── cases.py                      # Banco de casos clínicos oficiales y dinámicos (POST /api/cases)
+│   │   ├── evaluation.py                 # POST /api/evaluate con soporte multi-archivo y simulación por fases
 │   │   ├── history.py                    # Historial, IBF de cohorte y exportación PDF
 │   │   └── collaboration.py              # Salas sincrónicas de Ateneo en tiempo real
 │   ├── models/                           # Capa de compatibilidad y esquemas DTO
-│   │   ├── schemas.py                    # Esquemas tipados (EvaluationResult, IBFReport, etc.)
+│   │   ├── schemas.py                    # Esquemas tipados Pydantic (EvaluationResult, IBFReport, etc.)
 │   │   ├── history_db.py                 # Fachada a modules.analytics_history (SQLAlchemy)
 │   │   ├── learning_analytics.py         # Motor de cálculo de IBF y alertas docentes
 │   │   └── clinical_case.py              # Fachada a modules.cases
 │   ├── rag/                              # Pipeline de Búsqueda y Evaluación RAG
 │   │   ├── retriever.py                  # Motor híbrido denso + sparse BM25 (RRF k=60)
 │   │   ├── prompt_builder.py             # Constructor de prompts multi-estudio y por fases
-│   │   └── evaluator.py                  # Evaluador multimodal con Gemini Vision API
+│   │   ├── evaluator.py                  # Evaluador multimodal con Gemini Vision API
+│   │   └── chroma_telemetry.py           # NoOpProductTelemetry desacoplada
 │   ├── services/                         # Fachadas de compatibilidad hacia core y generadores
 │   │   ├── llm_gateway.py                # Fachada a core.llm_gateway
 │   │   └── pdf_report_generator.py       # Generador de dictamen PDF institucional con SHA-256
@@ -281,23 +284,30 @@ clinical_rag/
 │   └── scripts/
 │       └── generate_paper_tables_pdf.py  # Generador del compendio PDF oficial
 │
-├── frontend/                             # APLICACIÓN CLIENTE REACT 18 + VITE 6 (SPA/PWA)
+├── frontend/                             # APLICACIÓN CLIENTE REACT 18 + VITE 6 + TYPESCRIPT (SPA/PWA)
+│   ├── e2e/                              # SUITES E2E MULTI-NAVEGADOR PLAYWRIGHT (15 TESTS APROBADOS)
+│   │   ├── auth-and-rbac.spec.ts         # Pruebas de autenticación y control de acceso RBAC
+│   │   ├── clinical-catalog.spec.ts      # Búsqueda semántica, filtrado de casos y ZDP
+│   │   ├── clinical-study-viewer.spec.ts # Visor diagnóstico en Canvas HTML5, zoom/pan y presets
+│   │   └── core-web-vitals.spec.ts       # Rendimiento de carga, FCP, LCP y CLS en cliente
 │   └── src/
+│       ├── types/                        # Contratos de tipos de dominio TypeScript estrictos (index.ts)
 │       ├── core/                         # Capa transversal compartida
-│       │   ├── http/httpClient.js        # Cliente HTTP base con inyección de JWT y control de errores
+│       │   ├── http/                     # httpClient.ts y eventStreamClient.ts (SSE streaming)
+│       │   ├── realtime/socketClient.ts  # Cliente WebSocket tipado con reconexión exponencial
+│       │   ├── storage/                  # offlineDb.ts (IndexedDB) y useConnectivitySync.ts (Outbox)
+│       │   ├── query/queryClient.ts      # Cliente centralizado TanStack Query con políticas de resiliencia
 │       │   ├── ui/                       # Design tokens y componentes base (FloatingLabelInput, ClinicalButton, etc.)
 │       │   └── layouts/                  # Plantillas estructurales (Navbar, AppLayout)
 │       ├── modules/                      # Slices de dominio clínico verticalmente particionados
-│       │   ├── auth/                     # Autenticación institucional y guardias RBAC
-│       │   ├── cases/                    # Catálogo clínico, filtrado semántico y useCases hook
-│       │   ├── evaluation/               # Simulador split-screen, voz, paraclínicos y useCaseSolver
-│       │   ├── collaboration/            # Salas de consenso sincrónico y useAteneoRoom
-│       │   ├── adaptive/                 # Algorítmica adaptativa KST/BKT y grafo SVG
+│       │   ├── auth/                     # Autenticación, Zustand store (useAuthStore), Zod schemas y ProtectedRoute
+│       │   ├── cases/                    # Catálogo clínico, filtrado semántico, Zod schemas y useCases hook
+│       │   ├── evaluation/               # Simulador split-screen, SocraticDebrief, ClinicalStudyViewer (Canvas 60 FPS)
+│       │   ├── collaboration/            # Salas de consenso sincrónico, room store y useAteneoRoom (WebSockets)
+│       │   ├── adaptive/                 # Algorítmica adaptativa KST/BKT, grafo SVG y useAdaptiveCurriculum
 │       │   └── analytics/                # Paneles docentes, radar clínico e IBF institucional
-│       ├── routes/AppRoutes.jsx          # Enrutamiento con code-splitting (React.lazy + Suspense)
-│       ├── context/AuthContext.jsx       # Contexto global de sesión y credenciales
-│       ├── components/                   # Fachadas de retrocompatibilidad hacia modules/
-│       └── pages/                        # Fachadas de retrocompatibilidad hacia modules/
+│       ├── routes/AppRoutes.tsx          # Enrutamiento con code-splitting dinámico (React.lazy + Suspense)
+│       └── context/AuthContext.tsx       # Fachada contextual para retrocompatibilidad con tests existentes
 │
 └── docker-compose.yml                    # Orquestación multicontenedor para producción
 ```
@@ -309,7 +319,7 @@ clinical_rag/
 Los experimentos, tablas LaTeX, figuras y pruebas unitarias/de integración se pueden ejecutar con los siguientes comandos:
 
 ```bash
-# 1. Ejecutar el orquestador maestro de pruebas (100% PASS):
+# 1. Ejecutar el orquestador maestro de pruebas de backend (100% PASS):
 docker compose exec backend python tests/run_all_tests.py
 
 # 2. Generar la Tabla I del Paper (Benchmark de Recuperación RAG):
@@ -329,6 +339,12 @@ docker compose exec backend python tests/run_kst_simulation.py
 
 # 7. Compilar el Compendio Unificado en PDF:
 docker compose exec backend python scripts/generate_paper_tables_pdf.py
+
+# 8. Ejecutar suite unitaria frontend Vitest (16 suites, 72 tests PASS):
+docker compose exec frontend npm test
+
+# 9. Ejecutar pruebas End-to-End con Playwright (15 tests PASS):
+docker compose exec frontend npx playwright test
 ```
 
 ---

@@ -1,12 +1,16 @@
-from fastapi import APIRouter, HTTPException, Form, Depends
+import logging
+from fastapi import APIRouter, HTTPException, Form, Depends, WebSocket, WebSocketDisconnect
 from typing import Optional, Dict, Any
 from modules.collaboration.dependencies import get_collaboration_service
 from modules.collaboration.service import CollaborationService
+from modules.collaboration.connection_manager import connection_manager
 from modules.cases.dependencies import get_case_service
 from modules.cases.service import CaseService
 from rag.retriever import retrieve_relevant_chunk
 from rag.evaluator import evaluate_clinical_reasoning
 from auth.security import get_optional_current_user, UserResponse
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/ateneo", tags=["Ateneo de Sala Colaborativo"])
 
@@ -49,6 +53,11 @@ async def join_ateneo_room(
         real_user_rol = current_user.rol.value if current_user else user_rol
 
         room = collab_service.join_room(room_code, real_user_id, real_user_email, real_user_nombre, real_user_rol)
+        # Notificar a los clientes conectados por WebSocket
+        await connection_manager.broadcast_to_room(room_code, {
+            "type": "ROOM_STATE_UPDATED",
+            "payload": room
+        })
         return room
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -86,6 +95,18 @@ async def update_room_status(
 
     try:
         room = collab_service.change_room_status(room_code, nuevo_estado, docente_id)
+        # Difundir transición de fase a los clientes WebSocket en tiempo real
+        await connection_manager.broadcast_to_room(room_code, {
+            "type": "PHASE_TRANSITION",
+            "payload": {
+                "nuevo_estado": nuevo_estado,
+                "room": room
+            }
+        })
+        await connection_manager.broadcast_to_room(room_code, {
+            "type": "ROOM_STATE_UPDATED",
+            "payload": room
+        })
         return room
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -132,8 +153,102 @@ async def submit_ateneo_answer(
         eval_result=eval_dict
     )
 
+    # Difundir recepción de entrega en tiempo real
+    await connection_manager.broadcast_to_room(room_code, {
+        "type": "ANSWER_SUBMITTED",
+        "payload": {
+            "user_email": user_email,
+            "room": updated_room
+        }
+    })
+    await connection_manager.broadcast_to_room(room_code, {
+        "type": "ROOM_STATE_UPDATED",
+        "payload": updated_room
+    })
+
     return {
         "status": "ok",
         "evaluacion": resultado_eval,
         "room": updated_room
     }
+
+
+@router.websocket("/ws/{room_code}")
+async def websocket_ateneo_room(
+    websocket: WebSocket,
+    room_code: str,
+    collab_service: CollaborationService = Depends(get_collaboration_service)
+):
+    """
+    Canal WebSocket bidireccional y de baja latencia para salas colaborativas de Ateneo+.
+    Sincroniza en tiempo real: presencia activa, transiciones pedagógicas de fase,
+    votos de hipótesis diagnóstica y dictámenes grupales sin polling HTTP.
+    """
+    room = collab_service.get_room(room_code)
+    if not room:
+        await websocket.close(code=4004, reason=f"Sala '{room_code}' no encontrada")
+        return
+
+    await connection_manager.connect(room_code, websocket)
+    try:
+        # Enviar estado actual consolidado al cliente al momento del apretón de manos
+        await websocket.send_json({
+            "type": "ROOM_STATE_UPDATED",
+            "payload": room
+        })
+
+        while True:
+            data = await websocket.receive_json()
+            msg_type = data.get("type")
+            payload = data.get("payload", {})
+
+            if msg_type == "PING":
+                await websocket.send_json({
+                    "type": "PONG",
+                    "payload": {"server_time": payload.get("timestamp")}
+                })
+
+            elif msg_type == "IDENTIFY":
+                meta = {
+                    "user_id": payload.get("user_id"),
+                    "nombre": payload.get("nombre"),
+                    "email": payload.get("email"),
+                    "rol": payload.get("rol", "alumno")
+                }
+                connection_manager.client_meta[websocket] = meta
+                await connection_manager.broadcast_to_room(room_code, {
+                    "type": "PARTICIPANT_JOINED",
+                    "payload": {
+                        "user": meta,
+                        "total_conectados": connection_manager.get_connected_count(room_code)
+                    }
+                })
+
+            elif msg_type == "VOTE_CAST":
+                # Estudiante emite o actualiza su voto de hipótesis clínica
+                await connection_manager.broadcast_to_room(room_code, {
+                    "type": "VOTE_CAST",
+                    "payload": payload
+                })
+
+            elif msg_type == "SYNC_REQUEST":
+                fresh_state = collab_service.get_room(room_code)
+                await websocket.send_json({
+                    "type": "ROOM_STATE_UPDATED",
+                    "payload": fresh_state
+                })
+
+    except WebSocketDisconnect:
+        meta = await connection_manager.disconnect(room_code, websocket)
+        if meta:
+            await connection_manager.broadcast_to_room(room_code, {
+                "type": "PARTICIPANT_LEFT",
+                "payload": {
+                    "user": meta,
+                    "total_conectados": connection_manager.get_connected_count(room_code)
+                }
+            })
+    except Exception as e:
+        logger.error(f"[WS] Error inesperado en socket de sala '{room_code}': {e}")
+        await connection_manager.disconnect(room_code, websocket)
+

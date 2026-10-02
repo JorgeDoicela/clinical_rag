@@ -23,14 +23,18 @@ class CaseService:
         cases = self.repository.get_all()
         if especialidad:
             esp_lower = especialidad.lower()
-            cases = [c for c in cases if esp_lower in c.especialidad.lower()]
+            cases = [c for c in cases if getattr(c, "especialidad", None) and esp_lower in c.especialidad.lower()]
         if dificultad:
             dif_lower = dificultad.lower()
-            cases = [c for c in cases if dif_lower in c.dificultad.lower()]
+            cases = [c for c in cases if getattr(c, "dificultad", None) and dif_lower in c.dificultad.lower()]
         return cases
 
     def get_case(self, case_id: str) -> Optional[ClinicalCaseSchema]:
         return self.repository.get_by_id(case_id)
+
+    def create_case(self, case: ClinicalCaseSchema, creado_por: Optional[str] = None) -> ClinicalCaseSchema:
+        """Crea o actualiza un caso clínico en la base de datos relacional."""
+        return self.repository.save_case(case, creado_por=creado_por)
 
     def get_case_image_path(self, case_id: str, image_filename: str) -> Optional[Path]:
         img_path = self.images_base_dir / image_filename
