@@ -6,19 +6,7 @@ import pymupdf
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 from config import GEMINI_API_KEY, GEMINI_MODEL
-
-_GEMINI_CLIENT = None
-
-def get_ocr_gemini_client():
-    """Inicializa el cliente de Gemini API para OCR Multimodal."""
-    global _GEMINI_CLIENT
-    if _GEMINI_CLIENT is None and GEMINI_API_KEY:
-        try:
-            from google import genai
-            _GEMINI_CLIENT = genai.Client(api_key=GEMINI_API_KEY)
-        except Exception as e:
-            print(f"[OCR] No se pudo inicializar Gemini Client para OCR: {e}", flush=True)
-    return _GEMINI_CLIENT
+from services.llm_gateway import llm_gateway, LLMException
 
 def render_pdf_page_to_png(pdf_path: Path, page_number: int, dpi: int = 180) -> Optional[bytes]:
     """
@@ -60,11 +48,9 @@ def perform_defensive_ocr_on_page(pdf_path: Path, page_number: int) -> str:
     except Exception:
         pass
 
-    # Nivel 2: OCR Multimodal de Alta Precisión con Gemini Vision API
-    client = get_ocr_gemini_client()
-    if client:
+    # Nivel 2: OCR Multimodal de Alta Precisión con Gemini Vision API (vía Resilient Gateway)
+    if GEMINI_API_KEY:
         try:
-            from google.genai import types
             prompt_ocr = (
                 "Actúa como un transcriptor médico de precisión para Guías de Práctica Clínica (GPC) del MSP Ecuador.\n"
                 "Transcribe todo el texto, tablas y algoritmos clínicos contenidos en esta imagen escaneada del documento oficial.\n"
@@ -73,20 +59,18 @@ def perform_defensive_ocr_on_page(pdf_path: Path, page_number: int) -> str:
                 "- Si la imagen es una portada decorativa o página en blanco sin contenido médico, responde únicamente: 'PORTADA_SIN_TEXTO_CLINICO'."
             )
 
-            response = client.models.generate_content(
-                model=GEMINI_MODEL,
-                contents=[
-                    types.Part.from_bytes(data=image_bytes, mime_type="image/png"),
-                    prompt_ocr
-                ]
+            result = llm_gateway.generate(
+                prompt=prompt_ocr,
+                imagenes_list=[(image_bytes, "image/png")],
+                temperature=0.0
             )
 
-            ocr_text = response.text.strip() if response and response.text else ""
+            ocr_text = result.text.strip() if result and result.text else ""
             if "PORTADA_SIN_TEXTO_CLINICO" in ocr_text:
                 return ""
 
             if len(ocr_text) > 40:
-                print(f"  [OCR GEMINI VISION] Extraídos {len(ocr_text)} caracteres en pág. {page_number} de '{pdf_path.name}'", flush=True)
+                print(f"  [OCR GEMINI VISION - {result.model_used}] Extraídos {len(ocr_text)} caracteres en pág. {page_number} de '{pdf_path.name}'", flush=True)
                 return ocr_text
 
         except Exception as api_err:

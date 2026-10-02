@@ -54,3 +54,12 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     * Backend: 6 suites maestras aprobadas en 37s (`tests/run_all_tests.py`).
     * Frontend: 12 suites y 44 tests aprobados (`vitest run`).
     * Compilación de producción: `vite build` completado sin errores (1,604 módulos, PWA habilitada).
+* **Arquitectura de Resiliencia de IA y Fuente Única de Configuración (Single Source of Truth):**
+  - **12-Factor App & Centralización:** Se unificó toda la configuración en `.env` (raíz), eliminando la duplicidad en subcarpetas y vinculando directamente `docker-compose.yml` (`env_file: - .env`).
+  - **AppSettings Tipado:** Se refactorizó `backend/config.py` con Pydantic para validación Fail-Fast de variables críticas al arranque (puertos, rutas absolutas, API key, JWT y orígenes permitidos).
+  - **ResilientLLMGateway con Circuit Breaker:** Se implementó `backend/services/llm_gateway.py` desacoplando el acceso a modelos de IA. Incorpora máquina de estados (`CLOSED`, `OPEN`, `HALF_OPEN`) con cooldown configurable (`GEMINI_CIRCUIT_COOLDOWN_SECONDS=300`), discriminando entre errores fatales (401/403) y transitorios (404/429/503/timeouts) para conmutar sin latencia fantasma entre la jerarquía de modelos configurada (`gemini-3.8-flash`, `gemini-flash-lite-latest`, `gemini-flash-latest`, `gemini-3.5-flash-lite`, `gemini-3.7-flash`).
+  - **Desacoplamiento de Consumidores:** `backend/rag/evaluator.py` y `backend/ingestion/ocr_service.py` delegan de forma transparente en `llm_gateway`, garantizando alta disponibilidad sin código duplicado.
+* **Organización Modular Docs-as-Code (`docs/`):**
+  - **Eliminación de Artefactos Sueltos:** Se reubicaron figuras PNG y tablas `.tex` dispersas en la raíz de `docs/` hacia `docs/1_tablas_latex/` y `docs/2_figuras_300dpi/`.
+  - **Nueva Carpeta Temática:** Se creó `docs/6_despliegue_y_operaciones/` para albergar `DESPLIEGUE_Y_ACCESO_CLOUDFLARE_TUNNEL.md`.
+  - **Corrección de Causa Raíz en Scripts de Prueba:** Se actualizaron `pilot_study_analyzer.py`, `run_faithfulness_benchmark.py`, `run_ibf_figure.py` y `run_kst_simulation.py` para exportar directamente a sus subcarpetas correspondientes, previniendo la contaminación de la raíz de `docs/`.

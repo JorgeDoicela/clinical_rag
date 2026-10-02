@@ -16,7 +16,7 @@ if hasattr(sys.stderr, "reconfigure"):
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-OUTPUT_DIR  = Path(__file__).resolve().parent.parent.parent / "docs"
+OUTPUT_DIR  = Path(__file__).resolve().parent.parent.parent / "docs" / "2_figuras_300dpi"
 OUTPUT_PNG  = OUTPUT_DIR / "figura_ibf_cohorte.png"
 OUTPUT_JSON = Path(__file__).resolve().parent / "resultados_ibf_figure.json"
 

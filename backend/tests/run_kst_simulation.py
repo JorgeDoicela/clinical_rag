@@ -26,8 +26,9 @@ from adaptive.knowledge_tracer import (
 )
 from adaptive.knowledge_space import CLINICAL_COMPETENCIES
 
-OUTPUT_DIR = Path(__file__).resolve().parent.parent.parent / "docs"
-OUTPUT_PNG  = OUTPUT_DIR / "figura_kst_trajectory.png"
+DOCS_DIR   = Path(__file__).resolve().parent.parent.parent / "docs"
+OUTPUT_PNG = DOCS_DIR / "2_figuras_300dpi" / "figura_kst_trajectory.png"
+OUTPUT_TEX = DOCS_DIR / "1_tablas_latex" / "tabla_kst_bkt_paper.tex"
 OUTPUT_JSON = Path(__file__).resolve().parent / "resultados_kst_simulation.json"
 
 
@@ -179,7 +180,8 @@ def run_kst_simulation():
     print(f"\n[JSON] Exportado: {OUTPUT_JSON}")
 
     # ── Generar Tabla V en LaTeX (BKT por competencia: estado final) ─────────
-    OUTPUT_TEX = OUTPUT_DIR / "tabla_kst_bkt_paper.tex"
+    OUTPUT_TEX.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT_PNG.parent.mkdir(parents=True, exist_ok=True)
     rows_tex = ""
     for comp in COMPETENCIAS:
         label = COMPETENCIAS_DISPLAY.get(comp, comp)

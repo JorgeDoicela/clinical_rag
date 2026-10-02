@@ -17,7 +17,8 @@ if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 DATA_PATH = Path(__file__).resolve().parent.parent / "data" / "pilot_study" / "resultados_pilot.csv"
-OUTPUT_TEX_PATH = Path(__file__).resolve().parent.parent.parent / "docs" / "tabla_pilot_study_paper.tex"
+DOCS_DIR = Path(__file__).resolve().parent.parent.parent / "docs"
+OUTPUT_TEX_PATH = DOCS_DIR / "1_tablas_latex" / "tabla_pilot_study_paper.tex"
 
 def calculate_learning_gains() -> Dict[str, Any]:
     if not DATA_PATH.exists():
@@ -113,7 +114,8 @@ Tamaño de Muestra ($N$) & {results['n']} internos & {results['n']} internos & -
 
 def generate_learning_gain_figure(results: Dict[str, Any]):
     """Genera la Figura 1 del paper: Pre/Post-Test y distribución de Hake g (300 DPI)."""
-    OUTPUT_FIG = OUTPUT_TEX_PATH.parent / "figura_learning_gain.png"
+    OUTPUT_FIG = DOCS_DIR / "2_figuras_300dpi" / "figura_learning_gain.png"
+    OUTPUT_FIG.parent.mkdir(parents=True, exist_ok=True)
     try:
         import matplotlib
         matplotlib.use("Agg")

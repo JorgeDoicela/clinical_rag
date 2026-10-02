@@ -23,7 +23,7 @@ from models.clinical_case import load_all_cases
 from rag.retriever import retrieve_relevant_chunk
 from evaluation.faithfulness_scorer import calculate_faithfulness_score
 
-OUTPUT_TEX_PATH = Path(__file__).resolve().parent.parent.parent / "docs" / "tabla_faithfulness_paper.tex"
+OUTPUT_TEX_PATH = Path(__file__).resolve().parent.parent.parent / "docs" / "1_tablas_latex" / "tabla_faithfulness_paper.tex"
 OUTPUT_JSON_PATH = Path(__file__).resolve().parent / "resultados_faithfulness.json"
 
 def run_faithfulness_benchmark() -> Dict[str, Any]:

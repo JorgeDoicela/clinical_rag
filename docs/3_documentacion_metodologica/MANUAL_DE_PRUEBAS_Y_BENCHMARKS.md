@@ -101,11 +101,11 @@ backend/.venv/Scripts/pytest backend/tests/ -v
 
 | Script | Descripción | Artefactos Exportados |
 |:---|:---|:---|
-| `run_kst_simulation.py` | Simulación longitudinal BKT comparativa (Ruta Fija vs KST Adaptativa) | `docs/figura_kst_trajectory.png` (300 DPI)<br>`docs/tabla_kst_bkt_paper.tex`<br>`backend/tests/resultados_kst_simulation.json` |
-| `run_ibf_figure.py` | Generación de visualización de cohorte en 4 ejes clínicos con umbral normativo | `docs/figura_ibf_cohorte.png` (300 DPI)<br>`backend/tests/resultados_ibf_figure.json` |
-| `run_faithfulness_benchmark.py` | Benchmark de anclaje normativo de las 12 GPCs frente a fragmentos normativos | `docs/tabla_faithfulness_paper.tex`<br>`backend/tests/resultados_faithfulness.json` |
-| `run_metrics.py` | Evaluación cuantitativa completa del pipeline RAG (Hit@1, MRR@5, NDCG@5, Latencias) | `backend/tests/tabla_resultados_paper.tex`<br>`backend/tests/resultados_metricas.json` |
-| `pilot_study_analyzer.py` | Análisis inferencial del estudio piloto con ganancia de aprendizaje | `docs/figura_learning_gain.png` (300 DPI)<br>`docs/tabla_pilot_study_paper.tex` |
+| `run_kst_simulation.py` | Simulación longitudinal BKT comparativa (Ruta Fija vs KST Adaptativa) | `docs/2_figuras_300dpi/figura_kst_trajectory.png`<br>`docs/1_tablas_latex/tabla_kst_bkt_paper.tex`<br>`backend/tests/resultados_kst_simulation.json` |
+| `run_ibf_figure.py` | Generación de visualización de cohorte en 4 ejes clínicos con umbral normativo | `docs/2_figuras_300dpi/figura_ibf_cohorte.png`<br>`backend/tests/resultados_ibf_figure.json` |
+| `run_faithfulness_benchmark.py` | Benchmark de anclaje normativo de las 12 GPCs frente a fragmentos normativos | `docs/1_tablas_latex/tabla_faithfulness_paper.tex`<br>`backend/tests/resultados_faithfulness.json` |
+| `run_metrics.py` | Evaluación cuantitativa completa del pipeline RAG (Hit@1, MRR@5, NDCG@5, Latencias) | `docs/1_tablas_latex/tabla_resultados_paper.tex`<br>`backend/tests/resultados_metricas.json` |
+| `pilot_study_analyzer.py` | Análisis inferencial del estudio piloto con ganancia de aprendizaje | `docs/2_figuras_300dpi/figura_learning_gain.png`<br>`docs/1_tablas_latex/tabla_pilot_study_paper.tex` |
 
 ---
 

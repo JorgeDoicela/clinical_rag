@@ -82,15 +82,21 @@ Algoritmo de auditoría que comprueba que cada acierto u omisión generado por l
 
 El entorno completo (Backend FastAPI + Frontend React/Vite + Base Vectorial ChromaDB + Pesos Fine-Tuned + SQLite) se ejecuta de forma contenerizada:
 
-### 3.1 Configuración Previa: Variables de Entorno
+### 3.1 Configuración Previa: Variables de Entorno (Única Fuente de Verdad)
 
-Copia el archivo de ejemplo y completa tu API Key de Google Gemini:
+Copia el archivo de plantilla ubicado en la raíz del proyecto y completa tu API Key de Google Gemini:
 
 ```bash
-cp backend/.env.example backend/.env
+cp .env.example .env
 ```
 
-Edita `backend/.env` y configura la variable `ALLOWED_ORIGINS` según tu escenario:
+Edita `.env` para configurar las credenciales y el enrutamiento de modelos:
+
+* `GEMINI_API_KEY`: Clave de acceso a la API de Google Gemini (requerida).
+* `GEMINI_MODEL`: Modelo primario de inferencia (por defecto `gemini-3.8-flash`).
+* `GEMINI_FALLBACK_MODELS`: Cadena priorizada de modelos de respaldo separados por coma (`gemini-flash-lite-latest,gemini-flash-latest,gemini-3.5-flash-lite,gemini-3.7-flash`).
+* `GEMINI_CIRCUIT_COOLDOWN_SECONDS`: Tiempo de cuarentena del Circuit Breaker ante fallos 404/429 (por defecto `300` segundos).
+* `ALLOWED_ORIGINS`: Control de CORS según el entorno de despliegue:
 
 | Valor de `ALLOWED_ORIGINS` | Comportamiento | Cuándo usarlo |
 | :--- | :--- | :--- |
@@ -149,7 +155,7 @@ Para compartir el sistema en demostraciones públicas con certificado HTTPS vál
 4. **Para finalizar la sesión pública:**
    Basta con presionar **`Ctrl + C`** en la ventana de PowerShell para cerrar el túnel de inmediato sin afectar los contenedores locales.
 
-> **Nota de Configuración:** Requiere `ALLOWED_ORIGINS=*` en `backend/.env`. El frontend de Vite automáticamente proxifica las peticiones `/api` y `/static` hacia el backend en Docker, garantizando navegación fluida por HTTPS.
+> **Nota de Configuración:** Requiere `ALLOWED_ORIGINS=*` en `.env`. El frontend de Vite automáticamente proxifica las peticiones `/api` y `/static` hacia el backend en Docker, garantizando navegación fluida por HTTPS.
 
 ---
 
@@ -192,6 +198,7 @@ clinical_rag/
 │   │   ├── CURRICULO_ADAPTATIVO_KST_Y_LEARNING_ANALYTICS.md # Fundamentación KST/BKT/ZDP/IBF
 │   │   ├── PROTOCOLO_PILOTO_LEARNING_GAIN.md # Protocolo de estudio clínico e instrumentos
 │   │   ├── ARQUITECTURA_RAG_Y_FINE_TUNING.md # Especificación técnica del recuperador híbrido
+│   │   ├── ARQUITECTURA_RESILIENTE_LLM_Y_CONFIGURACION.md # Gateway resiliente, Circuit Breaker y 12-Factor App
 │   │   ├── DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md # Análisis crítico y amenazas a la validez
 │   │   ├── PUBLICACION_Y_PRESENTACION_CONGRESO.md # Guía editorial y estructura de presentación
 │   │   ├── MANUAL_DE_PRUEBAS_Y_BENCHMARKS.md # Guía para réplica experimental
@@ -204,16 +211,19 @@ clinical_rag/
 │   ├── 4_pdf_compilado/                  # DOCUMENTO PDF UNIFICADO
 │   │   └── COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf # Documento consolidado de 3 páginas con tablas y figuras
 │   │
-│   └── 5_capturas_sistema/               # EVIDENCIA VISUAL DE LA PLATAFORMA EN EJECUCIÓN
-│       ├── GUIA_VISUAL_DEL_SISTEMA.md    # Manual visual explicativo de cada módulo y pantalla
-│       ├── 01_autenticacion_usuario.png  # Pantalla de acceso RBAC
-│       ├── 02_catalogo_y_recomendacion_zdp.png # Catálogo y recomendador ZDP
-│       ├── 03_grafo_espacio_conocimiento_kst.png # Modal del grafo de competencias KST
-│       ├── 04_resolucion_multimodal_rx_dictado.png # Caso de neumonía con Rx y dictado por voz
-│       ├── 05_simulacion_dinamica_fases_clinicas.png # Stepper de simulación por fases
-│       ├── 06_panel_docente_analitica_ibf.png # Dashboard B2B con IBF de cohorte y alertas
-│       ├── 07_panel_docente_deficiencias_institucionales.png # Top deficiencias curriculares
-│       └── 08_perfil_estudiante_radar_competencias.png # Radar de competencias Recharts
+│   ├── 5_capturas_sistema/               # EVIDENCIA VISUAL DE LA PLATAFORMA EN EJECUCIÓN
+│   │   ├── GUIA_VISUAL_DEL_SISTEMA.md    # Manual visual explicativo de cada módulo y pantalla
+│   │   ├── 01_autenticacion_usuario.png  # Pantalla de acceso RBAC
+│   │   ├── 02_catalogo_y_recomendacion_zdp.png # Catálogo y recomendador ZDP
+│   │   ├── 03_grafo_espacio_conocimiento_kst.png # Modal del grafo de competencias KST
+│   │   ├── 04_resolucion_multimodal_rx_dictado.png # Caso de neumonía con Rx y dictado por voz
+│   │   ├── 05_simulacion_dinamica_fases_clinicas.png # Stepper de simulación por fases
+│   │   ├── 06_panel_docente_analitica_ibf.png # Dashboard B2B con IBF de cohorte y alertas
+│   │   ├── 07_panel_docente_deficiencias_institucionales.png # Top deficiencias curriculares
+│   │   └── 08_perfil_estudiante_radar_competencias.png # Radar de competencias Recharts
+│   │
+│   └── 6_despliegue_y_operaciones/       # INFRAESTRUCTURA Y ACCESO REMOTO
+│       └── DESPLIEGUE_Y_ACCESO_CLOUDFLARE_TUNNEL.md # Guía de túnel Cloudflare seguro (TLS 1.3)
 │
 ├── backend/                              # SERVICIOS BACKEND FASTAPI (PYTHON 3.11)
 │   ├── adaptive/                         # Motor de Currículo Adaptativo (KST, BKT y ZDP)
@@ -239,6 +249,7 @@ clinical_rag/
 │   │   ├── history.py                    # Historial, IBF de cohorte y exportación PDF
 │   │   └── collaboration.py              # Salas sincrónicas de Ateneo en tiempo real
 │   ├── services/
+│   │   ├── llm_gateway.py                # Gateway de IA resiliente con Circuit Breaker y fallback
 │   │   └── pdf_report_generator.py       # Generador de dictamen PDF institucional con SHA-256
 │   ├── cases_data/                       # 12 casos clínicos normativos y banco de imágenes
 │   │   ├── cases.json                    # Casos con competencias activadas y GPC asignada
@@ -333,7 +344,9 @@ docker compose exec backend python scripts/generate_paper_tables_pdf.py
 
 * **Redacción en [Overleaf](https://www.overleaf.com/) / LaTeX:** Subir las subcarpetas [`docs/1_tablas_latex/`](docs/1_tablas_latex/) y [`docs/2_figuras_300dpi/`](docs/2_figuras_300dpi/) al proyecto. En el archivo `main.tex` se insertan las tablas con `\input{tabla_resultados_paper.tex}` o se compila directamente el archivo maestro [`compendio_tablas_y_figuras_paper.tex`](docs/1_tablas_latex/compendio_tablas_y_figuras_paper.tex).
 * **Redacción en Microsoft Word / Google Docs:** Abrir el documento [`docs/4_pdf_compilado/COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf`](docs/4_pdf_compilado/COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf), copiar las tablas de datos e insertar las figuras PNG de alta resolución.
-* **Documentación Metodológica:** Los archivos `.md` en [`docs/3_documentacion_metodologica/`](docs/3_documentacion_metodologica/) contienen la formulación matemática, justificación de la pérdida MNRL y el análisis de limitaciones.
+* **Documentación Metodológica y Arquitectónica:** Los archivos `.md` en [`docs/3_documentacion_metodologica/`](docs/3_documentacion_metodologica/) contienen la formulación matemática, justificación de la pérdida MNRL, análisis de limitaciones y la especificación del Gateway Resiliente:
+  * [Arquitectura de Resiliencia de IA y Configuración 12-Factor](docs/3_documentacion_metodologica/ARQUITECTURA_RESILIENTE_LLM_Y_CONFIGURACION.md)
+  * [Arquitectura RAG Híbrida y Fine-Tuning](docs/3_documentacion_metodologica/ARQUITECTURA_RAG_Y_FINE_TUNING.md)
 
 ---
 
@@ -343,5 +356,5 @@ docker compose exec backend python scripts/generate_paper_tables_pdf.py
 ## 9. Acceso Remoto Seguro (Cloudflare Tunnel)
 
 Para la exposicion segura del sistema en entornos de demostracion y evaluacion remota bajo el dominio oficial https://ateneo.doicela.dev, consultar la guia completa de infraestructura y despliegue en:
-* [docs/DESPLIEGUE_Y_ACCESO_CLOUDFLARE_TUNNEL.md](docs/DESPLIEGUE_Y_ACCESO_CLOUDFLARE_TUNNEL.md)
+* [docs/6_despliegue_y_operaciones/DESPLIEGUE_Y_ACCESO_CLOUDFLARE_TUNNEL.md](docs/6_despliegue_y_operaciones/DESPLIEGUE_Y_ACCESO_CLOUDFLARE_TUNNEL.md)
 *Desarrollado para la investigación en educación médica formativa basada en inteligencia artificial en Ecuador.*

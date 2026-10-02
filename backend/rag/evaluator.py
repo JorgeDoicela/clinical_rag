@@ -4,6 +4,7 @@ from typing import Dict, Any, Optional, List, Tuple
 from google import genai
 from google.genai import types
 from config import GEMINI_API_KEY, GEMINI_MODEL
+from services.llm_gateway import llm_gateway, AllModelsExhaustedException, FatalLLMException
 from models.schemas import EvaluationResult, ClinicalCaseSchema, CitaNormativa, PhaseEvaluationResult
 from rag.prompt_builder import SYSTEM_INSTRUCTION, build_prompt, build_phase_prompt
 
@@ -15,17 +16,14 @@ def call_gemini_llm(
     imagen_mime: str = "image/jpeg"
 ) -> str:
     """
-    Llama a la API de Google Gemini usando el SDK oficial `google-genai`
-    solicitando respuesta JSON forzada mediante response_mime_type.
-    Soporta Fusión Multimodal Simultánea: envía múltiples estudios diagnósticos
-    (ECG, Rx, Labs, etc.) en un SOLO request multimodal a Gemini.
+    Llama a la API de Google Gemini a través del ResilientLLMGateway oficial.
+    Soporta Circuit Breaker automático, fallback entre modelos configurados sin latencia fantasma
+    y Fusión Multimodal Simultánea (ECG, Rx, Labs).
     """
-    # Normalizar a lista unificada de (bytes, mime)
     partes_imagenes: List[Tuple[bytes, str]] = []
     if imagenes_list:
         partes_imagenes = imagenes_list
     elif imagen_bytes:
-        # Backward compat: imagen singular
         partes_imagenes = [(imagen_bytes, imagen_mime)]
 
     if not GEMINI_API_KEY:
@@ -58,58 +56,19 @@ def call_gemini_llm(
             "retroalimentacion_general": "Excelente razonamiento inicial en el diagnóstico. Recuerda revisar la dosificación exacta recomendada por el MSP."
         })
 
-    client = genai.Client(api_key=GEMINI_API_KEY)
-
-    config = types.GenerateContentConfig(
-        system_instruction=SYSTEM_INSTRUCTION,
-        response_mime_type="application/json",
-        temperature=0.2
-    )
-
-    models_to_try = [
-        GEMINI_MODEL,
-        "gemini-flash-lite-latest",
-        "gemini-3.5-flash-lite",
-        "gemini-3.1-flash-lite",
-        "gemini-3.7-flash",
-        "gemini-3.8-flash",
-        "gemini-flash-latest",
-        "gemini-3.5-flash",
-        "gemini-3.6-flash",
-        "gemini-3-flash-preview",
-        "gemini-2.5-flash",
-        "gemini-2.5-flash-lite",
-        "gemini-2.0-flash",
-    ]
-    # Eliminar duplicados preservando orden
-    seen = set()
-    unique_models = [m for m in models_to_try if not (m in seen or seen.add(m))]
-
-    last_err = None
-    for model_name in unique_models:
-        try:
-            if partes_imagenes:
-                n_estudios = len(partes_imagenes)
-                print(f"[LLM] Enviando prompt MULTIMODAL ({n_estudios} estudio(s) adjunto(s)) a Gemini (Modelo: {model_name})...", flush=True)
-                # Construir lista de parts: todas las imágenes primero, luego el texto del prompt
-                image_parts = [
-                    types.Part.from_bytes(data=img_b, mime_type=img_m)
-                    for img_b, img_m in partes_imagenes
-                ]
-                contents = image_parts + [prompt]
-            else:
-                print(f"[LLM] Enviando prompt a Google Gemini API (Modelo: {model_name})...", flush=True)
-                contents = prompt
-            response = client.models.generate_content(
-                model=model_name,
-                contents=contents,
-                config=config
-            )
-            print(f"[LLM] Respuesta de Gemini recibida exitosamente desde {model_name}.", flush=True)
-            return response.text
-        except Exception as err:
-            print(f"[LLM] Error al invocar el modelo {model_name}: {err}", flush=True)
-            last_err = err
+    try:
+        result = llm_gateway.generate(
+            prompt=prompt,
+            imagenes_list=partes_imagenes if partes_imagenes else None,
+            system_instruction=SYSTEM_INSTRUCTION,
+            response_mime_type="application/json",
+            temperature=0.2
+        )
+        return result.text
+    except AllModelsExhaustedException as exc:
+        print(f"[LLM] ALERTA RESILIENCIA: {exc}. Activando fallback formativo de respaldo...", flush=True)
+    except FatalLLMException as fatal:
+        print(f"[LLM] ERROR CRÍTICO AUTENTICACIÓN: {fatal}. Activando fallback formativo de respaldo...", flush=True)
 
     # Si la cuota gratuita de la API se agotó temporalmente en todos los modelos, usar fallback defensivo formativo
     print("[LLM] Cuota gratuita de Gemini agotada temporalmente. Devolviendo evaluación formativa de respaldo...", flush=True)
