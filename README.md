@@ -94,7 +94,7 @@ Edita `.env` para configurar las credenciales y el enrutamiento de modelos:
 
 * `GEMINI_API_KEY`: Clave de acceso a la API de Google Gemini (requerida).
 * `GEMINI_MODEL`: Modelo primario de inferencia (por defecto `gemini-3.8-flash`).
-* `GEMINI_FALLBACK_MODELS`: Cadena priorizada de modelos de respaldo separados por coma (`gemini-flash-lite-latest,gemini-flash-latest,gemini-3.5-flash-lite,gemini-3.7-flash`).
+* `GEMINI_FALLBACK_MODELS`: Cadena priorizada de modelos de respaldo por degradación gradual clínica (`gemini-3.7-flash,gemini-3.5-flash,gemini-flash-latest,gemini-flash-lite-latest`).
 * `GEMINI_CIRCUIT_COOLDOWN_SECONDS`: Tiempo de cuarentena del Circuit Breaker ante fallos 404/429 (por defecto `300` segundos).
 * `ALLOWED_ORIGINS`: Control de CORS según el entorno de despliegue:
 

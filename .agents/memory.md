@@ -57,7 +57,16 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
 * **Arquitectura de Resiliencia de IA y Fuente Única de Configuración (Single Source of Truth):**
   - **12-Factor App & Centralización:** Se unificó toda la configuración en `.env` (raíz), eliminando la duplicidad en subcarpetas y vinculando directamente `docker-compose.yml` (`env_file: - .env`).
   - **AppSettings Tipado:** Se refactorizó `backend/config.py` con Pydantic para validación Fail-Fast de variables críticas al arranque (puertos, rutas absolutas, API key, JWT y orígenes permitidos).
-  - **ResilientLLMGateway con Circuit Breaker:** Se implementó `backend/services/llm_gateway.py` desacoplando el acceso a modelos de IA. Incorpora máquina de estados (`CLOSED`, `OPEN`, `HALF_OPEN`) con cooldown configurable (`GEMINI_CIRCUIT_COOLDOWN_SECONDS=300`), discriminando entre errores fatales (401/403) y transitorios (404/429/503/timeouts) para conmutar sin latencia fantasma entre la jerarquía de modelos configurada (`gemini-3.8-flash`, `gemini-flash-lite-latest`, `gemini-flash-latest`, `gemini-3.5-flash-lite`, `gemini-3.7-flash`).
+  - **ResilientLLMGateway con Circuit Breaker:** Se implementó `backend/services/llm_gateway.py` desacoplando el acceso a modelos de IA. Incorpora máquina de estados (`CLOSED`, `OPEN`, `HALF_OPEN`) con cooldown configurable (`GEMINI_CIRCUIT_COOLDOWN_SECONDS=300`), discriminando entre errores fatales (401/403) y transitorios (404/429/503/timeouts) para conmutar sin latencia fantasma.
+  - **Auditoría Empírica de Modelos y Degradación Gradual Clínica:**
+    * Se comprobó empíricamente el nivel de servicio de la clave: `X-Gemini-Service-Tier: standard` (cuenta de pago).
+    * Se constató la deprecación de endpoints como `gemini-2.5-flash` (HTTP 404).
+    * Se consolidó la jerarquía de relevo por preservación de razonamiento diagnóstico:
+      1. Primario: `gemini-3.8-flash` (máxima fidelidad clínica y JSON estricto).
+      2. Respaldo 1: `gemini-3.7-flash` (potencia y profundidad diagnóstica equivalente).
+      3. Respaldo 2: `gemini-3.5-flash` (alta velocidad con razonamiento sólido).
+      4. Respaldo 3: `gemini-flash-latest` (alias canónico completo actualizado).
+      5. Salvavidas extremo: `gemini-flash-lite-latest` (~818 ms, contingencia de saturación de cuota).
   - **Desacoplamiento de Consumidores:** `backend/rag/evaluator.py` y `backend/ingestion/ocr_service.py` delegan de forma transparente en `llm_gateway`, garantizando alta disponibilidad sin código duplicado.
 * **Organización Modular Docs-as-Code (`docs/`):**
   - **Eliminación de Artefactos Sueltos:** Se reubicaron figuras PNG y tablas `.tex` dispersas en la raíz de `docs/` hacia `docs/1_tablas_latex/` y `docs/2_figuras_300dpi/`.

@@ -79,15 +79,24 @@ La jerarquía de conmutación se parametriza externamente sin requerir recompila
 
 ```dotenv
 GEMINI_MODEL=gemini-3.8-flash
-GEMINI_FALLBACK_MODELS=gemini-flash-lite-latest,gemini-flash-latest,gemini-3.5-flash-lite,gemini-3.7-flash
+GEMINI_FALLBACK_MODELS=gemini-3.7-flash,gemini-3.5-flash,gemini-flash-latest,gemini-flash-lite-latest
 GEMINI_CIRCUIT_COOLDOWN_SECONDS=300
 ```
 
-1. **Nodo 1 (Primario):** `gemini-3.8-flash` (alta velocidad de inferencia, soporte multimodal y adherencia estricta a esquemas JSON).
-2. **Nodo 2 (Secundario):** `gemini-flash-lite-latest` (menor consumo de cuota y latencia reducida).
-3. **Nodo 3 (Terciario):** `gemini-flash-latest` (versión balanceada general).
-4. **Nodo 4 (Cuaternario):** `gemini-3.5-flash-lite` (generación de respaldo complementario).
-5. **Nodo 5 (Quinto):** `gemini-3.7-flash` (nodo de alta capacidad para contingencias).
+### 4.1 Principio de Degradación Gradual Clínica (*Graceful Degradation*)
+
+En sistemas de evaluación médica y simulación formativa, la jerarquía de conmutación prioriza la **profundidad de razonamiento diagnóstico y fidelidad a la GPC** antes de degradar hacia modelos económicos/ligeros:
+
+| Nivel | Modelo | Latencia Mediana | Ventana Contexto | Rol en la Cascada Clínica |
+| :---: | :--- | :---: | :---: | :--- |
+| **1 (Primario)** | `gemini-3.8-flash` | 2,456 ms | 1,048,576 tokens | **Inferencia Principal:** Máxima agudeza médica, multimodalidad y JSON estricto. |
+| **2 (Respaldo 1)** | `gemini-3.7-flash` | 2,664 ms | 1,048,576 tokens | **Potencia Completa:** Mantiene el 100% del rigor clínico si 3.8 está saturado. |
+| **3 (Respaldo 2)** | `gemini-3.5-flash` | 1,744 ms | 1,048,576 tokens | **Flash Estándar:** Alta velocidad y comprensión probada de tablas GPC. |
+| **4 (Respaldo 3)** | `gemini-flash-latest` | 2,865 ms | 1,048,576 tokens | **Alias Canónico:** Apunta a la versión general estable de Google. |
+| **5 (Salvavidas)** | `gemini-flash-lite-latest` | **818 ms** | 1,048,576 tokens | **Alta Disponibilidad:** Red de seguridad final para evitar caídas ante cuota crítica. |
+
+> [!NOTE]
+> **Fundamentación:** Conmutar directamente a un modelo *Lite* ante el primer fallo degrada prematuramente la evaluación clínica de dosis y paraclínicos. Los modelos *Lite* se reservan como salvavidas de disponibilidad final.
 
 ---
 
