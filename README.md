@@ -283,19 +283,21 @@ clinical_rag/
 │
 ├── frontend/                             # APLICACIÓN CLIENTE REACT 18 + VITE 6 (SPA/PWA)
 │   └── src/
-│       ├── components/
-│       │   ├── AdaptiveNextCase.jsx      # Card de recomendación en ZDP
-│       │   ├── KnowledgeSpaceGraph.jsx   # Grafo SVG interactivo de dominio KST/BKT
-│       │   ├── VoiceInputButton.jsx      # Dictado clínico por voz (Web Speech API)
-│       │   ├── ImageUploadZone.jsx       # Galería multi-estudio con badges Rx/ECG/Lab
-│       │   ├── FeedbackCard.jsx          # Retroalimentación con sello Faithfulness Score
-│       │   ├── CoordinatorAnalytics.jsx  # Panel docente con IBF de cohorte y alertas
-│       │   ├── SimulationStepper.jsx     # Stepper de simulación por fases secuenciales
-│       │   └── SkillRadarChart.jsx       # Radar de competencias en 4 ejes clínicos
-│       └── pages/
-│           ├── CaseList.jsx              # Catálogo con recomendador adaptativo KST
-│           ├── CaseSolve.jsx             # Resolución split-screen con voz y multi-imagen
-│           └── AteneoRoom.jsx            # Sala colaborativa sincrónica de consenso clínico
+│       ├── core/                         # Capa transversal compartida
+│       │   ├── http/httpClient.js        # Cliente HTTP base con inyección de JWT y control de errores
+│       │   ├── ui/                       # Design tokens y componentes base (FloatingLabelInput, ClinicalButton, etc.)
+│       │   └── layouts/                  # Plantillas estructurales (Navbar, AppLayout)
+│       ├── modules/                      # Slices de dominio clínico verticalmente particionados
+│       │   ├── auth/                     # Autenticación institucional y guardias RBAC
+│       │   ├── cases/                    # Catálogo clínico, filtrado semántico y useCases hook
+│       │   ├── evaluation/               # Simulador split-screen, voz, paraclínicos y useCaseSolver
+│       │   ├── collaboration/            # Salas de consenso sincrónico y useAteneoRoom
+│       │   ├── adaptive/                 # Algorítmica adaptativa KST/BKT y grafo SVG
+│       │   └── analytics/                # Paneles docentes, radar clínico e IBF institucional
+│       ├── routes/AppRoutes.jsx          # Enrutamiento con code-splitting (React.lazy + Suspense)
+│       ├── context/AuthContext.jsx       # Contexto global de sesión y credenciales
+│       ├── components/                   # Fachadas de retrocompatibilidad hacia modules/
+│       └── pages/                        # Fachadas de retrocompatibilidad hacia modules/
 │
 └── docker-compose.yml                    # Orquestación multicontenedor para producción
 ```
@@ -351,7 +353,9 @@ docker compose exec backend python scripts/generate_paper_tables_pdf.py
 
 * **Redacción en [Overleaf](https://www.overleaf.com/) / LaTeX:** Subir las subcarpetas [`docs/1_tablas_latex/`](docs/1_tablas_latex/) y [`docs/2_figuras_300dpi/`](docs/2_figuras_300dpi/) al proyecto. En el archivo `main.tex` se insertan las tablas con `\input{tabla_resultados_paper.tex}` o se compila directamente el archivo maestro [`compendio_tablas_y_figuras_paper.tex`](docs/1_tablas_latex/compendio_tablas_y_figuras_paper.tex).
 * **Redacción en Microsoft Word / Google Docs:** Abrir el documento [`docs/4_pdf_compilado/COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf`](docs/4_pdf_compilado/COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf), copiar las tablas de datos e insertar las figuras PNG de alta resolución.
-* **Documentación Metodológica y Arquitectónica:** Los archivos `.md` en [`docs/3_documentacion_metodologica/`](docs/3_documentacion_metodologica/) contienen la formulación matemática, justificación de la pérdida MNRL, análisis de limitaciones y la especificación del Gateway Resiliente:
+* **Documentación Metodológica y Arquitectónica:** Los archivos `.md` en [`docs/3_documentacion_metodologica/`](docs/3_documentacion_metodologica/) contienen la formulación matemática, justificación de la pérdida MNRL, análisis de limitaciones y las especificaciones de arquitectura de software:
+  * [Arquitectura Modular del Frontend (Feature-Driven Slices & Core Shared)](docs/3_documentacion_metodologica/ARQUITECTURA_MODULAR_FRONTEND.md)
+  * [Arquitectura del Backend: Monolito Modular con Persistencia Desacoplada](docs/3_documentacion_metodologica/ARQUITECTURA_MODULAR_MONOLITO_BACKEND.md)
   * [Arquitectura de Resiliencia de IA y Configuración 12-Factor](docs/3_documentacion_metodologica/ARQUITECTURA_RESILIENTE_LLM_Y_CONFIGURACION.md)
   * [Arquitectura RAG Híbrida y Fine-Tuning](docs/3_documentacion_metodologica/ARQUITECTURA_RAG_Y_FINE_TUNING.md)
 

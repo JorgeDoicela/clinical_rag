@@ -1,0 +1,283 @@
+import React from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { 
+  ArrowLeft, 
+  Send, 
+  Loader2, 
+  BookOpen, 
+  AlertCircle, 
+  FileImage, 
+  Stethoscope, 
+  Activity, 
+  Sparkles,
+  ChevronRight,
+  HelpCircle,
+  Pill
+} from 'lucide-react';
+import useCaseSolver from '../hooks/useCaseSolver';
+import FeedbackCard from '../components/FeedbackCard';
+import EvaluationGameLoader from '../components/EvaluationGameLoader';
+import VoiceInputButton from '../components/VoiceInputButton';
+import ImageUploadZone from '../components/ImageUploadZone';
+import SimulationStepper from '../components/SimulationStepper';
+import PhaseFeedbackCard from '../components/PhaseFeedbackCard';
+import ClinicalButton from '../../../core/ui/ClinicalButton';
+
+export default function CaseSolve() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const {
+    caso,
+    loading,
+    error,
+    respuesta,
+    setRespuesta,
+    imagenes,
+    setImagenes,
+    evaluating,
+    resultado,
+    isPhaseMode,
+    currentPhase,
+    setCurrentPhase,
+    totalPhases,
+    activePhaseData,
+    phaseScores,
+    completedPhases,
+    currentPhaseResult,
+    showingPhaseFeedback,
+    submitSingleTurn,
+    submitPhase,
+    proceedToNextPhase,
+    resetCase,
+  } = useCaseSolver(id);
+
+  if (loading) {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center space-y-4">
+        <Activity className="w-10 h-10 text-[#0b57d0] animate-spin" />
+        <p className="text-sm font-medium text-[#444746]">
+          Cargando entorno de simulación clínica...
+        </p>
+      </div>
+    );
+  }
+
+  if (error && !caso) {
+    return (
+      <div className="bg-white rounded-[28px] p-8 max-w-lg mx-auto text-center space-y-4 shadow-xs">
+        <AlertCircle className="w-10 h-10 text-rose-600 mx-auto" />
+        <h2 className="text-xl font-normal text-[#1f1f1f] font-heading">
+          Caso No Disponible
+        </h2>
+        <p className="text-xs text-[#747775]">{error}</p>
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#f0f4f9] hover:bg-slate-200 text-[#1f1f1f] rounded-full text-xs font-medium transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Volver al Catálogo
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6 animate-fadeIn pb-16">
+      
+      {/* 1. Header de Simulación */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80">
+        <div className="flex items-center gap-3">
+          <Link
+            to="/"
+            className="p-2 rounded-full hover:bg-slate-100 text-[#444746] transition-colors"
+            title="Volver al catálogo"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          <div>
+            <div className="flex items-center gap-2 text-xs font-medium text-[#0b57d0]">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Entorno de Simulación Médica • Ateneo+</span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-normal text-[#1f1f1f] font-heading tracking-tight">
+              {caso?.titulo}
+            </h1>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <span className="text-xs font-medium bg-sky-50 text-[#0b57d0] px-3 py-1 rounded-full border border-sky-200/80">
+            {caso?.guia_asociada || 'GPC MSP'}
+          </span>
+          <span className="text-xs text-[#747775] bg-[#f0f4f9] px-3 py-1 rounded-full">
+            Dificultad: {caso?.dificultad || 'Intermedia'}
+          </span>
+        </div>
+      </div>
+
+      {/* 2. Barra de Progreso Secuencial por Fases */}
+      {isPhaseMode && !resultado && (
+        <SimulationStepper
+          currentPhase={currentPhase}
+          totalPhases={totalPhases}
+          phaseScores={phaseScores}
+          completedPhases={completedPhases}
+          onSelectPhase={(f) => setCurrentPhase(f)}
+        />
+      )}
+
+      {/* 3. Modal de Feedback Inmediato por Fase */}
+      {showingPhaseFeedback && currentPhaseResult && (
+        <PhaseFeedbackCard
+          phaseResult={currentPhaseResult}
+          currentPhase={currentPhase}
+          onProceedNextPhase={proceedToNextPhase}
+          isLastPhase={currentPhase >= totalPhases}
+        />
+      )}
+
+      {/* 4. Dictamen Formativo Global (cuando finaliza la simulación) */}
+      {resultado && (
+        <FeedbackCard
+          result={resultado}
+          studentAnswer={respuesta}
+          onReset={resetCase}
+        />
+      )}
+
+      {/* 5. Área de Trabajo Split-Screen (50% Caso / 50% Resolución) */}
+      {!resultado && !showingPhaseFeedback && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          {/* Panel Izquierdo: Enunciado Clínico y Hallazgos */}
+          <div className="lg:col-span-6 bg-white rounded-[28px] p-6 sm:p-8 shadow-xs border-0 space-y-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-xs font-medium text-[#444746]">
+                <Stethoscope className="w-4 h-4 text-[#0b57d0]" />
+                <span>Presentación del Cuadro Clínico</span>
+              </div>
+              <h2 className="text-lg font-normal text-[#1f1f1f] font-heading leading-snug">
+                {isPhaseMode && activePhaseData
+                  ? activePhaseData.titulo_fase
+                  : caso?.titulo}
+              </h2>
+            </div>
+
+            <div className="p-4 bg-[#f0f4f9] rounded-[20px] text-xs sm:text-sm text-[#1f1f1f] leading-relaxed whitespace-pre-wrap">
+              {isPhaseMode && activePhaseData
+                ? activePhaseData.escenario_clinico
+                : caso?.enunciado}
+            </div>
+
+            {/* Imagen Clínica de Apoyo */}
+            {caso?.imagen_url && (
+              <div className="space-y-2 pt-2">
+                <span className="text-xs font-medium text-[#444746] flex items-center gap-1.5">
+                  <FileImage className="w-3.5 h-3.5 text-[#0b57d0]" />
+                  Estudio de Imagen Adjunto al Caso
+                </span>
+                <div className="rounded-[20px] overflow-hidden border border-slate-200/80 bg-black/5 aspect-video flex items-center justify-center">
+                  <img
+                    src={caso.imagen_url}
+                    alt="Estudio clínico"
+                    className="max-h-72 object-contain"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Pregunta Orientadora */}
+            <div className="p-4 bg-sky-50/60 rounded-[20px] border border-sky-100 space-y-1">
+              <span className="text-xs font-semibold text-[#0b57d0] flex items-center gap-1.5">
+                <HelpCircle className="w-3.5 h-3.5" />
+                Interrogante Formativa
+              </span>
+              <p className="text-xs sm:text-sm text-[#1f1f1f] leading-relaxed font-medium">
+                {isPhaseMode && activePhaseData
+                  ? activePhaseData.pregunta_orientadora
+                  : caso?.pregunta || 'Plantee su juicio diagnóstico, exámenes prioritarios y esquema terapéutico de acuerdo a la GPC oficial del MSP.'}
+              </p>
+            </div>
+          </div>
+
+          {/* Panel Derecho: Área de Resolución Diagnóstica */}
+          <div className="lg:col-span-6 bg-white rounded-[28px] p-6 sm:p-8 shadow-xs border-0 space-y-6">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div className="space-y-0.5">
+                <h3 className="text-base font-normal text-[#1f1f1f] font-heading">
+                  Tu Resolución Clínica
+                </h3>
+                <p className="text-xs text-[#747775]">
+                  Escribe o dicta tu análisis estructurado según la metodología SOAP
+                </p>
+              </div>
+
+              <VoiceInputButton
+                value={respuesta}
+                onChange={setRespuesta}
+                disabled={evaluating}
+              />
+            </div>
+
+            <form
+              onSubmit={isPhaseMode ? submitPhase : submitSingleTurn}
+              className="space-y-6"
+            >
+              <div>
+                <textarea
+                  id="clinical-answer-input"
+                  rows={8}
+                  value={respuesta}
+                  onChange={(e) => setRespuesta(e.target.value)}
+                  disabled={evaluating}
+                  placeholder="Detalla tu impresión diagnóstica, paraclínicos solicitados, hidratación, dosificación y criterios de seguimiento según la norma oficial..."
+                  className="w-full p-4 bg-[#f0f4f9] rounded-[20px] text-sm text-[#1f1f1f] border border-slate-200/80 focus:outline-none focus:border-[#0b57d0] focus:bg-white transition-all leading-relaxed placeholder:text-[#747775] resize-none"
+                  required
+                />
+              </div>
+
+              {/* Subida de Estudios Diagnósticos Multimodales */}
+              <ImageUploadZone
+                files={imagenes}
+                onChange={setImagenes}
+                disabled={evaluating}
+              />
+
+              {error && (
+                <div className="p-3.5 bg-rose-50 border border-rose-200/80 rounded-[16px] flex items-start gap-2.5 text-xs text-rose-800 animate-fadeIn">
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                  <span className="leading-snug">{error}</span>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between pt-2">
+                <span className="text-[11px] text-[#747775]">
+                  {respuesta.trim().split(/\s+/).filter(Boolean).length} palabras
+                </span>
+
+                <ClinicalButton
+                  type="submit"
+                  variant="primary"
+                  size="md"
+                  loading={evaluating}
+                  disabled={!respuesta.trim() || evaluating}
+                  icon={Send}
+                >
+                  {isPhaseMode
+                    ? `Evaluar Fase ${currentPhase}`
+                    : 'Emitir Diagnóstico'}
+                </ClinicalButton>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Loader de Juego Evaluador */}
+      {evaluating && (
+        <EvaluationGameLoader hasImage={imagenes.length > 0} />
+      )}
+    </div>
+  );
+}
