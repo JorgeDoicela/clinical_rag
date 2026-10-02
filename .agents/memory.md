@@ -95,4 +95,11 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     * Backend: 6 suites maestras aprobadas al 100% en 34.7s (`tests/run_all_tests.py`), recuperación RAG en 12/12 casos clínicos y evaluación multimodal con Gemini 3.8 Flash.
     * Frontend: 12 suites y 44 pruebas unitarias aprobadas en 6.6s (`npm run test`), build de producción completado en 3.75s (`npm run build`).
     * Compilación oficial: Compendio PDF del paper generado con 1.34 MB en `docs/4_pdf_compilado/COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf`.
+* **Consolidación de Persistencia Relacional Integral y Algoritmos Puros (Opción 1):**
+  - **Identidad Persistente:** Se implementó `UserModel` y `UserRepository` en `backend/modules/auth/`, eliminando la dependencia volátil de memoria para usuarios. Incorporación de siembra automática e idempotente de perfiles demo en `init_database()`.
+  - **Inyección de Dependencias en Seguridad:** Se adaptó `get_current_user` y `get_optional_current_user` en `backend/auth/security.py` para resolver credenciales contra `UserRepository` con FastAPI `Depends(get_db)`.
+  - **Pureza Algorítmica en BKT:** Se refactorizó `backend/adaptive/knowledge_tracer.py` como un módulo matemático puro (sin I/O ni dependencias de base de datos). La coordinación de persistencia se trasladó a `AdaptiveCurriculumService` mediante `AdaptiveRepository` (`StudentMasteryModel`, `StudentSnapshotModel`) e `HistoryRepository`.
+  - **Impacto Psicométrico en Evaluaciones:** `EvaluationService` actualiza el modelo BKT y genera snapshots longitudinales tras cada evaluación completada.
+  - **Validación Completa:** 6 suites maestras del backend (100% PASS), 12 suites / 44 tests de frontend (100% PASS) y build de producción limpio en 10.74s.
+
 

@@ -16,9 +16,15 @@ class EvaluationService:
     Orquesta la recuperación de contexto GPC, la inferencia en LLM Gateway,
     la certificación criptográfica en PDF y la persistencia del resultado.
     """
-    def __init__(self, case_service: CaseService, analytics_service: AnalyticsHistoryService):
+    def __init__(
+        self,
+        case_service: CaseService,
+        analytics_service: AnalyticsHistoryService,
+        adaptive_service: Optional[Any] = None
+    ):
         self.case_service = case_service
         self.analytics_service = analytics_service
+        self.adaptive_service = adaptive_service
 
     def evaluate_reasoning(
         self,
@@ -48,6 +54,15 @@ class EvaluationService:
                 case_title=case.titulo,
                 eval_result=eval_result.model_dump() if hasattr(eval_result, "model_dump") else eval_result.dict()
             )
+
+            # Impactar el modelo psicométrico BKT de forma transaccional y coherente
+            if self.adaptive_service:
+                competencias = getattr(case, "competencias_evaluadas", []) or []
+                score_val = getattr(eval_result, "score", 0.0)
+                try:
+                    self.adaptive_service.record_evaluation_impact(user_id, competencias, score_val)
+                except Exception:
+                    pass
 
         return eval_result
 

@@ -2,6 +2,7 @@
 Módulo de Bayesian Knowledge Tracing (BKT) para Ateneo+
 Calcula probabilísticamente el dominio continuo de competencias clínicas.
 Referencia científica: Corbett & Anderson (1994), Knowledge Tracing.
+Implementado como lógica algorítmica y matemática pura (sin I/O de base de datos).
 """
 
 from typing import Dict, List, Any, Optional
@@ -53,13 +54,15 @@ BKT_PARAMETERS: Dict[str, Dict[str, float]] = {
     }
 }
 
-# Cache en memoria de estados de conocimiento por estudiante
+# Cache en memoria de nivel 1 (L1) para acceso rápido en el proceso local
 _KNOWLEDGE_STATES_CACHE: Dict[str, Dict[str, float]] = {}
 _LEARNING_SNAPSHOTS_CACHE: Dict[str, List[Dict[str, Any]]] = {}
+
 
 def get_initial_knowledge_state() -> Dict[str, float]:
     """Retorna el estado de conocimiento inicial con las probabilidades a priori L0."""
     return {cid: params["L0"] for cid, params in BKT_PARAMETERS.items()}
+
 
 def bayesian_update(p_prior: float, observation_correct: bool, params: Dict[str, float]) -> float:
     """
@@ -85,41 +88,48 @@ def bayesian_update(p_prior: float, observation_correct: bool, params: Dict[str,
     p_next = p_posterior + (1.0 - p_posterior) * t
     return round(max(0.01, min(0.99, p_next)), 4)
 
+
+def project_knowledge_state_from_history(records: List[Dict[str, Any]]) -> Dict[str, float]:
+    """
+    Función pura que proyecta determinísticamente el vector de conocimiento BKT
+    a partir de una secuencia cronológica de eventos de evaluación.
+    """
+    state = get_initial_knowledge_state()
+    for record in reversed(records):
+        score = record.get("score", 0.0)
+        is_correct = score >= 7.0
+        for comp_id, params in BKT_PARAMETERS.items():
+            comp_eje = CLINICAL_COMPETENCIES[comp_id]["eje_principal"]
+            comp_correct = is_correct
+            for cd in record.get("competencias_deficientes", []):
+                if isinstance(cd, dict) and cd.get("eje") == comp_eje:
+                    comp_correct = False
+                    break
+            state[comp_id] = bayesian_update(state[comp_id], comp_correct, params)
+    return state
+
+
 def get_student_knowledge_state(student_id: str) -> Dict[str, float]:
     """
     Retorna el vector continuo de probabilidades de dominio {competencia: P(dominio)} para el estudiante.
-    Si no existe en cache, lo inicializa o reconstruye desde el historial SQLite.
+    Mantiene caché L1 en memoria para tests y acceso local rápido.
     """
     if student_id not in _KNOWLEDGE_STATES_CACHE:
-        # Reconstruir estado a partir del historial previo en SQLite si existe
         state = get_initial_knowledge_state()
-        try:
-            from models.history_db import get_user_evaluation_history
-            history = get_user_evaluation_history(student_id)
-            for record in reversed(history): # Cronológico
-                score = record.get("score", 0.0)
-                is_correct = score >= 7.0
-                ejes = ["diagnostico", "tratamiento", "seguimiento"]
-                for comp_id, params in BKT_PARAMETERS.items():
-                    # Mapear eje clínico
-                    comp_eje = CLINICAL_COMPETENCIES[comp_id]["eje_principal"]
-                    comp_correct = is_correct
-                    # Si hubo omisiones específicas en este eje
-                    for cd in record.get("competencias_deficientes", []):
-                        if isinstance(cd, dict) and cd.get("eje") == comp_eje:
-                            comp_correct = False
-                            break
-                    state[comp_id] = bayesian_update(state[comp_id], comp_correct, params)
-        except Exception:
-            pass
-
         _KNOWLEDGE_STATES_CACHE[student_id] = state
         _LEARNING_SNAPSHOTS_CACHE[student_id] = [{
             "session_num": 0,
+            "score_obtained": 0.0,
             "state": state.copy()
         }]
 
     return _KNOWLEDGE_STATES_CACHE[student_id]
+
+
+def set_student_knowledge_state(student_id: str, state: Dict[str, float]) -> None:
+    """Actualiza la caché L1 en memoria con un estado proveniente de base de datos."""
+    _KNOWLEDGE_STATES_CACHE[student_id] = state.copy()
+
 
 def update_knowledge_state_from_score(student_id: str, case_competencies: List[str], score: float) -> Dict[str, float]:
     """
@@ -134,7 +144,7 @@ def update_knowledge_state_from_score(student_id: str, case_competencies: List[s
 
     _KNOWLEDGE_STATES_CACHE[student_id] = state
     
-    # Guardar snapshot de trayectoria longitudinal
+    # Guardar snapshot de trayectoria longitudinal en caché L1
     history_list = _LEARNING_SNAPSHOTS_CACHE.setdefault(student_id, [])
     history_list.append({
         "session_num": len(history_list),
@@ -143,6 +153,7 @@ def update_knowledge_state_from_score(student_id: str, case_competencies: List[s
     })
 
     return state
+
 
 def get_student_learning_path(student_id: str) -> List[Dict[str, Any]]:
     """Retorna la secuencia histórica de snapshots BKT para trazar curvas de aprendizaje."""

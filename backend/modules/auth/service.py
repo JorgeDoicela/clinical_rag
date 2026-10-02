@@ -1,33 +1,93 @@
+import os
+import datetime
 from typing import List, Optional
 from auth.security import (
-    DEMO_USERS_DB,
     verify_password,
+    get_password_hash,
     create_access_token,
 )
-from models.schemas import LoginRequest, TokenResponse, UserResponse, User
+from models.schemas import LoginRequest, TokenResponse, UserResponse, UserRole, User
+from modules.auth.models import UserModel
+from modules.auth.repository import UserRepository
 
 
 class AuthService:
     """
     Servicio de Dominio para Autenticación e Identidad.
-    Centraliza el login, verificación de credenciales y emisión de tokens JWT.
+    Centraliza el login, verificación de credenciales y emisión de tokens JWT,
+    apoyado en un repositorio de persistencia durable.
     """
+    def __init__(self, repository: UserRepository):
+        self.repository = repository
+
+    def seed_demo_users_if_needed(self) -> None:
+        """Siembra los 3 perfiles demo institucionales si la base de datos de usuarios está vacía."""
+        if self.repository.count() > 0:
+            return
+
+        demo_users = [
+            {
+                "id": "usr_admin_001",
+                "email": "admin@ateneo.edu.ec",
+                "nombre": "Dra. Valeria Gómez (Administradora)",
+                "rol": UserRole.ADMINISTRADOR.value,
+                "password": os.getenv("DEMO_ADMIN_PASSWORD", "Admin123!")
+            },
+            {
+                "id": "usr_docente_001",
+                "email": "docente@ateneo.edu.ec",
+                "nombre": "Dr. Carlos Andrade (Docente de Medicina)",
+                "rol": UserRole.DOCENTE.value,
+                "password": os.getenv("DEMO_DOCENTE_PASSWORD", "Docente123!")
+            },
+            {
+                "id": "usr_alumno_001",
+                "email": "alumno@ateneo.edu.ec",
+                "nombre": "Estudiante María José Silva",
+                "rol": UserRole.ALUMNO.value,
+                "password": os.getenv("DEMO_ALUMNO_PASSWORD", "Alumno123!")
+            }
+        ]
+
+        now = datetime.datetime.utcnow().isoformat()
+        for u in demo_users:
+            record = UserModel(
+                id=u["id"],
+                email=u["email"].lower(),
+                nombre=u["nombre"],
+                rol=u["rol"],
+                hashed_password=get_password_hash(u["password"]),
+                activo=True,
+                created_at=now
+            )
+            self.repository.create(record)
+
     def authenticate(self, req: LoginRequest) -> Optional[TokenResponse]:
         email_clean = req.email.strip().lower()
-        user = DEMO_USERS_DB.get(email_clean)
+        user_record = self.repository.get_by_email(email_clean)
 
-        if not user or not verify_password(req.password, user.hashed_password):
+        if not user_record or not verify_password(req.password, user_record.hashed_password):
             return None
 
-        if not user.activo:
+        if not user_record.activo:
             raise PermissionError("La cuenta de usuario está desactivada")
 
-        access_token = create_access_token(user)
+        role_enum = UserRole(user_record.rol)
+        user_domain = User(
+            id=user_record.id,
+            email=user_record.email,
+            nombre=user_record.nombre,
+            rol=role_enum,
+            hashed_password=user_record.hashed_password,
+            activo=user_record.activo
+        )
+
+        access_token = create_access_token(user_domain)
         user_res = UserResponse(
-            id=user.id,
-            email=user.email,
-            nombre=user.nombre,
-            rol=user.rol
+            id=user_record.id,
+            email=user_record.email,
+            nombre=user_record.nombre,
+            rol=role_enum
         )
 
         return TokenResponse(
@@ -37,7 +97,13 @@ class AuthService:
         )
 
     def list_users(self) -> List[UserResponse]:
+        records = self.repository.get_all()
         return [
-            UserResponse(id=u.id, email=u.email, nombre=u.nombre, rol=u.rol)
-            for u in DEMO_USERS_DB.values()
+            UserResponse(
+                id=u.id,
+                email=u.email,
+                nombre=u.nombre,
+                rol=UserRole(u.rol)
+            )
+            for u in records
         ]

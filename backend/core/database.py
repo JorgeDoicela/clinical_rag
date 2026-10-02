@@ -46,5 +46,19 @@ def get_db() -> Generator[Session, None, None]:
 
 
 def init_database() -> None:
-    """Crea todas las tablas declaradas en los modelos si aún no existen."""
+    """Crea todas las tablas declaradas en los modelos si aún no existen y siembra datos iniciales."""
+    # Importar entidades para registrar sus esquemas en Base.metadata
+    from modules.auth.models import UserModel
+    from modules.analytics_history.models import EvaluationHistoryModel
+    from modules.collaboration.models import AteneoRoomModel
+    from modules.adaptive.models import StudentMasteryModel, StudentSnapshotModel
+
     Base.metadata.create_all(bind=engine)
+
+    # Siembra defensiva e idempotente de usuarios institucionales si la tabla users está vacía
+    with SessionLocal() as db:
+        from modules.auth.repository import UserRepository
+        from modules.auth.service import AuthService
+        user_repo = UserRepository(db)
+        auth_service = AuthService(user_repo)
+        auth_service.seed_demo_users_if_needed()

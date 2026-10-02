@@ -1,6 +1,6 @@
 import os
 import datetime
-from typing import List, Optional
+from typing import List, Optional, Any
 import jwt
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
@@ -104,7 +104,10 @@ def decode_access_token(token: str) -> dict:
             headers={"WWW-Authenticate": "Bearer"}
         )
 
-def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security_scheme)) -> UserResponse:
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security_scheme),
+    user_repo: Optional[Any] = Depends(lambda: None)
+) -> UserResponse:
     token = credentials.credentials
     payload = decode_access_token(token)
     email = payload.get("sub")
@@ -114,6 +117,30 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
             detail="Credenciales de token no válidas"
         )
     
+    # Resolver repositorio si no fue inyectado directamente
+    if user_repo is None:
+        try:
+            from modules.auth.dependencies import get_user_repository
+            from core.database import SessionLocal
+            with SessionLocal() as db:
+                from modules.auth.repository import UserRepository
+                repo = UserRepository(db)
+                user_record = repo.get_by_email(email.lower())
+                if user_record:
+                    if not user_record.activo:
+                        raise HTTPException(
+                            status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="Usuario inactivo"
+                        )
+                    return UserResponse(
+                        id=user_record.id,
+                        email=user_record.email,
+                        nombre=user_record.nombre,
+                        rol=UserRole(user_record.rol)
+                    )
+        except Exception:
+            pass
+
     user = DEMO_USERS_DB.get(email.lower())
     if not user or not user.activo:
         raise HTTPException(
@@ -128,24 +155,13 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
         rol=user.rol
     )
 
-def get_optional_current_user(credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security_scheme)) -> Optional[UserResponse]:
+def get_optional_current_user(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security_scheme)
+) -> Optional[UserResponse]:
     if not credentials:
         return None
     try:
-        token = credentials.credentials
-        payload = decode_access_token(token)
-        email = payload.get("sub")
-        if not email:
-            return None
-        user = DEMO_USERS_DB.get(email.lower())
-        if not user or not user.activo:
-            return None
-        return UserResponse(
-            id=user.id,
-            email=user.email,
-            nombre=user.nombre,
-            rol=user.rol
-        )
+        return get_current_user(credentials)
     except Exception:
         return None
 
