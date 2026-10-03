@@ -13,10 +13,13 @@ if not (BACKEND_DIR / "config.py").exists() and Path("/app/config.py").exists():
 
 sys.path.insert(0, str(BACKEND_DIR))
 
-# Cargar variables de entorno del backend si existen
-env_path = BACKEND_DIR / ".env"
-if env_path.exists():
-    load_dotenv(dotenv_path=env_path)
+# Cargar variables de entorno con prioridad a la raíz del proyecto
+root_env = ROOT_DIR / ".env"
+backend_env = BACKEND_DIR / ".env"
+if root_env.exists():
+    load_dotenv(dotenv_path=root_env)
+elif backend_env.exists():
+    load_dotenv(dotenv_path=backend_env)
 
 from config import GEMINI_API_KEY
 from google import genai

@@ -1,3 +1,4 @@
+import { lazy, Suspense, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
   ArrowLeft, 
@@ -7,7 +8,8 @@ import {
   Stethoscope, 
   Activity, 
   Sparkles,
-  HelpCircle
+  HelpCircle,
+  Layers
 } from 'lucide-react';
 import useCaseSolver from '../hooks/useCaseSolver';
 import FeedbackCard from '../components/FeedbackCard';
@@ -19,6 +21,8 @@ import PhaseFeedbackCard from '../components/PhaseFeedbackCard';
 import SocraticDebriefModal from '../components/SocraticDebriefModal';
 import ClinicalStudyViewer from '../components/ClinicalStudyViewer';
 import ClinicalButton from '../../../core/ui/ClinicalButton';
+
+const DicomStudyViewer = lazy(() => import('../components/DicomStudyViewer'));
 
 export default function CaseSolve() {
   const { id } = useParams<{ id: string }>();
@@ -47,6 +51,8 @@ export default function CaseSolve() {
     proceedToNextPhase,
     resetCase,
   } = useCaseSolver(id);
+
+  const [studyViewerTab, setStudyViewerTab] = useState<'standard' | 'dicom'>('standard');
 
   if (loading) {
     return (
@@ -166,20 +172,66 @@ export default function CaseSolve() {
                 : caso?.enunciado}
             </div>
 
-            {/* Visor Diagnóstico de Estudio Paraclínico Acelerado */}
-            {caso?.imagen_url && (
-              <div className="space-y-2 pt-2">
-                <span className="text-xs font-medium text-[#444746] flex items-center gap-1.5">
-                  <FileImage className="w-3.5 h-3.5 text-[#0b57d0]" />
-                  Visor Diagnóstico Interactivo de Imagen
+            {/* Visor Diagnóstico de Estudio Paraclínico Acelerado (Estándar 2D y DICOM Multicorte) */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-1.5">
+                <div className="flex items-center gap-4">
+                  {caso?.imagen_url && (
+                    <button
+                      type="button"
+                      onClick={() => setStudyViewerTab('standard')}
+                      className={`text-xs pb-1.5 font-medium flex items-center gap-1.5 border-b-2 transition-colors ${
+                        studyViewerTab === 'standard'
+                          ? 'border-blue-600 text-blue-700 font-semibold -mb-[2px]'
+                          : 'border-transparent text-[#747775] hover:text-[#1f1f1f]'
+                      }`}
+                    >
+                      <FileImage className="w-3.5 h-3.5" />
+                      <span>Imagen 2D</span>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setStudyViewerTab('dicom')}
+                    className={`text-xs pb-1.5 font-medium flex items-center gap-1.5 border-b-2 transition-colors ${
+                      studyViewerTab === 'dicom'
+                        ? 'border-cyan-600 text-cyan-700 font-semibold -mb-[2px]'
+                        : 'border-transparent text-[#747775] hover:text-[#1f1f1f]'
+                    }`}
+                  >
+                    <Layers className="w-3.5 h-3.5" />
+                    <span>Tomografía Volumétrica DICOM</span>
+                  </button>
+                </div>
+
+                <span className="text-[11px] text-[#747775]">
+                  {studyViewerTab === 'dicom' ? 'PACS WADO-RS' : 'Resolución Acelerada'}
                 </span>
-                <ClinicalStudyViewer
-                  imageUrl={caso.imagen_url}
-                  title={caso.titulo || 'Estudio Clínico'}
-                  studyType={caso.id?.toLowerCase().includes('ecg') ? 'ecg' : 'general'}
-                />
               </div>
-            )}
+
+              {studyViewerTab === 'dicom' ? (
+                <Suspense
+                  fallback={
+                    <div className="min-h-[460px] bg-[#090d16] rounded-[24px] flex flex-col items-center justify-center space-y-3 text-slate-400 border border-slate-800">
+                      <Activity className="w-7 h-7 text-cyan-400 animate-spin" />
+                      <span className="text-xs font-medium">Inicializando visor tomográfico DICOM...</span>
+                    </div>
+                  }
+                >
+                  <DicomStudyViewer
+                    study={isPhaseMode && activePhaseData?.dicom_study ? activePhaseData.dicom_study : caso?.dicom_study}
+                  />
+                </Suspense>
+              ) : (
+                caso?.imagen_url && (
+                  <ClinicalStudyViewer
+                    imageUrl={caso.imagen_url}
+                    title={caso.titulo || 'Estudio Clínico'}
+                    studyType={caso.id?.toLowerCase().includes('ecg') ? 'ecg' : 'general'}
+                  />
+                )
+              )}
+            </div>
 
             {/* Pregunta Orientadora */}
             <div className="p-4 bg-sky-50/60 rounded-[20px] border border-sky-100 space-y-1">

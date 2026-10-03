@@ -1,10 +1,10 @@
 export type ConnectionStatus = 'DISCONNECTED' | 'CONNECTING' | 'CONNECTED' | 'RECONNECTING';
 
-export type SocketEventHandler = (payload: any) => void;
+export type SocketEventHandler<T = unknown> = (payload: T) => void;
 
-export interface AteneoSocketMessage {
+export interface AteneoSocketMessage<T = unknown> {
   type: string;
-  payload?: any;
+  payload?: T;
 }
 
 export interface AteneoUserMeta {
@@ -162,7 +162,7 @@ export class AteneoSocketClient {
     }
   }
 
-  public send(type: string, payload?: any): boolean {
+  public send(type: string, payload?: unknown): boolean {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       try {
         this.ws.send(JSON.stringify({ type, payload }));
@@ -174,22 +174,23 @@ export class AteneoSocketClient {
     return false;
   }
 
-  public on(eventType: string, handler: SocketEventHandler): () => void {
+  public on<T = unknown>(eventType: string, handler: SocketEventHandler<T>): () => void {
     if (!this.eventHandlers.has(eventType)) {
       this.eventHandlers.set(eventType, new Set());
     }
-    this.eventHandlers.get(eventType)!.add(handler);
+    const untypedHandler = handler as SocketEventHandler<unknown>;
+    this.eventHandlers.get(eventType)!.add(untypedHandler);
 
     // Retorna función de desuscripción limpia
     return () => {
-      this.off(eventType, handler);
+      this.off(eventType, untypedHandler);
     };
   }
 
-  public off(eventType: string, handler: SocketEventHandler): void {
+  public off<T = unknown>(eventType: string, handler: SocketEventHandler<T>): void {
     const handlers = this.eventHandlers.get(eventType);
     if (handlers) {
-      handlers.delete(handler);
+      handlers.delete(handler as SocketEventHandler<unknown>);
       if (handlers.size === 0) {
         this.eventHandlers.delete(eventType);
       }
@@ -211,7 +212,7 @@ export class AteneoSocketClient {
     }
   }
 
-  private dispatch(type: string, payload: any): void {
+  private dispatch(type: string, payload: unknown): void {
     const handlers = this.eventHandlers.get(type);
     if (handlers) {
       handlers.forEach((handler) => {

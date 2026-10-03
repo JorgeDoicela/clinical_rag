@@ -537,6 +537,162 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     * Integrado en la nueva Suite 7 del orquestador maestro `run_all_tests.py`: 7/7 suites maestras del backend aprobadas al 100% PASS (38.45s).
     * Frontend: 16 suites y 72 tests unitarios aprobados al 100% PASS en Vitest (5.07s); `tsc --noEmit` completado con 0 errores.
     * `PLAN_ESCALABILIDAD_BACKEND.md` y `HOJA_DE_RUTA_EJECUCION_SESIONES.md` actualizados: Sesión BE-9 **COMPLETADA**.
+* **Revisión Exhaustiva Integral del Proyecto y Sincronización Canónica (/goal - 2026-10-02):**
+  - **Auditoría Estructural y de Código Fuente:**
+    * Backend: 13 paquetes auditados (`core/`, `modules/`, `routers/`, `rag/`, `tests/`, `models/`, `cases_data/`, `data/`). Certificado: exactamente 0 llamadas a `print(` en tiempo de ejecución de producción, 0 violaciones de capas B1 (`from rag` en `routers/`), 0 emojis.
+    * Frontend: 7 módulos y capas auditados (`core/`, `modules/`, `routes/`, `types/`, `context/`, `__tests__/`, `e2e/`). Certificado: 16 suites unitarias en Vitest, 4 especificaciones Playwright E2E y 0 emojis.
+    * Orquestador maestro backend (`backend/tests/run_all_tests.py`): Actualizadas las etiquetas de consola para numerar homogéneamente las 7 suites maestras (`[SUITE 1/7]` a `[SUITE 7/7]`).
+  - **Sincronización Quirúrgica de Documentación:**
+    * `HOJA_DE_RUTA_EJECUCION_SESIONES.md`: Corregida la tabla de control (Sesión BE-9 marcada como COMPLETADA y Sesión BE-10 establecida como PENDIENTE (SIGUIENTE)).
+    * `docs/3_documentacion_metodologica/ARQUITECTURA_MODULAR_FRONTEND.md`: Sustituidos caracteres decorativos por la etiqueta técnica formal `[PASS]`.
+    * `docs/3_documentacion_metodologica/ARQUITECTURA_MODULAR_MONOLITO_BACKEND.md`: Sincronizado el árbol con `unit_of_work.py`, `rate_limiter.py`, `background_worker.py`, `logger.py`, `security_guard.py`, `cache_manager.py`, `health.py` y la base canónica normalizada `ateneo_clinical.db`.
+    * `docs/3_documentacion_metodologica/MANUAL_DE_PRUEBAS_Y_BENCHMARKS.md`: Actualizada la sección 3 a 7 suites maestras e incorporadas `test_background_tasks.py` y `test_structured_logging.py`.
+    * `README.md`: Sincronizada la base de datos normalizada `ateneo_clinical.db` y el árbol completo del backend.
+    * `scripts/check_gemini_models.py`: Carga prioritaria de variables de entorno desde la raíz del proyecto `.env` bajo el estándar 12-factor.
+  - **Estado Operativo:** El proyecto se encuentra 100% auditado, coherente, normalizado y listo para la ejecución de la Sesión BE-10 (Fase 10: Auditoría de Carga y Concurrencia).
+* **Sesión BE-10 (Fase 10 de Backend) — Auditoría de Carga, Concurrencia y Resistencia al Fallo (2026-10-02):**
+  - **Script de Simulación de Carga y Concurrencia (`backend/tests/load_test_simulation.py`):**
+    * Simulación de concurrencia progresiva de 10, 25, 50 y 100 estudiantes simultáneos (`run_http_concurrency_tier`).
+    * Métricas de latencia percentil calculadas: P50, P95 y P99 en milisegundos, throughput en RPS y 0.0% errores HTTP 500.
+    * Estrés relacional concurrente sobre SQLite en modo WAL con 100 trabajadores simultáneos (`run_database_wal_concurrency_stress`): 0 bloqueos (`database is locked`), transaccionalidad ACID e integridad referencial certificadas.
+    * Saturación de cuotas con ráfaga de 150 peticiones consecutivas (`run_rate_limiter_saturation_stress`): bloqueo defensivo con HTTP 429 RFC 7807 y cabeceras `Retry-After`, 0 errores 500.
+    * Auditoría de resiliencia del Circuit Breaker (`run_circuit_breaker_resilience_audit`): verificación de máquina de estados (`CLOSED` -> `OPEN` -> `HALF_OPEN` -> `CLOSED`), conmutación inmediata a modelos de respaldo y auto-recuperación sin latencia fantasma.
+  - **Informe Técnico en Dosier Metodológico:**
+    * Creado `docs/3_documentacion_metodologica/INFORME_AUDITORIA_CARGA_Y_CONCURRENCIA.md` con especificación metodológica, diagrama de carga Mermaid y tablas analíticas de rendimiento y percentiles.
+  - **Integración en Orquestador Maestro (`backend/tests/run_all_tests.py`):**
+    * Incorporada la Suite 8/8 (`[SUITE 8/8] AUDITORÍA DE CARGA, CONCURRENCIA Y RESISTENCIA AL FALLO (FASE 10)`), validando escalones de concurrencia, ausencia de locks en SQLite WAL, defensa 429 y resiliencia de disyuntores.
+  - **Cierre Integral del Bloque 2 (Backend):**
+    * `PLAN_ESCALABILIDAD_BACKEND.md`: Las 10 Fases marcadas como **COMPLETADAS** (100% concluido).
+    * `HOJA_DE_RUTA_EJECUCION_SESIONES.md`: Sesión BE-10 marcada como **COMPLETADA (BLOQUE 2 100%)**; Sesión FE-1 (Imagenología Médica DICOM/PACS) establecida como siguiente activa en Bloque 3.
+* **Sesión FE-1 (Fase 11 de Frontend) — Imagenología Médica Estándar (DICOM / PACS / WADO-RS) (2026-10-02):**
+  - **Tipado de Dominio e Imagenología Médica (`frontend/src/types/dicom.ts` e `index.ts`):**
+    * Formalizados contratos estrictos de metadatos de estudio tomográfico y volumétrico: `DicomStudyMetadata`, `DicomSeriesMetadata`, `DicomSliceMetadata`, `DicomWindowPreset`, `DicomViewPlane`, `DicomActiveTool`, `CaliperMeasurement`, `DicomPixelReadout`.
+    * Modelados presets estándar de unidades Hounsfield según American College of Radiology (ACR): Pulmonar (-600 / 1500 HU), Mediastínica (40 / 350 HU), Ósea (450 / 2000 HU), Cerebral (40 / 80 HU) y Abdominal (40 / 400 HU).
+    * Integrado campo opcional `dicom_study?: DicomStudyMetadata` en `ClinicalCase` y `CasePhase`.
+  - **Componente Diagnóstico Volumétrico (`frontend/src/modules/evaluation/components/DicomStudyViewer.tsx`):**
+    * Renderizado sobre Canvas 2D acelerado aplicando la función de transferencia radiológica Hounsfield sobre el buffer de píxeles con lookup table (LUT) en tiempo real.
+    * Navegación ortogonal multiplanar (MPR): Axial (adquisición estándar), Coronal (reconstrucción frontal) y Sagital (reconstrucción lateral).
+    * Navegación fluida de cortes volumétricos: barra de desplazamiento (slider), rueda del mouse (`wheel`), atajos de teclado (flechas arriba/abajo) y botones de paso.
+    * Herramienta de medición métrica (Caliper): marcado de puntos con cálculo determinístico de distancias reales en milímetros ($mm$) basado en `pixelSpacing`.
+    * Readout interactivo en tiempo real de unidades Hounsfield (HU readout) bajo el cursor del estudiante.
+    * Panel desplegable de ajuste fino continuo de Window Center (WL) y Window Width (WW).
+    * Zoom, paneo y modo de pantalla completa.
+    * Estricto cumplimiento del sistema de diseño `ateneo-design-system`: cero emojis, iconos planos de `lucide-react`, fondo de negatoscopio de alta fidelidad `#090d16`.
+  - **Integración Split-Screen y Fragmentación de Chunks con Carga Perezosa (`CaseSolve.tsx`):**
+    * Carga asíncrona desacoplada mediante `React.lazy(() => import('../components/DicomStudyViewer'))` y `Suspense` con fallback clínico sobrio.
+    * Pestañas planas de selección de estudio (`Imagen 2D` vs `Tomografía Volumétrica DICOM`) según directrices de navegación de Ateneo+.
+    * El bundle principal no sufre penalización de peso: el chunk `DicomStudyViewer-*.js` se empaqueta en 17.43 kB (6.09 kB gzip) de forma completamente aislada.
+  - **Validación Completa y Cero Regresiones:**
+    * `npm run typecheck` (`tsc --noEmit`): 0 errores en TypeScript 5 estricto.
+    * Suite unitaria `frontend/src/__tests__/DicomStudyViewer.test.jsx`: 7/7 tests aprobados al 100%.
+    * Suite total de frontend: 17 suites y 79 tests unitarios aprobados al 100% en Vitest (0 fallos).
+    * `npm run build`: compilación de producción exitosa en 18.49s con Service Worker PWA activo (28 activos precacheados).
+    * `HOJA_DE_RUTA_EJECUCION_SESIONES.md`: Sesión FE-1 marcada como **COMPLETADA**.
+* **Sesión FE-2 (Fase 12 de Frontend) — Motor de Exámenes Clínicos Estructurados (OSCE / ECOE) (2026-10-02):**
+  - **Tipado de Dominio para Estaciones OSCE (`frontend/src/types/osce.ts` e `index.ts`):**
+    * Modelados contratos formales para evaluación multiestación: `OsceStation`, `OsceCircuit`, `OsceRubricItem`, `OsceSubmissionPayload`, `OsceCircuitState`, `OsceClockSync`.
+    * Tipos de estación clínica: `anamnesis`, `examen_fisico`, `comunicacion`, `interpretacion_paraclinicos`, `procedimiento` y `simulacion_ia`.
+  - **Controlador de Circuito Cronometrado Anti-Trampa (`frontend/src/modules/cases/hooks/useOsceCircuit.ts`):**
+    * Sincronización horaria con el servidor mediante cálculo de deriva (`skewMs = serverNow - clientNow`), protegiendo el temporizador frente a la alteración del reloj local del navegador.
+    * Ticker de alta precisión compensado para períodos de lectura previa (`READING_INSTRUCTIONS`) y estación activa (`STATION_ACTIVE`).
+    * Despacho atómico y bloqueo forzado de edición ante evento de timeout (`expiradoPorServidor: true`, `isLocked: true`).
+    * Firma criptográfica determinística SHA-256 (`generateSha256Signature`) del acta clínica del estudiante vinculada al timestamp del servidor.
+  - **Componente Visual de Estación (`frontend/src/modules/cases/components/OsceStationView.tsx`):**
+    * Barra superior con indicador de progreso de circuito, temporizador con código de colores según urgencia médica (azul/ámbar/rojo pulsante) y badge de sincronización de servidor.
+    * Split-screen según `ateneo-design-system`: columna izquierda con escenario clínico y tarea solicitada; columna derecha con pestañas planas para alternar entre "Tu Resolución Clínica" y "Rúbrica de Cotejo Oficial".
+    * Pantalla de transición entre estaciones y acta final de culminación del circuito con hashes SHA-256 de todas las estaciones rendidas.
+    * Cero emojis y apego riguroso a los tokens visuales institucionales.
+  - **Validación Completa y Cero Regresiones:**
+    * `npm run typecheck` (`tsc --noEmit`): 0 errores en TypeScript 5 estricto.
+    * Suite unitaria `frontend/src/__tests__/OsceCircuit.test.tsx`: 6/6 tests aprobados al 100%.
+    * Suite total de frontend: 18 suites y 85 tests unitarios aprobados al 100% en Vitest (0 fallos).
+    * `npm run build`: compilación limpia en 9.07s con Service Worker PWA activo (28 activos precacheados).
+    * `HOJA_DE_RUTA_EJECUCION_SESIONES.md`: Sesión FE-2 marcada como **COMPLETADA**.
+* **Sesión FE-3 (Fase 13 de Frontend) — Tele-Simulación y Audio Streaming Bidireccional (WebRTC) (2026-10-02):**
+  - **Cliente WebRTC de Audio de Grado Clínico (`frontend/src/core/realtime/webrtcClient.ts`):**
+    * Integración de `RTCPeerConnection` con STUN y canal de señalización continuo sobre los WebSockets existentes de la sala (`ateneoSocketClient.send('WEBRTC_SIGNAL', ...)`).
+    * Captura de audio de alta fidelidad con `getUserMedia`: cancelación acústica de eco (`echoCancellation: true`), supresión de ruido ambiental (`noiseSuppression: true`), control automático de ganancia y muestreo Opus a 48 kHz.
+    * Medidor de nivel de voz (VU meter) con Web Audio API (`AudioContext`, `createMediaStreamSource`, `createAnalyser`) con cálculo en tiempo real de volumen medio normalizado y detección de habla activa (`isSpeaking`).
+    * Limpieza determinística de recursos: cierre de pistas de audio (`track.stop()`), desconexión de AudioContext y PeerConnection, y desuscripción de eventos WebSocket al desconectar.
+  - **Componente Visual de Tele-Debriefing (`frontend/src/modules/collaboration/components/VoiceRoomBar.tsx`):**
+    * Barra interactiva montada en `AteneoRoom.tsx`: botón para unirse al debriefing de voz, conmutador de micrófono con estados activo/silenciado, VU meter animado y badge de moderador para docentes.
+    * Estética clínica sobria sin emojis, con iconos planos de `lucide-react`.
+  - **Validación Completa y Cero Regresiones:**
+    * `npm run typecheck` (`tsc --noEmit`): 0 errores en TypeScript 5 estricto.
+    * Suite unitaria `frontend/src/__tests__/WebRtcAudioRoom.test.tsx`: 5/5 tests aprobados al 100%.
+    * Suite total de frontend: 19 suites y 90 tests unitarios aprobados al 100% en Vitest (0 fallos).
+    * `npm run build`: compilación limpia en 8.17s con Service Worker PWA activo (28 activos precacheados).
+    * `HOJA_DE_RUTA_EJECUCION_SESIONES.md`: Sesión FE-3 marcada como **COMPLETADA**.
+* **Sesión FE-4 (Fase 14 de Frontend) — Multi-Tenancy UI y ThemeProvider Institucional (2026-10-02):**
+  - **Tokens de Diseño Institucional y Catálogo Multi-Tenant (`frontend/src/core/theme/tokens.ts`):**
+    * Modelado estricto de tipos `TenantId` (`default`, `uce`, `usfq`, `msp_hospital`) y `TenantTheme`.
+    * Cálculo algorítmico matemático de ratio de contraste WCAG ISO-9241-3 (`calculateContrastRatio`), garantizando que todas las identidades cromáticas superen la norma WCAG AA ($\ge 4.5:1$).
+    * Catálogo oficial con asignación de paletas institucionales, normativas GPC por defecto (`Guías de Práctica Clínica MSP Ecuador`, `Cátedra UCE`, `COCSA USFQ`, `Protocolos MSP`) y subdominios canónicos.
+  - **ThemeProvider y Dynamic CSS Injection (`frontend/src/core/theme/ThemeProvider.tsx`):**
+    * Inyección en tiempo de ejecución de variables CSS nativas (`--ateneo-brand-primary`, `--ateneo-surface-canvas`, `--ateneo-card-radius`, etc.) en `document.documentElement` y atributo `data-tenant`.
+    * Detección automática en cascada: (1) clave de persistencia canónica `ateneo_active_tenant` en `localStorage`, (2) hostname o subdominio de acceso, y (3) fallback a `default`.
+    * Hooks desacoplados `useTheme` y `useTenantTheme` disponibles en todo el árbol de React a través del Provider montado en `App.tsx`.
+  - **Integración Visual Institucional en `Navbar.tsx`:**
+    * Badge de sede institucional en el imagotipo de Ateneo+ con el color primario y siglas de la facultad o red médica.
+    * Selector accesible con `Building2` en el menú de perfil para conmutación de campus/hospital en caliente, con visualización fáctica del ratio de contraste WCAG AA.
+  - **Validación Completa y Cero Regresiones:**
+    * `npm run typecheck` (`tsc --noEmit`): 0 errores en TypeScript 5 estricto.
+    * Suite unitaria `frontend/src/__tests__/ThemeProvider.test.tsx`: 5/5 tests aprobados al 100%.
+    * Suite total de frontend: 20 suites y 95 tests unitarios aprobados al 100% en Vitest (0 fallos).
+    * `npm run build`: compilación limpia en 9.81s con Service Worker PWA activo (28 activos precacheados, 576.57 KiB).
+    * `HOJA_DE_RUTA_EJECUCION_SESIONES.md`: Sesión FE-4 marcada como **COMPLETADA**.
+* **Sesión FE-5 (Fase 15 de Frontend) — Internacionalización Tipada y Localización Nosológica (2026-10-02):**
+  - **Infraestructura i18n Tipada y Diccionarios Modulares (`frontend/src/core/i18n/` y `frontend/src/types/i18n.ts`):**
+    * Integración de `i18next` y `react-i18next` con partición por espacios de nombres (`common`, `clinical`, `evaluation`, `nosology`).
+    * Contrato formal en `types/i18n.ts` (`AteneoTranslationResources`) garantizando en tiempo de compilación con `tsc` que todas las variantes regionales satisfacen el 100% de las claves sin excepciones.
+    * Diccionarios completos implementados para `es-EC` (Ecuador - MSP), `es-PE` (Perú - MINSA) y `en-US` (Internacional - WHO/PAHO).
+  - **Adaptador de Taxonomía y Localización Nosológica (`frontend/src/core/i18n/nosologyAdapter.ts`):**
+    * Homologación contextual de patologías prevalentes (`apendicitis_aguda`, `neumonia_comunitaria`, `cetoacidosis_diabetica`, `preeclampsia_severa`).
+    * Mapeo de códigos nosológicos oficiales (CIE-10 para Ecuador y Perú vs. CIE-11 para OMS global) y enlace a las normativas de referencia (GPC MSP, NTS MINSA, WHO Emergency Surgical Standards).
+  - **Hook `useI18n` y Selector en `Navbar.tsx`:**
+    * Hook `useI18n()` con resolución automática de namespaces (`t('common.sistema')`, `t('clinical.casoClinico')`), conmutación en caliente de idioma y región nosológica, y persistencia en `localStorage` (`ateneo_locale`, `ateneo_nosology_region`).
+    * Selector accesible con icono `Globe` integrado en el dropdown de perfil institucional.
+  - **Validación Completa y Cero Regresiones:**
+    * `npm run typecheck` (`tsc --noEmit`): 0 errores en TypeScript 5 estricto.
+    * Suite unitaria `frontend/src/__tests__/I18nNosology.test.tsx`: 5/5 tests aprobados al 100%.
+    * Suite total de frontend: 21 suites y 100 tests unitarios aprobados al 100% en Vitest (0 fallos).
+    * `HOJA_DE_RUTA_EJECUCION_SESIONES.md`: Sesión FE-5 marcada como **COMPLETADA**.
+* **Sesión FE-6 (Fase 16 de Frontend) — Observabilidad Forense de Usuario Real (RUM) (2026-10-02):**
+  - **Módulo de Telemetría Distribuida y RUM (`frontend/src/core/observability/telemetry.ts`):**
+    * Monitoreo de Core Web Vitals (LCP, FID, CLS, INP, TTFB) con calificación automática de calidad perceptual (`good`, `needs-improvement`, `poor`).
+    * Captura de metadatos forenses enriquecidos de dispositivo y red: `appName`, `appVersion`, `tenantId`, `locale`, `route`, `networkType` (`navigator.connection`), `deviceMemory`, `hardwareConcurrency`, `viewport` e `isOnline`.
+    * Detección y almacenamiento en buffer rotativo en memoria de errores no capturados (`window.onerror`) y rechazos de promesas (`unhandledrejection`).
+    * Descarga asíncrona segura mediante `navigator.sendBeacon` o `fetch(..., { keepalive: true })` en eventos de ciclo de vida (`visibilitychange`, `pagehide`).
+  - **Propagación W3C Trace Context y Correlación Distribuida (`frontend/src/core/http/httpClient.ts`):**
+    * Generador de cabeceras de trazabilidad: `X-Request-ID` determinístico por petición y `traceparent` estándar W3C (`00-{traceId}-{spanId}-01`).
+    * Inyección transparente en el 100% de las solicitudes salientes de `httpClient` hacia el backend de FastAPI, garantizando correlación forense extremo a extremo con OpenTelemetry.
+  - **Inicialización en Arranque (`frontend/src/main.tsx`):**
+    * Montaje de `telemetry.init()` en el punto de entrada de la aplicación previo a la hidratación del DOM de React.
+  - **Validación Completa y Cero Regresiones (Certificación del Bloque 3):**
+    * `npm run typecheck` (`tsc --noEmit`): 0 errores en TypeScript 5 estricto.
+    * Suite unitaria `frontend/src/__tests__/TelemetryRum.test.tsx`: 6/6 tests aprobados al 100%.
+    * Suite total de frontend: 22 suites y 106 pruebas unitarias aprobadas al 100% en Vitest (0 fallos).
+    * Batería Playwright E2E: 15/15 pruebas aprobadas al 100% en Google Chrome, Microsoft Edge y Mobile Pixel 5.
+    * `npm run build`: compilación limpia en 10.54s con Service Worker PWA activo (28 activos precacheados, 646.18 KiB).
+    * `HOJA_DE_RUTA_EJECUCION_SESIONES.md`: Sesión FE-6 marcada como **COMPLETADA (BLOQUE 3 100%)**.
+    * `PLAN_ESCALABILIDAD_FRONTEND.md`: Las 16 Fases del frontend marcadas como **COMPLETADAS al 100%**.
+* **Sincronización Total de Documentación Técnica Docs-as-Code (/documentacion) (2026-10-02):**
+  - **Índice Maestro Central (`docs/README.md`):** Creado sitemap estructurado con mapa temático de arquitectura para los tres bloques de ingeniería (Base de Datos, Backend, Frontend).
+  - **Especificación de Persistencia (`docs/3_documentacion_metodologica/ARQUITECTURA_Y_MODELADO_BASE_DE_DATOS.md`):** Creado dosier técnico exhaustivo con diagrama ERD Mermaid de 6 entidades, tabla de restricciones/índices y script de migración determinística.
+  - **Arquitectura de Backend (`docs/3_documentacion_metodologica/ARQUITECTURA_MODULAR_MONOLITO_BACKEND.md`):** Actualizada sección 7 detallando las 10 fases implementadas (Clean Architecture, Unit of Work, Rate Limiter Token Bucket, Prompt Shield, RAG Cache, Multi-Tenancy, Sondas liveness/readiness, Pool asíncrono, Logging OpenTelemetry y Auditoría de carga).
+  - **Arquitectura de Frontend (`docs/3_documentacion_metodologica/ARQUITECTURA_MODULAR_FRONTEND.md`):** Expandida sección 8 detallando las Fases 11 a 16 (DICOM WADO-RS, OSCE/ECOE anti-trampa, WebRTC Audio, ThemeProvider WCAG AA, i18n tipado y Telemetría RUM) y actualizada sección 9 con las 22 suites y 106 pruebas unitarias aprobadas.
+  - **Manual de Pruebas (`docs/3_documentacion_metodologica/MANUAL_DE_PRUEBAS_Y_BENCHMARKS.md`):** Actualizada pirámide de pruebas, detalle de 22 suites de frontend en Vitest y comandos de ejecución.
+  - **README Raíz (`README.md`):** Sincronizadas métricas de pruebas unitarias (22 suites / 106 tests PASS) y enlaces a los nuevos documentos técnicos.
+* **Organización Canónica de Planes y Hoja de Ruta (`docs/7_planes_de_escalabilidad_y_hoja_de_ruta/`) (2026-10-02):**
+  - **Reubicación de Documentos Directores:** Se trasladaron desde la raíz los 4 archivos rectores a su subdirectorio canónico en `docs/`:
+    * `HOJA_DE_RUTA_EJECUCION_SESIONES.md`
+    * `PLAN_ESCALABILIDAD_BASE_DE_DATOS.md`
+    * `PLAN_ESCALABILIDAD_BACKEND.md`
+    * `PLAN_ESCALABILIDAD_FRONTEND.md`
+  - **Unificación de Índice en README Raíz:** Eliminado `docs/README.md` para evitar duplicidad; el archivo [README.md](file:///c:/Users/jorge/Desktop/Proyectos/clinical_rag/README.md) en la raíz centraliza la totalidad del árbol documental de `docs/` (incluyendo las subcarpetas `1_` a `7_` y sus 17 documentos metodológicos) y el mapa de acceso a los planes de escalabilidad.
+
+
+
 
 
 

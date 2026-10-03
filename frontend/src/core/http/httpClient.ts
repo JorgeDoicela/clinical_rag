@@ -1,4 +1,5 @@
 import type { HttpResponse, RequestOptions } from '../../types';
+import { telemetry } from '../observability/telemetry';
 
 export const getBaseApiUrl = (): string => {
   if (import.meta.env.VITE_API_URL) {
@@ -63,7 +64,8 @@ export class HttpClient {
 
     const url = `${base}${normalizedEndpoint}`;
     const initialHeaders: Record<string, string> = (options.headers as Record<string, string>) || {};
-    const headers = getAuthHeaders(initialHeaders);
+    const traceHeaders = telemetry.getTraceHeaders();
+    const headers = { ...traceHeaders, ...getAuthHeaders(initialHeaders) };
 
     if (!(options.body instanceof FormData) && !headers['Content-Type'] && options.body) {
       headers['Content-Type'] = 'application/json';

@@ -27,7 +27,7 @@ El sistema organiza sus pruebas en 4 niveles complementarios que garantizan la i
 │ • test_api_endpoints.py (Rutas /auth, /cases, /history, /adaptive, /rooms)  │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ NIVEL 1: PRUEBAS DE FRONTEND, TIEMPO REAL Y E2E                             │
-│ • Vitest + React Testing Library (16 suites, 72 tests de interfaz y estado) │
+│ • Vitest + React Testing Library (22 suites, 106 tests unitarios aprobados)  │
 │ • Playwright E2E Multi-Navegador (15 tests en Chrome, Edge y Mobile Pixel 5)│
 │ • test_multimodal_and_cases.py (12 casos ChromaDB, PDF ReportLab SHA-256)   │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -37,7 +37,7 @@ El sistema organiza sus pruebas en 4 niveles complementarios que garantizan la i
 
 ## 2. Catálogo de Pruebas de Frontend (Vitest + React Testing Library & Playwright)
 
-El frontend dispone de 16 suites de prueba y 72 especificaciones unitarias y de integración en Vitest, junto con 4 suites E2E multi-navegador en Playwright (15 pruebas), que convalidan el árbol de componentes, accesibilidad, manejo de estado, resiliencia offline y estándar de diseño:
+El frontend dispone de **22 suites de prueba y 106 especificaciones unitarias y de integración** en Vitest, junto con 4 suites E2E multi-navegador en Playwright (15 pruebas), que convalidan el árbol de componentes, imagenología DICOM, exámenes OSCE, tele-audio WebRTC, temas multi-tenancy, i18n tipado, observabilidad forense y estándar de diseño:
 
 ### 2.1 Ejecución de Pruebas Unitarias e Integración (Vitest)
 ```bash
@@ -52,10 +52,16 @@ docker compose exec frontend npm test
 ### 2.2 Ejecución de Pruebas End-to-End Multi-Navegador (Playwright)
 ```bash
 cd frontend
-npx playwright test
+npm run test:e2e
 ```
 
-### 2.3 Detalle de Suites Frontend (Vitest 5)
+### 2.3 Verificación de Tipos Estrictos (TypeScript 5)
+```bash
+cd frontend
+npm run typecheck
+```
+
+### 2.4 Detalle de Suites Frontend (Vitest 5)
 | Archivo de Prueba | Componente Evaluado | Casos de Prueba Verificados |
 |:---|:---|:---|
 | `src/__tests__/client.test.js` | Capa de API y red | Contratos HTTP, inyección de tokens JWT, headers y serialización multipart para estudios paraclínicos. |
@@ -74,13 +80,19 @@ npx playwright test
 | `src/__tests__/AteneoRealtimeCollab.test.jsx` | Salas WebSockets | Conexión bidireccional, sincronización de hipótesis diagnósticas y presencia activa en vivo. |
 | `src/__tests__/ClinicalStudyViewer.test.jsx` | Visor Canvas GPU | Lienzo acelerado a 60 FPS, paneo, zoom, calibrador ECG milimétrico y ventana radiológica. |
 | `src/__tests__/OfflineSync.test.tsx` | Resiliencia Offline | Persistencia IndexedDB (`ateneo_offline_v1`), cola de salida Outbox y sincronización automática. |
+| `src/__tests__/DicomStudyViewer.test.jsx` | Imagenología DICOM | Negatoscopio digital Canvas 2D, cortes ortogonales MPR (Axial, Coronal, Sagital), ventanas HU y caliper. |
+| `src/__tests__/OsceCircuit.test.tsx` | Motor OSCE / ECOE | Sincronización horaria anti-trampa (`skewMs`), ticker compensado, código de urgencia y firma SHA-256. |
+| `src/__tests__/WebRtcAudioRoom.test.tsx` | Tele-Simulación WebRTC | Cliente RTCPeerConnection STUN, supresión de ruido Opus 48 kHz, VU meter y controles de moderador. |
+| `src/__tests__/ThemeProvider.test.tsx` | Multi-Tenancy UI | Inyección en caliente de CSS variables, ratio de contraste WCAG AA computado ($\ge 4.5:1$) y persistencia. |
+| `src/__tests__/I18nNosology.test.tsx` | i18n & Nosología | Diccionarios tipados `es-EC`, `es-PE`, `en-US` y adaptador nosológico (CIE-10 / CIE-11 / NTS / GPC). |
+| `src/__tests__/TelemetryRum.test.tsx` | Observabilidad RUM | Captura de Core Web Vitals, metadatos de red, W3C `traceparent` y correlación distribuida `X-Request-ID`. |
 
 ---
 
 ## 3. Catálogo de Pruebas de Backend y Modelado Matemático
 
 ### 3.1 Orquestador Maestro Consolidado (`backend/tests/run_all_tests.py`)
-Ejecuta de forma estructurada las 6 suites maestras del backend:
+Ejecuta de forma estructurada las 8 suites maestras del backend:
 ```bash
 # Entorno local (con venv activo)
 backend/.venv/Scripts/python backend/tests/run_all_tests.py
@@ -104,6 +116,9 @@ backend/.venv/Scripts/pytest backend/tests/ -v
 | `pilot_study_analyzer.py` | Análisis Inferencial | Procesamiento de `resultados_pilot.csv`, cálculo de ganancia de Hake ($g=0.74$), $t$-test pareado y exportación de Tabla IV LaTeX. |
 | `test_api_endpoints.py` | Integración HTTP | Pruebas de endpoints FastAPI (Auth, Cases, Benchmark, History, Salas Colaborativas, PDF y Fases). |
 | `test_multimodal_and_cases.py` | Casos GPC y Multimodal | Recuperación de los 12 casos del MSP, evaluación multi-imagen con Gemini Vision y generación de reportes PDF con sello SHA-256. |
+| `test_background_tasks.py` | Pool Asíncrono de Reportes | Despachador en segundo plano (ThreadPoolExecutor), exportación asíncrona HTTP 202 y prueba de estrés concurrente. |
+| `test_structured_logging.py` | Observabilidad y Logs JSON | Formateador estructurado OpenTelemetry, inyección de contextvars (request_id, user_id, tenant_id) y ofuscación de secretos. |
+| `load_test_simulation.py` | Estrés y Concurrencia | Concurrencia de 100 usuarios, SQLite WAL 0% locks, Rate Limit 429 RFC 7807 y Circuit Breakers. |
 
 ---
 
@@ -111,6 +126,7 @@ backend/.venv/Scripts/pytest backend/tests/ -v
 
 | Script | Descripción | Artefactos Exportados |
 |:---|:---|:---|
+| `load_test_simulation.py` | Auditoría de estrés masivo, concurrencia progresiva y resistencia al fallo | `docs/3_documentacion_metodologica/INFORME_AUDITORIA_CARGA_Y_CONCURRENCIA.md` |
 | `run_kst_simulation.py` | Simulación longitudinal BKT comparativa (Ruta Fija vs KST Adaptativa) | `docs/2_figuras_300dpi/figura_kst_trajectory.png`<br>`docs/1_tablas_latex/tabla_kst_bkt_paper.tex`<br>`backend/tests/resultados_kst_simulation.json` |
 | `run_ibf_figure.py` | Generación de visualización de cohorte en 4 ejes clínicos con umbral normativo | `docs/2_figuras_300dpi/figura_ibf_cohorte.png`<br>`backend/tests/resultados_ibf_figure.json` |
 | `run_faithfulness_benchmark.py` | Benchmark de anclaje normativo de las 12 GPCs frente a fragmentos normativos | `docs/1_tablas_latex/tabla_faithfulness_paper.tex`<br>`backend/tests/resultados_faithfulness.json` |

@@ -14,6 +14,7 @@ import {
   Award
 } from 'lucide-react';
 import useAteneoRoom, { RoomParticipantDetail } from '../hooks/useAteneoRoom';
+import VoiceRoomBar from '../components/VoiceRoomBar';
 import ClinicalButton from '../../../core/ui/ClinicalButton';
 import ClinicalBadge from '../../../core/ui/ClinicalBadge';
 import type { User, UserRole } from '../../../types';
@@ -186,6 +187,14 @@ export default function AteneoRoom() {
           )}
         </div>
       </div>
+
+      {/* 1.1 Barra de Control de Audio y Debriefing Sincrónico WebRTC */}
+      <VoiceRoomBar
+        roomCode={roomDetails.room_code || room.codigo || roomCode}
+        userId={currentUser.id || currentUser.email}
+        userName={currentUser.nombre}
+        isDocente={isDocente}
+      />
 
       {/* 2. Banner de Consenso (si está activo) */}
       {consenso && (

@@ -161,7 +161,7 @@ Para compartir el sistema en demostraciones públicas con certificado HTTPS vál
 
 ## 4. Cuentas de Acceso Preconfiguradas
 
-La base de datos SQLite relacional ([`backend/data/history.db`](backend/data/history.db)) incluye usuarios y sesiones de prueba para verificar las vistas del sistema:
+La base de datos SQLite relacional normalizada ([`backend/data/ateneo_clinical.db`](backend/data/ateneo_clinical.db)) incluye usuarios y sesiones de prueba para verificar las vistas del sistema:
 
 | Rol | Correo Electrónico | Contraseña | Vistas y Capacidades |
 | :--- | :--- | :--- | :--- |
@@ -194,15 +194,18 @@ clinical_rag/
 │   │   └── figura_kst_trajectory.png     # Figura 4: Trayectorias de Dominio Probabilístico en ZDP
 │   │
 │   ├── 3_documentacion_metodologica/     # BASES TEÓRICAS Y METODOLÓGICAS (.md)
-│   │   ├── METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md # Fórmulas, diseño y métricas
+│   │   ├── ARQUITECTURA_MODULAR_FRONTEND.md # Arquitectura React 18, TypeScript 5, DICOM, OSCE y RUM
+│   │   ├── ARQUITECTURA_MODULAR_MONOLITO_BACKEND.md # Monolito modular, persistencia desacoplada y UoW
+│   │   ├── ARQUITECTURA_Y_MODELADO_BASE_DE_DATOS.md # Entidades relacionales SQLAlchemy, ERD e índices
+│   │   ├── INFORME_AUDITORIA_CARGA_Y_CONCURRENCIA.md # Simulación de estrés con 100 estudiantes concurrentes
+│   │   ├── METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md # Fórmulas, diseño experimental y métricas IR
 │   │   ├── CURRICULO_ADAPTATIVO_KST_Y_LEARNING_ANALYTICS.md # Fundamentación KST/BKT/ZDP/IBF
 │   │   ├── PROTOCOLO_PILOTO_LEARNING_GAIN.md # Protocolo de estudio clínico e instrumentos
 │   │   ├── ARQUITECTURA_RAG_Y_FINE_TUNING.md # Especificación técnica del recuperador híbrido
 │   │   ├── ARQUITECTURA_RESILIENTE_LLM_Y_CONFIGURACION.md # Gateway resiliente, Circuit Breaker y 12-Factor App
-│   │   ├── ARQUITECTURA_MODULAR_MONOLITO_BACKEND.md # Monolito modular, persistencia agnóstica SQLAlchemy y Repository Pattern
 │   │   ├── DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md # Análisis crítico y amenazas a la validez
 │   │   ├── PUBLICACION_Y_PRESENTACION_CONGRESO.md # Guía editorial y estructura de presentación
-│   │   ├── MANUAL_DE_PRUEBAS_Y_BENCHMARKS.md # Guía para réplica experimental
+│   │   ├── MANUAL_DE_PRUEBAS_Y_BENCHMARKS.md # Guía para réplica experimental y 22 suites
 │   │   ├── GUIA_FINE_TUNING_COLAB_Y_METRICAS.md # Protocolo de fine-tuning supervisado
 │   │   ├── GUIA_INGESTA_Y_CASOS.md       # Ingesta y calibración de casos clínicos
 │   │   ├── GUIA_PASO_A_PASO_ENTRENAMIENTO_Y_PROXIMOS_PASOS.md # Guía de entrenamiento en GPU
@@ -223,8 +226,14 @@ clinical_rag/
 │   │   ├── 07_panel_docente_deficiencias_institucionales.png # Top deficiencias curriculares
 │   │   └── 08_perfil_estudiante_radar_competencias.png # Radar de competencias Recharts
 │   │
-│   └── 6_despliegue_y_operaciones/       # INFRAESTRUCTURA Y ACCESO REMOTO
-│       └── DESPLIEGUE_Y_ACCESO_CLOUDFLARE_TUNNEL.md # Guía de túnel Cloudflare seguro (TLS 1.3)
+│   ├── 6_despliegue_y_operaciones/       # INFRAESTRUCTURA Y ACCESO REMOTO
+│   │   └── DESPLIEGUE_Y_ACCESO_CLOUDFLARE_TUNNEL.md # Guía de túnel Cloudflare seguro (TLS 1.3)
+│   │
+│   └── 7_planes_de_escalabilidad_y_hoja_de_ruta/ # PLANES DIRECTORES Y HOJA DE RUTA
+│       ├── HOJA_DE_RUTA_EJECUCION_SESIONES.md # Cronograma de 21 sesiones de desarrollo
+│       ├── PLAN_ESCALABILIDAD_BASE_DE_DATOS.md # Fases 1 a 5 de persistencia relacional
+│       ├── PLAN_ESCALABILIDAD_BACKEND.md # Fases 1 a 10 de ingeniería de servidores
+│       └── PLAN_ESCALABILIDAD_FRONTEND.md # Fases 1 a 16 de arquitectura cliente
 │
 ├── backend/                              # SERVICIOS BACKEND FASTAPI (PYTHON 3.11)
 │   ├── core/                             # INFRAESTRUCTURA TRANSVERSAL COMPARTIDA
@@ -233,7 +242,11 @@ clinical_rag/
 │   │   ├── llm_gateway.py                # ResilientLLMGateway con Circuit Breaker y degradación gradual
 │   │   ├── security.py                   # Criptografía JWT, hashing de contraseñas y RBAC
 │   │   ├── middleware.py                 # CorrelationIdMiddleware (X-Request-ID y X-Process-Time)
-│   │   └── errors.py                     # Estandarización de errores RFC 7807 (Problem Details)
+│   │   ├── errors.py                     # Estandarización de errores RFC 7807 (Problem Details)
+│   │   ├── unit_of_work.py               # Patrón Unit of Work y transacciones ACID
+│   │   ├── rate_limiter.py               # Limitador Token Bucket defensivo y control de cuotas
+│   │   ├── background_worker.py          # Pool asíncrono para reportes y tareas pesadas
+│   │   └── logger.py                     # Logging estructurado JSON y ofuscación de credenciales
 │   ├── modules/                          # DOMINIOS CLÍNICOS DESACOPLADOS (MONOLITO MODULAR)
 │   │   ├── analytics_history/            # Historial, métricas de cohorte, IBF (Models + Repo + Service)
 │   │   ├── cases/                        # Catálogo de casos clínicos y paraclínicos (Models + Repo + Service)
@@ -247,7 +260,8 @@ clinical_rag/
 │   │   ├── cases.py                      # Banco de casos clínicos oficiales y dinámicos (POST /api/cases)
 │   │   ├── evaluation.py                 # POST /api/evaluate con soporte multi-archivo y simulación por fases
 │   │   ├── history.py                    # Historial, IBF de cohorte y exportación PDF
-│   │   └── collaboration.py              # Salas sincrónicas de Ateneo en tiempo real
+│   │   ├── collaboration.py              # Salas sincrónicas de Ateneo en tiempo real
+│   │   └── health.py                     # Sondas de observabilidad (/health/live, /ready, /circuit-breakers)
 │   ├── models/                           # Capa de compatibilidad y esquemas DTO
 │   │   ├── schemas.py                    # Esquemas tipados Pydantic (EvaluationResult, IBFReport, etc.)
 │   │   ├── history_db.py                 # Fachada a modules.analytics_history (SQLAlchemy)
@@ -257,6 +271,8 @@ clinical_rag/
 │   │   ├── retriever.py                  # Motor híbrido denso + sparse BM25 (RRF k=60)
 │   │   ├── prompt_builder.py             # Constructor de prompts multi-estudio y por fases
 │   │   ├── evaluator.py                  # Evaluador multimodal con Gemini Vision API
+│   │   ├── security_guard.py             # Blindaje heurístico anti-prompt injection
+│   │   ├── cache_manager.py              # Caché semántica y léxica LRU de recuperación
 │   │   └── chroma_telemetry.py           # NoOpProductTelemetry desacoplada
 │   ├── services/                         # Fachadas de compatibilidad hacia core y generadores
 │   │   ├── llm_gateway.py                # Fachada a core.llm_gateway
@@ -267,7 +283,8 @@ clinical_rag/
 │   ├── data/
 │   │   ├── ateneo-bge-m3-ecuador/        # Pesos compilados del modelo fine-tuned
 │   │   ├── chroma_db/                    # Base vectorial con 5,944 fragmentos de GPCs MSP
-│   │   ├── history.db                    # Base relacional SQLite con sesiones y salas
+│   │   ├── ateneo_clinical.db            # Base relacional SQLite normalizada
+│   │   ├── history.db                    # Base relacional SQLite histórica
 │   │   ├── ft_dataset.json               # Dataset de 480 tripletas supervisadas (Query/Pos/Neg)
 │   │   └── pilot_study/                  # Instrumentos estandarizados del estudio piloto
 │   │       ├── pre_test_casos.json       # 5 casos del pre-test
@@ -340,11 +357,11 @@ docker compose exec backend python tests/run_kst_simulation.py
 # 7. Compilar el Compendio Unificado en PDF:
 docker compose exec backend python scripts/generate_paper_tables_pdf.py
 
-# 8. Ejecutar suite unitaria frontend Vitest (16 suites, 72 tests PASS):
+# 8. Ejecutar suite unitaria frontend Vitest (22 suites, 106 tests PASS):
 docker compose exec frontend npm test
 
 # 9. Ejecutar pruebas End-to-End con Playwright (15 tests PASS):
-docker compose exec frontend npx playwright test
+docker compose exec frontend npm run test:e2e
 ```
 
 ---
@@ -372,8 +389,11 @@ docker compose exec frontend npx playwright test
 * **Documentación Metodológica y Arquitectónica:** Los archivos `.md` en [`docs/3_documentacion_metodologica/`](docs/3_documentacion_metodologica/) contienen la formulación matemática, justificación de la pérdida MNRL, análisis de limitaciones y las especificaciones de arquitectura de software:
   * [Arquitectura Modular del Frontend (Feature-Driven Slices & Core Shared)](docs/3_documentacion_metodologica/ARQUITECTURA_MODULAR_FRONTEND.md)
   * [Arquitectura del Backend: Monolito Modular con Persistencia Desacoplada](docs/3_documentacion_metodologica/ARQUITECTURA_MODULAR_MONOLITO_BACKEND.md)
+  * [Arquitectura y Modelado de la Base de Datos Relacional](docs/3_documentacion_metodologica/ARQUITECTURA_Y_MODELADO_BASE_DE_DATOS.md)
+  * [Informe de Auditoría de Carga, Concurrencia y Resistencia al Fallo](docs/3_documentacion_metodologica/INFORME_AUDITORIA_CARGA_Y_CONCURRENCIA.md)
   * [Arquitectura de Resiliencia de IA y Configuración 12-Factor](docs/3_documentacion_metodologica/ARQUITECTURA_RESILIENTE_LLM_Y_CONFIGURACION.md)
   * [Arquitectura RAG Híbrida y Fine-Tuning](docs/3_documentacion_metodologica/ARQUITECTURA_RAG_Y_FINE_TUNING.md)
+* **Planes de Escalabilidad y Hoja de Ruta Operativa:** Consultar [`docs/7_planes_de_escalabilidad_y_hoja_de_ruta/`](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/) para la [Hoja de Ruta de 21 Sesiones](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/HOJA_DE_RUTA_EJECUCION_SESIONES.md) y los planes maestros de [Base de Datos](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/PLAN_ESCALABILIDAD_BASE_DE_DATOS.md), [Backend](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/PLAN_ESCALABILIDAD_BACKEND.md) y [Frontend](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/PLAN_ESCALABILIDAD_FRONTEND.md).
 
 ---
 

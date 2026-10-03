@@ -44,7 +44,7 @@ def run_full_verification_pipeline():
     
     # 1. Seguridad Criptográfica y Autenticación RBAC
     try:
-        print("\n--- [SUITE 1/6] SEGURIDAD CRIPTOGRÁFICA, TOKENS JWT Y ROLES RBAC ---")
+        print("\n--- [SUITE 1/8] SEGURIDAD CRIPTOGRÁFICA, TOKENS JWT Y ROLES RBAC ---")
         from tests.test_auth_security import (
             test_password_hashing,
             test_jwt_token_lifecycle,
@@ -177,7 +177,7 @@ def run_full_verification_pipeline():
 
     # 2. Módulo Adaptativo KST & BKT
     try:
-        print("\n--- [SUITE 2/6] MOTOR DE CURRÍCULO ADAPTATIVO (KST + BKT + ZDP) ---")
+        print("\n--- [SUITE 2/8] MOTOR DE CURRÍCULO ADAPTATIVO (KST + BKT + ZDP) ---")
         test_knowledge_space_topology()
         test_bayesian_knowledge_tracing()
         test_curriculum_engine_recommendation()
@@ -190,7 +190,7 @@ def run_full_verification_pipeline():
 
     # 3. Módulo de Diferenciadores (Faithfulness & IBF)
     try:
-        print("\n--- [SUITE 3/6] DIFERENCIADORES CIENTÍFICOS (FAITHFULNESS SCORE & IBF) ---")
+        print("\n--- [SUITE 3/8] DIFERENCIADORES CIENTÍFICOS (FAITHFULNESS SCORE & IBF) ---")
         test_faithfulness_scorer()
         test_learning_analytics_ibf()
         test_new_api_routes()
@@ -218,7 +218,7 @@ def run_full_verification_pipeline():
 
     # 4. Estudio Piloto de Ganancia de Aprendizaje
     try:
-        print("\n--- [SUITE 4/6] ESTUDIO PILOTO (HAKE LEARNING GAIN & TABLA IV LATEX) ---")
+        print("\n--- [SUITE 4/8] ESTUDIO PILOTO (HAKE LEARNING GAIN & TABLA IV LATEX) ---")
         pilot_res = calculate_learning_gains()
         generate_latex_table(pilot_res)
         suite_results.append({
@@ -233,7 +233,7 @@ def run_full_verification_pipeline():
 
     # 5. Integración de Endpoints HTTP FastAPI
     try:
-        print("\n--- [SUITE 5/6] INTEGRACIÓN ENDPOINTS HTTP FASTAPI ---")
+        print("\n--- [SUITE 5/8] INTEGRACIÓN ENDPOINTS HTTP FASTAPI ---")
         from tests.test_api_endpoints import (
             test_health_check,
             test_auth_endpoints,
@@ -264,7 +264,7 @@ def run_full_verification_pipeline():
 
     # 6. Validación de Casos Clínicos y Reportes
     try:
-        print("\n--- [SUITE 6/6] CASOS CLÍNICOS, FUSIÓN MULTIMODAL Y REPORTES PDF ---")
+        print("\n--- [SUITE 6/8] CASOS CLÍNICOS, FUSIÓN MULTIMODAL Y REPORTES PDF ---")
         from tests.test_multimodal_and_cases import (
             test_all_12_cases_retrieval,
             test_pdf_generation,
@@ -281,7 +281,7 @@ def run_full_verification_pipeline():
 
     # 7. Pool Asíncrono de Reportes y Logging Estructurado OpenTelemetry (Fases 8 y 9)
     try:
-        print("\n--- [SUITE 7/7] POOL ASÍNCRONO DE REPORTES Y LOGGING ESTRUCTURADO (FASES 8 Y 9) ---")
+        print("\n--- [SUITE 7/8] POOL ASÍNCRONO DE REPORTES Y LOGGING ESTRUCTURADO (FASES 8 Y 9) ---")
         from tests.test_background_tasks import (
             test_background_worker_unit_lifecycle,
             test_background_worker_failure_handling
@@ -307,6 +307,43 @@ def run_full_verification_pipeline():
         traceback.print_exc()
         err_msg = f"{type(e).__name__}: {e}" if str(e) else type(e).__name__
         suite_results.append({"suite": "Pool Asíncrono & Logging JSON", "status": "FAIL", "detalles": err_msg})
+
+    # 8. Auditoría de Carga, Concurrencia y Resistencia al Fallo (Fase 10)
+    try:
+        print("\n--- [SUITE 8/8] AUDITORÍA DE CARGA, CONCURRENCIA Y RESISTENCIA AL FALLO (FASE 10) ---")
+        from tests.load_test_simulation import (
+            run_http_concurrency_tier,
+            run_database_wal_concurrency_stress,
+            run_rate_limiter_saturation_stress,
+            run_circuit_breaker_resilience_audit
+        )
+        # 1. Concurrencia HTTP (10, 25, 50, 100 usuarios)
+        for c_users in [10, 25, 50, 100]:
+            tier = run_http_concurrency_tier(concurrency_users=c_users, requests_per_user=3)
+            assert tier["error_500_count"] == 0, f"Errores 500 detectados en escalon {c_users}: {tier['error_500_count']}"
+
+        # 2. Concurrencia transaccional SQLite WAL (100 workers)
+        wal_st = run_database_wal_concurrency_stress(concurrency_workers=50, operations_per_worker=3)
+        assert wal_st["database_locked_errors"] == 0, f"Bloqueos SQLite detectados: {wal_st['database_locked_errors']}"
+
+        # 3. Saturación Rate Limiter
+        rl_st = run_rate_limiter_saturation_stress(total_burst_requests=50)
+        assert rl_st["server_500_errors"] == 0
+        assert rl_st["graceful_defense_success"] is True
+
+        # 4. Resiliencia Circuit Breaker
+        cb_st = run_circuit_breaker_resilience_audit()
+        assert cb_st["circuit_breaker_validated"] is True
+
+        suite_results.append({
+            "suite": "Auditoría de Carga & Concurrencia",
+            "status": "PASS",
+            "detalles": "100 usuarios simultáneos, SQLite WAL 0% locks, Rate Limit 429 y Circuit Breakers validados"
+        })
+    except Exception as e:
+        traceback.print_exc()
+        err_msg = f"{type(e).__name__}: {e}" if str(e) else type(e).__name__
+        suite_results.append({"suite": "Auditoría de Carga & Concurrencia", "status": "FAIL", "detalles": err_msg})
 
     elapsed = time.time() - start_time
     

@@ -11,12 +11,20 @@ import {
   LogOut,
   Wifi,
   WifiOff,
-  RefreshCw
+  RefreshCw,
+  Building2,
+  Globe
 } from 'lucide-react';
 import { useConnectivitySync } from '../storage/useConnectivitySync';
+import { useTheme } from '../theme/ThemeProvider';
+import type { TenantId } from '../theme/tokens';
+import { useI18n } from '../i18n/useI18n';
+import type { SupportedLocale } from '../../types/i18n';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const { tenant, tenantId, setTenantId, availableTenants } = useTheme();
+  const { t, locale, changeLocale, supportedLocales, authority } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -66,6 +74,15 @@ export default function Navbar() {
               <span className="font-heading font-black text-xl tracking-tight text-slate-900">
                 ATENEO<span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600">+</span>
               </span>
+              {tenant.siglas && (
+                <span 
+                  className="hidden sm:inline-block text-[10px] font-bold tracking-wider px-1.5 py-0.5 rounded text-white uppercase ml-1 shadow-xs"
+                  style={{ backgroundColor: tenant.colores.brandPrimary }}
+                  title={tenant.nombreInstitucion}
+                >
+                  {tenant.siglas}
+                </span>
+              )}
             </div>
           </Link>
         </div>
@@ -189,13 +206,67 @@ export default function Navbar() {
                       </span>
                     </div>
 
+                    {/* Selector de Sede Institucional (Multi-Tenancy) */}
+                    <div className="py-3 border-b border-slate-100">
+                      <label 
+                        htmlFor="tenant-selector" 
+                        className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5"
+                      >
+                        <Building2 className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Sede Institucional</span>
+                      </label>
+                      <select
+                        id="tenant-selector"
+                        value={tenantId}
+                        onChange={(e) => setTenantId(e.target.value as TenantId)}
+                        className="w-full text-xs font-medium bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+                      >
+                        {availableTenants.map((t) => (
+                          <option key={t.id} value={t.id}>
+                            {t.nombreInstitucion} ({t.siglas})
+                          </option>
+                        ))}
+                      </select>
+                      <div className="flex items-center justify-between mt-1.5 text-[10px] text-slate-400">
+                        <span>Contraste WCAG:</span>
+                        <span className="font-mono text-emerald-600 font-semibold">{tenant.ratioContrasteWcag.toFixed(1)}:1 (AA)</span>
+                      </div>
+                    </div>
+
+                    {/* Selector de Idioma y Taxonomía Nosológica (i18n) */}
+                    <div className="py-3 border-b border-slate-100">
+                      <label 
+                        htmlFor="locale-selector" 
+                        className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5"
+                      >
+                        <Globe className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Idioma y Taxonomía</span>
+                      </label>
+                      <select
+                        id="locale-selector"
+                        value={locale}
+                        onChange={(e) => changeLocale(e.target.value as SupportedLocale)}
+                        className="w-full text-xs font-medium bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+                      >
+                        {supportedLocales.map((loc) => (
+                          <option key={loc.code} value={loc.code}>
+                            {loc.label} ({loc.region})
+                          </option>
+                        ))}
+                      </select>
+                      <div className="flex items-center justify-between mt-1.5 text-[10px] text-slate-400">
+                        <span>Norma Nosológica:</span>
+                        <span className="font-medium text-slate-600 truncate max-w-[150px]">{authority.sistemaClasificacion} ({authority.pais})</span>
+                      </div>
+                    </div>
+
                     <div className="pt-2">
                       <button
                         onClick={handleLogout}
                         className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-full text-xs font-medium text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
                       >
                         <LogOut className="w-3.5 h-3.5" />
-                        <span>Cerrar Sesión</span>
+                        <span>{t('common.cerrarSesion')}</span>
                       </button>
                     </div>
                   </div>

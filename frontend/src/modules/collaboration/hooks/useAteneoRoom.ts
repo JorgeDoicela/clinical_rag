@@ -1,5 +1,5 @@
 import { useEffect, useCallback, FormEvent, useRef } from 'react';
-import { useAteneoRoomStore } from '../../../core/stores/useAteneoRoomStore';
+import { useAteneoRoomStore, type ExtendedAteneoRoom } from '../../../core/stores/useAteneoRoomStore';
 import { ateneoSocketClient } from '../../../core/realtime/socketClient';
 import type { User } from '../../../types';
 
@@ -67,31 +67,31 @@ export function useAteneoRoom(roomCode: string, currentUser: User | null) {
     });
 
     // 4. Suscripción a eventos en tiempo real
-    const unsubRoomUpdate = ateneoSocketClient.on('ROOM_STATE_UPDATED', (payload) => {
+    const unsubRoomUpdate = ateneoSocketClient.on<ExtendedAteneoRoom>('ROOM_STATE_UPDATED', (payload) => {
       if (payload) {
         setRoom(payload, userEmail);
       }
     });
 
-    const unsubPhaseTransition = ateneoSocketClient.on('PHASE_TRANSITION', (payload) => {
+    const unsubPhaseTransition = ateneoSocketClient.on<{ room: ExtendedAteneoRoom }>('PHASE_TRANSITION', (payload) => {
       if (payload?.room) {
         setRoom(payload.room, userEmail);
       }
     });
 
-    const unsubAnswerSubmitted = ateneoSocketClient.on('ANSWER_SUBMITTED', (payload) => {
+    const unsubAnswerSubmitted = ateneoSocketClient.on<{ room: ExtendedAteneoRoom }>('ANSWER_SUBMITTED', (payload) => {
       if (payload?.room) {
         setRoom(payload.room, userEmail);
       }
     });
 
-    const unsubParticipantJoined = ateneoSocketClient.on('PARTICIPANT_JOINED', (payload) => {
+    const unsubParticipantJoined = ateneoSocketClient.on<{ total_conectados: number }>('PARTICIPANT_JOINED', (payload) => {
       if (payload?.total_conectados !== undefined) {
         setConnectedCount(payload.total_conectados);
       }
     });
 
-    const unsubParticipantLeft = ateneoSocketClient.on('PARTICIPANT_LEFT', (payload) => {
+    const unsubParticipantLeft = ateneoSocketClient.on<{ total_conectados: number }>('PARTICIPANT_LEFT', (payload) => {
       if (payload?.total_conectados !== undefined) {
         setConnectedCount(payload.total_conectados);
       }

@@ -422,9 +422,9 @@ graph LR
 | **Sesión 8** | **Fase 8** | Visualización Médica Avanzada | Visor interactivo Canvas HTML5 GPU para Rx y ECG con calibrador y ventana radiológica | **Completado** |
 | **Sesión 9** | **Fase 9** | Resiliencia Offline Hospitalaria | IndexedDB nativo tipado + Outbox Pattern + background sync + degradación transparente | **Completado** |
 | **Sesión 10**| **Fase 10**| Validación E2E de Calidad | Batería de pruebas Playwright multi-navegador y Core Web Vitals | **Completado** |
-| **Sesión 11**| **Fase 11**| Imagenología Médica Estándar | Visor DICOM WADO-RS con CornerstoneJS y stacks axiales multicorte | **Planificado** |
-| **Sesión 12**| **Fase 12**| Circuitos de Certificación Médica | Motor de examen clínico objetivo estructurado (OSCE / ECOE) cronometrado | **Planificado** |
-| **Sesión 13**| **Fase 13**| Tele-Simulación y Audio en Tiempo Real | WebRTC bidireccional y AudioWorklet para pases de visita y debriefing | **Planificado** |
-| **Sesión 14**| **Fase 14**| Multi-Tenancy y White-Labeling | ThemeProvider dinámico con CSS variables para universidades asociadas | **Planificado** |
-| **Sesión 15**| **Fase 15**| Internacionalización Regional | i18n tipado con react-i18next y adaptadores nosológicos (MSP/MINSA/OMS) | **Planificado** |
-| **Sesión 16**| **Fase 16**| Observabilidad Forense en Producción | Real User Monitoring (RUM) con OpenTelemetry Web SDK y Sentry | **Planificado** |
+| **Sesión 11**| **Fase 11**| Imagenología Médica Estándar | Visor DICOM WADO-RS con Canvas 2D, LUT Hounsfield y caliper métrico | **Completado** |
+| **Sesión 12**| **Fase 12**| Circuitos de Certificación Médica | Motor OSCE / ECOE cronometrado anti-trampa con firma digital SHA-256 | **Completado** |
+| **Sesión 13**| **Fase 13**| Tele-Simulación y Audio en Tiempo Real | WebRTC bidireccional, AudioWorklet/Web Audio API y Tele-Debriefing | **Completado** |
+| **Sesión 14**| **Fase 14**| Multi-Tenancy y White-Labeling | ThemeProvider dinámico con CSS variables y WCAG AA computado | **Completado** |
+| **Sesión 15**| **Fase 15**| Internacionalización Regional | i18n tipado con react-i18next y adaptadores nosológicos (MSP/MINSA/OMS) | **Completado** |
+| **Sesión 16**| **Fase 16**| Observabilidad Forense en Producción | Real User Monitoring (RUM) con Core Web Vitals y W3C traceparent | **Completado** |

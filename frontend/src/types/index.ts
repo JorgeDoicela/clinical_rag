@@ -58,6 +58,7 @@ export interface CasePhase {
   tiempo_estimado?: string;
   estudios_adjuntos?: string[];
   ejes_evaluados?: string[];
+  dicom_study?: import('./dicom').DicomStudyMetadata;
 }
 
 export type CaseDifficulty = 'Básico' | 'Intermedio' | 'Avanzado';
@@ -81,7 +82,11 @@ export interface ClinicalCase {
   estudios_paraclinicos?: ParaclinicalStudy[];
   fases?: CasePhase[];
   competencias_activadas?: string[];
+  dicom_study?: import('./dicom').DicomStudyMetadata;
 }
+
+export * from './dicom';
+export * from './osce';
 
 // ==========================================
 // 3. Evaluación Formativa, RAG y Citas MSP

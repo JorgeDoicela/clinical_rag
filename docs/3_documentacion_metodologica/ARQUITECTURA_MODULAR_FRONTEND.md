@@ -405,39 +405,100 @@ La arquitectura implementada incorpora formalmente cinco subsistemas de alta tec
   - `core-web-vitals.spec.ts`: Auditoría de rendimiento clínico en cliente (LCP < 2.5s, CLS < 0.1, TTFB < 1.0s, DOM Interactive < 3.5s).
 * **Multi-Navegador:** Ejecución nativa sobre Google Chrome, Microsoft Edge y emulación móvil de smartphone (Pixel 5).
 
+### 8.6 Visor Diagnóstico de Imagenología Médica Estándar (DICOM / PACS / WADO-RS)
+* **Implementación:** `src/types/dicom.ts`, `src/modules/evaluation/components/DicomStudyViewer.tsx` y carga perezosa (`React.lazy`) en `CaseSolve.tsx`.
+* **Mecanismo:** Negatoscopio digital Canvas 2D con reconstrucción multiplanar ortogonal (MPR: cortes Axial, Coronal y Sagital) optimizado para series de Tomografía Computarizada (TC) y Resonancia Magnética (RM).
+* **Presets de Ventana Hounsfield (HU):**
+  - Ventana Pulmonar: Nivel -600 HU, Ancho 1500 HU (evaluación de parénquima y consolidaciones).
+  - Ventana Ósea: Nivel +300 HU, Ancho 1800 HU (líneas de fractura y cortical).
+  - Ventana Mediastínica/Tejidos Blandos: Nivel +40 HU, Ancho 400 HU.
+  - Ventana Cerebral: Nivel +40 HU, Ancho 80 HU.
+* **Herramientas Métricas:** Caliper métrico euclidiano interactivo con conversión a escala física milimétrica real (`pixelSpacing`), visualización de valor HU puntual bajo el cursor e inversión de polaridad fotométrica (`MONOCHROME1` / `MONOCHROME2`).
+* **Optimización de Rendimiento:** Aislado en su propio chunk de código (`dist/assets/DicomStudyViewer.js`, 17.43 kB / 6.10 kB gzip) sin recargar la vista principal del caso.
+
+### 8.7 Motor de Evaluación Clínica Estructurada (OSCE / ECOE) Anti-Trampa
+* **Implementación:** `src/types/osce.ts`, `src/modules/cases/hooks/useOsceCircuit.ts` y `src/modules/cases/components/OsceStationView.tsx`.
+* **Sincronización Horaria y Deriva Temporal:** Cálculo de deriva entre reloj de cliente y servidor (`skewMs = serverNow - clientNow`) mediante ticker de compensación continua, previniendo la alteración o congelamiento del tiempo de examen por manipulación del reloj del sistema operativo.
+* **Flujo Multiestación Cronometrado:**
+  - Período de lectura previa (`READING_INSTRUCTIONS`) con transición automática.
+  - Estación activa (`STATION_ACTIVE`) con temporizador clasificado por código de urgencia médica (Azul $\rightarrow$ Ámbar $\rightarrow$ Rojo crítico pulsante en los últimos 60 segundos).
+  - Bloqueo forzado instantáneo de edición ante evento de expiración (`expiradoPorServidor: true`).
+* **Firma Criptográfica SHA-256:** Generación de acta de respuesta con hash SHA-256 nativo (`SubtleCrypto`) sellando la entrega con el timestamp del servidor para auditorías de acreditación médica.
+
+### 8.8 Tele-Simulación y Audio Streaming Bidireccional (WebRTC)
+* **Implementación:** `src/core/realtime/webrtcClient.ts`, `src/modules/collaboration/components/VoiceRoomBar.tsx` y `AteneoRoom.tsx`.
+* **Arquitectura de Audio Clínico:**
+  - `RTCPeerConnection` con STUN y señalización desacoplada sobre el canal WebSocket existente de la sala (`WEBRTC_SIGNAL`).
+  - Captura con procesamiento de señal: cancelación de eco acústico (`echoCancellation: true`), supresión de ruido de fondo hospitalario (`noiseSuppression: true`), control automático de ganancia (`autoGainControl: true`) y muestreo Opus a 48 kHz.
+  - Medidor de voz (VU meter) con Web Audio API (`AudioContext`, `AnalyserNode`) con normalización de volumen medio y detección de habla activa (`isSpeaking`).
+  - Roles de moderación docente con silenciado remoto y desconexión determinística de pistas de medios (`MediaStreamTrack.stop()`).
+
+### 8.9 Arquitectura Multi-Tenancy UI y ThemeProvider Institucional
+* **Implementación:** `src/core/theme/tokens.ts`, `src/core/theme/ThemeProvider.tsx` y selector en `Navbar.tsx`.
+* **Inyección Dinámica de Tokens CSS:** Inyección en tiempo de ejecución de variables CSS nativas (`--ateneo-brand-primary`, `--ateneo-surface-canvas`, `--ateneo-card-radius`, `--ateneo-brand-gradient`) en `document.documentElement` y atributo `data-tenant`.
+* **Cálculo Algorítmico de Accesibilidad WCAG AA:** Implementación algorítmica de luminancia relativa y ratio de contraste según ISO-9241-3 (`calculateContrastRatio`), asegurando que la totalidad de los temas institucionales superen la norma WCAG AA ($\ge 4.5:1$ sobre fondo blanco).
+* **Catálogo de Sedes Médicas:**
+  - `default`: Sistema Nacional Ateneo+ (`#2563eb`, ratio 5.17:1, GPC MSP Ecuador).
+  - `uce`: Universidad Central del Ecuador (`#0f4c81`, ratio 8.21:1, Cátedra UCE/MSP).
+  - `usfq`: Universidad San Francisco de Quito (`#991b1b`, ratio 7.00:1, COCSA USFQ).
+  - `msp_hospital`: Hospital Docente RPIS (`#047857`, ratio 5.15:1, Protocolos de Emergencia MSP).
+* **Resolución en Cascada:** (1) clave de persistencia `ateneo_active_tenant` en `localStorage`, (2) subdominio de acceso (`uce.ateneo.edu.ec`), y (3) fallback resiliente a `default`.
+
+### 8.10 Internacionalización Tipada y Localización Nosológica (i18n)
+* **Implementación:** `src/core/i18n/i18n.ts`, `useI18n.ts`, `nosologyAdapter.ts`, `src/types/i18n.ts` y diccionarios modulares en `src/core/i18n/locales/`.
+* **Tipado Estricto de Traducciones:** Contrato `AteneoTranslationResources` que obliga en tiempo de compilación con TypeScript a que las variantes regionales completen el 100% de las claves en los namespaces `common`, `clinical`, `evaluation` y `nosology`.
+* **Variantes Regionales Implementadas:**
+  - `es-EC`: Español (Ecuador) con terminología y normativas GPC del MSP Ecuador.
+  - `es-PE`: Español (Perú) con nomenclatura NTS MINSA y exámenes auxiliares.
+  - `en-US`: Inglés (Internacional) para publicaciones biomédicas según estándares de la OMS/PAHO.
+* **Adaptador Nosológico Contextual:** Homologa códigos y guías de referencia para patologías prevalentes entre CIE-10 (Ecuador/Perú) y CIE-11 (OMS Global), incluyendo cobertura para apendicitis aguda, neumonía comunitaria, cetoacidosis diabética y preeclampsia severa.
+
+### 8.11 Observabilidad Forense de Usuario Real (RUM + OpenTelemetry Context)
+* **Implementación:** `src/core/observability/telemetry.ts`, `httpClient.ts` y arranque en `main.tsx`.
+* **Monitoreo de Core Web Vitals en Cliente:** Captura continua de LCP, FID, CLS, INP y TTFB con calificación cualitativa automatizada (`good`, `needs-improvement`, `poor`).
+* **Captura de Metadatos de Dispositivo y Red:** Registro de `tenantId`, `locale`, `route`, tipo de red efectiva (`navigator.connection.effectiveType`), memoria física (`deviceMemory`), concurrencia (`hardwareConcurrency`) y estado de conectividad (`isOnline`).
+* **Buffer Rotativo y Volcado Seguro:** Registro de excepciones no capturadas (`window.onerror`) y rechazos de promesas (`unhandledrejection`), con volcado atómico mediante `navigator.sendBeacon` o `fetch(..., { keepalive: true })` en eventos de ciclo de vida (`visibilitychange`, `pagehide`).
+* **Propagación Distribuida:** Inyección obligatoria de cabeceras de trazabilidad `X-Request-ID` y W3C `traceparent` (`00-{traceId}-{spanId}-01`) en cada solicitud de `httpClient`, permitiendo correlacionar trazas de frontend con el backend y las métricas OpenTelemetry de FastAPI.
+
 ---
 
 ## 9. Validación y Verificación Automatizada (100% PASS)
 
-La totalidad de los módulos y contratos arquitectónicos fueron certificados mediante la doble batería de pruebas unitarias (Vitest 5) y pruebas de integración de navegador real (Playwright):
+La totalidad de los módulos, controladores de dominio y contratos arquitectónicos fueron certificados mediante la doble batería de pruebas unitarias (Vitest 5) y pruebas de integración de navegador real (Playwright):
 
 ### 9.1 Batería Unitaria y de Integración (Vitest 5 + RTL)
 ```text
- ✓ src/__tests__/OfflineSync.test.tsx (6 tests)
- ✓ src/__tests__/PhaseFeedbackCard.test.jsx (3 tests)
- ✓ src/__tests__/SkillRadarChart.test.jsx (2 tests)
- ✓ src/__tests__/ImageUploadZone.test.jsx (3 tests)
- ✓ src/__tests__/client.test.js (7 tests)
- ✓ src/__tests__/VoiceInputButton.test.jsx (3 tests)
- ✓ src/__tests__/ProtectedRoute.test.jsx (4 tests)
- ✓ src/__tests__/AdaptiveNextCase.test.jsx (3 tests)
- ✓ src/__tests__/CoordinatorAnalytics.test.jsx (2 tests)
- ✓ src/__tests__/KnowledgeSpaceGraph.test.jsx (3 tests)
+ ✓ src/__tests__/DicomStudyViewer.test.jsx (7 tests)
+ ✓ src/__tests__/OsceCircuit.test.tsx (6 tests)
+ ✓ src/__tests__/Login.test.jsx (5 tests)
+ ✓ src/__tests__/WebRtcAudioRoom.test.tsx (5 tests)
+ ✓ src/__tests__/SocraticDebrief.test.jsx (10 tests)
+ ✓ src/__tests__/AteneoRealtimeCollab.test.jsx (7 tests)
  ✓ src/__tests__/ClinicalStudyViewer.test.jsx (5 tests)
  ✓ src/__tests__/AdminDashboard.test.jsx (3 tests)
- ✓ src/__tests__/AteneoRealtimeCollab.test.jsx (7 tests)
  ✓ src/__tests__/FeedbackCard.test.jsx (6 tests)
- ✓ src/__tests__/SocraticDebrief.test.jsx (10 tests)
- ✓ src/__tests__/Login.test.jsx (5 tests)
+ ✓ src/__tests__/CoordinatorAnalytics.test.jsx (2 tests)
+ ✓ src/__tests__/KnowledgeSpaceGraph.test.jsx (3 tests)
+ ✓ src/__tests__/AdaptiveNextCase.test.jsx (3 tests)
+ ✓ src/__tests__/VoiceInputButton.test.jsx (3 tests)
+ ✓ src/__tests__/PhaseFeedbackCard.test.jsx (3 tests)
+ ✓ src/__tests__/ImageUploadZone.test.jsx (3 tests)
+ ✓ src/__tests__/SkillRadarChart.test.jsx (2 tests)
+ ✓ src/__tests__/ProtectedRoute.test.jsx (4 tests)
+ ✓ src/__tests__/I18nNosology.test.tsx (5 tests)
+ ✓ src/__tests__/ThemeProvider.test.tsx (5 tests)
+ ✓ src/__tests__/OfflineSync.test.tsx (6 tests)
+ ✓ src/__tests__/client.test.js (7 tests)
+ ✓ src/__tests__/TelemetryRum.test.tsx (6 tests)
 
- Test Files  16 passed (16)
-      Tests  72 passed (72)
-   Duration  6.41s
+ Test Files  22 passed (22)
+      Tests  106 passed (106)
+   Duration  58.92s
 ```
 
 ### 9.2 Batería End-to-End Multi-Navegador (Playwright)
 ```text
- Running 5 tests using 1 worker
+ Running 15 tests using 1 worker
    ok 1 [Google Chrome] › auth-and-rbac.spec.ts (Login & RBAC)
    ok 2 [Google Chrome] › clinical-catalog.spec.ts (Catálogo y Búsqueda)
    ok 3 [Google Chrome] › clinical-study-viewer.spec.ts (Split-Screen & Canvas)
@@ -448,5 +509,5 @@ La totalidad de los módulos y contratos arquitectónicos fueron certificados me
  Test Results: 15/15 Passed (100% PASS)
 ```
 
-* **Compilación de Producción PWA:** `npm run build` completado limpiamente con Vite PWA (`dist/sw.js`) y precache activo de 26 activos en menos de 5 segundos.
+* **Compilación de Producción PWA:** `npm run build` completado limpiamente en 10.54s con Vite PWA (`dist/sw.js`) y precache activo de 28 activos (646.18 KiB).
 * **Tipado Estricto (TypeScript 5):** `npm run typecheck` (`tsc --noEmit`) con 0 errores en la totalidad del código.
