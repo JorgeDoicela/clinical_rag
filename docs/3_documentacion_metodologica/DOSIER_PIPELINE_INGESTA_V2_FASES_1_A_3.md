@@ -194,7 +194,8 @@ Cada registro en `chunks_corpus_v2.json` se adhiere al siguiente contrato inmuta
 Con los 7,052 chunks certificados, el flujo continúa de acuerdo con la hoja de ruta establecida:
 
 1. **Fase 4 (`04_mine_hard_negatives.py`):**
-   Recuperación densa con `BAAI/bge-m3` base sobre el banco de 7,052 chunks para extraer Hard Negatives candidatos (Top-2 a Top-8) asociados a consultas clínicas controladas, sustituyendo el filtro obsoleto de similitud léxica de Jaccard.
+   *Estado: 100% Completada y Certificada.* Minería semántica densa en dos etapas con BGE-M3 base y filtrado defensivo estricto anti-falsos negativos (1,709 tripletas, partición 70/15/15 congelada con SHA-256).  
+   > **Documento Completo:** [Dosier Metodológico de la Fase 4](./DOSIER_PIPELINE_INGESTA_V2_FASE_4_HARD_NEGATIVES.md)
 2. **Fase 5 (`05_build_ground_truth_pool.py`):**
    Ensamblado del pool de tripletas y matriz de concordancia inter-anotador ($\kappa \ge 0.80$) para revisión por pares clínicos ciegos.
 3. **Fase 6 (`06_train_bge_m3.py`):**
