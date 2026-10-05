@@ -690,6 +690,30 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     * `PLAN_ESCALABILIDAD_BACKEND.md`
     * `PLAN_ESCALABILIDAD_FRONTEND.md`
   - **Unificación de Índice en README Raíz:** Eliminado `docs/README.md` para evitar duplicidad; el archivo [README.md](file:///c:/Users/jorge/Desktop/Proyectos/clinical_rag/README.md) en la raíz centraliza la totalidad del árbol documental de `docs/` (incluyendo las subcarpetas `1_` a `7_` y sus 17 documentos metodológicos) y el mapa de acceso a los planes de escalabilidad.
+* **Auditoría Integral del Proyecto y Certificación de Calidad (/goal) (2026-10-03):**
+  - **Inspección de Árbol Completo de Directorios:** Verificación exhaustiva de raíz, `backend/` (14 subdirectorios, 29 archivos de test, módulos de dominio desacoplados, RAG híbrido, core con WAL, UoW, Rate Limiting, Sanitizador Anti-Injection y Logging JSON sin `print`), `frontend/` (SPA/PWA modularizada en Vertical Slices, Core Shared, ThemeProvider WCAG AA, i18n tipado, Canvas 60 FPS, WADO-RS DICOM, WebRTC Audio, IndexedDB y RUM), `docs/` (7 subdirectorios temáticos, 17 documentos metodológicos, compendio PDF de 1.34 MB, 6 tablas LaTeX, 4 figuras 300dpi y 4 planes directores en `docs/7_planes_de_escalabilidad_y_hoja_de_ruta/`).
+  - **Verificación de Contratos y Ausencia de Violaciones:**
+    * 0 imports de `from rag` en `backend/routers/` (aislamiento estricto Clean Architecture).
+    * 0 llamadas a `print(` en código de producción en runtime.
+    * Integridad referencial reforzada con `PRAGMA foreign_keys=ON` en SQLite y modelos SQLAlchemy con claves foráneas explícitas.
+  - **Pruebas en Vivo y Compilación:**
+    * TypeScript 5: `npm run typecheck` aprobado con 0 errores en tipado estricto.
+    * Vitest 5: 22 suites y 106 pruebas unitarias e integración aprobadas al 100% en 45.69s.
+    * Vite 6: `npm run build` completado exitosamente en 7.64s con Service Worker PWA activo (28 activos precacheados, 646.18 KiB).
+  - **Estado Global:** 100% de consistencia entre código fuente, esquemas de datos relacionales, cliente frontend PWA y literatura científica experimental.
+* **Consolidación del Plan Maestro de Reestructuración del Pipeline de IA v2 (`PLAN_REESTRUCTURACION_PIPELINE_IA.md`) (2026-10-03):**
+  - **Depuración Estratégica de Investigación Científica (Q1):** Se erradicó la sobredimensión de intentar re-entrenar simultáneamente BGE-M3 y Qwen2.5-VL con SFT/DPO en un corpus pequeño (riesgo crítico de pérdida de control de variables y olvido catastrófico).
+  - **Foco de Cómputo en NVIDIA A100 (40 GB VRAM):** Concentración exclusiva de la GPU en el re-entrenamiento limpio de `BAAI/bge-m3` con pérdida `MultipleNegativesRankingLoss` (MNRL), temperatura 0.02, batch size 32 en `bfloat16` y minería semántica de Hard Negatives (erradicando la métrica léxica de Jaccard).
+  - **Corpus 100% Oficial de Ecuador:** Delimitación territorial y epidemiológica estricta (GPC MSP, Cuadro Nacional de Medicamentos Básicos CONASA, Score MAMA, Código Rojo y estadísticas INEC de egresos y mortalidad) dividida en 5 ejes clínicos prevalentes.
+  - **Evaluador Multimodal Soberano y Desacoplado:** Inferencia con `Qwen2.5-VL-7B-Instruct` base vía `vLLM` con Guided JSON Decoding (esquema Pydantic estricto), eliminando variaciones de APIs comerciales y garantizando reproducibilidad determinística.
+  - **Despliegue Económico sin AWS:** Adopción de arquitecturas costo-eficientes mediante Modal Labs Serverless (cobro por segundo activo), RunPod Community Cloud o Cloudflare Tunnel hacia el servidor anfitrión local ($0 USD en cómputo en la nube).
+  - **Hoja de Ruta:** Reducida de 15 a 8 fases secuenciales ejecutables con banco ciego de evaluación médica humana (Kappa de Cohen $\ge 0.80$).
+* **Ejecución de Fase 1 y Preparación de Fase 2 del Pipeline de IA v2 (2026-10-03):**
+  - **Fase 1 Completada (Inventario y Clasificación):** Se implementó y ejecutó `classify_corpus.cjs` y `01_classify_and_inventory_corpus.py`. Se organizaron 45 guías oficiales del MSP en los 5 ejes clínicos prioritarios y se exportó `backend/data/corpus_manifest.json` con hashes criptográficos SHA-256 inmutables.
+  - **Fase 2 Preparada (Extracción sin Pérdida):** Se creó `backend/ingestion_v2/02_extract_with_marker.py` y `requirements-ingestion-v2.txt`, diseñados para segmentar figuras a 300 DPI, capturar tablas completas y detectar paginación física real al pie de página mediante `marker-pdf`.
+
+
+
 
 
 

@@ -1,0 +1,15 @@
+# Requerimientos Oficiales para el Pipeline de Ingesta, Entrenamiento y Evaluacion
+# Ateneo+ v2.0 - Reproducibilidad Cientifica para Investigacion Q1
+# Compatible con Python 3.10 / 3.11 y aceleradores NVIDIA CUDA 12.x / A100
+
+marker-pdf>=0.3.0
+sentence-transformers>=3.0.0
+torch>=2.2.0
+transformers>=4.40.0
+accelerate>=0.30.0
+pydantic>=2.7.0
+chromadb>=0.5.0
+scikit-learn>=1.4.0
+pandas>=2.2.0
+numpy>=1.26.0
+tqdm>=4.66.0
