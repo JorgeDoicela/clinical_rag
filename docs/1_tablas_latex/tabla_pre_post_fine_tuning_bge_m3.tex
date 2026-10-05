@@ -1,0 +1,18 @@
+\begin{table}[htbp]
+\centering
+\caption{Comparación empírica Pre vs. Post Fine-Tuning en Ateneo+ BGE-M3 Ecuador v2 (MNRL $\tau=0.02$).}
+\label{tab:pre_post_retrieval}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Métrica de Retrieval} & \textbf{Baseline (Pre)} & \textbf{Ateneo+ (Post)} & \textbf{Delta ($\Delta$)} & \textbf{Ganancia (\%)} \\
+\midrule
+    Accuracy@1 (Hit@1) & 0.0522 & 0.2450 & +0.1928 & +369.23\% \\
+    Accuracy@5 (Hit@5) & 0.1606 & 0.4739 & +0.3133 & +195.00\% \\
+    MRR@1 & 0.0522 & 0.2450 & +0.1928 & +369.23\% \\
+    MRR@5 & 0.0889 & 0.3328 & +0.2439 & +274.40\% \\
+    NDCG@5 & 0.1066 & 0.3682 & +0.2616 & +245.40\% \\
+    Precision@5 & 0.0321 & 0.0948 & +0.0627 & +195.00\% \\
+    Recall@5 & 0.1606 & 0.4739 & +0.3133 & +195.00\% \\
+\bottomrule
+\end{tabular}
+\end{table}
