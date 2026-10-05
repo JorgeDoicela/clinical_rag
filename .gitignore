@@ -47,9 +47,10 @@ backend/data/processed/
 *.bin
 *.pt
 **/checkpoints/
-backend/data/legacy_v1/ateneo-bge-m3-ecuador/model.safetensors
 *.zip
 **/*.zip
+*.tar.gz
+**/*.tar.gz
 
 # ==========================================
 # 4. FRONTEND / NODE
