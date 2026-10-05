@@ -787,4 +787,17 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     * Backend: 8 suites maestras verificadas con 100% PASS (0 fallos) en `tests.run_all_tests`.
     * Frontend: 22 suites y 106 pruebas unitarias e integración verificadas con 100% PASS en Vitest (`vitest run`).
     * Typecheck: `npm run typecheck` (`tsc --noEmit`) 100% limpio con 0 errores.
+* **Culminación Exitosa de la Fase 3: Token Chunking Semántico e Indivisible BGE-M3 (2026-10-05):**
+  - **Implementación de `03_token_chunker.py`:**
+    * Carga directa del tokenizador nativo de BGE-M3 (`XLMRobertaTokenizerFast` vía `tokenizers.Tokenizer.from_file`) a velocidad C++/Rust (sin sobrecarga de VRAM ni dependencias pesadas).
+    * Parámetros: 512 tokens objetivo, 128 tokens de solapamiento semántico (*overlap*), mínimo de 64 tokens.
+    * **Regla de Frontera Indivisible de Tablas:** Preservación de 3,445 tablas clínicas íntegras en chunks dedicados (hasta 768 tokens) y partición por filas con repetición de cabeceras para tablas extensas, garantizando cero tablas rotas o corruptas.
+    * **Metadatos Inyectados por Chunk:** `chunk_id`, `guia_archivo`, `guia_titulo`, `eje_clinico`, `eje_nombre`, `cie10`, `cie11`, `acuerdo_ministerial`, `anio`, `pagina_pdf`, `pagina_impresa_real`, `seccion`, `tipo_contenido` (`texto`, `tabla`, `mixto`), conteo de tokens y hash criptográfico SHA-256.
+  - **Métricas Certificadas del Corpus Chunked:**
+    * **Total de Chunks generados:** 5,905 fragmentos clínicos canónicos.
+    * **Distribución de Tokens:** Media de 430.5 tokens, mediana de 451 tokens, percentil 95 de 730 tokens.
+    * **Desglose de Contenido:** 3,445 chunks de tablas puras, 963 mixtos (tabla + contexto clínico) y 1,497 de texto puro.
+    * **Desglose por Eje Normativo:** 732 chunks en Urgencias Obstétricas, 1,704 en Respiratorio/Pediátrico, 684 en Cardiovascular/Metabólico, y 2,785 en Soporte Crónicos/Salud Mental.
+    * **Tiempo de Ejecución:** 37.79 segundos para el universo completo de las 44 GPCs.
+    * **Artefactos Guardados:** `backend/data/extracted/chunks_corpus_v2.json` (12.94 MB) y `backend/data/extracted/chunks_summary.json` (9.08 KB).
 
