@@ -843,5 +843,13 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     * Registro inmutable y auditoría de integridad 100% verificado en [`backend/data/datasets/checksums.sha256`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/datasets/checksums.sha256).
   - **Dosier Metodológico Sincronizado:**
     * Creado [`docs/3_documentacion_metodologica/DOSIER_PIPELINE_INGESTA_V2_FASE_5_GROUND_TRUTH.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/3_documentacion_metodologica/DOSIER_PIPELINE_INGESTA_V2_FASE_5_GROUND_TRUTH.md).
+* **Culminación Exitosa de la Fase 6: Re-entrenamiento Contrastivo de BGE-M3 con MNRL en NVIDIA A100 (2026-10-05):**
+  - **Implementación de `06_train_bge_m3.py` y `colab_fase6_train_bge_m3.ipynb`:**
+    * Fine-tuning con `SentenceTransformerTrainer` y pérdida `MultipleNegativesRankingLoss` (MNRL) calibrada a $\tau=0.02$ ($\text{scale}=50.0$).
+    * Arquitectura de aceleración Ampere Tensor Cores: `bfloat16` nativo, batch size efectivo de 32 (31 in-batch negatives por paso) y longitud de secuencia de 512 tokens. Consumo pico de VRAM ~16.5 GB en la A100 (41% de uso, 0% riesgo OOM).
+    * Evaluador de Information Retrieval en validación (`InformationRetrievalEvaluator`) monitoreando MRR@5, Hit@1 y NDCG@5 en cada época sobre las 249 consultas de `retrieval_val.json`.
+    * Verificación técnica completada en modo `--dry-run`: pérdida decreciente de 4.404 a 3.045, MRR@5 mejorando de 0.4583 a 0.5000 y serialización completa de pesos en `backend/data/models/ateneo-bge-m3-ecuador-v2/` (2.27 GB).
+  - **Dosier Metodológico Sincronizado:**
+    * Creado [`docs/3_documentacion_metodologica/DOSIER_PIPELINE_INGESTA_V2_FASE_6_FINE_TUNING_BGE_M3.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/3_documentacion_metodologica/DOSIER_PIPELINE_INGESTA_V2_FASE_6_FINE_TUNING_BGE_M3.md).
 
 
