@@ -246,18 +246,68 @@ def train_bge_m3(
         evaluator=evaluator,
     )
 
-    # 8. Ejecución del entrenamiento
+    # 8. Evaluación PRE-entrenamiento (Baseline BGE-M3 Base)
+    logger.info("=" * 80)
+    logger.info("EJECUTANDO EVALUACIÓN PRE-ENTRENAMIENTO (BASELINE BGE-M3 SIN FT)...")
+    logger.info("=" * 80)
+    pre_metrics = evaluator(model)
+
+    # 9. Ejecución del entrenamiento
     logger.info("Iniciando optimización con SentenceTransformerTrainer...")
     train_result = trainer.train()
 
-    # 9. Guardar el mejor modelo en el directorio de salida definitivo
+    # 10. Guardar el mejor modelo en el directorio de salida definitivo
     logger.info("Guardando modelo final re-entrenado en: %s", output_dir)
     model.save_pretrained(str(output_dir))
+
+    # 11. Evaluación POST-entrenamiento (Ateneo+ BGE-M3 Re-entrenado)
+    logger.info("=" * 80)
+    logger.info("EJECUTANDO EVALUACIÓN POST-ENTRENAMIENTO (ATENEO+ BGE-M3 FT)...")
+    logger.info("=" * 80)
+    post_metrics = evaluator(model)
+
+    # 12. Comparación Científica PRE vs POST
+    metric_keys = [
+        ("Accuracy@1 (Hit@1)", "ateneo_val_ir_evaluator_cosine_accuracy@1"),
+        ("Accuracy@5 (Hit@5)", "ateneo_val_ir_evaluator_cosine_accuracy@5"),
+        ("MRR@1", "ateneo_val_ir_evaluator_cosine_mrr@1"),
+        ("MRR@5", "ateneo_val_ir_evaluator_cosine_mrr@5"),
+        ("NDCG@5", "ateneo_val_ir_evaluator_cosine_ndcg@5"),
+        ("Precision@5", "ateneo_val_ir_evaluator_cosine_precision@5"),
+        ("Recall@5", "ateneo_val_ir_evaluator_cosine_recall@5"),
+    ]
+
+    print("\n" + "=" * 90)
+    print(" CUADRO COMPARATIVO PRE vs. POST FINE-TUNING (PAPER CIENTÍFICO)")
+    print("=" * 90)
+    print(f" {'Métrica Científica':<25} | {'Baseline (PRE)':<15} | {'Ateneo+ (POST)':<15} | {'Delta (Δ)':<12} | {'Ganancia (%)':<12}")
+    print("-" * 90)
+
+    pre_post_data = {}
+    latex_rows = []
+
+    for name, key in metric_keys:
+        val_pre = float(pre_metrics.get(key, 0.0))
+        val_post = float(post_metrics.get(key, 0.0))
+        delta = val_post - val_pre
+        gain_pct = (delta / val_pre * 100.0) if val_pre > 0.0 else 0.0
+
+        pre_post_data[name] = {
+            "pre": round(val_pre, 4),
+            "post": round(val_post, 4),
+            "delta": round(delta, 4),
+            "gain_pct": round(gain_pct, 2),
+        }
+
+        print(f" {name:<25} | {val_pre:15.4f} | {val_post:15.4f} | {delta:+12.4f} | {gain_pct:+11.2f}%")
+        latex_rows.append(f"    {name} & {val_pre:.4f} & {val_post:.4f} & {delta:+.4f} & {gain_pct:+.2f}\\% \\\\")
+
+    print("=" * 90)
 
     elapsed_time = time.time() - start_time
     logger.info("Entrenamiento finalizado exitosamente en %.2f segundos (%.2f minutos).", elapsed_time, elapsed_time / 60.0)
 
-    # 10. Guardar métricas de entrenamiento
+    # 13. Guardar métricas y tablas LaTeX
     summary = {
         "base_model": base_model_name,
         "device": device,
@@ -271,12 +321,32 @@ def train_bge_m3(
         "val_samples": len(val_triplets),
         "training_time_seconds": round(elapsed_time, 2),
         "training_loss": round(float(train_result.training_loss), 5) if hasattr(train_result, "training_loss") else None,
+        "pre_post_comparison": pre_post_data,
     }
 
-    metrics_file = output_dir / "training_summary.json"
+    metrics_file = output_dir / "pre_post_metrics.json"
     with open(metrics_file, "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2, ensure_ascii=False)
-    logger.info("Resumen de métricas guardado en: %s", metrics_file)
+    logger.info("Resumen comparativo guardado en: %s", metrics_file)
+
+    # Exportar tabla LaTeX
+    latex_content = "\\begin{table}[htbp]\n"
+    latex_content += "\\centering\n"
+    latex_content += "\\caption{Comparación empírica Pre vs. Post Fine-Tuning en Ateneo+ BGE-M3 Ecuador v2 (Pérdida MNRL $\\tau=0.02$).}\n"
+    latex_content += "\\label{tab:pre_post_retrieval}\n"
+    latex_content += "\\begin{tabular}{lcccc}\n"
+    latex_content += "\\toprule\n"
+    latex_content += "\\textbf{Métrica de Retrieval} & \\textbf{Baseline (Pre)} & \\textbf{Ateneo+ (Post)} & \\textbf{Delta ($\\Delta$)} & \\textbf{Ganancia (\\%)} \\\\\n"
+    latex_content += "\\midrule\n"
+    latex_content += "\n".join(latex_rows) + "\n"
+    latex_content += "\\bottomrule\n"
+    latex_content += "\\end{tabular}\n"
+    latex_content += "\\end{table}\n"
+
+    latex_file = output_dir / "pre_post_table.tex"
+    with open(latex_file, "w", encoding="utf-8") as f:
+        f.write(latex_content)
+    logger.info("Tabla LaTeX para paper científico exportada en: %s", latex_file)
 
 
 def main() -> None:

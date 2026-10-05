@@ -85,6 +85,18 @@ Donde:
 * Cuaderno estructurado y autocontenido listo para ser ejecutado en la NVIDIA A100.
 * Monitorización en vivo de VRAM con `nvidia-smi`, entrenamiento acelerado en BF16 y empaquetado final comprimido en `ateneo-bge-m3-ecuador-v2.tar.gz`.
 
+### 5.3 Evaluación Empírica Comparativa PRE vs. POST y Exportación LaTeX
+* **Evaluación PRE (Baseline BAAI/bge-m3 sin FT):** Se ejecuta el evaluador de Information Retrieval sobre `retrieval_val.json` antes de iniciar la optimización para establecer la línea de base.
+* **Evaluación POST (Ateneo+ bge-m3 Re-entrenado):** Se evalúa el modelo final sobre el mismo conjunto para cuantificar la ganancia de la adaptación de dominio.
+* **Métricas Científicas Comparadas:**
+  - $\text{Accuracy@1}$ ($\text{Hit@1}$), $\text{Accuracy@5}$ ($\text{Hit@5}$).
+  - $\text{MRR@1}$, $\text{MRR@5}$.
+  - $\text{NDCG@5}$ (Normalized Discounted Cumulative Gain).
+  - $\text{Precision@5}$ y $\text{Recall@5}$.
+* **Entregables Científicos Automáticos:**
+  - `pre_post_metrics.json`: Diccionario estructurado con los valores PRE, POST, $\Delta$ absoluto y $\%$ de ganancia relativa.
+  - `pre_post_table.tex`: Tabla formal en formato LaTeX lista para ser insertada directamente en el manuscrito científico (Q1).
+
 ---
 
 ## 6. Procedimiento de Ejecución en la NVIDIA A100
