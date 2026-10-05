@@ -830,5 +830,18 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
   - **Certificación de Regresión (100% PASS):**
     * Backend: 66/66 pruebas unitarias y de integración aprobadas (`pytest` 100% PASS).
     * Frontend: 22/22 suites y 106/106 pruebas aprobadas (`vitest run` 100% PASS).
+* **Culminación Exitosa de la Fase 5: Ensamblado y Curación del Ground Truth Clínico Humano (2026-10-05):**
+  - **Implementación de `05_build_ground_truth_pool.py`:**
+    * Modos CLI `--mode generate`, `--mode validate` y `--mode verify` con tipado estricto.
+    * Ensamblado de 160 pares clínicos balanceados estratificados en los 4 ejes normativos del MSP (40 pares por eje: 50% positivos directos, 30% distractores plausibles/hard negatives y 20% contextuales neutrales).
+    * Exportación a formato tabular RFC-4180 con comillas obligatorias en [`backend/data/ground_truth/pairs_raw.csv`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/ground_truth/pairs_raw.csv).
+  - **Protocolo Clínico de Anotación (`annotation_protocol.md`):**
+    * Escala ordinal Likert $\{0, 1, 2\}$ con criterios específicos para cada uno de los 4 ejes MSP (Urgencias Obstétricas, Respiratorio Pediátrico, Cardiovascular/Metabólico y Soporte/Crónicos).
+  - **Validación Estadística Inter-Anotador:**
+    * Coeficiente Kappa ponderado cuadrático de Cohen ($\kappa_w$) con penalización severa a divergencias $0 \leftrightarrow 2$: $\kappa_w = 0.9531$ con acuerdo simple $P_o = 91.25\%$ (Acuerdo casi perfecto, Landis & Koch).
+    * Consolidación de [`backend/data/ground_truth/pairs_validated.csv`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/ground_truth/pairs_validated.csv) (SHA-256: `ff2d043a390e584fdb7cf1eaf2519afc717dca952877b8d19c84644560f4c2af`).
+    * Registro inmutable y auditoría de integridad 100% verificado en [`backend/data/datasets/checksums.sha256`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/datasets/checksums.sha256).
+  - **Dosier Metodológico Sincronizado:**
+    * Creado [`docs/3_documentacion_metodologica/DOSIER_PIPELINE_INGESTA_V2_FASE_5_GROUND_TRUTH.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/3_documentacion_metodologica/DOSIER_PIPELINE_INGESTA_V2_FASE_5_GROUND_TRUTH.md).
 
 
