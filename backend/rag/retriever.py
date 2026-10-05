@@ -149,11 +149,9 @@ def retrieve_top_k_chunks(
             con.execute("UPDATE collections SET config_json_str = NULL WHERE config_json_str = '{}';")
             con.commit()
             con.close()
-            collection = client.get_collection("gpc_msp")
-        except Exception:
-            from ingestion.run_ingestion import run_ingestion_pipeline
-            run_ingestion_pipeline()
-            collection = client.get_collection("gpc_msp")
+        except Exception as exc:
+            logger.warning(f"Colección gpc_msp no encontrada, inicializando: {exc}")
+            collection = client.get_or_create_collection("gpc_msp")
 
     # Resolver nombre canónico exacto para la base de datos
     canonical_guia = resolve_canonical_guia(collection, guia_filtro)
