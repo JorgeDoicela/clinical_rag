@@ -773,4 +773,7 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     * **Volumen textual útil:** 7,689,869 caracteres clínicos.
     * **Archivos generados:** 44 archivos Markdown en [`backend/data/extracted/markdown/`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/extracted/markdown/) y reporte de auditoría en [`backend/data/extracted/extraction_summary.json`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/extracted/extraction_summary.json).
   - **Hito:** Fase 2 concluida al 100% con rigor metodológico, lista para la Fase 3 (Chunking semántico indivisible con tokenizador BGE-M3).
+  - **Saneamiento Estructural y Persistencia de Directorios (.gitkeep):**
+    * Se eliminó el directorio vacío obsoleto `backend/data/ateneo-bge-m3-ecuador/2_Normalize`.
+    * Se crearon archivos `.gitkeep` y se ajustó `.gitignore` para preservar en GitHub la estructura de directorios canónicos del pipeline: `backend/data/extracted/markdown/`, `backend/data/chroma_db/`, `backend/data/ground_truth/`, `backend/data/datasets/` y `backend/data/models/`.
 
