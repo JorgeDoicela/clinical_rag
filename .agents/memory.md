@@ -858,11 +858,13 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     * **Recall@5:** 0.1606 $\rightarrow$ **0.4739** (+0.3133, **+195.00%**)
     * Tabla formal LaTeX exportada a [`docs/1_tablas_latex/tabla_pre_post_fine_tuning_bge_m3.tex`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/1_tablas_latex/tabla_pre_post_fine_tuning_bge_m3.tex).
     * Pesos definitivos de la A100 (2.27 GB) instalados en [`backend/data/models/ateneo-bge-m3-ecuador-v2/`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/models/ateneo-bge-m3-ecuador-v2/).
-  - **Segregación Definitiva de Versión 1 (Legacy) vs. Versión 2 (Científica):**
-    * Se eliminó el mock de prueba local CPU y se instaló el modelo real de la A100.
-    * Todos los artefactos de la v1 preliminar (`train_triplets.json`, `ateneo-bge-m3-ecuador`, `history.db`, etc.) quedaron aislados en `backend/data/legacy_v1/`.
-    * Los cuadernos preliminares de Colab de la v1 se archivaron en `backend/ingestion/legacy_notebooks/`.
-    * El espacio de trabajo en `backend/data/` y `backend/ingestion_v2/` quedó 100% puro y exclusivo para la Versión 2.
+  - **Erradicación Total de Versión 1 (Legacy) y Auditoría Exhaustiva (/goal):**
+    * Se eliminó el mock de prueba local CPU y se instalaron los pesos auténticos de la A100 (2.27 GB).
+    * Se eliminaron definitivamente `backend/data/legacy_v1/` y la totalidad de `backend/ingestion/` (1,083,829 líneas purgadas en `e0ef39f`).
+    * Se eliminaron los scripts obsoletos `scripts/prepare_colab_bundle.py`, `scripts/upsert_seed_chunks.py` y `scripts/generate_seed_chunks_ai.py`.
+    * Se actualizaron todos los dosieres metodológicos en `docs/3_documentacion_metodologica/` y `README.md` hacia `ingestion_v2` y los datasets canónicos v2.
+    * Se configuró `backend/core/config.py` para priorizar automáticamente el modelo local fine-tuned `ateneo-bge-m3-ecuador-v2`.
+    * Certificación de 100% PASS en Frontend (22 suites, 106 tests en Vitest, 0 errores en `tsc --noEmit`) y Backend (8 suites maestras en `tests.run_all_tests`).
   - **Dosier Metodológico Sincronizado:**
     * Creado [`docs/3_documentacion_metodologica/DOSIER_PIPELINE_INGESTA_V2_FASE_6_FINE_TUNING_BGE_M3.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/3_documentacion_metodologica/DOSIER_PIPELINE_INGESTA_V2_FASE_6_FINE_TUNING_BGE_M3.md).
 
