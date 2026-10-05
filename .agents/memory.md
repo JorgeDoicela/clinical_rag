@@ -776,4 +776,15 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
   - **Saneamiento Estructural y Persistencia de Directorios (.gitkeep):**
     * Se eliminó el directorio vacío obsoleto `backend/data/ateneo-bge-m3-ecuador/2_Normalize`.
     * Se crearon archivos `.gitkeep` y se ajustó `.gitignore` para preservar en GitHub la estructura de directorios canónicos del pipeline: `backend/data/extracted/markdown/`, `backend/data/chroma_db/`, `backend/data/ground_truth/`, `backend/data/datasets/` y `backend/data/models/`.
+* **Depuración de Residuos de Compilación y Blindaje Defensivo contra Cachés (2026-10-05):**
+  - **Eliminación Quirúrgica de Residuos:**
+    * Se eliminó `backend/scripts` (symlink residual plano de 10 bytes creado en plataformas no Windows). Se actualizaron 3 documentos metodológicos para referenciar limpiamente a la carpeta canónica raíz `scripts/`.
+    * Se eliminó el archivo de compilación incremental de TypeScript `frontend/tsconfig.node.tsbuildinfo` (113 KB) y los resultados locales de Playwright `frontend/test-results/.last-run.json`.
+    * Se limpiaron las carpetas temporales locales `.pytest_cache/` en la raíz.
+  - **Blindaje en `.gitignore`:**
+    * Se incorporaron reglas estrictas para ignorar `*.tsbuildinfo`, `**/*.tsbuildinfo`, `test-results/`, `**/test-results/`, `playwright-report/` y `**/playwright-report/`.
+  - **Certificación de Cero Roturas (100% PASS):**
+    * Backend: 8 suites maestras verificadas con 100% PASS (0 fallos) en `tests.run_all_tests`.
+    * Frontend: 22 suites y 106 pruebas unitarias e integración verificadas con 100% PASS en Vitest (`vitest run`).
+    * Typecheck: `npm run typecheck` (`tsc --noEmit`) 100% limpio con 0 errores.
 
