@@ -68,13 +68,13 @@ Los fragmentos canónicos de referencia (*Ground Truth*) están desacoplados del
 
 ---
 
-## 3. Extensión y Generación Asistida por IA ([../backend/scripts/generate_seed_chunks_ai.py](../backend/scripts/generate_seed_chunks_ai.py))
+## 3. Extensión y Generación Asistida por IA ([../../scripts/generate_seed_chunks_ai.py](../../scripts/generate_seed_chunks_ai.py))
 
 Para incorporar nuevas anclas normativas de Ground Truth sin editar código Python:
 
 ```bash
 # Ejecutar gestor de seed chunks
-py backend/scripts/generate_seed_chunks_ai.py
+python scripts/generate_seed_chunks_ai.py
 ```
 
 El script valida automáticamente los códigos CIE-10 contra el catálogo maestro [`../backend/data/catalogo_cie10_gpc.json`](../backend/data/catalogo_cie10_gpc.json) e inserta o actualiza el fragmento preservando la integridad del formato JSON.

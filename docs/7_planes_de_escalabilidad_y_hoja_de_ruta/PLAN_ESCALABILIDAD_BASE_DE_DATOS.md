@@ -351,7 +351,7 @@ Almacena casos clínicos dinámicos creados institucionalmente por docentes en l
 ### Fase 3: Migración de Datos y Preservación de Registros Existentes
 * **Estado:** **Completado.**
 * **Pasos de Ejecución:**
-  1. Crear el script de migración determinístico `backend/scripts/migrate_history_to_ateneo_clinical.py` que:
+  1. Crear el script de migración determinístico `scripts/migrate_history_to_ateneo_clinical.py` que:
      - Cree la base de datos con el nuevo esquema normalizado (`ateneo_clinical.db`).
      - Migre los usuarios, 33 evaluaciones, 52 salas y estados psicométricos existentes en `history.db` garantizando que no se pierda ningún dato histórico.
      - Resuelva la integridad de usuarios huérfanos (`usr_estudiante_002` a `usr_estudiante_007`) matriculándolos formalmente en `users`.

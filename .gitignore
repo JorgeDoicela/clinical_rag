@@ -60,6 +60,12 @@ dist/
 **/dist/
 .dist/
 *.local
+*.tsbuildinfo
+**/*.tsbuildinfo
+test-results/
+**/test-results/
+playwright-report/
+**/playwright-report/
 
 # ==========================================
 # 5. IDE & OS METADATA

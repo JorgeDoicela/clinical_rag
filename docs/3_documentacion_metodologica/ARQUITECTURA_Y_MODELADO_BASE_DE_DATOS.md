@@ -149,7 +149,7 @@ erDiagram
 ## 4. Script Determinístico de Migración de Datos
 
 Para migrar la base histórica no tipada hacia la nueva arquitectura relacional, se diseñó e implementó el script idempotente:
-* **Ubicación:** `backend/scripts/migrate_history_to_ateneo_clinical.py`.
+* **Ubicación:** `scripts/migrate_history_to_ateneo_clinical.py`.
 * **Características Técnicas:**
   1. Ejecución transaccional protegida: si una fila falla, la migración completa hace rollback.
   2. Parseo y normalización de fechas ISO 8601 a objetos `datetime` UTC nativos.
