@@ -3,8 +3,8 @@
 [![Status](https://img.shields.io/badge/Status-Validado-success.svg)]()
 [![Backend](https://img.shields.io/badge/FastAPI-0.115.6-009688.svg?logo=fastapi)]()
 [![Frontend](https://img.shields.io/badge/React%2018-Vite%206-61DAFB.svg?logo=react)]()
-[![Embeddings](https://img.shields.io/badge/Fine--Tuned-ateneo--bge--m3--ecuador-blue.svg)]()
-[![VectorDB](https://img.shields.io/badge/ChromaDB-5%2C944%20Chunks-orange.svg)]()
+[![Embeddings](https://img.shields.io/badge/Fine--Tuned-ateneo--bge--m3--ecuador--v2-blue.svg)]()
+[![VectorDB](https://img.shields.io/badge/ChromaDB-7%2C052%20Chunks-orange.svg)]()
 [![Evaluator](https://img.shields.io/badge/Google%20Gemini-Multimodal%20Vision-8E75C2.svg)]()
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED.svg?logo=docker)]()
 
@@ -20,7 +20,7 @@
 
 **Ateneo+** es un sistema de tutoría inteligente (*Intelligent Tutoring System - ITS*) clínico multimodal desarrollado y calibrado sobre el cuerpo normativo de las **Guías de Práctica Clínica (GPC) del Ministerio de Salud Pública (MSP) del Ecuador**.
 
-La plataforma contrasta de forma automatizada y en tiempo real el razonamiento clínico expresado por el estudiante (mediante texto o dictado por voz) junto con estudios diagnósticos adjuntos (Radiografías, Trazados ECG de 12 derivaciones, Hemogramas, Gasometrías y Coagulogramas) contra 5,944 fragmentos normativos oficiales indexados en una base vectorial híbrida.
+La plataforma contrasta de forma automatizada y en tiempo real el razonamiento clínico expresado por el estudiante (mediante texto o dictado por voz) junto con estudios diagnósticos adjuntos (Radiografías, Trazados ECG de 12 derivaciones, Hemogramas, Gasometrías y Coagulogramas) contra 7,052 fragmentos normativos oficiales indexados en una base vectorial híbrida.
 
 ```text
                   ┌───────────────────────────────────────────────────────────┐
@@ -181,17 +181,15 @@ clinical_rag/
 │   │
 │   ├── 1_tablas_latex/                   # TABLAS EN FORMATO LATEX
 │   │   ├── compendio_tablas_y_figuras_paper.tex # Documento LaTeX maestro con plantilla IEEE
-│   │   ├── tabla_resultados_paper.tex    # Tabla I: Benchmark IR (Hit@1 = 100%, MRR@5 = 1.000)
-│   │   ├── tabla_ablacion_paper.tex      # Tabla II: Estudio de Ablación RRF Híbrido
-│   │   ├── tabla_faithfulness_paper.tex  # Tabla III: Auditoría de Fidelidad Normativa (Faithfulness)
-│   │   ├── tabla_pilot_study_paper.tex   # Tabla IV: Estudio Piloto (Ganancia de Hake g = 0.74)
-│   │   └── tabla_kst_bkt_paper.tex       # Tabla V: Bayesian Knowledge Tracing por Competencia
+│   │   ├── tabla_pre_post_fine_tuning_bge_m3.tex # Tabla I: Comparación Empírica Pre vs. Post Fine-Tuning A100
+│   │   ├── tabla_faithfulness_paper.tex  # Tabla II: Auditoría de Fidelidad Normativa (Faithfulness Score)
+│   │   ├── tabla_pilot_study_paper.tex   # Tabla III: Estudio Piloto de Ganancia de Hake (g = 0.74, p < 0.0001)
+│   │   └── tabla_kst_bkt_paper.tex       # Tabla IV: Probabilidad de Dominio BKT por Competencia en ZDP
 │   │
 │   ├── 2_figuras_300dpi/                 # FIGURAS EN ALTA RESOLUCIÓN (300 DPI)
-│   │   ├── grafico_convergencia_paper.png # Figura 1: Curva de convergencia de pérdida MNRL (GPU)
-│   │   ├── figura_learning_gain.png      # Figura 2: Ganancia de Razonamiento Clínico (Pre vs Post)
-│   │   ├── figura_ibf_cohorte.png        # Figura 3: Evolución Temporal del IBF en 4 Ejes
-│   │   └── figura_kst_trajectory.png     # Figura 4: Trayectorias de Dominio Probabilístico en ZDP
+│   │   ├── figura_learning_gain.png      # Figura 1: Distribución de Ganancia de Hake (Pre vs. Post)
+│   │   ├── figura_ibf_cohorte.png        # Figura 2: Evolución Temporal del IBF en 4 Ejes
+│   │   └── figura_kst_trajectory.png     # Figura 3: Trayectorias de Dominio Probabilístico BKT en ZDP
 │   │
 │   ├── 3_documentacion_metodologica/     # BASES TEÓRICAS Y METODOLÓGICAS (.md)
 │   │   ├── ARQUITECTURA_MODULAR_FRONTEND.md # Arquitectura React 18, TypeScript 5, DICOM, OSCE y RUM
@@ -206,14 +204,14 @@ clinical_rag/
 │   │   ├── DISCUSION_LIMITACIONES_Y_TRABAJO_FUTURO.md # Análisis crítico y amenazas a la validez
 │   │   ├── PUBLICACION_Y_PRESENTACION_CONGRESO.md # Guía editorial y estructura de presentación
 │   │   ├── MANUAL_DE_PRUEBAS_Y_BENCHMARKS.md # Guía para réplica experimental y 22 suites
-│   │   ├── GUIA_FINE_TUNING_COLAB_Y_METRICAS.md # Protocolo de fine-tuning supervisado
-│   │   ├── GUIA_INGESTA_Y_CASOS.md       # Ingesta y calibración de casos clínicos
-│   │   ├── GUIA_PASO_A_PASO_ENTRENAMIENTO_Y_PROXIMOS_PASOS.md # Guía de entrenamiento en GPU
-│   │   ├── PROTOCOLO_A100_MLOPS_Y_GROUND_TRUTH.md # Pipeline MLOps
+│   │   ├── DOSIER_PIPELINE_INGESTA_V2_FASES_1_A_3.md # Dosier Fases 1 a 3: Corpus, Extracción y Chunks
+│   │   ├── DOSIER_PIPELINE_INGESTA_V2_FASE_4_HARD_NEGATIVES.md # Dosier Fase 4: Minería Hard Negatives
+│   │   ├── DOSIER_PIPELINE_INGESTA_V2_FASE_5_GROUND_TRUTH.md # Dosier Fase 5: Ground Truth Canónico y Kappa
+│   │   ├── DOSIER_PIPELINE_INGESTA_V2_FASE_6_FINE_TUNING_BGE_M3.md # Dosier Fase 6: Reentrenamiento A100 y Métricas
 │   │   └── CUANTIZACION_Y_DESPLIEGUE_AWS.md # Cuantización y despliegue cloud
 │   │
 │   ├── 4_pdf_compilado/                  # DOCUMENTO PDF UNIFICADO
-│   │   └── COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf # Documento consolidado de 3 páginas con tablas y figuras
+│   │   └── COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf # Documento consolidado de 3 páginas con tablas y figuras v2
 │   │
 │   ├── 5_capturas_sistema/               # EVIDENCIA VISUAL DE LA PLATAFORMA EN EJECUCIÓN
 │   │   ├── GUIA_VISUAL_DEL_SISTEMA.md    # Manual visual explicativo de cada módulo y pantalla
@@ -408,7 +406,7 @@ docker compose exec frontend npm run test:e2e
 
 ## 8. Guía para la Redacción y Publicación del Paper
 
-* **Redacción en [Overleaf](https://www.overleaf.com/) / LaTeX:** Subir las subcarpetas [`docs/1_tablas_latex/`](docs/1_tablas_latex/) y [`docs/2_figuras_300dpi/`](docs/2_figuras_300dpi/) al proyecto. En el archivo `main.tex` se insertan las tablas con `\input{tabla_resultados_paper.tex}` o se compila directamente el archivo maestro [`compendio_tablas_y_figuras_paper.tex`](docs/1_tablas_latex/compendio_tablas_y_figuras_paper.tex).
+* **Redacción en [Overleaf](https://www.overleaf.com/) / LaTeX:** Subir las subcarpetas [`docs/1_tablas_latex/`](docs/1_tablas_latex/) y [`docs/2_figuras_300dpi/`](docs/2_figuras_300dpi/) al proyecto. En el archivo `main.tex` se insertan las tablas con `\input{tabla_pre_post_fine_tuning_bge_m3.tex}` o se compila directamente el archivo maestro [`compendio_tablas_y_figuras_paper.tex`](docs/1_tablas_latex/compendio_tablas_y_figuras_paper.tex).
 * **Redacción en Microsoft Word / Google Docs:** Abrir el documento [`docs/4_pdf_compilado/COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf`](docs/4_pdf_compilado/COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf), copiar las tablas de datos e insertar las figuras PNG de alta resolución.
 * **Documentación Metodológica y Arquitectónica:** Los archivos `.md` en [`docs/3_documentacion_metodologica/`](docs/3_documentacion_metodologica/) contienen la formulación matemática, justificación de la pérdida MNRL, análisis de limitaciones y las especificaciones de arquitectura de software:
   * [Arquitectura Modular del Frontend (Feature-Driven Slices & Core Shared)](docs/3_documentacion_metodologica/ARQUITECTURA_MODULAR_FRONTEND.md)

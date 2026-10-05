@@ -7,14 +7,14 @@ El sistema **Ateneo** implementa una arquitectura de Recuperación Aumentada por
 ```text
                                ETAPA 1: RECUPERACIÓN HÍBRIDA RRF (BGE-M3 + BM25)
 ┌─────────────────────────┐     ┌───────────────────────────┐     ┌───────────────────────────┐
-│ 45+ GPC (MSP Ecuador)   │ ──► │ Extracción & Tablas MD    │ ──► │ Embeddings Densos BGE-M3  │
-│ (2013-2019 / raw_pdfs)  │     │ (pdfplumber + chunker)    │     │ (1024 dims - Fine-Tuned)  │
+│ 42 GPCs (MSP Ecuador)   │ ──► │ Extracción & Tablas MD    │ ──► │ Embeddings Densos BGE-M3  │
+│ (2013-2019 / raw_pdfs)  │     │ (PyMuPDF + chunker)       │     │ (1024 dims - Fine-Tuned)  │
 └─────────────────────────┘     └───────────────────────────┘     └─────────────┬─────────────┘
                                                                                 │
                                                                                 ▼
 ┌─────────────────────────┐     ┌───────────────────────────┐     ┌───────────────────────────┐
 │ Razonamiento Estudiante │ ──► │ Consulta Híbrida (RRF)    │ ──► │ ChromaDB + Sparse BM25    │
-│ (Texto o Voz es-EC)     │     │ Rank Fusion: k=60         │     │ (5,944 fragmentos normat.)│
+│ (Texto o Voz es-EC)     │     │ Rank Fusion: k=60         │     │ (7,052 fragmentos normat.)│
 └─────────────────────────┘     └───────────────────────────┘     └─────────────┬─────────────┘
                                                                                 │
                                                                                 ▼

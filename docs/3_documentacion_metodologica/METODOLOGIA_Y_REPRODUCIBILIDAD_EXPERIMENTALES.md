@@ -99,19 +99,13 @@ if torch.cuda.is_available():
 
 Los artefactos LaTeX generados automáticamente por el pipeline se encuentran preservados en [`docs/1_tablas_latex/`](../1_tablas_latex/):
 
-### Tabla I: Rendimiento Cuantitativo de Recuperación ([tabla_resultados_paper.tex](../1_tablas_latex/tabla_resultados_paper.tex))
-* **In-Distribution ($N=15$):** $\text{Hit@1}=73.3\%$, $\text{Hit@5}=73.3\%$, $\text{MRR@5}=0.7333$.
-* **Out-of-Distribution ($N=10$):** $\text{Hit@1}=\mathbf{100.0\%}$, $\text{Hit@5}=\mathbf{100.0\%}$, $\text{MRR@5}=\mathbf{1.0000}$.
-* **Global Completo ($N=25$):** $\text{Hit@1}=\mathbf{84.0\%}$, $\text{Hit@5}=\mathbf{84.0\%}$, $\text{MRR@5}=\mathbf{0.8400}$, $\text{NDCG@5}=\mathbf{0.8400}$.
-* **Latencias:** Mediana $P_{50}=89.59\text{ ms}$, Percentil $P_{95}=111.94\text{ ms}$.
-
-### Tabla II: Estudio de Ablación Arquitectónica ([tabla_ablacion_paper.tex](../1_tablas_latex/tabla_ablacion_paper.tex))
-| Variante Arquitectónica | $\text{Hit@1}$ | $\text{Hit@5}$ | $\text{MRR@5}$ | $\text{NDCG@5}$ | Latencia $P_{50}$ |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| 1. Sparse BM25 Solo (Sin Embeddings) | 84.0% | 84.0% | 0.8400 | 0.8400 | 62.5 ms |
-| 2. Dense Base Solo (`BAAI/bge-m3`) | 84.0% | 84.0% | 0.8400 | 0.8400 | 23.8 ms |
-| 3. Dense Fine-Tuned Solo (MNRL) | 84.0% | 84.0% | 0.8400 | 0.8400 | 24.0 ms |
-| **4. Ateneo RAG Híbrido Completo (RRF)** | **84.0%** | **84.0%** | **0.8400** | **0.8400** | **92.6 ms** |
+### Tabla I: Comparación Empírica Pre vs. Post Fine-Tuning ([tabla_pre_post_fine_tuning_bge_m3.tex](../1_tablas_latex/tabla_pre_post_fine_tuning_bge_m3.tex))
+* **Muestra de Evaluación:** 570 tripletas de validación/prueba ciega sobre 42 GPCs normativas oficiales (7,052 fragmentos).
+* **Hit@1 (Top-1 Retrieval Accuracy):** Incremento de $0.0522$ a $\mathbf{0.2450}$ ($\Delta = +0.1928$, ganancia de **$+369.23\%$**).
+* **Hit@5:** Incremento de $0.1606$ a $\mathbf{0.4739}$ ($\Delta = +0.3133$, ganancia de **$+195.00\%$**).
+* **Mean Reciprocal Rank (MRR@5):** Incremento de $0.0889$ a $\mathbf{0.3328}$ ($\Delta = +0.2439$, ganancia de **$+274.40\%$**).
+* **NDCG@5:** Incremento de $0.1066$ a $\mathbf{0.3682}$ ($\Delta = +0.2616$, ganancia de **$+245.40\%$**).
+* **Concordancia Inter-Anotador del Ground Truth:** $\kappa_w = \mathbf{0.9509}$ (Acuerdo casi perfecto según Landis & Koch).
 
 ---
 

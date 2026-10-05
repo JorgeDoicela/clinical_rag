@@ -129,8 +129,8 @@ backend/.venv/Scripts/pytest backend/tests/ -v
 | `load_test_simulation.py` | Auditoría de estrés masivo, concurrencia progresiva y resistencia al fallo | `docs/3_documentacion_metodologica/INFORME_AUDITORIA_CARGA_Y_CONCURRENCIA.md` |
 | `run_kst_simulation.py` | Simulación longitudinal BKT comparativa (Ruta Fija vs KST Adaptativa) | `docs/2_figuras_300dpi/figura_kst_trajectory.png`<br>`docs/1_tablas_latex/tabla_kst_bkt_paper.tex`<br>`backend/tests/resultados_kst_simulation.json` |
 | `run_ibf_figure.py` | Generación de visualización de cohorte en 4 ejes clínicos con umbral normativo | `docs/2_figuras_300dpi/figura_ibf_cohorte.png`<br>`backend/tests/resultados_ibf_figure.json` |
-| `run_faithfulness_benchmark.py` | Benchmark de anclaje normativo de las 12 GPCs frente a fragmentos normativos | `docs/1_tablas_latex/tabla_faithfulness_paper.tex`<br>`backend/tests/resultados_faithfulness.json` |
-| `run_metrics.py` | Evaluación cuantitativa completa del pipeline RAG (Hit@1, MRR@5, NDCG@5, Latencias) | `docs/1_tablas_latex/tabla_resultados_paper.tex`<br>`backend/tests/resultados_metricas.json` |
+| `run_faithfulness_benchmark.py` | Benchmark de anclaje normativo de las GPCs frente a fragmentos normativos | `docs/1_tablas_latex/tabla_faithfulness_paper.tex`<br>`backend/tests/resultados_faithfulness.json` |
+| `06_train_bge_m3.py` | Fine-Tuning MNRL y evaluación cuantitativa Pre vs. Post en A100 | `docs/1_tablas_latex/tabla_pre_post_fine_tuning_bge_m3.tex`<br>`backend/data/models/eval_metrics_pre_post.json` |
 | `pilot_study_analyzer.py` | Análisis inferencial del estudio piloto con ganancia de aprendizaje | `docs/2_figuras_300dpi/figura_learning_gain.png`<br>`docs/1_tablas_latex/tabla_pilot_study_paper.tex` |
 
 ---
@@ -139,13 +139,12 @@ backend/.venv/Scripts/pytest backend/tests/ -v
 
 | Artefacto Generado | Ubicación | Elemento en Artículo Científico |
 |:---|:---|:---|
-| `tabla_resultados_paper.tex` | `docs/1_tablas_latex/` | **Tabla I:** Rendimiento de Recuperación y Generación del Pipeline RAG |
-| `tabla_ablacion_paper.tex` | `docs/1_tablas_latex/` | **Tabla II:** Estudio de Ablación Arquitectónica (Sparse vs Dense vs Híbrido) |
-| `tabla_faithfulness_paper.tex` | `docs/1_tablas_latex/` | **Tabla III:** Evaluación de Fidelidad Normativa (Anti-Alucinación) |
-| `tabla_pilot_study_paper.tex` | `docs/1_tablas_latex/` | **Tabla IV:** Ganancia de Aprendizaje Normalizada de Hake ($g$) |
-| `tabla_kst_bkt_paper.tex` | `docs/1_tablas_latex/` | **Tabla V:** Comparativa de Dominio Final BKT por Competencia Clínica |
+| `tabla_pre_post_fine_tuning_bge_m3.tex` | `docs/1_tablas_latex/` | **Tabla I:** Comparación Pre vs. Post Fine-Tuning BGE-M3 Ecuador en GPU A100 |
+| `tabla_faithfulness_paper.tex` | `docs/1_tablas_latex/` | **Tabla II:** Evaluación de Fidelidad Normativa (Faithfulness Score / Anti-Alucinación) |
+| `tabla_pilot_study_paper.tex` | `docs/1_tablas_latex/` | **Tabla III:** Ganancia de Aprendizaje Normalizada de Hake ($g = 0.74, p < 0.0001$) |
+| `tabla_kst_bkt_paper.tex` | `docs/1_tablas_latex/` | **Tabla IV:** Comparativa de Dominio Final BKT por Competencia Clínica en ZDP |
 | `figura_learning_gain.png` | `docs/2_figuras_300dpi/` | **Figura 1:** Distribución Pre-Test vs Post-Test y Ganancia de Hake |
-| `figura_ibf_cohorte.png` | `docs/2_figuras_300dpi/` | **Figura 2:** Índice de Brecha Formativa (IBF) por Eje Clínico con Umbral |
+| `figura_ibf_cohorte.png` | `docs/2_figuras_300dpi/` | **Figura 2:** Índice de Brecha Formativa (IBF) por Eje Clínico con Umbral Normativo |
 | `figura_kst_trajectory.png` | `docs/2_figuras_300dpi/` | **Figura 3:** Trayectoria Longitudinal de Dominio $P(L)$ según KST/BKT |
 
 ---

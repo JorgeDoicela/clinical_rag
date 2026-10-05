@@ -865,7 +865,13 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     * Se actualizaron todos los dosieres metodológicos en `docs/3_documentacion_metodologica/` y `README.md` hacia `ingestion_v2` y los datasets canónicos v2.
     * Se configuró `backend/core/config.py` para priorizar automáticamente el modelo local fine-tuned `ateneo-bge-m3-ecuador-v2`.
     * Certificación de 100% PASS en Frontend (22 suites, 106 tests en Vitest, 0 errores en `tsc --noEmit`) y Backend (8 suites maestras en `tests.run_all_tests`).
-  - **Dosier Metodológico Sincronizado:**
     * Creado [`docs/3_documentacion_metodologica/DOSIER_PIPELINE_INGESTA_V2_FASE_6_FINE_TUNING_BGE_M3.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/3_documentacion_metodologica/DOSIER_PIPELINE_INGESTA_V2_FASE_6_FINE_TUNING_BGE_M3.md).
+  - **Depuración Integral de Documentación, Tablas LaTeX e Imágenes Antiguas (2026-10-05):**
+    * Se eliminaron 4 guías preliminares obsoletas en `docs/3_documentacion_metodologica/`: `GUIA_FINE_TUNING_COLAB_Y_METRICAS.md`, `GUIA_INGESTA_Y_CASOS.md`, `GUIA_PASO_A_PASO_ENTRENAMIENTO_Y_PROXIMOS_PASOS.md`, y `PROTOCOLO_A100_MLOPS_Y_GROUND_TRUTH.md`. En su lugar, rigen los 4 dosieres oficiales v2 (`DOSIER_PIPELINE_INGESTA_V2_FASES_1_A_3.md`, `DOSIER_PIPELINE_INGESTA_V2_FASE_4_HARD_NEGATIVES.md`, `DOSIER_PIPELINE_INGESTA_V2_FASE_5_GROUND_TRUTH.md`, `DOSIER_PIPELINE_INGESTA_V2_FASE_6_FINE_TUNING_BGE_M3.md`).
+    * Se eliminaron tablas e imágenes antiguas de la v1: `docs/2_figuras_300dpi/grafico_convergencia_paper.png` (gráfico preliminar de 480 tripletas), `docs/1_tablas_latex/tabla_resultados_paper.tex` y `docs/1_tablas_latex/tabla_ablacion_paper.tex` (generadas sobre prototipo de 5,944 chunks).
+    * Se actualizó `docs/1_tablas_latex/compendio_tablas_y_figuras_paper.tex` integrando la evidencia empírica genuina v2 (`tabla_pre_post_fine_tuning_bge_m3.tex`, `tabla_faithfulness_paper.tex`, `tabla_pilot_study_paper.tex`, `tabla_kst_bkt_paper.tex` y las 3 figuras de 300 DPI).
+    * Se refactorizó `scripts/generate_paper_tables_pdf.py` y se compiló exitosamente el nuevo compendio consolidado en `docs/4_pdf_compilado/COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf` (1.23 MB).
+    * Se mantuvieron estrictamente vacíos los modelos (`backend/data/models/` solo con `.gitkeep`) preservando el tarball original de 1.80 GB en `Downloads` según las instrucciones del usuario.
+    * Todas las suites de pruebas validadas con 100% PASS: Backend (8 suites maestras) y Frontend (22 suites, 106 tests aprobados en Vitest).
 
 
