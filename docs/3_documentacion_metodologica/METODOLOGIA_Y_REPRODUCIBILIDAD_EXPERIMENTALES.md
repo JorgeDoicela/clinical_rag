@@ -11,7 +11,7 @@ El corpus está compuesto por **45 documentos oficiales** emitidos por el Minist
 * **Ginecología y Obstetricia** (Preeclampsia, Hemorragia Posparto, RPM, Cesárea, Anemia Gestacional, Trabajo de Parto, Infección Vaginal, etc.)
 * **Pediatría y Neonatología** (EHIRN, Sepsis Neonatal, Recién Nacido Prematuro, Dificultad Respiratoria, APLV, Hipotiroidismo Congénito)
 * **Medicina Interna y Crónicos** (Diabetes Mellitus Tipo 2, Enfermedad Renal Crónica, Artritis Reumatoide, Dolor Lumbar)
-* **Infectología y Epidemiología** (Dengue, Tuberculosis Pulmonar, VIH/SIDA)
+* **Infectología y Epidemiología** (Tuberculosis Pulmonar y Extrapulmonar, Infección por VIH/SIDA)
 * **Cardiología y Neumología** (Hipertensión Arterial Primaria, Neumonía Adquirida en la Comunidad, Fibrosis Quística)
 * **Genética y Hematología** (Fenilcetonuria, Enfermedad de Gaucher, Hemofilia Congénita)
 * **Cuidados Paliativos y Oncología** (Cuidados Paliativos Integrales, Dolor Oncológico, Linfoma de Hodgkin)

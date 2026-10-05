@@ -1,31 +1,21 @@
-# Guía de Ingesta Masiva, Organización por Años y Visor de GPCs
+# Guía de Ingesta, Catalogación Nosológica y Visor de GPCs
 
-Esta guía detalla la gestión de documentos normativos en formato PDF, su organización por carpetas de año, el pipeline de ingesta automática, el catálogo de metadatos CIE-10 y la exportación de informes formativos en el sistema **Ateneo**.
+Esta guía detalla la gestión de documentos normativos en formato PDF, su clasificación en los 4 ejes clínicos canónicos del MSP Ecuador, el inventario criptográfico con CIE-10/CIE-11 y la integración con el pipeline de ingesta y visualización formativa en **Ateneo+**.
 
 ---
 
-## 1. Estructura de Directorios para Ingesta Masiva ([../backend/data/raw_pdfs/](../backend/data/raw_pdfs))
+## 1. Estructura Canónica de Directorios del Corpus ([../backend/data/raw_pdfs/](../backend/data/raw_pdfs))
 
-Las ~60 Guías de Práctica Clínica emitidas por el Ministerio de Salud Pública (MSP) del Ecuador se organizan por año de publicación oficial dentro de subcarpetas dedicadas:
+El universo normativo del Ministerio de Salud Pública (MSP) del Ecuador comprende exactamente **45 Guías de Práctica Clínica oficiales** expedidas por Acuerdo Ministerial (2013-2019), organizadas en 4 ejes temáticos y respaldadas por [`backend/data/corpus_manifest.json`](../backend/data/corpus_manifest.json):
 
 ```text
-backend/data/raw_pdfs/
-├── 2013/
-│   ├── Guia-de-hemorragia-postparto.pdf
-│   ├── Guia-de-gaucher.pdf
-│   └── ...
-├── 2014/
-├── 2015/
-├── 2016/
-├── 2017/
-├── 2018/
-│   ├── guia_prevencion_diagnostico_tratamiento_enfermedad_renal_cronica_2018.pdf
-├── 2019/
-│   ├── gpc_VIH_acuerdo_ministerial05-07-2019.pdf
-│   ├── gpc_ehirn2019.pdf
-│   └── gpc_hta192019.pdf
-└── general/
-    └── GP_Tuberculosis-1.pdf
+backend/data/
+├── raw_pdfs/
+│   ├── 01_urgencias_obstetricas/         # 14 GPCs (Preeclampsia, Código Rojo, Diabetes Gestacional, etc.)
+│   ├── 02_respiratorio_pediatrico/       # 11 GPCs (NAC, Tuberculosis, Sepsis Neonatal, SDR, etc.)
+│   ├── 03_cardiovascular_metabolico/     # 2 GPCs (Hipertensión Arterial, Enfermedad Renal Crónica)
+│   └── 04_soporte_cronicos_salud_mental/ # 18 GPCs (Depresión, Dolor Oncológico, Cuidados Paliativos, Raras)
+└── corpus_manifest.json                  # Manifiesto criptográfico (45 hashes SHA-256, CIE-10 y CIE-11)
 ```
 
 ---

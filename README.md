@@ -281,6 +281,12 @@ clinical_rag/
 │   │   ├── cases.json                    # Casos con competencias activadas y GPC asignada
 │   │   └── images/                       # Rx pediátrica, ECG, hemograma y coagulograma
 │   ├── data/
+│   │   ├── raw_pdfs/                     # 45 PDFs oficiales organizados en 4 ejes canónicos del MSP
+│   │   │   ├── 01_urgencias_obstetricas/ # 14 GPCs (Preeclampsia, Código Rojo, Diabetes Gestacional)
+│   │   │   ├── 02_respiratorio_pediatrico/ # 11 GPCs (NAC, Tuberculosis, Sepsis Neonatal, SDR)
+│   │   │   ├── 03_cardiovascular_metabolico/ # 2 GPCs (Hipertensión Arterial, Enfermedad Renal Crónica)
+│   │   │   └── 04_soporte_cronicos_salud_mental/ # 18 GPCs (Depresión, Dolor Oncológico, Cuidados Paliativos, Raras)
+│   │   ├── corpus_manifest.json          # Manifiesto criptográfico inmutable (45 hashes SHA-256 y CIE-10/11)
 │   │   ├── ateneo-bge-m3-ecuador/        # Pesos compilados del modelo fine-tuned
 │   │   ├── chroma_db/                    # Base vectorial con 5,944 fragmentos de GPCs MSP
 │   │   ├── ateneo_clinical.db            # Base relacional SQLite normalizada
@@ -291,6 +297,9 @@ clinical_rag/
 │   │       ├── post_test_casos.json      # 5 casos equivalentes del post-test
 │   │       ├── rubrica_evaluacion.json   # Rúbrica para evaluadores clínicos externos
 │   │       └── resultados_pilot.csv      # Matriz de datos anonimizada de la cohorte
+│   ├── ingestion_v2/                     # Pipeline científico de reestructuración v2 (100% Corpus Ecuador)
+│   │   ├── 01_classify_and_inventory_corpus.py # Clasificación e inventario criptográfico con CIE-10/CIE-11
+│   │   └── 02_extract_with_marker.py     # Ingesta por lotes con marker-pdf (paginación real)
 │   ├── tests/                            # Suites de pruebas automatizadas y benchmarks
 │   │   ├── run_all_tests.py              # Orquestador maestro de todas las suites
 │   │   ├── run_metrics.py                # Benchmark IR automatizado (Hit@k, MRR, NDCG)
@@ -393,7 +402,7 @@ docker compose exec frontend npm run test:e2e
   * [Informe de Auditoría de Carga, Concurrencia y Resistencia al Fallo](docs/3_documentacion_metodologica/INFORME_AUDITORIA_CARGA_Y_CONCURRENCIA.md)
   * [Arquitectura de Resiliencia de IA y Configuración 12-Factor](docs/3_documentacion_metodologica/ARQUITECTURA_RESILIENTE_LLM_Y_CONFIGURACION.md)
   * [Arquitectura RAG Híbrida y Fine-Tuning](docs/3_documentacion_metodologica/ARQUITECTURA_RAG_Y_FINE_TUNING.md)
-* **Planes de Escalabilidad y Hoja de Ruta Operativa:** Consultar [`docs/7_planes_de_escalabilidad_y_hoja_de_ruta/`](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/) para la [Hoja de Ruta de 21 Sesiones](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/HOJA_DE_RUTA_EJECUCION_SESIONES.md) y los planes maestros de [Base de Datos](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/PLAN_ESCALABILIDAD_BASE_DE_DATOS.md), [Backend](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/PLAN_ESCALABILIDAD_BACKEND.md) y [Frontend](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/PLAN_ESCALABILIDAD_FRONTEND.md).
+* **Planes de Escalabilidad y Hoja de Ruta Operativa:** Consultar [`docs/7_planes_de_escalabilidad_y_hoja_de_ruta/`](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/) para el [Plan Maestro de Reestructuración del Pipeline de IA v2 (100% Corpus Ecuador)](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/PLAN_REESTRUCTURACION_PIPELINE_IA.md), la [Hoja de Ruta de 21 Sesiones](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/HOJA_DE_RUTA_EJECUCION_SESIONES.md) y los planes maestros de [Base de Datos](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/PLAN_ESCALABILIDAD_BASE_DE_DATOS.md), [Backend](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/PLAN_ESCALABILIDAD_BACKEND.md) y [Frontend](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/PLAN_ESCALABILIDAD_FRONTEND.md).
 
 ---
 

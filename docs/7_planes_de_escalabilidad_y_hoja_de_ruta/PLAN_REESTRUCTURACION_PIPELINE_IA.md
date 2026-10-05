@@ -38,15 +38,18 @@ Para evitar contradicciones terapéuticas con la farmacopea local y garantizar l
 3. **Instituto Nacional de Estadística y Censos (INEC):**
    - Registro Estadístico de Camas y Egresos Hospitalarios y Anuario de Estadísticas Vitales (defunciones generales y materno-infantiles).
 
-### 2.2 Selección de los 5 Ejes Clínicos Prevalentes
+### 2.2 Delimitación Canónica: El 100% del Universo Normativo de GPCs del MSP Ecuador
 
-| Eje Clínico | Patologías Normadas (GPC MSP) | Justificación Epidemiológica (INEC / MSP) | Estudios Paraclínicos Asignados |
-| :--- | :--- | :--- | :--- |
-| **1. Síndrome Febril y Arbovirosis** | • Dengue con/sin signos de alarma y Dengue Grave.<br>• Leptospirosis.<br>• Malaria (*P. vivax* / *P. falciparum*). | Brotes epidémicos recurrentes en Costa y Amazonía; elevada tasa de complicaciones por reposición hídrica tardía. | Hemograma seriado (hematocrito/plaquetas), frotis de gota gruesa, enzimas hepáticas. |
-| **2. Urgencias Obstétricas (Score MAMA)** | • Trastornos Hipertensivos del Embarazo (Preeclampsia severa / Eclampsia).<br>• Hemorragia Posparto (Atonía uterina - Código Rojo). | 1ra y 2da causa de muerte materna evitable en el Ecuador. | Tira reactiva de orina, proteinograma, signos vitales con Score MAMA, monitoreo fetal. |
-| **3. Urgencias Cardiovasculares y Metabólicas** | • Hipertensión Arterial y Emergencia Hipertensiva.<br>• Síndrome Coronario Agudo (SCACEST / SCASEST).<br>• Diabetes Mellitus Tipo 2 y Cetoacidosis Diabética. | Las cardiopatías isquémicas y la DM2 representan la 1ra y 2da causa de mortalidad general en adultos en Ecuador. | Electrocardiograma (ECG) de 12 derivaciones, troponinas, gasometría arterial, ionograma. |
-| **4. Infecciones Respiratorias Agudas** | • Neumonía Adquirida en la Comunidad (NAC) pediátrica y en adultos.<br>• Bronquiolitis y Crisis Asmática (AIEPI Ecuador). | Principal causa de egreso hospitalario pediátrico y 3ra causa de mortalidad en extremos de la vida. | Radiografía PA/Lateral de tórax, saturometría, procalcitonina/PCR. |
-| **5. Abdomen Agudo Quirúrgico** | • Apendicitis Aguda (Score de Alvarado / MSP).<br>• Colecistitis Aguda y Cólico Biliar (Criterios diagnósticos MSP). | Principal causa de intervención quirúrgica de urgencia en el sistema hospitalario ecuatoriano. | Ecografía de abdomen superior, leucograma con neutrofilia, química sanguínea. |
+La biblioteca oficial de Guías de Práctica Clínica (GPC) aprobadas por Acuerdo Ministerial del Ministerio de Salud Pública del Ecuador comprende exactamente **45 documentos oficiales** (expedidos entre 2013 y 2019). Para garantizar rigor científico absoluto en publicaciones Q1 y cero inconsistencias documentales, el corpus normativo abarca el **100% exhaustivo de estas 45 guías oficiales**, clasificadas en 4 ejes normativos que cubren las principales causas de morbilidad y mortalidad materna, neonatal y de adultos en el país:
+
+| Eje Normativo Oficial (MSP) | Volumen | Patologías Normadas Relevantes (GPC MSP Oficial) | Justificación Epidemiológica y Clínica (INEC / MSP) |
+| :--- | :---: | :--- | :--- |
+| **1. Urgencias y Salud Materno-Obstétrica** | **14 guías** | • Preeclampsia severa / Eclampsia (Acuerdo MSP-2016).<br>• Hemorragia Posparto - Código Rojo (Protocolo MSP-2013).<br>• Diabetes Gestacional (Acuerdo MSP-2017).<br>• Infección Vaginal Obstétrica, Parto por Cesárea, Ruptura Prematura de Membranas, Anomalías de Inserción Placentaria. | 1ra y 2da causa de muerte materna evitable en el Ecuador. Fundamento del Score MAMA en la red pública de salud. |
+| **2. Infecciones Respiratorias y Salud Pediátrica / Neonatal** | **11 guías** | • Neumonía Adquirida en la Comunidad - NAC (Acuerdo MSP-2017).<br>• Tuberculosis Pulmonar y Extrapulmonar (Acuerdos MSP-2016 y 2018 - 2da Ed.).<br>• Sepsis Neonatal, Dificultad Respiratoria del Recién Nacido, Prematurez, Hipotiroidismo Congénito, AIEPI Nutrición. | Principal causa de egreso hospitalario pediátrico y 3ra causa de mortalidad general en extremos de la vida. |
+| **3. Urgencias Cardiovasculares, Renales y Metabólicas** | **2 guías** | • Hipertensión Arterial - HTA (Acuerdo Ministerial 00019-2019).<br>• Enfermedad Renal Crónica - ERC (Acuerdo Ministerial MSP-2018). | Las enfermedades isquémicas y la HTA representan la 1ra causa de mortalidad general en adultos en el Ecuador. |
+| **4. Soporte Clínico, Oncología, Salud Mental y Enfermedades Raras** | **18 guías** | • Depresión en Adultos (Guía MSP-2018).<br>• Cuidados Paliativos y Manejo del Dolor Oncológico.<br>• Linfoma de Hodgkin, Artritis Reumatoide, Hemofilia Congénita.<br>• Enfermedades Raras: Gaucher, Fenilcetonuria, Fibrosis Quística. | Carga de enfermedad crónica, soporte onco-hematológico y normativas de alta complejidad del sistema de salud ecuatoriano. |
+
+> **Nota Metodológica de Realidad Institucional (Ecuador):** En el sistema de salud pública del Ecuador, patologías como apendicitis aguda o dengue no cuentan con una "Guía de Práctica Clínica" emitida por Acuerdo Ministerial independiente; se rigen por la adopción directa de directrices internacionales (Guías de Jerusalén / WSES para abdomen agudo y Algoritmos OPS/OMS para dengue). Delimitar el corpus al 100% de las GPC ministeriales garantiza que cada fragmento indexado posea respaldo legal, institucional y bibliográfico inmutable en la República del Ecuador.
 
 ---
 
@@ -173,38 +176,37 @@ Para la fase de pruebas con estudiantes y validación experimental, se descartan
 ```text
 backend/
 ├── data/
-│   ├── raw_pdfs/                         # PDFs originales organizados por eje clínico
-│   │   ├── 01_febriles_arbovirosis/      # GPCs Dengue, Leptospirosis, Malaria (MSP)
-│   │   ├── 02_urgencias_obstetricas/     # GPCs Preeclampsia, Código Rojo, Score MAMA
-│   │   ├── 03_cardiovascular_metabolico/ # GPCs Hipertensión, Diabetes, SCA (MSP)
-│   │   ├── 04_respiratorio_pediatrico/   # GPCs Neumonía, Asma, AIEPI (MSP)
-│   │   ├── 05_abdomen_quirurgico/        # GPCs Apendicitis, Colecistitis (MSP)
-│   │   └── normativas_conasa/            # CNMB 10ma y 11na Revisión oficial
-│   ├── extracted/                        # Salida de marker-pdf (texto Markdown + figuras PNG)
-│   │   ├── markdown/                     # Documentos .md con paginación real al pie
-│   │   └── figures/                      # Figuras diagnósticas a 300 DPI
-│   ├── ground_truth/                     # Conjuntos de validación médica humana
-│   │   ├── annotation_protocol.md        # Instrucciones de criterio clínico para médicos evaluadores
-│   │   ├── pairs_raw.csv                 # Pares consulta-fragmento generados automáticamente
-│   │   └── pairs_validated.csv           # Ground truth final curado por médicos (kappa >= 0.80)
-│   ├── datasets/                         # Datasets reproducibles con sumas SHA-256
-│   │   ├── retrieval_train.json          # Tripletas con Hard Negatives para BGE-M3 (70%)
-│   │   ├── retrieval_val.json            # Conjunto de validación para early stopping (15%)
-│   │   ├── retrieval_test_blind.json     # Test ciego fuera de distribución (15%)
-│   │   └── checksums.sha256              # Verificación criptográfica de integridad
+│   ├── raw_pdfs/                             # 45 PDFs oficiales organizados por los 4 ejes normativos MSP
+│   │   ├── 01_urgencias_obstetricas/         # 14 GPCs (Preeclampsia, Código Rojo, Parto, Diabetes Gestacional)
+│   │   ├── 02_respiratorio_pediatrico/       # 11 GPCs (Neumonía NAC, Tuberculosis, Sepsis Neonatal, SDR)
+│   │   ├── 03_cardiovascular_metabolico/     # 2 GPCs (Hipertensión Arterial HTA, Enfermedad Renal Crónica ERC)
+│   │   └── 04_soporte_cronicos_salud_mental/ # 18 GPCs (Depresión, Dolor Oncológico, Cuidados Paliativos, Raras)
+│   ├── corpus_manifest.json                  # Manifiesto criptográfico inmutable (45 hashes SHA-256 y CIE-10/11)
+│   ├── extracted/                            # Salida de marker-pdf (texto Markdown + figuras PNG)
+│   │   ├── markdown/                         # Documentos .md con paginación real al pie
+│   │   └── figures/                          # Figuras diagnósticas a 300 DPI
+│   ├── ground_truth/                         # Conjuntos de validación médica humana
+│   │   ├── annotation_protocol.md            # Instrucciones de criterio clínico para médicos evaluadores
+│   │   ├── pairs_raw.csv                     # Pares consulta-fragmento generados automáticamente
+│   │   └── pairs_validated.csv               # Ground truth final curado por médicos (kappa >= 0.80)
+│   ├── datasets/                             # Datasets reproducibles con sumas SHA-256
+│   │   ├── retrieval_train.json              # Tripletas con Hard Negatives para BGE-M3 (70%)
+│   │   ├── retrieval_val.json                # Conjunto de validación para early stopping (15%)
+│   │   ├── retrieval_test_blind.json         # Test ciego fuera de distribución (15%)
+│   │   └── checksums.sha256                  # Verificación criptográfica de integridad
 │   ├── models/
-│   │   └── ateneo-bge-m3-ecuador-v2/     # Pesos finales del modelo de embeddings re-entrenado
-│   └── chroma_db_v2/                     # Base vectorial reconstruida con metadatos extendidos
+│   │   └── ateneo-bge-m3-ecuador-v2/         # Pesos finales del modelo de embeddings re-entrenado
+│   └── chroma_db_v2/                         # Base vectorial reconstruida con metadatos extendidos
 │
-└── ingestion_v2/                         # Código fuente del nuevo pipeline
-    ├── 01_extract_pdfs.py                # Ingesta por lotes con marker-pdf
-    ├── 02_caption_figures.py             # Enriquecimiento de metadatos clínicos para figuras PNG
-    ├── 03_token_chunker.py               # Chunking por tokens BGE-M3 (512 tks, tablas intactas)
-    ├── 04_mine_hard_negatives.py         # Minería semántica con BGE-M3 base y filtrado defensivo
-    ├── 05_build_ground_truth_pool.py     # Ensamblado de pares para validación de revisores médicos
-    ├── 06_train_bge_m3.py                # Script de fine-tuning con MNRL optimizado para A100 40GB
-    ├── 07_index_chromadb_v2.py           # Indexación de embeddings y metadatos en ChromaDB v2
-    └── 08_evaluate_blind_benchmark.py    # Evaluación empírica ciega (Hit@1, MRR@5, NDCG@5)
+└── ingestion_v2/                             # Código fuente del nuevo pipeline
+    ├── 01_classify_and_inventory_corpus.py   # Clasificación e inventario criptográfico con CIE-10/CIE-11
+    ├── 02_extract_with_marker.py             # Ingesta por lotes con marker-pdf (paginación real)
+    ├── 03_token_chunker.py                   # Chunking por tokens BGE-M3 (512 tks, tablas intactas)
+    ├── 04_mine_hard_negatives.py             # Minería semántica con BGE-M3 base y filtrado defensivo
+    ├── 05_build_ground_truth_pool.py         # Ensamblado de pares para validación de revisores médicos
+    ├── 06_train_bge_m3.py                    # Script de fine-tuning con MNRL optimizado para A100 40GB
+    ├── 07_index_chromadb_v2.py               # Indexación de embeddings y metadatos en ChromaDB v2
+    └── 08_evaluate_blind_benchmark.py        # Evaluación empírica ciega (Hit@1, MRR@5, NDCG@5)
 ```
 
 ---
@@ -225,7 +227,7 @@ graph TD
 
 | Fase | Hito Técnico | Entregable Clave | Criterio de Éxito / Aceptación |
 | :---: | :--- | :--- | :--- |
-| **Fase 1** | Organización de PDFs en `raw_pdfs/` | ~40 documentos oficiales clasificados por los 5 ejes clínicos. | Cobertura total de las patologías priorizadas por INEC/MSP. |
+| **Fase 1** | Organización de PDFs en `raw_pdfs/` | 45 documentos oficiales (100% GPCs Ecuador) clasificados en los 4 ejes canónicos con metadatos CIE-10/11 y hashes SHA-256. | Cobertura total del catálogo ministerial oficial con 0 inconsistencias bibliográficas. |
 | **Fase 2** | Extracción con `marker-pdf` | Carpeta `extracted/markdown/` y `extracted/figures/`. | Paginación física coincidente al 100% con los documentos impresos. Tablas intactas. |
 | **Fase 3** | Chunking semántico por tokens | `03_token_chunker.py` ejecutado sobre el corpus Markdown. | Fragmentos de $\le 512$ tokens (máx 768 para tablas completas). Metadatos CIE-10/CIE-11 inyectados. |
 | **Fase 4** | Minería de Hard Negatives | Generación de `retrieval_train.json` y `retrieval_val.json`. | Tripletas compuestas por Positivo verificado y Hard Negatives del Top-2 al Top-8 del modelo base. |

@@ -23,6 +23,7 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+REPO_ROOT = BASE_DIR.parent
 DATA_DIR = BASE_DIR / "data"
 MANIFEST_PATH = DATA_DIR / "corpus_manifest.json"
 EXTRACTED_DIR = DATA_DIR / "extracted"
@@ -75,10 +76,8 @@ def run_extraction_pipeline(prioritarios_solo: bool = True, max_docs: int = None
     documentos = manifest.get("documentos", [])
     print(f"[INFO] Total de documentos en manifiesto: {len(documentos)}")
 
-    # Filtrar prioritarios (excluir '07_otras_guias_msp' si se solicita modo prioritario)
-    if prioritarios_solo:
-        documentos = [d for d in documentos if d["eje_clinico"] != "07_otras_guias_msp"]
-        print(f"[INFO] Documentos en los ejes clinicos prioritarios (1 a 6): {len(documentos)}")
+    # En la arquitectura v2, el 100% de los 45 documentos pertenecen a los 4 ejes oficiales
+    print(f"[INFO] Documentos en los 4 ejes clinicos oficiales del MSP: {len(documentos)}")
 
     if max_docs:
         documentos = documentos[:max_docs]
@@ -100,7 +99,7 @@ def run_extraction_pipeline(prioritarios_solo: bool = True, max_docs: int = None
         print("     pip install marker-pdf")
         print("\n  2. Ejecutar la extraccion masiva por CLI:")
         for doc in documentos[:5]:
-            pdf_full_path = BASE_DIR.parent / doc["ruta_relativa"]
+            pdf_full_path = REPO_ROOT / doc["ruta_relativa"]
             print(f"     marker_single \"{pdf_full_path}\" --output_dir \"{MARKDOWN_OUT_DIR}\" --langs Spanish")
         print(f"     ... ({len(documentos) - 5} guias adicionales)")
         print("\n  3. O ejecutar el script completo una vez instalado marker:")
@@ -112,7 +111,7 @@ def run_extraction_pipeline(prioritarios_solo: bool = True, max_docs: int = None
     exitos = 0
     fallos = 0
     for doc in documentos:
-        pdf_full_path = BASE_DIR.parent / doc["ruta_relativa"]
+        pdf_full_path = REPO_ROOT / doc["ruta_relativa"]
         if not pdf_full_path.exists():
             print(f"  [ALERTA] Archivo no encontrado en disco: {pdf_full_path}")
             fallos += 1
