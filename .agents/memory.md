@@ -759,14 +759,18 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
   - **Blindaje con Backend PyTorch Puro:** Se inyectaron variables de entorno defensivas (`SURYA_BACKEND=pytorch`, `USE_VLLM=False`, `SURYA_USE_VLLM=0`, `TORCH_DEVICE=cuda`, `USE_DOCKER=False`, `OCRMYPDF_USE_DOCKER=0`) forzando la inferencia directa en PyTorch sin subprocesos de red.
   - **Progreso en Vivo con `flush=True`:** Enumeración `[i/45]`, reporte de tamaño en MB, tiempo por documento `dt_doc`, caracteres y figuras extraídas.
   - **Regeneración de Paquete:** Se reempaquetó [`fase2_marker_bundle.zip`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/fase2_marker_bundle.zip) (124.96 MB).
-
-
-
-
-
-
-
-
-
-
+* **Culminación Exitosa de la Fase 2 con Extractor Nativo de Alta Fidelidad (`02_extract_corpus_native.py`) (2026-10-05):**
+  - **Depuración del Corpus (Eliminación de Tríptico de Imágenes):** Se eliminó físicamente y del manifiesto el documento de bolsillo escaneado `GPC_de_bolsillo_componente_materno_2015.pdf` (tríptico de 2 páginas con puro raster), consolidando el corpus en exactamente **44 Guías de Práctica Clínica oficiales con texto y tablas clínicas completas**.
+  - **Arquitectura del Extractor Nativo con PyMuPDF:**
+    * **Extracción de Tablas en Markdown Pura:** Utiliza `page.find_tables()` nativo en C++ de PyMuPDF, generando tablas Markdown con alineación estricta y solventando discrepancias de catálogo/xref que afectaban a librerías externas.
+    * **Deduplicación Espacial:** Filtra bloques de texto coincidentes con bboxes de tablas para evitar frases duplicadas.
+    * **Paginación Física Real:** Identifica el número de página impreso en el pie de página (`y >= height * 0.82`) y delimita cada hoja con `<!-- GPC_PAGE_START | NUMERO_PDF: X | PAGINA_IMPRESA: Y | GUIA: archivo.pdf -->` y `<!-- GPC_PAGE_END | NUMERO_PDF: X -->`.
+    * **Normalización Clínica Segura:** Resuelve caracteres diacríticos NFC y estandariza unidades (`µg`, `°C`) mediante regex contextuales sin mutar el texto común.
+  - **Auditoría de Ejecución y Métricas Certificadas (100% PASS):**
+    * **Documentos procesados:** 44 / 44 (100% completados, 0 fallos).
+    * **Páginas analizadas:** 3,468 páginas de PDF normativo.
+    * **Tablas estructuradas Markdown:** 3,201 tablas intactas.
+    * **Volumen textual útil:** 7,689,869 caracteres clínicos.
+    * **Archivos generados:** 44 archivos Markdown en [`backend/data/extracted/markdown/`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/extracted/markdown/) y reporte de auditoría en [`backend/data/extracted/extraction_summary.json`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/extracted/extraction_summary.json).
+  - **Hito:** Fase 2 concluida al 100% con rigor metodológico, lista para la Fase 3 (Chunking semántico indivisible con tokenizador BGE-M3).
 

@@ -11,7 +11,7 @@ Este módulo contiene la implementación del **Nuevo Pipeline Científico de Ing
 | Fase | Descripción Técnica | Script / Notebook | Estado |
 | :---: | :--- | :--- | :---: |
 | **Fase 1** | Clasificación en 4 ejes canónicos del MSP e inventario criptográfico con CIE-10/CIE-11 | `01_classify_and_inventory_corpus.py` | **100% Completada y Certificada** |
-| **Fase 2** | Extracción sin pérdida de texto, tablas Markdown y figuras a 300 DPI con Marker-PDF | `02_extract_with_marker.py`<br>`colab_fase2_marker_extraction.ipynb` | **Entorno Preparado (Listo para GPU)** |
+| **Fase 2** | Extracción nativa de alta fidelidad (PyMuPDF, tablas Markdown, paginación física real) | `02_extract_corpus_native.py` | **100% Completada y Certificada (44/44 GPCs, 3,201 tablas, 7.68M chars)** |
 | **Fase 3** | Chunking semántico indivisible por tokens BGE-M3 (512 tokens) | `03_token_chunker.py` *(Próxima Fase)* | Pendiente |
 | **Fase 4** | Minería semántica de Hard Negatives con BGE-M3 base y filtrado de falsos negativos | `04_mine_hard_negatives.py` *(Próxima Fase)* | Pendiente |
 | **Fase 5** | Curación ciega del Ground Truth médico humano (Kappa de Cohen $\ge 0.80$) | `05_build_ground_truth_pool.py` *(Próxima Fase)* | Pendiente |
@@ -26,9 +26,9 @@ Este módulo contiene la implementación del **Nuevo Pipeline Científico de Ing
 ```text
 backend/ingestion_v2/
 ├── 01_classify_and_inventory_corpus.py     # Fase 1: Clasificación, hash SHA-256 y CIE-10/11
-├── 02_extract_with_marker.py               # Fase 2: Orquestador local de Marker-PDF
-├── colab_fase2_marker_extraction.ipynb     # Fase 2: Notebook maestro para Google Colab con GPU
-└── requirements-ingestion-v2.txt           # Dependencias oficiales (marker-pdf, sentence-transformers, torch)
+├── 02_extract_corpus_native.py             # Fase 2: Extractor nativo determinístico (PyMuPDF + pdfplumber)
+├── 02_extract_with_marker.py               # Fase 2 (Alternativa histórica con GPU / Marker)
+└── colab_fase2_marker_extraction.ipynb     # Fase 2 (Alternativa histórica en Google Colab)
 ```
 
 ---
@@ -39,9 +39,6 @@ backend/ingestion_v2/
 # 1. Regenerar o auditar el inventario criptográfico del corpus (Fase 1):
 py backend/ingestion_v2/01_classify_and_inventory_corpus.py
 
-# 2. Generar el paquete ligero de extracción para Google Colab (~124 MB):
-py scripts/prepare_fase2_bundle.py
-
-# 3. Ejecutar la extracción local con Marker-PDF (requiere marker-pdf instalado):
-py backend/ingestion_v2/02_extract_with_marker.py
+# 2. Ejecutar la extracción de alta fidelidad local con PyMuPDF + pdfplumber (Fase 2):
+py backend/ingestion_v2/02_extract_corpus_native.py
 ```

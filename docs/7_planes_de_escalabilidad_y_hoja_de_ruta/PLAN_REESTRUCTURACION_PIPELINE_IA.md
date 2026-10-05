@@ -176,15 +176,15 @@ Para la fase de pruebas con estudiantes y validación experimental, se descartan
 ```text
 backend/
 ├── data/
-│   ├── raw_pdfs/                             # 45 PDFs oficiales organizados por los 4 ejes normativos MSP
-│   │   ├── 01_urgencias_obstetricas/         # 14 GPCs (Preeclampsia, Código Rojo, Parto, Diabetes Gestacional)
+│   ├── raw_pdfs/                             # 44 PDFs oficiales organizados por los 4 ejes normativos MSP
+│   │   ├── 01_urgencias_obstetricas/         # 13 GPCs (Preeclampsia, Código Rojo, Parto, Diabetes Gestacional)
 │   │   ├── 02_respiratorio_pediatrico/       # 11 GPCs (Neumonía NAC, Tuberculosis, Sepsis Neonatal, SDR)
 │   │   ├── 03_cardiovascular_metabolico/     # 2 GPCs (Hipertensión Arterial HTA, Enfermedad Renal Crónica ERC)
 │   │   └── 04_soporte_cronicos_salud_mental/ # 18 GPCs (Depresión, Dolor Oncológico, Cuidados Paliativos, Raras)
-│   ├── corpus_manifest.json                  # Manifiesto criptográfico inmutable (45 hashes SHA-256 y CIE-10/11)
-│   ├── extracted/                            # Salida de marker-pdf (texto Markdown + figuras PNG)
-│   │   ├── markdown/                         # Documentos .md con paginación real al pie
-│   │   └── figures/                          # Figuras diagnósticas a 300 DPI
+│   ├── corpus_manifest.json                  # Manifiesto criptográfico inmutable (44 hashes SHA-256 y CIE-10/11)
+│   ├── extracted/                            # Salida del extractor nativo de alta fidelidad
+│   │   ├── markdown/                         # 44 documentos .md con delimitación canónica y tablas estructuradas
+│   │   └── extraction_summary.json           # Auditoría técnica (3,201 tablas, 7.68M caracteres, 0 fallos)
 │   ├── ground_truth/                         # Conjuntos de validación médica humana
 │   │   ├── annotation_protocol.md            # Instrucciones de criterio clínico para médicos evaluadores
 │   │   ├── pairs_raw.csv                     # Pares consulta-fragmento generados automáticamente
@@ -200,7 +200,7 @@ backend/
 │
 └── ingestion_v2/                             # Código fuente del nuevo pipeline
     ├── 01_classify_and_inventory_corpus.py   # Clasificación e inventario criptográfico con CIE-10/CIE-11
-    ├── 02_extract_with_marker.py             # Ingesta por lotes con marker-pdf (paginación real)
+    ├── 02_extract_corpus_native.py           # Extracción nativa de alta fidelidad (PyMuPDF + pdfplumber, paginación real)
     ├── 03_token_chunker.py                   # Chunking por tokens BGE-M3 (512 tks, tablas intactas)
     ├── 04_mine_hard_negatives.py             # Minería semántica con BGE-M3 base y filtrado defensivo
     ├── 05_build_ground_truth_pool.py         # Ensamblado de pares para validación de revisores médicos
@@ -215,20 +215,20 @@ backend/
 
 ```mermaid
 graph TD
-    F1[Fase 1: Recolección y Clasificación de PDFs Oficiales MSP/CONASA] --> F2[Fase 2: Extracción con marker-pdf Paginación Real y Tablas]
-    F2 --> F3[Fase 3: Token Chunking Semántico BGE-M3 512 tokens]
-    F3 --> F4[Fase 4: Minería Semántica de Hard Negatives con BGE-M3 Base]
-    F4 --> F5[Fase 5: Curación Humana del Ground Truth Médico Kappa >= 0.80]
+    F1[Fase 1: Recoleccion y Clasificacion de PDFs Oficiales MSP/CONASA] --> F2[Fase 2: Extraccion Nativa de Alta Fidelidad PyMuPDF y pdfplumber]
+    F2 --> F3[Fase 3: Token Chunking Semantico BGE-M3 512 tokens]
+    F3 --> F4[Fase 4: Mineria Semantica de Hard Negatives con BGE-M3 Base]
+    F4 --> F5[Fase 5: Curacion Humana del Ground Truth Medico Kappa >= 0.80]
     F4 --> F6[Fase 6: Re-entrenamiento de BGE-M3 en NVIDIA A100 40GB]
-    F6 --> F7[Fase 7: Re-indexación Vectorial en ChromaDB v2]
-    F5 --> F8[Fase 8: Benchmark Científico Ciego y Evaluación Multimodal vLLM]
+    F6 --> F7[Fase 7: Re-indexacion Vectorial en ChromaDB v2]
+    F5 --> F8[Fase 8: Benchmark Cientifico Ciego y Evaluacion Multimodal vLLM]
     F7 --> F8
 ```
 
 | Fase | Hito Técnico | Entregable Clave | Criterio de Éxito / Aceptación |
 | :---: | :--- | :--- | :--- |
-| **Fase 1** | Organización de PDFs en `raw_pdfs/` | 45 documentos oficiales (100% GPCs Ecuador) clasificados en los 4 ejes canónicos con metadatos CIE-10/11 y hashes SHA-256. | Cobertura total del catálogo ministerial oficial con 0 inconsistencias bibliográficas. |
-| **Fase 2** | Extracción con `marker-pdf` | Carpeta `extracted/markdown/` y `extracted/figures/`. | Paginación física coincidente al 100% con los documentos impresos. Tablas intactas. |
+| **Fase 1** | Organización de PDFs en `raw_pdfs/` | 44 documentos oficiales (100% GPCs Ecuador con texto) clasificados en los 4 ejes canónicos con metadatos CIE-10/11 y hashes SHA-256. | Cobertura total del catálogo ministerial oficial con 0 inconsistencias bibliográficas. **Completada.** |
+| **Fase 2** | Extracción nativa con `02_extract_corpus_native.py` | Carpeta `extracted/markdown/` (44 `.md`) y `extraction_summary.json` (3,201 tablas, 7.68M caracteres). | Paginación física coincidente al 100% con los documentos impresos (`GPC_PAGE_START`). Tablas Markdown estructuradas intactas. 0 fallos. **Completada al 100%.** |
 | **Fase 3** | Chunking semántico por tokens | `03_token_chunker.py` ejecutado sobre el corpus Markdown. | Fragmentos de $\le 512$ tokens (máx 768 para tablas completas). Metadatos CIE-10/CIE-11 inyectados. |
 | **Fase 4** | Minería de Hard Negatives | Generación de `retrieval_train.json` y `retrieval_val.json`. | Tripletas compuestas por Positivo verificado y Hard Negatives del Top-2 al Top-8 del modelo base. |
 | **Fase 5** | Curación médica del Ground Truth | Archivo `pairs_validated.csv` con $\ge 100$ pares clínicos evaluados. | Concordancia inter-anotador $\kappa \ge 0.80$. Test set ciego congelado en `checksums.sha256`. |

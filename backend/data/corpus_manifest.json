@@ -2,9 +2,9 @@
   "version": "2.0",
   "fecha_inventario": "2026-10-03",
   "descripcion": "Manifiesto criptografico de las Guias de Practica Clinica y Normas del MSP Ecuador para Ateneo+",
-  "total_documentos": 45,
+  "total_documentos": 44,
   "distribucion_por_eje": {
-    "01_urgencias_obstetricas": 14,
+    "01_urgencias_obstetricas": 13,
     "02_respiratorio_pediatrico": 11,
     "03_cardiovascular_metabolico": 2,
     "04_soporte_cronicos_salud_mental": 18
@@ -139,19 +139,6 @@
       "sha256": "e780aea9c93ce5bac895658a789c2628fd3c816b3f2bdd5194eb4fdd3be8faa5",
       "cie10": "O82",
       "cie11": "JB02",
-      "acuerdo_ministerial": "Acuerdo Ministerial MSP-2015",
-      "anio": 2015
-    },
-    {
-      "archivo": "GPC_de_bolsillo_componente_materno_2015.pdf",
-      "titulo_oficial": "Manual de Emergencias Obstetricas y Score MAMA (GPC Bolsillo)",
-      "eje_clinico": "01_urgencias_obstetricas",
-      "eje_nombre": "Salud Materna y Urgencias Obstetricas (Score MAMA)",
-      "ruta_relativa": "backend/data/raw_pdfs/01_urgencias_obstetricas/GPC_de_bolsillo_componente_materno_2015.pdf",
-      "tamano_bytes": 6932556,
-      "sha256": "0ce35b5fb813c06a1be10633e4722f663bd732dceb8e59d5bda84c5bec5125ad",
-      "cie10": "O90",
-      "cie11": "JA60",
       "acuerdo_ministerial": "Acuerdo Ministerial MSP-2015",
       "anio": 2015
     },
