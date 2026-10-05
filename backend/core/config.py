@@ -129,9 +129,10 @@ RAW_PDFS_PATH = settings.raw_pdfs_path
 CASES_FILE_PATH = settings.cases_file_path
 DATABASE_URL = settings.database_url
 _v2_model_path = BASE_DIR / "data" / "models" / "ateneo-bge-m3-ecuador-v2"
+_has_valid_v2_model = _v2_model_path.is_dir() and (_v2_model_path / "config.json").exists()
 EMBEDDING_MODEL_NAME = os.getenv(
     "EMBEDDING_MODEL_NAME",
-    str(_v2_model_path) if _v2_model_path.exists() else "BAAI/bge-m3"
+    str(_v2_model_path) if _has_valid_v2_model else "BAAI/bge-m3"
 )
 JWT_SECRET_KEY = settings.jwt_secret_key
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
