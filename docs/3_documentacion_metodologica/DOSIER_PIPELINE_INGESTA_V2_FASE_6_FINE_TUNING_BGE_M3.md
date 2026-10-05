@@ -110,3 +110,35 @@ python backend/ingestion_v2/06_train_bge_m3.py --batch-size 32 --epochs 5 --bf16
 1. Abrir `backend/ingestion_v2/colab_fase6_train_bge_m3.ipynb`.
 2. Asignar entorno de ejecución con GPU NVIDIA A100.
 3. Ejecutar las celdas secuencialmente; el entrenamiento concluye en ~10 a 15 minutos y genera el paquete final del modelo.
+
+---
+
+## 7. Despliegue en Producción Local y Normalización Canónica de Metadatos
+
+### 7.1 Instalación de Pesos en el Backend
+* Los artefactos de pesos serializados en la GPU NVIDIA A100 fueron desplegados en el directorio canónico:
+  ```text
+  backend/data/models/ateneo-bge-m3-ecuador-v2/
+  ├── config.json                       # Configuración base del modelo XLM-RoBERTa
+  ├── model.safetensors                 # 2.27 GB de tensores de pesos entrenados en BF16
+  ├── tokenizer.json                    # Tokenizador BGE-M3 (vocabulario 250k tokens)
+  ├── tokenizer_config.json             # Parámetros de tokenización y padding
+  ├── sentence_bert_config.json         # max_seq_length=512, do_lower_case=False
+  ├── modules.json                      # Grafo secuencial de capas SentenceTransformers
+  ├── 1_Pooling/config.json             # Pooling Layer (CLS Token, dim=1024)
+  ├── 2_Normalize/                      # Capa de normalización euclídea L2
+  └── pre_post_table.tex                # Evidencia empírica formal en LaTeX
+  ```
+
+### 7.2 Resolución de Incompatibilidad de Metadatos (Causa Raíz)
+Durante la carga en entornos locales de inferencia con SentenceTransformers, se identificaron y subsanaron las siguientes discrepancias en los esquemas de metadatos generados por entornos dev de Colab:
+1. **Espacio de Nombres en `modules.json`:** Las rutas dev `sentence_transformers.base.modules.*` fueron normalizadas a las clases canónicas del framework: `sentence_transformers.models.Transformer`, `sentence_transformers.models.Pooling` y `sentence_transformers.models.Normalize`.
+2. **Configuración de Transformer en `sentence_bert_config.json`:** Se eliminaron argumentos incompatibles (`transformer_task`, `modality_config`), fijando la especificación canónica con `max_seq_length: 512`.
+3. **Parámetro de Dimensión en `1_Pooling/config.json`:** Se corrigió el atributo `embedding_dimension` por el argumento formal esperado por la clase: `word_embedding_dimension: 1024` con modo `cls`.
+
+### 7.3 Verificación de Inferencia Vectorial en Tiempo Real
+El modelo desplegado fue sometido a validación computacional determinista:
+* **Vector Output:** Longitud fija de $1,024$ dimensiones latentes.
+* **Norma Euclídea:** $\|v\|_2 = 1.0000$ (proyección en hiperesfera unitaria).
+* **Conmutación Automática:** `backend/core/config.py` detecta de forma autónoma la presencia de `config.json` en el directorio de pesos, activando el modelo local y preservando a `BAAI/bge-m3` como respaldo de alta disponibilidad.
+
