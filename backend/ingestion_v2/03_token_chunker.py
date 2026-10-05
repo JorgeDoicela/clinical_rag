@@ -92,13 +92,15 @@ class ClinicalChunk:
 class SemanticTokenChunker:
     """Motor de segmentación semántica e indivisible para GPCs clínicas."""
 
-    def __init__(self, tokenizer_file: Path) -> None:
-        if not tokenizer_file.exists():
-            raise FileNotFoundError(f"Tokenizador no encontrado en {tokenizer_file}")
-        self.tokenizer = Tokenizer.from_file(str(tokenizer_file))
+    def __init__(self, tokenizer_file: Optional[Path] = None) -> None:
+        if tokenizer_file and tokenizer_file.exists():
+            self.tokenizer = Tokenizer.from_file(str(tokenizer_file))
+            logger.info("Tokenizador BGE-M3 cargado desde archivo local: %s", tokenizer_file)
+        else:
+            self.tokenizer = Tokenizer.from_pretrained("BAAI/bge-m3")
+            logger.info("Tokenizador BGE-M3 cargado desde Hugging Face ('BAAI/bge-m3')")
         # Desactivar truncación por defecto (evita el techo artificial de 1024 tokens al medir)
         self.tokenizer.no_truncation()
-        logger.info("Tokenizador BGE-M3 cargado con no_truncation() activo desde %s", tokenizer_file)
 
     def count_tokens(self, text: str) -> int:
         """Calcula el conteo exacto de tokens según el vocabulario de BGE-M3."""
