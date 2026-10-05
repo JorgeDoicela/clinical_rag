@@ -227,9 +227,9 @@ graph TD
 
 | Fase | Hito Técnico | Entregable Clave | Criterio de Éxito / Aceptación |
 | :---: | :--- | :--- | :--- |
-| **Fase 1** | Organización de PDFs en `raw_pdfs/` | 44 documentos oficiales (100% GPCs Ecuador con texto) clasificados en los 4 ejes canónicos con metadatos CIE-10/11 y hashes SHA-256. | Cobertura total del catálogo ministerial oficial con 0 inconsistencias bibliográficas. **Completada.** |
-| **Fase 2** | Extracción nativa con `02_extract_corpus_native.py` | Carpeta `extracted/markdown/` (44 `.md`) y `extraction_summary.json` (3,201 tablas, 7.68M caracteres). | Paginación física coincidente al 100% con los documentos impresos (`GPC_PAGE_START`). Tablas Markdown estructuradas intactas. 0 fallos. **Completada al 100%.** |
-| **Fase 3** | Chunking semántico por tokens | `03_token_chunker.py` ejecutado sobre el corpus Markdown. | Fragmentos de $\le 512$ tokens (máx 768 para tablas completas). Metadatos CIE-10/CIE-11 inyectados. |
+| **Fase 1** | Organización de PDFs en `raw_pdfs/` | 42 documentos oficiales (100% GPCs Ecuador con texto) clasificados en los 4 ejes canónicos con metadatos CIE-10/11 y hashes SHA-256. | Cobertura total del catálogo ministerial oficial con 0 inconsistencias bibliográficas. **Completada.** |
+| **Fase 2** | Extracción nativa con `02_extract_corpus_native.py` | Carpeta `extracted/markdown/` (42 `.md`) y `extraction_summary.json` (3,201 tablas, 7.68M caracteres). | Paginación física coincidente al 100% con los documentos impresos (`GPC_PAGE_START`). Tablas Markdown estructuradas intactas. 0 fallos. **Completada al 100%.** |
+| **Fase 3** | Chunking semántico por tokens | `03_token_chunker.py` ejecutado sobre el corpus Markdown. | Fragmentos de $\le 512$ tokens (máx 768 para tablas completas). Metadatos CIE-10/CIE-11 inyectados. 7,052 chunks, P95 616 tokens, 0 ruidos. **Completada al 100%.** |
 | **Fase 4** | Minería de Hard Negatives | Generación de `retrieval_train.json` y `retrieval_val.json`. | Tripletas compuestas por Positivo verificado y Hard Negatives del Top-2 al Top-8 del modelo base. |
 | **Fase 5** | Curación médica del Ground Truth | Archivo `pairs_validated.csv` con $\ge 100$ pares clínicos evaluados. | Concordancia inter-anotador $\kappa \ge 0.80$. Test set ciego congelado en `checksums.sha256`. |
 | **Fase 6** | Entrenamiento en NVIDIA A100 | Modelo exportado en `models/ateneo-bge-m3-ecuador-v2/`. | Curva de pérdida convergente en 5 épocas con MNRL. Tiempo de entrenamiento $\le 3$ horas. |
