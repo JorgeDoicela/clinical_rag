@@ -205,6 +205,7 @@ backend/
     ├── 04_mine_hard_negatives.py             # Minería semántica con BGE-M3 base y filtrado defensivo
     ├── 05_build_ground_truth_pool.py         # Ensamblado de pares para validación de revisores médicos
     ├── 06_train_bge_m3.py                    # Script de fine-tuning con MNRL optimizado para A100 40GB
+    ├── colab_fase6_train_bge_m3.ipynb        # Notebook interactivo para NVIDIA A100 40GB en bfloat16
     ├── 07_index_chromadb_v2.py               # Indexación de embeddings y metadatos en ChromaDB v2
     └── 08_evaluate_blind_benchmark.py        # Evaluación empírica ciega (Hit@1, MRR@5, NDCG@5)
 ```
