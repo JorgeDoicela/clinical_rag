@@ -28,6 +28,7 @@ from sqlalchemy import create_engine, text, event
 from sqlalchemy.orm import sessionmaker
 
 from main import app
+from core.config import settings
 from core.database import Base, SafeDateTime, init_database
 from core.llm_gateway import (
     ResilientLLMGateway,
@@ -292,18 +293,19 @@ def run_circuit_breaker_resilience_audit() -> Dict[str, Any]:
     Certifica la conmutación al modelo de respaldo ante fallos y la ausencia de latencias fantasma.
     """
     gateway = ResilientLLMGateway()
-    primary = "gemini-3.8-flash"
-    backup = "gemini-3.7-flash"
+    cascade = settings.get_models_cascade()
+    primary = cascade[0] if cascade else "gemini-flash-lite-latest"
+    backup = cascade[1] if len(cascade) > 1 else "gemini-3.7-flash"
 
     # 1. Estado inicial
     gateway.reset_all_circuits()
     initial_status = gateway.get_circuit_breakers_status()
-    assert initial_status["models"].get(primary, {}).get("circuit") == "CLOSED"
+    assert initial_status["models"].get(primary, {}).get("status") == "CLOSED"
 
     # 2. Inducción de fallo de cuota (429 / ResourceExhausted) en primario
     gateway._record_failure(primary, Exception("429 ResourceExhausted: Quota exceeded for model"))
     status_after_fail = gateway.get_circuit_breakers_status()
-    primary_state = status_after_fail["models"].get(primary, {}).get("circuit")
+    primary_state = status_after_fail["models"].get(primary, {}).get("status")
     cooldown_rem = status_after_fail["models"].get(primary, {}).get("cooldown_remaining_seconds", 0)
 
     # 3. Comprobar que primario está OPEN y respaldo sigue disponible
@@ -317,7 +319,7 @@ def run_circuit_breaker_resilience_audit() -> Dict[str, Any]:
     # 5. Éxito de prueba restablece a CLOSED
     gateway._record_success(primary)
     status_recovered = gateway.get_circuit_breakers_status()
-    recovered_state = status_recovered["models"].get(primary, {}).get("circuit")
+    recovered_state = status_recovered["models"].get(primary, {}).get("status")
 
     return {
         "primary_model": primary,

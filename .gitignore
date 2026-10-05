@@ -32,6 +32,7 @@ ENV/
 # ChromaDB local y checkpoints binarios
 backend/data/chroma_db/
 backend/data/processed/
+backend/data/extracted/
 backend/data/ateneo-bge-m3-ecuador/*.safetensors
 backend/data/ateneo-bge-m3-ecuador/*.bin
 backend/data/ateneo-bge-m3-ecuador/*.pt

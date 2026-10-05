@@ -727,7 +727,23 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     * Actualizado [`README.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/README.md) con el árbol canónico de `raw_pdfs/`, `corpus_manifest.json`, `ingestion_v2/` y enlace al Plan Maestro de Reestructuración de IA v2.
     * Sincronizados [`PLAN_REESTRUCTURACION_PIPELINE_IA.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/7_planes_de_escalabilidad_y_hoja_de_ruta/PLAN_REESTRUCTURACION_PIPELINE_IA.md), [`GUIA_INGESTA_Y_CASOS.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/3_documentacion_metodologica/GUIA_INGESTA_Y_CASOS.md) y [`METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/3_documentacion_metodologica/METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md).
   - **Auditoría Automatizada Aprobada (Cero Errores):** Script de verificación criptográfica y estructural (`audit_fase1.py`) ejecutado con 45/45 documentos auditados, 45 archivos únicos en disco, 0 errores y 0 advertencias.
-  - **Conclusión de Fase 1:** Fase 1 (Recolección, Clasificación e Inventario Criptográfico) concluida y certificada al 100% con rigor científico para publicación Q1. A la espera de autorización para planificar la Fase 2.
+  - **Conclusión de Fase 1:** Fase 1 (Recolección, Clasificación e Inventario Criptográfico) concluida y certificada al 100% con rigor científico para publicación Q1.
+* **Preparación de Entorno para Fase 2 (Extracción con Marker-PDF en GPU Cloud / Colab):**
+  - **Script Empaquetador Ligero (`scripts/prepare_fase2_bundle.py`):** Empaqueta de forma optimizada los 45 PDFs canónicos de `raw_pdfs/`, el manifiesto `corpus_manifest.json` y el módulo `ingestion_v2/` en `fase2_marker_bundle.zip` (124.95 MB, 15x más liviano que bundles históricos de 2 GB).
+  - **Notebook Maestro de Extracción (`backend/ingestion_v2/colab_fase2_marker_extraction.ipynb`):** Pipeline automatizado para Google Colab con GPU (T4/A100) que instala `marker-pdf`, descomprime el paquete, ejecuta la extracción por lotes sobre las 45 guías oficiales, valida la integridad de los `.md` y figuras PNG a 300 DPI, y genera `extracted.zip` con descarga automática.
+* **Saneamiento Estructural, Catalogación de Scripts y Clarificación de Módulos (Goal de Organización):**
+  - **Eliminación de Artefactos Obsoletos:** Se eliminó el archivo residual `ateneo_colab_bundle.zip` (1.94 GB) en la raíz y la copia de seguridad estática `backend/data/history.db.bak`, blindando `backend/data/extracted/` en `.gitignore`.
+  - **Distinción Canónica de Módulos de Ingesta:**
+    * [`backend/ingestion/`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/ingestion/): Documentado formalmente en su `README.md` como el **Baseline Histórico Congelado (v1)**. Se preserva intacto por dependencias activas de importación (`routers/evaluation.py`, `rag/retriever.py`) y para el estudio de ablación del paper (PyPDF/Tesseract vs Marker-PDF).
+    * [`backend/ingestion_v2/`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/ingestion_v2/): Documentado formalmente en su `README.md` como el **Pipeline Científico de 8 Fases (v2.0)** para el Corpus 100% Ecuador (Marker-PDF, BGE-M3 fine-tuning en A100 y evaluación con Qwen2.5-VL en vLLM).
+  - **Catalogación Integral de Scripts Operativos y Científicos:**
+    * Se creó [`scripts/README.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/scripts/README.md) catalogando los 8 scripts del repositorio por dominio operativo (Científico/Paper, MLOps GPU Cloud, Auditoría/Diagnóstico, Migraciones y Seeding).
+  - **Catálogo de Pruebas del Backend:**
+    * Se creó [`backend/tests/README.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/tests/README.md) documentando el orquestador maestro `run_all_tests.py`, los generadores de tablas LaTeX del paper y las 8 suites unitarias y de integración.
+  - **Resolución de Pruebas y Certificación de Cero Regresiones (100% PASS):**
+    * **Backend:** Se corrigió en [`backend/tests/load_test_simulation.py`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/tests/load_test_simulation.py) la importación de `settings` y la resolución dinámica del modelo primario/secundario con la clave `status` del reporte de Circuit Breakers. Se ejecutó `backend/tests/run_all_tests.py` con **100% PASS** en sus 8 suites en 52.6s (Carga 100 usuarios, SQLite WAL, Rate Limiting, KST/BKT, RAG Cache, Hake Gain, Endpoints HTTP, Fusión Multimodal).
+    * **Frontend:** Se instaló `react-i18next` en `node_modules` y se ejecutó `npm test -- --run` con **100% PASS** en sus 22 suites y 106 pruebas unitarias e integración en 25.9s.
+
 
 
 
