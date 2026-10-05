@@ -83,7 +83,7 @@ El script valida automáticamente los códigos CIE-10 contra el catálogo maestr
 
 ## 4. Pipeline Experimental y Publicación Científica
 
-El notebook maestro [`../backend/ingestion/colab_ingesta_benchmark_a100.ipynb`](../backend/ingestion/colab_ingesta_benchmark_a100.ipynb) genera directamente los artefactos formales requeridos por los revisores de congresos:
+El notebook maestro [`../backend/ingestion_v2/colab_fase6_train_bge_m3.ipynb`](../backend/ingestion_v2/colab_fase6_train_bge_m3.ipynb) genera directamente los artefactos formales requeridos por los revisores de congresos:
 
 ### 4.1 Fusión Recíproca de Rangos (RRF $k=60$)
 Combina las fortalezas de la recuperación léxica (BM25Okapi) y semántica supervisada (BGE-M3 MNRL):
@@ -112,7 +112,7 @@ Evalúa paramétricamente el aporte independiente de:
 cd backend
 py scripts/prepare_colab_bundle.py
 
-# 2. Ejecutar colab_ingesta_benchmark_a100.ipynb en Google Colab con GPU A100
+# 2. Ejecutar colab_fase6_train_bge_m3.ipynb en Google Colab con GPU A100
 
 # 3. Descomprimir la base pre-indexada descargada:
 Expand-Archive -Path chroma_db.zip -DestinationPath backend/data/chroma_db/ -Force

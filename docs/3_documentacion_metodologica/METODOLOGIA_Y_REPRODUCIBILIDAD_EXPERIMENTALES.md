@@ -28,15 +28,15 @@ Para evitar la sobreestimación del rendimiento causada por la memorización del
 
 | Partición del Dataset | Proporción | Cantidad de Guías | Función Científica |
 | :--- | :---: | :---: | :--- |
-| **Training Set (`train_triplets.json`)** | **`70%`** | ~31 GPCs | Ajuste supervisado de los pesos del modelo denso `ateneo-bge-m3-ecuador` con pérdida MNRL en GPU NVIDIA A100. |
-| **Validation Set (`val_triplets.json`)** | **`15%`** | ~7 GPCs | Monitoreo de exactitud de ranking por época (`TripletEvaluator`) y parada temprana (*Early Stopping*). |
-| **Test Set Ciego (`test_triplets_blind.json`)** | **`15%`** | ~7 GPCs | Evaluación ciega *Out-of-Distribution* de generalización del RAG sobre normas jamás vistas en entrenamiento. |
+| **Training Set (`retrieval_train.json`)** | **`70%`** | 1,178 tripletas | Ajuste supervisado de los pesos del modelo denso `ateneo-bge-m3-ecuador-v2` con pérdida MNRL ($\tau=0.02$) en GPU NVIDIA A100. |
+| **Validation Set (`retrieval_val.json`)** | **`15%`** | 249 tripletas | Monitoreo de exactitud de ranking por época (`InformationRetrievalEvaluator`) sobre las consultas clínicas. |
+| **Test Set Ciego (`retrieval_test_blind.json`)** | **`15%`** | 283 tripletas | Evaluación ciega *Out-of-Distribution* de generalización del RAG sobre normas jamás vistas en entrenamiento. |
 
 ---
 
 ## 3. Auditoría de Cero Fuga de Datos (*Data Leakage Prevention*)
 
-El script de auditoría ([../backend/ingestion/dataset_validator.py](../backend/ingestion/dataset_validator.py)) certifica matemáticamente las siguientes condiciones de validez:
+El script de partición estratificada ([../backend/ingestion_v2/04_mine_hard_negatives.py](../backend/ingestion_v2/04_mine_hard_negatives.py)) certifica matemáticamente las siguientes condiciones de validez:
 1. **Intersección Vacía de Guías Clínicas:**
    $$\text{Guias}(\text{Train}) \cap \text{Guias}(\text{Test}) = \emptyset, \quad \text{Guias}(\text{Train}) \cap \text{Guias}(\text{Val}) = \emptyset$$
 2. **Cero Coincidencia Textual:** Ningún fragmento normativo positivo ($p^+$) presente en el conjunto de validación o prueba existe dentro del conjunto de entrenamiento.

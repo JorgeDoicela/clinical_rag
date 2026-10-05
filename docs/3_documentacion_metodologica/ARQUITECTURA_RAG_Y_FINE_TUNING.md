@@ -67,7 +67,7 @@ Los fragmentos se ordenan de forma descendente según su $\text{RRF\_Score}$, ga
 
 ---
 
-## 3. Extracción Estructurada de Tablas Clínicas en Markdown ([../backend/ingestion/pdf_advanced_parser.py](../backend/ingestion/pdf_advanced_parser.py))
+## 3. Extracción Estructurada de Tablas Clínicas en Markdown ([../backend/ingestion_v2/02_extract_corpus_native.py](../backend/ingestion_v2/02_extract_corpus_native.py))
 
 Para preservar el 100% de la información contenida en matrices de dosis, esquemas terapéuticos y clasificaciones de severidad, el parser avanzado utiliza **`pdfplumber`**:
 

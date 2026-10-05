@@ -24,28 +24,20 @@ backend/data/
 
 ### 2.1 Opciones de Ejecución de la Ingesta
 
-#### Opción 1: Aceleración Élite en GPU NVIDIA A100 (Estándar MLOps Recomendado - < 60 segundos)
-A través del notebook maestro [`../backend/ingestion/colab_ingesta_benchmark_a100.ipynb`](../backend/ingestion/colab_ingesta_benchmark_a100.ipynb):
-* Procesa los embeddings de 1024 tokens con precisión nativa `TF32/BF16` en Tensor Cores.
-* Genera la base persistente `chroma_db/` con espacio métrico `cosine`.
-* Empaqueta automáticamente el artefacto `chroma_db.zip` para descarga y despliegue inmediato en local o AWS.
+#### Opción 1: Extracción en Google Colab con GPU
+A través del notebook de extracción multimodal [`../backend/ingestion_v2/colab_fase2_marker_extraction.ipynb`](../backend/ingestion_v2/colab_fase2_marker_extraction.ipynb) o entrenamiento de embeddings en [`../backend/ingestion_v2/colab_fase6_train_bge_m3.ipynb`](../backend/ingestion_v2/colab_fase6_train_bge_m3.ipynb).
 
-#### Opción 2: Ejecución Local en CPU
-Para procesar recursivamente todas las subcarpetas e indexar los fragmentos localmente:
+#### Opción 2: Extracción Local Nativa
+Para procesar las 42 GPCs oficiales y estructurar las tablas en Markdown nativo:
 ```bash
-py backend/ingestion/run_ingestion.py
+uv run python backend/ingestion_v2/02_extract_corpus_native.py
 ```
 
-### 2.2 Características Técnicas del Parser Avanzado ([../backend/ingestion/pdf_advanced_parser.py](../backend/ingestion/pdf_advanced_parser.py))
-1. **Detección Automática de Año:** Extrae el año de la carpeta contenedora (`2013`, `2019`, etc.) o del texto del acuerdo ministerial y lo almacena como metadato normativo `ano_publicacion`.
-2. **Conversión de Tablas a Markdown (`pdfplumber`):** Convierte tablas de dosificación, criterios diagnósticos y matrices clínicas directamente a sintaxis Markdown:
-   ```markdown
-   | Parámetro Clínico | Criterio de Riesgo | Conducta MSP |
-   | --- | --- | --- |
-   | Presión Arterial | >= 160/110 mmHg | Sulfato de Magnesio IV |
-   ```
-3. **OCR Defensivo Multinivel ([../backend/ingestion/ocr_service.py](../backend/ingestion/ocr_service.py)):** Si una página antigua carece de texto seleccionable pero contiene imágenes o flujogramas escaneados, el sistema renderiza la página a 180 DPI en memoria y ejecuta OCR automático (Local / Gemini Multimodal) preservando tablas y dosis sin pérdida de información.
-4. **Manejo Defensivo de Fuentes Dañadas:** Omite streams de fuentes corruptas sin detener el procesamiento de los demás documentos.
+### 2.2 Características Técnicas del Extractor Nativo ([../backend/ingestion_v2/02_extract_corpus_native.py](../backend/ingestion_v2/02_extract_corpus_native.py))
+1. **Detección Automática de Año y Metadatos:** Extrae el año y asocia los metadatos normativos del manifiesto criptográfico (`corpus_manifest.json`).
+2. **Conversión de Tablas a Markdown:** Convierte tablas de dosificación, criterios diagnósticos y matrices clínicas directamente a sintaxis Markdown limpia mediante `page.find_tables()` de PyMuPDF.
+3. **Paginación Física Real:** Inyecta delimitadores de página `<!-- GPC_PAGE_START -->` y `<!-- GPC_PAGE_END -->` con el número de página impreso oficial.
+4. **Manejo Defensivo y Normalización:** Normaliza caracteres diacríticos NFC y unidades clínicas (`µg`, `°C`) sin corromper el texto original.
 
 ---
 

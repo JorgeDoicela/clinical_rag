@@ -10,10 +10,9 @@ Los datasets ubicados en [`../backend/data/`](../backend/data) fueron generados 
 
 | Archivo | Cantidad de Tripletas | % del Corpus | Rol en la Investigación |
 | :--- | :---: | :---: | :--- |
-| **`train_triplets.json`** | **1,918** | **70%** | Ajuste supervisado de los 560M parámetros con pérdida *Multiple Negatives Ranking Loss (MNRL)*. |
-| **`val_triplets.json`** | **1,024** | **15%** | Evaluación periódica del ranking (`TripletEvaluator`) durante el entrenamiento para evitar sobreajuste. |
-| **`test_triplets_blind.json`** | **694** | **15%** | Evaluación ciega sobre 10 Guías de Práctica Clínica jamás vistas durante el entrenamiento (*Out-of-Distribution*). |
-| **`ft_dataset.json`** | **3,636** | **100%** | Dataset global consolidado de todas las tripletas generadas con *Hard Negatives*. |
+| **`retrieval_train.json`** | **1,178** | **70%** | Ajuste supervisado de los 560M parámetros con pérdida *Multiple Negatives Ranking Loss (MNRL)* ($\tau=0.02$). |
+| **`retrieval_val.json`** | **249** | **15%** | Evaluación periódica del ranking (`InformationRetrievalEvaluator`) durante el entrenamiento para evitar sobreajuste. |
+| **`retrieval_test_blind.json`** | **283** | **15%** | Evaluación ciega sobre Guías de Práctica Clínica jamás vistas durante el entrenamiento (*Out-of-Distribution*). |
 
 ### Estructura de cada Tripleta:
 ```json
@@ -36,37 +35,37 @@ Los datasets ubicados en [`../backend/data/`](../backend/data) fueron generados 
 
 ### Paso 1: Abrir el Notebook en Google Colab
 1. Ve a [Google Colab](https://colab.research.google.com/).
-2. Haz clic en **Subir (Upload)** y selecciona el archivo [`../backend/ingestion/colab_fine_tuning.ipynb`](../backend/ingestion/colab_fine_tuning.ipynb).
+2. Haz clic en **Subir (Upload)** y selecciona el archivo [`../backend/ingestion_v2/colab_fase6_train_bge_m3.ipynb`](../backend/ingestion_v2/colab_fase6_train_bge_m3.ipynb).
 
 ### Paso 2: Seleccionar la GPU A100
 1. En el menú superior de Colab: **Entorno de ejecución > Cambiar tipo de entorno de ejecución**.
-2. Selecciona **A100 GPU** (o en su defecto V100/T4 si estás en Colab estándar).
+2. Selecciona **A100 GPU** (o en su defecto V100/T4).
 3. Haz clic en **Guardar**.
 
 ### Paso 3: Cargar los Datos
 1. En el panel izquierdo de Colab, abre la pestaña de **Archivos** (icono de carpeta).
-2. Arrastra y suelta los dos archivos desde tu computadora:
-   * `backend/data/train_triplets.json`
-   * `backend/data/val_triplets.json`
+2. Sube los dos archivos desde tu computadora:
+   * `backend/data/datasets/retrieval_train.json`
+   * `backend/data/datasets/retrieval_val.json`
 
 ### Paso 4: Ejecutar el Entrenamiento
 1. Presiona `Ctrl + F9` o ve a **Entorno de ejecución > Ejecutar todas**.
-2. El script detectará la GPU A100, configurará el tamaño de lote grande ($B=32$) y la ventana de $1024$ tokens, y entrenará el modelo durante 3 épocas.
+2. El script detecta la GPU A100, configura `bfloat16`, pérdida MNRL ($\tau=0.02$) y evalúa el baseline Pre vs. Post.
 3. **Tiempo estimado:** ~8 a 10 minutos.
 
 ### Paso 5: Descargar los Artefactos Generados
-Al finalizar la última celda, el notebook generará y descargará automáticamente:
-1. **`ateneo-bge-m3-ecuador.zip`**: Archivo comprimido con los pesos del modelo optimizado.
-2. **`grafico_convergencia_paper.png`**: Gráfico formal de pérdida y exactitud a **300 DPI**, listo para insertar en el artículo científico.
+Al finalizar la última celda, el notebook generará y empaquetará:
+1. **`ateneo-bge-m3-ecuador-v2.tar.gz`**: Pesos ajustados del modelo v2 (~2.27 GB).
+2. **`pre_post_table.tex`**: Tabla formal LaTeX con el contraste empírico Pre vs. Post.
 
 ---
 
 ## 3. Despliegue del Modelo Entrenado en tu Computadora
 
-1. Descomprime el archivo descargado `ateneo-bge-m3-ecuador.zip`.
+1. Descomprime el archivo descargado `ateneo-bge-m3-ecuador-v2.tar.gz`.
 2. Coloca la carpeta resultante en:
-   `backend/data/ateneo-bge-m3-ecuador/`
-3. ¡Listo! El sistema [../backend/config.py](../backend/config.py) detectará los nuevos pesos y conmutará automáticamente todas las búsquedas hacia el modelo afinado con las 45 Guías del MSP.
+   `backend/data/models/ateneo-bge-m3-ecuador-v2/`
+3. ¡Listo! El sistema [../backend/core/config.py](../backend/core/config.py) detecta los nuevos pesos y conmuta automáticamente todas las búsquedas hacia el modelo afinado con las GPCs oficiales del MSP.
 
 ---
 
@@ -78,7 +77,7 @@ Tienes 2 opciones para ejecutar la ingesta masiva de PDFs y los benchmarks cient
 Para evitar lentitudes en el navegador y desconexiones por inactividad:
 1. Sube el archivo [`../ateneo_colab_bundle.zip`](../ateneo_colab_bundle.zip) a tu **Google Drive** en la carpeta `Mi unidad > Proyectos > Ateneo`.
 2. Abre en [Google Colab](https://colab.research.google.com/) el notebook maestro:
-   [`../backend/ingestion/colab_ingesta_benchmark_a100.ipynb`](../backend/ingestion/colab_ingesta_benchmark_a100.ipynb).
+   [`../backend/ingestion_v2/colab_fase6_train_bge_m3.ipynb`](../backend/ingestion_v2/colab_fase6_train_bge_m3.ipynb).
 3. Selecciona **GPU A100** y presiona `Ctrl + F9` (**Ejecutar todas**).
 4. El notebook:
    * Monta Google Drive y transfiere el archivo en 2 segundos a 1 Gbps+.

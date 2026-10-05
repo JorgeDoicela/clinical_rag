@@ -44,7 +44,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 DATA_DIR = BASE_DIR / "backend" / "data"
 EXTRACTED_MD_DIR = DATA_DIR / "extracted" / "markdown"
 MANIFEST_PATH = DATA_DIR / "corpus_manifest.json"
-TOKENIZER_PATH = DATA_DIR / "ateneo-bge-m3-ecuador" / "tokenizer.json"
+TOKENIZER_PATH = DATA_DIR / "models" / "ateneo-bge-m3-ecuador-v2" / "tokenizer.json"
 
 OUTPUT_CHUNKS_FILE = DATA_DIR / "extracted" / "chunks_corpus_v2.json"
 OUTPUT_SUMMARY_FILE = DATA_DIR / "extracted" / "chunks_summary.json"

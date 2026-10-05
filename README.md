@@ -286,20 +286,35 @@ clinical_rag/
 │   │   │   ├── 02_respiratorio_pediatrico/ # 11 GPCs (NAC, Tuberculosis, Sepsis Neonatal, SDR)
 │   │   │   ├── 03_cardiovascular_metabolico/ # 2 GPCs (Hipertensión Arterial, Enfermedad Renal Crónica)
 │   │   │   └── 04_soporte_cronicos_salud_mental/ # 18 GPCs (Depresión, Dolor Oncológico, Cuidados Paliativos, Raras)
-│   │   ├── corpus_manifest.json          # Manifiesto criptográfico inmutable (45 hashes SHA-256 y CIE-10/11)
-│   │   ├── ateneo-bge-m3-ecuador/        # Pesos compilados del modelo fine-tuned
-│   │   ├── chroma_db/                    # Base vectorial con 5,944 fragmentos de GPCs MSP
-│   │   ├── ateneo_clinical.db            # Base relacional SQLite normalizada
-│   │   ├── history.db                    # Base relacional SQLite histórica
-│   │   ├── ft_dataset.json               # Dataset de 480 tripletas supervisadas (Query/Pos/Neg)
+│   │   ├── corpus_manifest.json          # Manifiesto criptográfico inmutable (42 hashes SHA-256 y CIE-10/11)
+│   │   ├── models/ateneo-bge-m3-ecuador-v2/ # Pesos compilados del modelo fine-tuned en NVIDIA A100 (2.27 GB)
+│   │   ├── datasets/                     # Datasets de entrenamiento contrastivo con Hard Negatives y Zero Leakage
+│   │   │   ├── retrieval_train.json      # Partición de entrenamiento (70%, 1,178 tripletas)
+│   │   │   ├── retrieval_val.json        # Partición de validación (15%, 249 tripletas)
+│   │   │   ├── retrieval_test_blind.json # Partición ciega de prueba (15%, 283 tripletas)
+│   │   │   └── checksums.sha256          # Hashes criptográficos congelados
+│   │   ├── ground_truth/                 # Ground Truth clínico humano con Cohen's Kappa kw = 0.9531
+│   │   │   ├── pairs_validated.csv       # 160 pares clínicos anotados por especialistas
+│   │   │   └── annotation_protocol.md    # Protocolo formal de consenso en escala Likert
+│   │   ├── extracted/                    # Corpus procesado en Markdown y Chunks normativos
+│   │   │   ├── chunks_corpus_v2.json     # 7,052 fragmentos normativos indivisibles
+│   │   │   └── markdown/                 # 42 GPCs oficiales estructuradas en Markdown nativo
+│   │   ├── chroma_db/                    # Base vectorial persistente
+│   │   ├── ateneo_clinical.db            # Base relacional SQLite normalizada (Modo WAL)
 │   │   └── pilot_study/                  # Instrumentos estandarizados del estudio piloto
 │   │       ├── pre_test_casos.json       # 5 casos del pre-test
 │   │       ├── post_test_casos.json      # 5 casos equivalentes del post-test
 │   │       ├── rubrica_evaluacion.json   # Rúbrica para evaluadores clínicos externos
 │   │       └── resultados_pilot.csv      # Matriz de datos anonimizada de la cohorte
-│   ├── ingestion_v2/                     # Pipeline científico de reestructuración v2 (100% Corpus Ecuador)
-│   │   ├── 01_classify_and_inventory_corpus.py # Clasificación e inventario criptográfico con CIE-10/CIE-11
-│   │   └── 02_extract_with_marker.py     # Ingesta por lotes con marker-pdf (paginación real)
+│   ├── ingestion_v2/                     # Pipeline científico de ingesta y fine-tuning v2
+│   │   ├── 01_classify_and_inventory_corpus.py # Clasificación e inventario con CIE-10/CIE-11
+│   │   ├── 02_extract_corpus_native.py   # Extractor nativo con PyMuPDF y tablas Markdown
+│   │   ├── 03_token_chunker.py           # Chunking semántico indivisible BGE-M3 (7,052 chunks)
+│   │   ├── 04_mine_hard_negatives.py     # Minería de Hard Negatives BM25 + Dense Re-ranking
+│   │   ├── 05_build_ground_truth_pool.py # Ensamblado y validación inter-anotador Kappa
+│   │   ├── 06_train_bge_m3.py            # Fine-tuning contrastivo MNRL y evaluación PRE vs. POST
+│   │   ├── colab_fase2_marker_extraction.ipynb # Extracción en GPU Colab
+│   │   └── colab_fase6_train_bge_m3.ipynb      # Re-entrenamiento en NVIDIA A100 (80GB VRAM)
 │   ├── tests/                            # Suites de pruebas automatizadas y benchmarks
 │   │   ├── run_all_tests.py              # Orquestador maestro de todas las suites
 │   │   ├── run_metrics.py                # Benchmark IR automatizado (Hit@k, MRR, NDCG)

@@ -36,12 +36,12 @@ $$\mathcal{L}_{\text{MNRL}} = -\log \frac{e^{\text{sim}(q_i, p_i^+) / \tau}}{\su
 
 ## 3. Protocolo de Ejecución en Google Colab Pro
 
-1. Abrir el notebook [../backend/ingestion/colab_fine_tuning.ipynb](../backend/ingestion/colab_fine_tuning.ipynb) en **Google Colab**.
+1. Abrir el notebook [../backend/ingestion_v2/colab_fase6_train_bge_m3.ipynb](../backend/ingestion_v2/colab_fase6_train_bge_m3.ipynb) en **Google Colab**.
 2. Seleccionar el tipo de entorno de ejecución: **Entorno de ejecución > Cambiar tipo de entorno de ejecución > GPU A100** (o GPU V100/T4).
-3. Subir a la raíz del entorno los archivos generados en `backend/data/`:
-   * `train_triplets.json` (Conjunto de entrenamiento 70%)
-   * `val_triplets.json` (Conjunto de validación 15%)
-4. Ejecutar todas las celdas (`Ctrl + F9`). El tiempo estimado de entrenamiento en GPU A100 es de **~10 minutos**.
+3. Subir a la raíz del entorno los archivos generados en `backend/data/datasets/`:
+   * `retrieval_train.json` (Conjunto de entrenamiento 70%, 1,178 tripletas)
+   * `retrieval_val.json` (Conjunto de validación 15%, 249 tripletas)
+4. Ejecutar todas las celdas (`Ctrl + F9`). El tiempo estimado de entrenamiento en GPU A100 es de **~8 a 10 minutos**.
 5. Al finalizar, el notebook exporta:
    * `grafico_convergencia_paper.png` (Gráfico formal en alta resolución a 300 DPI listo para el artículo).
    * `ateneo-bge-m3-ecuador.zip` (Pesos compilados del modelo ajustado).

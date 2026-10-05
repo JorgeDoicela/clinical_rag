@@ -39,7 +39,7 @@ async def get_scientific_benchmark() -> Dict[str, Any]:
     e integridad del dataset científico para publicación en artículo / congreso.
     """
     metrics_path = Path(__file__).resolve().parent.parent / "tests" / "resultados_metricas.json"
-    dataset_path = Path(__file__).resolve().parent.parent / "data" / "ft_dataset.json"
+    dataset_path = Path(__file__).resolve().parent.parent / "data" / "datasets" / "retrieval_train.json"
 
     metrics_data = {}
     if metrics_path.exists():
@@ -53,7 +53,14 @@ async def get_scientific_benchmark() -> Dict[str, Any]:
             "latencias": {"latencia_promedio_segundos": 12.29, "latencia_p50_segundos": 7.73, "latencia_p95_segundos": 14.5}
         }
 
-    dataset_integrity = {"status": "valid", "version": "v2"}
+    dataset_integrity = {"status": "valid", "version": "v2", "samples": 0}
+    if dataset_path.exists():
+        try:
+            with open(dataset_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                dataset_integrity["samples"] = len(data)
+        except Exception:
+            pass
 
     return {
         "status": "success",

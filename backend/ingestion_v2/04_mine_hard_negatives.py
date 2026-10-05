@@ -48,8 +48,6 @@ logger = logging.getLogger("fase4_hard_negatives")
 WORKSPACE_DIR = Path(__file__).resolve().parent.parent.parent
 CHUNKS_FILE = WORKSPACE_DIR / "backend" / "data" / "extracted" / "chunks_corpus_v2.json"
 CASES_FILE = WORKSPACE_DIR / "backend" / "cases_data" / "cases.json"
-SEED_CHUNKS_FILE = WORKSPACE_DIR / "backend" / "data" / "seed_chunks.json"
-MODEL_LOCAL_DIR = WORKSPACE_DIR / "backend" / "data" / "ateneo-bge-m3-ecuador"
 
 DATASETS_DIR = WORKSPACE_DIR / "backend" / "data" / "datasets"
 TRAIN_FILE = DATASETS_DIR / "retrieval_train.json"
