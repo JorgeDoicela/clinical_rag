@@ -802,4 +802,32 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     * **Desglose de Contenido:** 5,253 tablas estructuradas, 1,734 de texto clínico y 65 mixtos.
     * **Tiempo de Ejecución:** 32.55 segundos sobre las 42 GPCs del MSP.
     * **Artefactos Guardados:** `backend/data/extracted/chunks_corpus_v2.json` (14.2 MB) y `backend/data/extracted/chunks_summary.json` (9.0 KB).
+* **Culminación Exitosa de la Fase 4: Minería Semántica de Hard Negatives y Filtrado Defensivo (2026-10-05):**
+  - **Implementación de `04_mine_hard_negatives.py` (Estándar Q1 Senior):**
+    * Motor de minería en dos etapas: Etapa 1 con BM25Okapi para recuperación de candidatos con contexto nosológico relevante (Top-40), seguido de Etapa 2 con re-ranking semántico denso utilizando el modelo BGE-M3 base en espacio latente de 1,024 dimensiones.
+    * **Aceleración Vectorizada por Lotes (Batching):** Caching matricial de candidatos únicos y procesamiento paralelo con PyTorch en batches de 32, reduciendo el tiempo de ejecución en CPU de ~4.5 horas a solo 9 minutos y 10 segundos para 1,765 consultas.
+  - **Filtro Defensivo Anti-Falsos Negativos y Erradicación de Ruido Editorial:**
+    * Regla 1: Exclusión de identidad (`chunk_id == pos.chunk_id`).
+    * Regla 2: Exclusión de misma guía y misma sección para evitar penalizar variantes del mismo párrafo.
+    * Regla 3: Exclusión de candidatos con solapamiento léxico de bigramas $> 65\%$ (Jaccard).
+    * Regla 4: Filtro de dos vías contra páginas de créditos, portadas, ISBN, CDU, derechos reservados, comités editoriales e índices de contenidos (detección de líneas con números de página).
+    * Regla 5: Detección y descarte de listas de autores, colaboradores y comités de redacción ($\ge 4$ menciones a títulos/cargos de profesionales).
+    * Regla 6: Exigencia de sustancia médica clínica real (términos de dosificación, diagnóstico, tratamiento, signos de severidad).
+  - **Métricas Certificadas de la Fase 4:**
+    * **Total de Tripletas Científicas Extraídas:** 1,709 tripletas clínicas completas.
+    * **Distribución por Ejes Normativos del MSP:**
+      - `01_urgencias_obstetricas`: 455 tripletas.
+      - `02_respiratorio_pediatrico`: 474 tripletas.
+      - `03_cardiovascular_metabolico`: 348 tripletas.
+      - `04_soporte_cronicos_salud_mental`: 432 tripletas.
+    * **Partición Estratificada Científica (Semilla Global 42 — Zero Data Leakage):**
+      - **Entrenamiento (70%):** 1,194 tripletas en [`backend/data/datasets/retrieval_train.json`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/datasets/retrieval_train.json) (SHA-256: `733a35bb7200...`).
+      - **Validación (15%):** 255 tripletas en [`backend/data/datasets/retrieval_val.json`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/datasets/retrieval_val.json) (SHA-256: `b81ed457f015...`).
+      - **Test Ciego Congelado (15%):** 260 tripletas en [`backend/data/datasets/retrieval_test_blind.json`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/datasets/retrieval_test_blind.json) (SHA-256: `ede2ceebefea...`).
+    * **Sumas Criptográficas Congeladas:** [`backend/data/datasets/checksums.sha256`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/datasets/checksums.sha256).
+    * **Distribución de Hard Negatives:** 55.6% Intra-Eje (950) y 44.4% Inter-Eje (759), con similitud coseno media de 0.2305.
+  - **Certificación de Regresión (100% PASS):**
+    * Backend: 66/66 pruebas unitarias y de integración aprobadas (`pytest` 100% PASS en 52.08s).
+    * Frontend: 22/22 suites y 106/106 pruebas aprobadas (`vitest run` 100% PASS en 44.97s).
+
 
