@@ -743,7 +743,22 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
   - **Resolución de Pruebas y Certificación de Cero Regresiones (100% PASS):**
     * **Backend:** Se corrigió en [`backend/tests/load_test_simulation.py`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/tests/load_test_simulation.py) la importación de `settings` y la resolución dinámica del modelo primario/secundario con la clave `status` del reporte de Circuit Breakers. Se ejecutó `backend/tests/run_all_tests.py` con **100% PASS** en sus 8 suites en 52.6s (Carga 100 usuarios, SQLite WAL, Rate Limiting, KST/BKT, RAG Cache, Hake Gain, Endpoints HTTP, Fusión Multimodal).
     * **Frontend:** Se instaló `react-i18next` en `node_modules` y se ejecutó `npm test -- --run` con **100% PASS** en sus 22 suites y 106 pruebas unitarias e integración en 25.9s.
-
+* **Auditoría Exhaustiva de Proyecto y Documentación Completa (/goal) (2026-10-05):**
+  - **Inspección Integral del Repositorio:**
+    * Se revisaron la totalidad de los archivos en la raíz (`README.md`, `docker-compose.yml`, `.env.example`, `.gitignore`), en `docs/` (subcarpetas `1_` a `7_`), `backend/` (código fuente, módulos, `core/`, tests, datos, `ingestion/` e `ingestion_v2/`), `frontend/` (`src/core/`, `src/modules/`, `src/__tests__/`, `e2e/`, tipos, layouts, UI) y `scripts/`.
+  - **Verificación Empírica de Calidad en Vivo (100% PASS):**
+    * **Backend:** 8 suites maestras ejecutadas y aprobadas al 100% PASS en 57.42s (`uv run python -m tests.run_all_tests`), validando seguridad RBAC, UoW ACID, Rate Limiting 429, Blindaje Anti-Prompt Injection, Multi-Tenancy, Sondas `/health`, Pool Asíncrono de Reportes, KST/BKT, Caché RAG, Estudio Piloto ($g=0.74$), Endpoints HTTP, Fusión Multimodal (12 casos GPC y firma SHA-256) y Auditoría de Carga (100 usuarios simultáneos, SQLite WAL 0% locks).
+    * **Frontend Typecheck:** `npm run typecheck` (`tsc --noEmit`) aprobado con 0 errores en TypeScript 5 estricto.
+    * **Frontend Vitest:** 22 suites y 106 pruebas unitarias e integración aprobadas al 100% PASS en 40.23s (`npm run test`).
+    * **Frontend Vite Build:** Compilación de producción limpia en 17.86s (`npm run build`) con Service Worker PWA (`dist/sw.js`) y 28 activos precacheados (646.18 KiB).
+  - **Sincronización y Consistencia Documental:**
+    * Todos los planes rectores en `docs/7_planes_de_escalabilidad_y_hoja_de_ruta/` (`PLAN_ESCALABILIDAD_BASE_DE_DATOS.md`, `PLAN_ESCALABILIDAD_BACKEND.md`, `PLAN_ESCALABILIDAD_FRONTEND.md`, `HOJA_DE_RUTA_EJECUCION_SESIONES.md` y `PLAN_REESTRUCTURACION_PIPELINE_IA.md`) se encuentran sincronizados y reflejan fielmente el estado del código fuente y los tests.
+    * `README.md` y los 17 documentos de `docs/3_documentacion_metodologica/` mantienen coherencia fáctica total con los resultados empíricos, tablas LaTeX y figuras a 300 DPI.
+* **Optimización de Telemetría y Blindaje Anti-vLLM en Cuaderno Colab Fase 2 (`colab_fase2_marker_extraction.ipynb`) (2026-10-05):**
+  - **Diagnóstico Causa Raíz vLLM Timeout:** Marker en sus versiones recientes intenta levantar un servidor vLLM (vía Docker o socket TCP local en `127.0.0.1:44213`), el cual entra en timeout de 600s en Google Colab por ausencia de Docker daemon y contención de VRAM en Tesla T4.
+  - **Blindaje con Backend PyTorch Puro:** Se inyectaron variables de entorno defensivas (`SURYA_BACKEND=pytorch`, `USE_VLLM=False`, `SURYA_USE_VLLM=0`, `TORCH_DEVICE=cuda`, `USE_DOCKER=False`, `OCRMYPDF_USE_DOCKER=0`) forzando la inferencia directa en PyTorch sin subprocesos de red.
+  - **Progreso en Vivo con `flush=True`:** Enumeración `[i/45]`, reporte de tamaño en MB, tiempo por documento `dt_doc`, caracteres y figuras extraídas.
+  - **Regeneración de Paquete:** Se reempaquetó [`fase2_marker_bundle.zip`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/fase2_marker_bundle.zip) (124.96 MB).
 
 
 

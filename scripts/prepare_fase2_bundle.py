@@ -62,7 +62,8 @@ def create_bundle():
                         if full_p.suffix.lower() == ".zip":
                             continue
                         rel_p = full_p.relative_to(src_path)
-                        arc_name = f"{arc_prefix}/{str(rel_p).replace('\\', '/')}"
+                        clean_rel = str(rel_p).replace("\\", "/")
+                        arc_name = f"{arc_prefix}/{clean_rel}"
                         f_size = full_p.stat().st_size
                         total_files += 1
                         total_uncompressed_bytes += f_size
