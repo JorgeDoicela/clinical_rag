@@ -1,0 +1,16 @@
+\begin{table*}[t]
+\centering
+\small
+\caption{Evaluación Comparativa de Recuperación Normativa en el Test Set Ciego OOD (283 consultas clínicas)}
+\label{tab:blind_retrieval_benchmark}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Arquitectura de Recuperación} & \textbf{Hit@1 (\%)} & \textbf{Hit@3 (\%)} & \textbf{Hit@5 (\%)} & \textbf{MRR@5 (\%)} & \textbf{NDCG@5 (\%)} \
+\midrule
+BM25 Puro (Léxico) & 2.47 & 4.95 & 5.30 & 3.55 & 3.99 \
+BAAI/bge-m3 (Zero-Shot) & 0.71 & 3.18 & 3.53 & 1.90 & 2.31 \
+Ateneo-BGE-M3 (Supervisado FT) & 5.65 & 14.49 & 20.49 & 10.82 & 13.21 \
+\textbf{Ensamble Híbrido RRF ($k=60$)} & \textbf{4.24} & \textbf{9.54} & \textbf{13.07} & \textbf{7.35} & \textbf{8.77} \
+\bottomrule
+\end{tabular}
+\end{table*}
