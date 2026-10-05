@@ -32,13 +32,10 @@ ENV/
 # ChromaDB local y checkpoints binarios (preserva carpetas via .gitkeep)
 backend/data/chroma_db/*
 !backend/data/chroma_db/.gitkeep
+backend/data/chroma_db_v2/*
+!backend/data/chroma_db_v2/.gitkeep
 
-backend/data/extracted/*
-!backend/data/extracted/.gitkeep
-!backend/data/extracted/markdown/
-backend/data/extracted/markdown/*
-!backend/data/extracted/markdown/.gitkeep
-
+# Modelos y pesos pesados (>100MB residen en Google Drive)
 backend/data/models/*
 !backend/data/models/.gitkeep
 

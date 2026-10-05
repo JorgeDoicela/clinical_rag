@@ -1,0 +1,323 @@
+{
+  "version": "2.0",
+  "fecha_generacion": "2026-10-05 13:46:28",
+  "total_documentos_procesados": 42,
+  "total_chunks_generados": 7052,
+  "distribucion_tokens": {
+    "min_tokens": 57,
+    "max_tokens": 1145,
+    "media_tokens": 370.2,
+    "mediana_tokens": 405,
+    "percentil_95_tokens": 616,
+    "chunks_menores_64_tokens": 3,
+    "chunks_mayores_768_tokens": 28
+  },
+  "desglose_por_tipo": {
+    "texto": 1734,
+    "tabla": 5253,
+    "mixto": 65
+  },
+  "desglose_por_eje": {
+    "01_urgencias_obstetricas": 893,
+    "02_respiratorio_pediatrico": 2079,
+    "03_cardiovascular_metabolico": 784,
+    "04_soporte_cronicos_salud_mental": 3296
+  },
+  "tiempo_total_segundos": 32.55,
+  "detalle_por_documento": [
+    {
+      "archivo": "Aborto-terapéutico.pdf",
+      "total_chunks": 41,
+      "media_tokens": 376.0,
+      "chunks_tablas": 23,
+      "tiempo_segundos": 0.12
+    },
+    {
+      "archivo": "Diagnostico_y_tratamiento_de_la_anemia_en_el_embarazo.pdf",
+      "total_chunks": 55,
+      "media_tokens": 326.5,
+      "chunks_tablas": 33,
+      "tiempo_segundos": 0.13
+    },
+    {
+      "archivo": "GPC_Atencion_del_trabajo_parto_posparto_y_parto_inmediato.pdf",
+      "total_chunks": 109,
+      "media_tokens": 363.4,
+      "chunks_tablas": 72,
+      "tiempo_segundos": 0.26
+    },
+    {
+      "archivo": "GPC_Infeccion_vaginal_obstetrica_2014.pdf",
+      "total_chunks": 67,
+      "media_tokens": 298.2,
+      "chunks_tablas": 47,
+      "tiempo_segundos": 0.19
+    },
+    {
+      "archivo": "GPC_anomalias_de_insercion_placentaria_2017.pdf",
+      "total_chunks": 93,
+      "media_tokens": 335.0,
+      "chunks_tablas": 74,
+      "tiempo_segundos": 0.5
+    },
+    {
+      "archivo": "GPC_atencion_parto_por_cesarea_2015.pdf",
+      "total_chunks": 88,
+      "media_tokens": 336.0,
+      "chunks_tablas": 74,
+      "tiempo_segundos": 0.4
+    },
+    {
+      "archivo": "GPC_ruptura_prematura_de_membranas_2015.pdf",
+      "total_chunks": 52,
+      "media_tokens": 366.9,
+      "chunks_tablas": 36,
+      "tiempo_segundos": 0.21
+    },
+    {
+      "archivo": "Guia Control Prenatal.pdf",
+      "total_chunks": 109,
+      "media_tokens": 410.6,
+      "chunks_tablas": 96,
+      "tiempo_segundos": 0.75
+    },
+    {
+      "archivo": "Guía-de-hemorragia-postparto.pdf",
+      "total_chunks": 52,
+      "media_tokens": 337.8,
+      "chunks_tablas": 32,
+      "tiempo_segundos": 0.19
+    },
+    {
+      "archivo": "MSP_Trastornos-hipertensivos-del-embarazo-con-portada-3.pdf",
+      "total_chunks": 162,
+      "media_tokens": 318.7,
+      "chunks_tablas": 119,
+      "tiempo_segundos": 0.61
+    },
+    {
+      "archivo": "gpc_guia_aborto_espontaneo_incompleto_19_feb_2014.pdf",
+      "total_chunks": 65,
+      "media_tokens": 389.5,
+      "chunks_tablas": 51,
+      "tiempo_segundos": 0.27
+    },
+    {
+      "archivo": "Alergia-a-la-proteína-d-ela-leche-de-vaca.pdf",
+      "total_chunks": 170,
+      "media_tokens": 344.5,
+      "chunks_tablas": 104,
+      "tiempo_segundos": 0.59
+    },
+    {
+      "archivo": "Alimentacion_y_nutricion_de_la_mujer_gestante_y_la_madre_en_periodo_de_lactancia.pdf",
+      "total_chunks": 235,
+      "media_tokens": 347.7,
+      "chunks_tablas": 195,
+      "tiempo_segundos": 0.62
+    },
+    {
+      "archivo": "GPC-RECIEN-NACIDO-CON-DIFICULTAD-PARA-RESPIRAR.pdf",
+      "total_chunks": 157,
+      "media_tokens": 348.3,
+      "chunks_tablas": 131,
+      "tiempo_segundos": 0.65
+    },
+    {
+      "archivo": "GPC-Recén-nacido-prematuro.pdf",
+      "total_chunks": 213,
+      "media_tokens": 358.1,
+      "chunks_tablas": 192,
+      "tiempo_segundos": 0.86
+    },
+    {
+      "archivo": "GPC-Sepsis-neonatal.pdf",
+      "total_chunks": 133,
+      "media_tokens": 336.1,
+      "chunks_tablas": 119,
+      "tiempo_segundos": 0.45
+    },
+    {
+      "archivo": "GPC_neumonía-adquirida_2017.pdf",
+      "total_chunks": 85,
+      "media_tokens": 409.4,
+      "chunks_tablas": 59,
+      "tiempo_segundos": 0.38
+    },
+    {
+      "archivo": "GPC_tuberculosis_2016.pdf",
+      "total_chunks": 188,
+      "media_tokens": 387.0,
+      "chunks_tablas": 135,
+      "tiempo_segundos": 0.72
+    },
+    {
+      "archivo": "GP_Tuberculosis-1.pdf",
+      "total_chunks": 187,
+      "media_tokens": 398.7,
+      "chunks_tablas": 146,
+      "tiempo_segundos": 0.71
+    },
+    {
+      "archivo": "Hipotiroidismo-congénito.pdf",
+      "total_chunks": 55,
+      "media_tokens": 431.0,
+      "chunks_tablas": 12,
+      "tiempo_segundos": 0.2
+    },
+    {
+      "archivo": "gpc_ehirn2019.pdf",
+      "total_chunks": 208,
+      "media_tokens": 374.8,
+      "chunks_tablas": 181,
+      "tiempo_segundos": 1.22
+    },
+    {
+      "archivo": "gpc_supervision_Salud_de_Adolescentes_2014.pdf",
+      "total_chunks": 448,
+      "media_tokens": 419.3,
+      "chunks_tablas": 391,
+      "tiempo_segundos": 1.33
+    },
+    {
+      "archivo": "gpc_hta192019.pdf",
+      "total_chunks": 189,
+      "media_tokens": 390.9,
+      "chunks_tablas": 162,
+      "tiempo_segundos": 1.11
+    },
+    {
+      "archivo": "guia_prevencion_diagnostico_tratamiento_enfermedad_renal_cronica_2018.pdf",
+      "total_chunks": 595,
+      "media_tokens": 411.5,
+      "chunks_tablas": 566,
+      "tiempo_segundos": 3.25
+    },
+    {
+      "archivo": "61069_MSP_Guía_DEPRESION_20180228_D.pdf",
+      "total_chunks": 235,
+      "media_tokens": 404.2,
+      "chunks_tablas": 141,
+      "tiempo_segundos": 0.97
+    },
+    {
+      "archivo": "Caries.pdf",
+      "total_chunks": 45,
+      "media_tokens": 367.4,
+      "chunks_tablas": 22,
+      "tiempo_segundos": 0.14
+    },
+    {
+      "archivo": "DIAGNÓSTICO-Y-TRATAMIENTO-DEL-ACNÉ_16012017.pdf",
+      "total_chunks": 123,
+      "media_tokens": 321.5,
+      "chunks_tablas": 95,
+      "tiempo_segundos": 0.56
+    },
+    {
+      "archivo": "GPC_Artitis_Reumatoide.pdf",
+      "total_chunks": 104,
+      "media_tokens": 348.1,
+      "chunks_tablas": 73,
+      "tiempo_segundos": 0.41
+    },
+    {
+      "archivo": "GPC_trastornos_del_espectro_autista_2017-1.pdf",
+      "total_chunks": 170,
+      "media_tokens": 346.6,
+      "chunks_tablas": 100,
+      "tiempo_segundos": 0.83
+    },
+    {
+      "archivo": "GUÍA-DOLOR-LUMBAR_16012017.pdf",
+      "total_chunks": 118,
+      "media_tokens": 372.1,
+      "chunks_tablas": 89,
+      "tiempo_segundos": 0.52
+    },
+    {
+      "archivo": "Guia-de-gaucher.pdf",
+      "total_chunks": 41,
+      "media_tokens": 305.5,
+      "chunks_tablas": 28,
+      "tiempo_segundos": 0.1
+    },
+    {
+      "archivo": "Guía-de-fenilcetonuria.pdf",
+      "total_chunks": 97,
+      "media_tokens": 382.9,
+      "chunks_tablas": 57,
+      "tiempo_segundos": 0.38
+    },
+    {
+      "archivo": "Guía-fibrosis-quística.pdf",
+      "total_chunks": 188,
+      "media_tokens": 345.8,
+      "chunks_tablas": 112,
+      "tiempo_segundos": 0.88
+    },
+    {
+      "archivo": "MSP_Guía_hemofilia-congénita_230117_D-3-1.pdf",
+      "total_chunks": 195,
+      "media_tokens": 244.0,
+      "chunks_tablas": 145,
+      "tiempo_segundos": 0.46
+    },
+    {
+      "archivo": "TRAUMA-DENTAL.pdf",
+      "total_chunks": 119,
+      "media_tokens": 374.8,
+      "chunks_tablas": 98,
+      "tiempo_segundos": 0.65
+    },
+    {
+      "archivo": "Tratamiento-odontologico.pdf",
+      "total_chunks": 72,
+      "media_tokens": 376.6,
+      "chunks_tablas": 53,
+      "tiempo_segundos": 0.27
+    },
+    {
+      "archivo": "gpc_VIH_acuerdo_ministerial05-07-2019.pdf",
+      "total_chunks": 586,
+      "media_tokens": 364.3,
+      "chunks_tablas": 494,
+      "tiempo_segundos": 2.36
+    },
+    {
+      "archivo": "gpc_cuidados_paliativos_completa_2014.pdf",
+      "total_chunks": 479,
+      "media_tokens": 346.0,
+      "chunks_tablas": 256,
+      "tiempo_segundos": 1.53
+    },
+    {
+      "archivo": "gpc_de_cuidados_paliativos_para_el_ciudadano_2014.pdf",
+      "total_chunks": 6,
+      "media_tokens": 454.2,
+      "chunks_tablas": 0,
+      "tiempo_segundos": 0.04
+    },
+    {
+      "archivo": "gpc_dolor_oncológico.pdf",
+      "total_chunks": 255,
+      "media_tokens": 401.1,
+      "chunks_tablas": 189,
+      "tiempo_segundos": 1.43
+    },
+    {
+      "archivo": "gpc_episodio_depresivo_adultos.pdf",
+      "total_chunks": 235,
+      "media_tokens": 403.9,
+      "chunks_tablas": 141,
+      "tiempo_segundos": 0.98
+    },
+    {
+      "archivo": "linfoma_hodgkin.pdf",
+      "total_chunks": 228,
+      "media_tokens": 390.2,
+      "chunks_tablas": 175,
+      "tiempo_segundos": 1.58
+    }
+  ]
+}

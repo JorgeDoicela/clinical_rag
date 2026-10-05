@@ -1,0 +1,409 @@
+{
+  "fecha_extraccion": "2026-10-05 13:00:13",
+  "total_documentos": 44,
+  "exitos": 44,
+  "fallos": 0,
+  "total_paginas_pdf": 3468,
+  "total_tablas_extraidas": 3201,
+  "volumen_total_caracteres": 7689869,
+  "tiempo_total_minutos": 8.37,
+  "detalle_por_documento": [
+    {
+      "archivo": "Aborto-terapéutico.pdf",
+      "total_paginas_pdf": 40,
+      "paginas_con_texto": 32,
+      "total_tablas": 28,
+      "caracteres_totales": 57874,
+      "paginas_impresas_detectadas": 27,
+      "tiempo_segundos": 1.99
+    },
+    {
+      "archivo": "Diagnostico_y_tratamiento_de_la_anemia_en_el_embarazo.pdf",
+      "total_paginas_pdf": 34,
+      "paginas_con_texto": 30,
+      "total_tablas": 30,
+      "caracteres_totales": 65582,
+      "paginas_impresas_detectadas": 26,
+      "tiempo_segundos": 3.15
+    },
+    {
+      "archivo": "GPC_Atencion_del_trabajo_parto_posparto_y_parto_inmediato.pdf",
+      "total_paginas_pdf": 64,
+      "paginas_con_texto": 57,
+      "total_tablas": 61,
+      "caracteres_totales": 133056,
+      "paginas_impresas_detectadas": 54,
+      "tiempo_segundos": 6.23
+    },
+    {
+      "archivo": "GPC_Infeccion_vaginal_obstetrica_2014.pdf",
+      "total_paginas_pdf": 34,
+      "paginas_con_texto": 30,
+      "total_tablas": 38,
+      "caracteres_totales": 70740,
+      "paginas_impresas_detectadas": 28,
+      "tiempo_segundos": 5.63
+    },
+    {
+      "archivo": "GPC_anomalias_de_insercion_placentaria_2017.pdf",
+      "total_paginas_pdf": 49,
+      "paginas_con_texto": 42,
+      "total_tablas": 57,
+      "caracteres_totales": 105307,
+      "paginas_impresas_detectadas": 40,
+      "tiempo_segundos": 9.56
+    },
+    {
+      "archivo": "GPC_atencion_parto_por_cesarea_2015.pdf",
+      "total_paginas_pdf": 44,
+      "paginas_con_texto": 38,
+      "total_tablas": 63,
+      "caracteres_totales": 97492,
+      "paginas_impresas_detectadas": 36,
+      "tiempo_segundos": 5.0
+    },
+    {
+      "archivo": "GPC_ruptura_prematura_de_membranas_2015.pdf",
+      "total_paginas_pdf": 38,
+      "paginas_con_texto": 32,
+      "total_tablas": 28,
+      "caracteres_totales": 68190,
+      "paginas_impresas_detectadas": 30,
+      "tiempo_segundos": 3.32
+    },
+    {
+      "archivo": "Guia Control Prenatal.pdf",
+      "total_paginas_pdf": 48,
+      "paginas_con_texto": 40,
+      "total_tablas": 49,
+      "caracteres_totales": 131955,
+      "paginas_impresas_detectadas": 38,
+      "tiempo_segundos": 6.31
+    },
+    {
+      "archivo": "Guia de ciudadan trastornos hipertensivos del embarazo.pdf",
+      "total_paginas_pdf": 20,
+      "paginas_con_texto": 0,
+      "total_tablas": 0,
+      "caracteres_totales": 3380,
+      "paginas_impresas_detectadas": 0,
+      "tiempo_segundos": 4.5
+    },
+    {
+      "archivo": "Guía-de-hemorragia-postparto.pdf",
+      "total_paginas_pdf": 36,
+      "paginas_con_texto": 28,
+      "total_tablas": 30,
+      "caracteres_totales": 62605,
+      "paginas_impresas_detectadas": 25,
+      "tiempo_segundos": 2.55
+    },
+    {
+      "archivo": "MSP_Trastornos-hipertensivos-del-embarazo-con-portada-3.pdf",
+      "total_paginas_pdf": 81,
+      "paginas_con_texto": 71,
+      "total_tablas": 101,
+      "caracteres_totales": 182259,
+      "paginas_impresas_detectadas": 75,
+      "tiempo_segundos": 8.92
+    },
+    {
+      "archivo": "gpc_diabetes_gestacional_guia_embarazada_2017.pdf",
+      "total_paginas_pdf": 10,
+      "paginas_con_texto": 0,
+      "total_tablas": 0,
+      "caracteres_totales": 1590,
+      "paginas_impresas_detectadas": 0,
+      "tiempo_segundos": 5.07
+    },
+    {
+      "archivo": "gpc_guia_aborto_espontaneo_incompleto_19_feb_2014.pdf",
+      "total_paginas_pdf": 48,
+      "paginas_con_texto": 42,
+      "total_tablas": 42,
+      "caracteres_totales": 90559,
+      "paginas_impresas_detectadas": 40,
+      "tiempo_segundos": 4.32
+    },
+    {
+      "archivo": "Alergia-a-la-proteína-d-ela-leche-de-vaca.pdf",
+      "total_paginas_pdf": 80,
+      "paginas_con_texto": 73,
+      "total_tablas": 86,
+      "caracteres_totales": 193722,
+      "paginas_impresas_detectadas": 68,
+      "tiempo_segundos": 8.5
+    },
+    {
+      "archivo": "Alimentacion_y_nutricion_de_la_mujer_gestante_y_la_madre_en_periodo_de_lactancia.pdf",
+      "total_paginas_pdf": 80,
+      "paginas_con_texto": 74,
+      "total_tablas": 105,
+      "caracteres_totales": 200518,
+      "paginas_impresas_detectadas": 70,
+      "tiempo_segundos": 11.51
+    },
+    {
+      "archivo": "GPC-RECIEN-NACIDO-CON-DIFICULTAD-PARA-RESPIRAR.pdf",
+      "total_paginas_pdf": 80,
+      "paginas_con_texto": 66,
+      "total_tablas": 96,
+      "caracteres_totales": 177493,
+      "paginas_impresas_detectadas": 71,
+      "tiempo_segundos": 11.9
+    },
+    {
+      "archivo": "GPC-Recén-nacido-prematuro.pdf",
+      "total_paginas_pdf": 130,
+      "paginas_con_texto": 114,
+      "total_tablas": 165,
+      "caracteres_totales": 243804,
+      "paginas_impresas_detectadas": 121,
+      "tiempo_segundos": 17.55
+    },
+    {
+      "archivo": "GPC-Sepsis-neonatal.pdf",
+      "total_paginas_pdf": 82,
+      "paginas_con_texto": 70,
+      "total_tablas": 106,
+      "caracteres_totales": 146042,
+      "paginas_impresas_detectadas": 74,
+      "tiempo_segundos": 15.26
+    },
+    {
+      "archivo": "GPC_neumonía-adquirida_2017.pdf",
+      "total_paginas_pdf": 56,
+      "paginas_con_texto": 51,
+      "total_tablas": 43,
+      "caracteres_totales": 114976,
+      "paginas_impresas_detectadas": 45,
+      "tiempo_segundos": 6.65
+    },
+    {
+      "archivo": "GPC_tuberculosis_2016.pdf",
+      "total_paginas_pdf": 138,
+      "paginas_con_texto": 132,
+      "total_tablas": 133,
+      "caracteres_totales": 244465,
+      "paginas_impresas_detectadas": 129,
+      "tiempo_segundos": 12.25
+    },
+    {
+      "archivo": "GP_Tuberculosis-1.pdf",
+      "total_paginas_pdf": 150,
+      "paginas_con_texto": 127,
+      "total_tablas": 131,
+      "caracteres_totales": 247681,
+      "paginas_impresas_detectadas": 145,
+      "tiempo_segundos": 27.76
+    },
+    {
+      "archivo": "Hipotiroidismo-congénito.pdf",
+      "total_paginas_pdf": 58,
+      "paginas_con_texto": 46,
+      "total_tablas": 9,
+      "caracteres_totales": 88327,
+      "paginas_impresas_detectadas": 52,
+      "tiempo_segundos": 6.67
+    },
+    {
+      "archivo": "gpc_ehirn2019.pdf",
+      "total_paginas_pdf": 69,
+      "paginas_con_texto": 52,
+      "total_tablas": 64,
+      "caracteres_totales": 211403,
+      "paginas_impresas_detectadas": 69,
+      "tiempo_segundos": 25.16
+    },
+    {
+      "archivo": "gpc_supervision_Salud_de_Adolescentes_2014.pdf",
+      "total_paginas_pdf": 98,
+      "paginas_con_texto": 84,
+      "total_tablas": 59,
+      "caracteres_totales": 282837,
+      "paginas_impresas_detectadas": 84,
+      "tiempo_segundos": 26.31
+    },
+    {
+      "archivo": "gpc_hta192019.pdf",
+      "total_paginas_pdf": 70,
+      "paginas_con_texto": 54,
+      "total_tablas": 60,
+      "caracteres_totales": 209988,
+      "paginas_impresas_detectadas": 69,
+      "tiempo_segundos": 17.09
+    },
+    {
+      "archivo": "guia_prevencion_diagnostico_tratamiento_enfermedad_renal_cronica_2018.pdf",
+      "total_paginas_pdf": 111,
+      "paginas_con_texto": 82,
+      "total_tablas": 107,
+      "caracteres_totales": 479851,
+      "paginas_impresas_detectadas": 111,
+      "tiempo_segundos": 43.78
+    },
+    {
+      "archivo": "61069_MSP_Guía_DEPRESION_20180228_D.pdf",
+      "total_paginas_pdf": 128,
+      "paginas_con_texto": 125,
+      "total_tablas": 106,
+      "caracteres_totales": 302919,
+      "paginas_impresas_detectadas": 122,
+      "tiempo_segundos": 27.97
+    },
+    {
+      "archivo": "Caries.pdf",
+      "total_paginas_pdf": 40,
+      "paginas_con_texto": 33,
+      "total_tablas": 22,
+      "caracteres_totales": 58647,
+      "paginas_impresas_detectadas": 29,
+      "tiempo_segundos": 2.81
+    },
+    {
+      "archivo": "DIAGNÓSTICO-Y-TRATAMIENTO-DEL-ACNÉ_16012017.pdf",
+      "total_paginas_pdf": 65,
+      "paginas_con_texto": 56,
+      "total_tablas": 77,
+      "caracteres_totales": 134234,
+      "paginas_impresas_detectadas": 55,
+      "tiempo_segundos": 7.07
+    },
+    {
+      "archivo": "GPC_Artitis_Reumatoide.pdf",
+      "total_paginas_pdf": 74,
+      "paginas_con_texto": 58,
+      "total_tablas": 63,
+      "caracteres_totales": 127764,
+      "paginas_impresas_detectadas": 67,
+      "tiempo_segundos": 7.94
+    },
+    {
+      "archivo": "GPC_trastornos_del_espectro_autista_2017-1.pdf",
+      "total_paginas_pdf": 105,
+      "paginas_con_texto": 85,
+      "total_tablas": 60,
+      "caracteres_totales": 220056,
+      "paginas_impresas_detectadas": 90,
+      "tiempo_segundos": 9.29
+    },
+    {
+      "archivo": "GUÍA-DOLOR-LUMBAR_16012017.pdf",
+      "total_paginas_pdf": 80,
+      "paginas_con_texto": 71,
+      "total_tablas": 78,
+      "caracteres_totales": 152487,
+      "paginas_impresas_detectadas": 69,
+      "tiempo_segundos": 8.51
+    },
+    {
+      "archivo": "Guia-de-gaucher.pdf",
+      "total_paginas_pdf": 26,
+      "paginas_con_texto": 22,
+      "total_tablas": 30,
+      "caracteres_totales": 45861,
+      "paginas_impresas_detectadas": 19,
+      "tiempo_segundos": 2.04
+    },
+    {
+      "archivo": "Guía-de-fenilcetonuria.pdf",
+      "total_paginas_pdf": 64,
+      "paginas_con_texto": 61,
+      "total_tablas": 48,
+      "caracteres_totales": 117259,
+      "paginas_impresas_detectadas": 57,
+      "tiempo_segundos": 6.99
+    },
+    {
+      "archivo": "Guía-fibrosis-quística.pdf",
+      "total_paginas_pdf": 96,
+      "paginas_con_texto": 91,
+      "total_tablas": 81,
+      "caracteres_totales": 219794,
+      "paginas_impresas_detectadas": 88,
+      "tiempo_segundos": 8.91
+    },
+    {
+      "archivo": "MSP_Guía_hemofilia-congénita_230117_D-3-1.pdf",
+      "total_paginas_pdf": 92,
+      "paginas_con_texto": 76,
+      "total_tablas": 138,
+      "caracteres_totales": 168345,
+      "paginas_impresas_detectadas": 81,
+      "tiempo_segundos": 8.48
+    },
+    {
+      "archivo": "TRAUMA-DENTAL.pdf",
+      "total_paginas_pdf": 64,
+      "paginas_con_texto": 54,
+      "total_tablas": 47,
+      "caracteres_totales": 125012,
+      "paginas_impresas_detectadas": 50,
+      "tiempo_segundos": 6.22
+    },
+    {
+      "archivo": "Tratamiento-odontologico.pdf",
+      "total_paginas_pdf": 50,
+      "paginas_con_texto": 43,
+      "total_tablas": 46,
+      "caracteres_totales": 86723,
+      "paginas_impresas_detectadas": 44,
+      "tiempo_segundos": 3.78
+    },
+    {
+      "archivo": "gpc_VIH_acuerdo_ministerial05-07-2019.pdf",
+      "total_paginas_pdf": 156,
+      "paginas_con_texto": 130,
+      "total_tablas": 154,
+      "caracteres_totales": 545005,
+      "paginas_impresas_detectadas": 149,
+      "tiempo_segundos": 27.01
+    },
+    {
+      "archivo": "gpc_cuidados_paliativos_completa_2014.pdf",
+      "total_paginas_pdf": 314,
+      "paginas_con_texto": 286,
+      "total_tablas": 238,
+      "caracteres_totales": 627434,
+      "paginas_impresas_detectadas": 306,
+      "tiempo_segundos": 36.37
+    },
+    {
+      "archivo": "gpc_de_cuidados_paliativos_para_el_ciudadano_2014.pdf",
+      "total_paginas_pdf": 34,
+      "paginas_con_texto": 31,
+      "total_tablas": 0,
+      "caracteres_totales": 16083,
+      "paginas_impresas_detectadas": 29,
+      "tiempo_segundos": 0.41
+    },
+    {
+      "archivo": "gpc_dolor_oncológico.pdf",
+      "total_paginas_pdf": 121,
+      "paginas_con_texto": 116,
+      "total_tablas": 150,
+      "caracteres_totales": 293624,
+      "paginas_impresas_detectadas": 113,
+      "tiempo_segundos": 17.88
+    },
+    {
+      "archivo": "gpc_episodio_depresivo_adultos.pdf",
+      "total_paginas_pdf": 129,
+      "paginas_con_texto": 126,
+      "total_tablas": 106,
+      "caracteres_totales": 302436,
+      "paginas_impresas_detectadas": 122,
+      "tiempo_segundos": 16.45
+    },
+    {
+      "archivo": "linfoma_hodgkin.pdf",
+      "total_paginas_pdf": 82,
+      "paginas_con_texto": 80,
+      "total_tablas": 66,
+      "caracteres_totales": 234490,
+      "paginas_impresas_detectadas": 75,
+      "tiempo_segundos": 7.01
+    }
+  ],
+  "fallos_detalle": []
+}

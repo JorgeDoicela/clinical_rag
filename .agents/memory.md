@@ -878,7 +878,19 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     * **Resolución de Causa Raíz en Metadatos de SentenceTransformers:** La versión de exportación de Colab guardó rutas no estándar (`sentence_transformers.base.*` y el parámetro `embedding_dimension` en lugar de `word_embedding_dimension`). Se normalizaron `modules.json`, `sentence_bert_config.json` y `1_Pooling/config.json` al estándar canónico de SentenceTransformers v3/v2.
     * **Verificación de Inferencia Denso-Clínica:** Confirmada la carga limpia de los pesos en memoria y la generación de vectores de 1,024 dimensiones con norma $L_2 = 1.0$ y similitud semántica clínica verificada.
     * Se eliminó el tarball redundante en `backend/data/models/` para liberar 1.76 GB en el repositorio, manteniendo el original resguardado en `Downloads`.
-    * Árbol de trabajo Git limpio (`working tree clean`).
+* **Preparación Metodológica de Fases 7 y 8 (Indexación Híbrida y Benchmark Ciego en GPU) (2026-10-05):**
+  - **Estrategia Desacoplada Colab-Drive:** Para evitar 50 minutos de indexación en CPU local y procesar los 7,052 fragmentos normativos en GPU en ~40 segundos, se configuró la ejecución en Google Colab aprovechando que los pesos del modelo (`ateneo-bge-m3-ecuador-v2.tar.gz`) ya se encontraban en Google Drive del usuario (`Ateneo/Versión 2`).
+  - **Empaquetado Quirúrgico de Insumos (`scripts/prepare_fase7_bundle.py`):**
+    * Generación de `fase7_insumos_colab.zip` (2.93 MB comprimido) conteniendo exclusivamente los insumos faltantes de alta fidelidad:
+      1. `chunks_corpus_v2.json` (13.34 MB, 7,052 fragmentos clínicos canónicos).
+      2. `retrieval_test_blind.json` (0.82 MB, 283 tripletas de evaluación ciega OOD con zero-leakage).
+      3. `retrieval_val.json` (0.75 MB, 249 tripletas de validación).
+  - **Cuaderno Unificado de MLOps (`backend/ingestion_v2/colab_fase7_index_and_benchmark.ipynb`):**
+    * Detección automática y descompresión de `ateneo-bge-m3-ecuador-v2.tar.gz` e insumos desde Google Drive.
+    * Generación acelerada por GPU de embeddings normalizados ($L_2 = 1.0$) e inserción por lotes en ChromaDB (`gpc_msp_v2`).
+    * Construcción y serialización del índice probabilístico `bm25_index_v2.pkl` (7,052 documentos).
+    * Ejecución del benchmark ciego comparativo (BM25 vs. BAAI/bge-m3 vs. Ateneo-BGE-M3 vs. RRF Híbrido $k=60$) sobre las 283 consultas OOD con cálculo de significancia estadística (Wilcoxon).
+    * Exportación automatizada de `tabla_resultados_paper.tex`, `benchmark_summary.json` y empaquetado a `fase7_8_artifacts_v2.zip` en Google Drive.
 
 
 
