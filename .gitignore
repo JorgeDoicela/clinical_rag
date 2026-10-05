@@ -43,11 +43,11 @@ backend/data/models/*
 !backend/data/models/.gitkeep
 
 backend/data/processed/
-backend/data/ateneo-bge-m3-ecuador/*.safetensors
-backend/data/ateneo-bge-m3-ecuador/*.bin
-backend/data/ateneo-bge-m3-ecuador/*.pt
-backend/data/ateneo-bge-m3-ecuador/checkpoints/
-backend/checkpoints/
+*.safetensors
+*.bin
+*.pt
+**/checkpoints/
+backend/data/legacy_v1/ateneo-bge-m3-ecuador/model.safetensors
 *.zip
 **/*.zip
 
