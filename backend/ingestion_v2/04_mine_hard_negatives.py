@@ -535,9 +535,21 @@ def construir_banco_consultas_corpus(
             ]):
                 continue
             
+            # Enriquecer la especificidad temática si el chunk describe una tabla o subtema concreto
+            subtema_especifico = ""
+            texto_chunk = chunk.get("texto", "")
+            m_tabla = re.search(r"Tabla\s+\d+[\.\:\s]+([^\n\|]{5,60})", texto_chunk)
+            if m_tabla:
+                subtema_limpio = re.sub(r"[\*#_\|]", "", m_tabla.group(1)).strip()
+                subtema_especifico = f" - {subtema_limpio}"
+            elif chunk.get("tipo_contenido") == "tabla":
+                subtema_especifico = " - Esquema y Criterios Normados"
+            
+            seccion_contextual = f"{seccion_limpia}{subtema_especifico}".strip()
+            
             plantilla = plantillas_clinicas[i % len(plantillas_clinicas)]
             pregunta = plantilla.format(
-                seccion=seccion_limpia,
+                seccion=seccion_contextual,
                 guia=guia_limpia,
                 cie10=cie10
             )
@@ -556,41 +568,82 @@ def generar_datasets_particionados(
     seed: int = 42
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]]]:
     """
-    Realiza una partición estratificada por eje clínico con semilla global 42.
-    Garantiza Zero Data Leakage: ninguna consulta del test ciego aparece en train/val.
+    Realiza una partición estratificada por eje clínico a nivel de GRUPO DE CONSULTA (GroupSplit).
+    Garantiza Cero Fugas de Datos (Zero Data Leakage):
+      Queries(Train) ∩ Queries(Test) = ∅
+      Queries(Val) ∩ Queries(Test) = ∅
+      Queries(Train) ∩ Queries(Val) = ∅
     """
     set_seed(seed)
-    
     triplets_dict = [asdict(t) for t in tripletas]
-    random.shuffle(triplets_dict)
     
-    # Estratificar por eje clínico
-    por_eje: Dict[str, List[Dict[str, Any]]] = {}
+    # 1. Agrupar tripletas por texto normalizado de la consulta Q
+    grupos_por_query: Dict[str, List[Dict[str, Any]]] = {}
     for item in triplets_dict:
-        eje = item.get("eje_clinico", "general")
-        por_eje.setdefault(eje, []).append(item)
+        q_norm = item.get("query", "").strip().lower()
+        grupos_por_query.setdefault(q_norm, []).append(item)
+    
+    # 2. Agrupar las queries por eje clínico
+    queries_por_eje: Dict[str, List[str]] = {}
+    for q_norm, items in grupos_por_query.items():
+        eje = items[0].get("eje_clinico", "general")
+        queries_por_eje.setdefault(eje, []).append(q_norm)
     
     train_set: List[Dict[str, Any]] = []
     val_set: List[Dict[str, Any]] = []
     test_set: List[Dict[str, Any]] = []
     
-    for eje, items in por_eje.items():
-        n = len(items)
-        n_train = int(n * train_ratio)
-        n_val = int(n * val_ratio)
+    # 3. Particionar los grupos de queries de forma estratificada por eje
+    for eje, q_list in queries_por_eje.items():
+        random.shuffle(q_list)
+        n = len(q_list)
+        n_train = max(1, int(round(n * train_ratio)))
+        n_val = max(1, int(round(n * val_ratio)))
         
-        train_items = items[:n_train]
-        val_items = items[n_train:n_train + n_val]
-        test_items = items[n_train + n_val:]
+        train_q = set(q_list[:n_train])
+        val_q = set(q_list[n_train:n_train + n_val])
+        test_q = set(q_list[n_train + n_val:])
         
-        train_set.extend(train_items)
-        val_set.extend(val_items)
-        test_set.extend(test_items)
+        # Si test_q quedó vacío por redondeo, transferir una de train
+        if not test_q and len(train_q) > 1:
+            elem = train_q.pop()
+            test_q.add(elem)
         
+        # Asignar todas las tripletas correspondientes a sus conjuntos
+        for q in train_q:
+            train_set.extend(grupos_por_query[q])
+        for q in val_q:
+            val_set.extend(grupos_por_query[q])
+        for q in test_q:
+            test_set.extend(grupos_por_query[q])
+        
+        total_eje = len(train_q) + len(val_q) + len(test_q)
         logger.info(
-            f"Eje '{eje}': Total={n} -> Train={len(train_items)} ({len(train_items)/n*100:.1f}%), "
-            f"Val={len(val_items)} ({len(val_items)/n*100:.1f}%), Test={len(test_items)} ({len(test_items)/n*100:.1f}%)"
+            f"Eje '{eje}': Queries únicas={total_eje} -> "
+            f"Train={len(train_q)} ({len(train_q)/total_eje*100:.1f}%), "
+            f"Val={len(val_q)} ({len(val_q)/total_eje*100:.1f}%), "
+            f"Test={len(test_q)} ({len(test_q)/total_eje*100:.1f}%)"
         )
+    
+    # 4. Verificación matemática estricta de Cero Fugas (Zero Data Leakage)
+    set_train_q = {t["query"].strip().lower() for t in train_set}
+    set_val_q = {t["query"].strip().lower() for t in val_set}
+    set_test_q = {t["query"].strip().lower() for t in test_set}
+    
+    leak_train_test = set_train_q.intersection(set_test_q)
+    leak_val_test = set_val_q.intersection(set_test_q)
+    leak_train_val = set_train_q.intersection(set_val_q)
+    
+    if leak_train_test or leak_val_test or leak_train_val:
+        raise ValueError(
+            f"Violación de integridad: Data Leakage detectado! "
+            f"Train-Test: {len(leak_train_test)}, Val-Test: {len(leak_val_test)}, Train-Val: {len(leak_train_val)}"
+        )
+    
+    logger.info(
+        f"Verificación de Cero Fugas (Zero Data Leakage): PASS "
+        f"(Train ∩ Test = ∅, Val ∩ Test = ∅, Train ∩ Val = ∅)"
+    )
     
     # Mezclar cada conjunto de forma determinística
     random.shuffle(train_set)

@@ -1,6 +1,6 @@
 # Checksums criptográficos SHA-256 — Pipeline Ingesta v2 (Fase 4)
 # Fecha: 2026-10-05
 # Semilla Global: 42 | Partición: 70% Train / 15% Val / 15% Blind Test
-733a35bb72002374704cc2dff81f414427358f3bca41e34a18035db1bcf6f900  retrieval_train.json
-b81ed457f0157f1dd6f4ccaacfe03925ca9903d9e33cdba5ec3136cda7850559  retrieval_val.json
-ede2ceebefea91f705f0de9783592e289569e4efcd90e16cfafdd7634ce4dfdf  retrieval_test_blind.json
+9833942bd0bcf13dc33f3b72db13abd5dd28df9161eaceaad785e339e576f476  retrieval_train.json
+80a4b72fb8c973fca69c608d802ecf3a210c2786ce10db192bae12b354e732d6  retrieval_val.json
+6dac228fae9c00127cc02dd19954faee67d9ba7b1203038216c47d06f281f381  retrieval_test_blind.json

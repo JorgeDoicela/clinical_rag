@@ -814,20 +814,21 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     * Regla 5: Detección y descarte de listas de autores, colaboradores y comités de redacción ($\ge 4$ menciones a títulos/cargos de profesionales).
     * Regla 6: Exigencia de sustancia médica clínica real (términos de dosificación, diagnóstico, tratamiento, signos de severidad).
   - **Métricas Certificadas de la Fase 4:**
-    * **Total de Tripletas Científicas Extraídas:** 1,709 tripletas clínicas completas.
+    * **Total de Tripletas Científicas Extraídas:** 1,710 tripletas clínicas completas.
     * **Distribución por Ejes Normativos del MSP:**
       - `01_urgencias_obstetricas`: 455 tripletas.
       - `02_respiratorio_pediatrico`: 474 tripletas.
       - `03_cardiovascular_metabolico`: 348 tripletas.
-      - `04_soporte_cronicos_salud_mental`: 432 tripletas.
-    * **Partición Estratificada Científica (Semilla Global 42 — Zero Data Leakage):**
-      - **Entrenamiento (70%):** 1,194 tripletas en [`backend/data/datasets/retrieval_train.json`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/datasets/retrieval_train.json) (SHA-256: `733a35bb7200...`).
-      - **Validación (15%):** 255 tripletas en [`backend/data/datasets/retrieval_val.json`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/datasets/retrieval_val.json) (SHA-256: `b81ed457f015...`).
-      - **Test Ciego Congelado (15%):** 260 tripletas en [`backend/data/datasets/retrieval_test_blind.json`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/datasets/retrieval_test_blind.json) (SHA-256: `ede2ceebefea...`).
+      - `04_soporte_cronicos_salud_mental`: 433 tripletas.
+    * **Partición Estratificada por Grupo de Consulta (Semilla Global 42 — Zero Data Leakage):**
+      - **Entrenamiento (70%):** 1,178 tripletas en [`backend/data/datasets/retrieval_train.json`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/datasets/retrieval_train.json) (SHA-256: `9833942bd0bc...`).
+      - **Validación (15%):** 249 tripletas en [`backend/data/datasets/retrieval_val.json`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/datasets/retrieval_val.json) (SHA-256: `80a4b72fb8c9...`).
+      - **Test Ciego Congelado (15%):** 283 tripletas en [`backend/data/datasets/retrieval_test_blind.json`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/datasets/retrieval_test_blind.json) (SHA-256: `6dac228fae9c...`).
+      - **Certificación Matemática de Cero Fugas:** $\text{Train} \cap \text{Test} = \emptyset$, $\text{Val} \cap \text{Test} = \emptyset$, $\text{Train} \cap \text{Val} = \emptyset$ (Leakage = 0).
     * **Sumas Criptográficas Congeladas:** [`backend/data/datasets/checksums.sha256`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/datasets/checksums.sha256).
-    * **Distribución de Hard Negatives:** 55.6% Intra-Eje (950) y 44.4% Inter-Eje (759), con similitud coseno media de 0.2305.
+    * **Distribución de Hard Negatives:** 53.9% Intra-Eje (922) y 46.1% Inter-Eje (788), con similitud coseno media de 0.2127.
   - **Certificación de Regresión (100% PASS):**
-    * Backend: 66/66 pruebas unitarias y de integración aprobadas (`pytest` 100% PASS en 52.08s).
-    * Frontend: 22/22 suites y 106/106 pruebas aprobadas (`vitest run` 100% PASS en 44.97s).
+    * Backend: 66/66 pruebas unitarias y de integración aprobadas (`pytest` 100% PASS).
+    * Frontend: 22/22 suites y 106/106 pruebas aprobadas (`vitest run` 100% PASS).
 
 

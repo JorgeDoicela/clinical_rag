@@ -102,22 +102,27 @@ $$n^* = \arg\max_{c \in \mathcal{C}_q} \text{Sim}(q, c)$$
 
 ## 4. Distribución Cuantitativa y Partición del Dataset
 
-### 4.1 Desglose por Ejes Normativos del MSP
+### 4.1 Desglose por Ejes Normativos del MSP (Grouped Split — Zero Data Leakage)
 
-| Eje Clínico Normativo MSP | GPCs Activas | Total Tripletas | Train (70%) | Val (15%) | Blind Test (15%) | Hard Neg Intra-Eje | Hard Neg Inter-Eje |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **01. Urgencias Obstétricas (Score MAMA)** | 11 | **455** | 318 | 68 | 69 | 288 (63.3%) | 167 (36.7%) |
-| **02. Infecciones Respiratorias y Pediatría** | 11 | **474** | 331 | 71 | 72 | 261 (55.1%) | 213 (44.9%) |
-| **03. Cardiovascular, Renal y Metabólico** | 2 | **348** | 243 | 52 | 53 | 192 (55.2%) | 156 (44.8%) |
-| **04. Soporte Crónicos y Salud Mental** | 18 | **432** | 302 | 64 | 66 | 209 (48.4%) | 223 (51.6%) |
-| **Total Consolidado** | **42** | **1,709** | **1,194** | **255** | **260** | **950 (55.6%)** | **759 (44.4%)** |
+| Eje Clínico Normativo MSP | GPCs Activas | Total Tripletas | Queries Únicas | Train (70%) | Val (15%) | Blind Test (15%) | Hard Neg Intra-Eje | Hard Neg Inter-Eje |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **01. Urgencias Obstétricas (Score MAMA)** | 11 | **455** | 292 | 311 | 69 | 75 | 275 (60.4%) | 180 (39.6%) |
+| **02. Infecciones Respiratorias y Pediatría** | 11 | **474** | 277 | 328 | 74 | 72 | 258 (54.4%) | 216 (45.6%) |
+| **03. Cardiovascular, Renal y Metabólico** | 2 | **348** | 75 | 240 | 48 | 60 | 185 (53.2%) | 163 (46.8%) |
+| **04. Soporte Crónicos y Salud Mental** | 18 | **433** | 289 | 299 | 58 | 76 | 204 (47.1%) | 229 (52.9%) |
+| **Total Consolidado** | **42** | **1,710** | **933** | **1,178** | **249** | **283** | **922 (53.9%)** | **788 (46.1%)** |
+
+> **Certificación Matemática de Fugas:**  
+> $$\text{Queries}(\text{Train}) \cap \text{Queries}(\text{Test}) = \emptyset \quad (\text{Leakage} = 0)$$  
+> $$\text{Queries}(\text{Val}) \cap \text{Queries}(\text{Test}) = \emptyset \quad (\text{Leakage} = 0)$$  
+> $$\text{Queries}(\text{Train}) \cap \text{Queries}(\text{Val}) = \emptyset \quad (\text{Leakage} = 0)$$
 
 ### 4.2 Métricas Estadísticas de Similitud Coseno de los Negativos
 
-* **Similitud Coseno Mínima:** $-0.0088$
-* **Similitud Coseno Media:** **$0.2305$**
-* **Similitud Coseno Mediana:** **$0.2184$**
-* **Similitud Coseno Máxima:** **$0.6569$** *(Hard Negatives de alta competitividad intra-nosológica sin incurrir en falsos negativos).*
+* **Similitud Coseno Mínima:** $-0.0219$
+* **Similitud Coseno Media:** **$0.2127$**
+* **Similitud Coseno Mediana:** **$0.2015$**
+* **Similitud Coseno Máxima:** **$0.6336$** *(Hard Negatives de alta competitividad intra-nosológica sin incurrir en falsos negativos).*
 
 ---
 
@@ -128,7 +133,7 @@ Cada registro generado cumple estrictamente con el siguiente esquema Pydantic/Da
 ```json
 {
   "id": "triplet_v2_00024",
-  "query": "¿Qué intervenciones farmacológicas y no farmacológicas de grado A/B están normadas por el MSP en Diagnóstico de la TB para Guia de Practica Clinica: Prevencion, Diagnostico y Tratamiento de la Tuberculosis?",
+  "query": "¿Qué intervenciones farmacológicas y no farmacológicas de grado A/B están normadas por el MSP en Diagnóstico de la TB - Tabla 1. Uso de PCR en tiempo real para Guia de Practica Clinica: Prevencion, Diagnostico y Tratamiento de la Tuberculosis?",
   "pos": "Tabla 1. Uso de PCR en tiempo real aprobada por la OMS para el diagnóstico de TB pulmonar y resistencia a la rifampicina en adultos...",
   "neg": "Clasificación diagnóstica y síntomas de la depresión mayor...",
   "guia_fuente": "GPC_tuberculosis_2016.pdf",
@@ -145,12 +150,12 @@ Cada registro generado cumple estrictamente con el siguiente esquema Pydantic/Da
 
 ## 6. Verificación Criptográfica de Integridad ([`checksums.sha256`](../../backend/data/datasets/checksums.sha256))
 
-Para garantizar reproducibilidad absoluta y prevenir cualquier fuga de datos (*Zero Data Leakage*) en los benchmarks ciegos de la Fase 8, las particiones generadas fueron congeladas con sus hashes SHA-256 oficiales:
+Para garantizar reproducibilidad absoluta y certificar Zero Data Leakage en los benchmarks ciegos de la Fase 8, las particiones generadas fueron congeladas con sus hashes SHA-256 oficiales:
 
 ```text
-733a35bb72002374704cc2dff81f414427358f3bca41e34a18035db1bcf6f900  retrieval_train.json
-b81ed457f0157f1dd6f4ccaacfe03925ca9903d9e33cdba5ec3136cda7850559  retrieval_val.json
-ede2ceebefea91f705f0de9783592e289569e4efcd90e16cfafdd7634ce4dfdf  retrieval_test_blind.json
+9833942bd0bcf13dc33f3b72db13abd5dd28df9161eaceaad785e339e576f476  retrieval_train.json
+80a4b72fb8c973fca69c608d802ecf3a210c2786ce10db192bae12b354e732d6  retrieval_val.json
+6dac228fae9c00127cc02dd19954faee67d9ba7b1203038216c47d06f281f381  retrieval_test_blind.json
 ```
 
 ---
