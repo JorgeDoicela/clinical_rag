@@ -873,10 +873,13 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     * Se refactorizó `scripts/generate_paper_tables_pdf.py` y se compiló exitosamente el nuevo compendio consolidado en `docs/4_pdf_compilado/COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf` (1.23 MB).
     * Se mantuvieron estrictamente vacíos los modelos (`backend/data/models/` solo con `.gitkeep`) preservando el tarball original de 1.80 GB en `Downloads` según las instrucciones del usuario.
     * Todas las suites de pruebas validadas con 100% PASS: Backend (8 suites maestras) y Frontend (22 suites, 106 tests aprobados en Vitest).
-  - **Auditoría de Preparación para Despliegue de Pesos Fine-Tuned v2 (2026-10-05):**
-    * Frontend: 100% PASS en typecheck estricto (`tsc --noEmit`, 0 errores) y compilación de producción (`vite build` exitosa con 1,822 módulos y precache PWA).
-    * Backend: Carga de aplicación FastAPI verificada (`main.py` 200 OK), 22 scripts de pruebas y 7 de pipeline validados sintácticamente (`py_compile`). Base de datos relacional SQLite intacta con 7 tablas operativas.
-    * Detección Defensiva de Modelo: Refactorizado `backend/core/config.py` para conmutar automáticamente a los pesos locales únicamente cuando la carpeta `ateneo-bge-m3-ecuador-v2` exista con su `config.json`, manteniendo fallback resiliente a `BAAI/bge-m3`. Tarball de la A100 verificado íntegro (2.27 GB descomprimido) en `backend/data/models/`.
+  - **Despliegue, Normalización Canónica y Activación Exitosa de Pesos v2 (2026-10-05):**
+    * Se descomprimió el modelo `ateneo-bge-m3-ecuador-v2` (2.27 GB de pesos `safetensors`) en `backend/data/models/ateneo-bge-m3-ecuador-v2/`.
+    * **Resolución de Causa Raíz en Metadatos de SentenceTransformers:** La versión de exportación de Colab guardó rutas no estándar (`sentence_transformers.base.*` y el parámetro `embedding_dimension` en lugar de `word_embedding_dimension`). Se normalizaron `modules.json`, `sentence_bert_config.json` y `1_Pooling/config.json` al estándar canónico de SentenceTransformers v3/v2.
+    * **Verificación de Inferencia Denso-Clínica:** Confirmada la carga limpia de los pesos en memoria y la generación de vectores de 1,024 dimensiones con norma $L_2 = 1.0$ y similitud semántica clínica verificada.
+    * Se eliminó el tarball redundante en `backend/data/models/` para liberar 1.76 GB en el repositorio, manteniendo el original resguardado en `Downloads`.
+    * Árbol de trabajo Git limpio (`working tree clean`).
+
 
 
 
