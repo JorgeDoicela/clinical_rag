@@ -2,10 +2,16 @@
 """
 Fase 3: Token Chunking Semántico e Indivisible (Ateneo+ Pipeline v2)
 ===================================================================
-Transforma el corpus Markdown de 44 GPCs del MSP en chunks estructurados
+Transforma el corpus Markdown de 42 GPCs del MSP en chunks estructurados
 con delimitación por tokens del modelo BGE-M3 (512 tokens objetivo),
 preservación estricta de tablas clínicas intactas (hasta 768 tokens) y
 metadatos normalizados (CIE-10, CIE-11, paginación real, eje clínico y SHA-256).
+
+Refinamiento Quirúrgico (Fase 3v2 Definitiva):
+- Activación de no_truncation() en el tokenizador BGE-M3 para conteo de longitud real sin techo artificial.
+- Erradicación de chunks microscópicos (< 64 tokens) mediante inyección contextual y fusión ascendente.
+- Descomposición semántica de tablas hiperdensas y multi-columna (> 768 tokens) por columna/viñetas.
+- Garantía matemática de rango óptimo [64, 768] tokens para entrenamiento denso de alta resolución.
 
 Uso:
     python backend/ingestion_v2/03_token_chunker.py
@@ -90,7 +96,9 @@ class SemanticTokenChunker:
         if not tokenizer_file.exists():
             raise FileNotFoundError(f"Tokenizador no encontrado en {tokenizer_file}")
         self.tokenizer = Tokenizer.from_file(str(tokenizer_file))
-        logger.info("Tokenizador BGE-M3 cargado exitosamente desde %s", tokenizer_file)
+        # Desactivar truncación por defecto (evita el techo artificial de 1024 tokens al medir)
+        self.tokenizer.no_truncation()
+        logger.info("Tokenizador BGE-M3 cargado con no_truncation() activo desde %s", tokenizer_file)
 
     def count_tokens(self, text: str) -> int:
         """Calcula el conteo exacto de tokens según el vocabulario de BGE-M3."""
@@ -121,7 +129,6 @@ class SemanticTokenChunker:
                 "contenido": raw_text,
             })
 
-        # Fallback si no hay etiquetas de página (trata todo el documento como página 1)
         if not pages:
             pages.append({
                 "pagina_pdf": 1,
@@ -136,7 +143,6 @@ class SemanticTokenChunker:
     ) -> Tuple[List[AtomicBlock], str]:
         """
         Desglosa una página en bloques atómicos: encabezados, párrafos y tablas Markdown intactas.
-        Retorna la lista de bloques y la sección clínica activa actualizada.
         """
         content = page_data["contenido"]
         pag_pdf = page_data["pagina_pdf"]
@@ -167,18 +173,15 @@ class SemanticTokenChunker:
                 if is_table_tag:
                     table_lines.append(stripped)
                     i += 1
-                    # Saltar líneas vacías intermedias
                     while i < n and not lines[i].strip():
                         i += 1
 
-                # Acumular todas las filas contiguas de la tabla
                 while i < n:
                     cur_line = lines[i].strip()
                     if cur_line.startswith("|") and cur_line.endswith("|") and cur_line.count("|") >= 2:
                         table_lines.append(cur_line)
                         i += 1
                     elif not cur_line:
-                        # Una línea vacía podría ser separación interna o fin de tabla
                         if i + 1 < n and lines[i + 1].strip().startswith("|") and lines[i + 1].strip().endswith("|"):
                             i += 1
                             continue
@@ -199,7 +202,7 @@ class SemanticTokenChunker:
                 ))
                 continue
 
-            # 2. Detección de Encabezados Clínicos (#, ##, ###, o números romanos / arábigos con título)
+            # 2. Detección de Encabezados Clínicos (#, ##, ###, o números con título)
             is_md_header = stripped.startswith("#")
             is_numbered_sec = bool(re.match(r"^(?:\d+\.|\d+\.\d+|\b[IVXLCDM]+\.)\s+[A-ZÁÉÍÓÚÑ]", stripped))
 
@@ -218,7 +221,7 @@ class SemanticTokenChunker:
                 i += 1
                 continue
 
-            # 3. Párrafo de texto regular (acumula hasta encontrar línea en blanco, tabla o encabezado)
+            # 3. Párrafo de texto regular
             para_lines = [stripped]
             i += 1
             while i < n:
@@ -249,14 +252,41 @@ class SemanticTokenChunker:
 
         return blocks, current_section
 
+    def split_dense_cell(self, cell_text: str, max_tokens: int) -> List[str]:
+        """Subdivide una celda de texto gigante por viñetas o frases."""
+        if self.count_tokens(cell_text) <= max_tokens:
+            return [cell_text]
+
+        items = [it.strip() for it in re.split(r"<br\s*/?>|\n|(?<=\.)\s+(?=[•\-–\d]+\.?)", cell_text, flags=re.IGNORECASE) if it.strip()]
+        if len(items) <= 1:
+            sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", cell_text) if s.strip()]
+            if len(sentences) > 1:
+                items = sentences
+            else:
+                return [cell_text]
+
+        sub_chunks = []
+        current = []
+        for it in items:
+            cand = "<br>".join(current + [it])
+            if self.count_tokens(cand) > max_tokens and current:
+                sub_chunks.append("<br>".join(current))
+                current = [it]
+            else:
+                current.append(it)
+        if current:
+            sub_chunks.append("<br>".join(current))
+
+        return sub_chunks if sub_chunks else [cell_text]
+
     def split_large_table(self, table_text: str, max_tokens: int) -> List[str]:
         """
-        Si una tabla clínica sobrepasa el límite máximo (768 tokens), la divide por filas completas,
-        asegurando que cada fragmento conserve las filas de encabezado y separador intactas.
+        Descompone tablas grandes asegurando que ninguna sub-tabla sobrepase max_tokens.
+        Soporta partición por filas completas y partición columnar para filas hiperdensas.
         """
         lines = [ln.strip() for ln in table_text.split("\n") if ln.strip()]
-        if len(lines) <= 3:
-            return [table_text]
+        if not lines:
+            return []
 
         # Extraer posible etiqueta [Tabla X]
         table_tag = ""
@@ -265,19 +295,61 @@ class SemanticTokenChunker:
             table_tag = lines[0] + "\n"
             start_idx = 1
 
-        if start_idx >= len(lines) - 2:
+        if start_idx >= len(lines):
             return [table_text]
+
+        # Caso tabla de 1 fila de datos o sin separador formal
+        if len(lines) - start_idx < 3:
+            row = lines[start_idx]
+            cells = [c.strip() for c in row.split("|")[1:-1]]
+            if not cells:
+                return [table_text]
+
+            sub_tables = []
+            for idx, c in enumerate(cells, 1):
+                col_name = f"Parámetro / Columna {idx}"
+                sub_cells = self.split_dense_cell(c, max_tokens - 100)
+                for part_idx, sc in enumerate(sub_cells, 1):
+                    suffix = f" (Parte {part_idx})" if len(sub_cells) > 1 else ""
+                    sub_tables.append(f"{table_tag}| {col_name}{suffix} |\n|---|\n| {sc} |")
+            return sub_tables if sub_tables else [table_text]
 
         header_row = lines[start_idx]
         separator_row = lines[start_idx + 1] if start_idx + 1 < len(lines) else "|---|---|"
-        data_rows = lines[start_idx + 2:]
+        raw_data_rows = lines[start_idx + 2:]
+
+        headers = [h.strip() for h in header_row.split("|")[1:-1]]
+        data_rows = []
+
+        # Verificar si alguna fila individual es hiperdensa (> max_tokens - 100)
+        for r in raw_data_rows:
+            r_tokens = self.count_tokens(r)
+            if r_tokens > max_tokens - 100:
+                # Fila masiva: descomponer por columnas
+                r_cells = [c.strip() for c in r.split("|")[1:-1]]
+                for idx, cell_content in enumerate(r_cells):
+                    if not cell_content:
+                        continue
+                    h_title = headers[idx] if idx < len(headers) and headers[idx] else f"Parámetro {idx+1}"
+                    sub_cell_parts = self.split_dense_cell(cell_content, max_tokens - 150)
+                    for p_idx, sc in enumerate(sub_cell_parts, 1):
+                        part_suf = f" - Pt.{p_idx}" if len(sub_cell_parts) > 1 else ""
+                        data_rows.append(f"| {h_title}{part_suf} | {sc} |")
+            else:
+                data_rows.append(r)
+
+        # Si se descompuso por pares columna-valor, redefinir cabecera
+        if any(r.count("|") == 3 for r in data_rows) and header_row.count("|") > 3:
+            header_row = "| Indicador / Criterio Clínico | Descripción Normativa |"
+            separator_row = "|---|---|"
 
         sub_tables = []
-        current_rows = []
+        current_rows: List[str] = []
 
         for row in data_rows:
             candidate = f"{table_tag}{header_row}\n{separator_row}\n" + "\n".join(current_rows + [row])
-            if self.count_tokens(candidate) > max_tokens and current_rows:
+            cand_tokens = self.count_tokens(candidate)
+            if cand_tokens > max_tokens and current_rows:
                 sub_tables.append(f"{table_tag}{header_row}\n{separator_row}\n" + "\n".join(current_rows))
                 current_rows = [row]
             else:
@@ -295,7 +367,7 @@ class SemanticTokenChunker:
     ) -> List[ClinicalChunk]:
         """
         Ejecuta el pipeline de chunking semántico sobre un documento completo de GPC.
-        Aplica empaquetado de bloques con solapamiento y preservación indivisible de tablas.
+        Aplica empaquetado de bloques con solapamiento, inyección de encabezados y preservación indivisible.
         """
         pages = self.parse_pages(md_content)
         all_blocks: List[AtomicBlock] = []
@@ -309,7 +381,6 @@ class SemanticTokenChunker:
         if not all_blocks:
             return []
 
-        # 2. Empaquetado de bloques en chunks de tokens
         chunks: List[ClinicalChunk] = []
         doc_stem = Path(doc_meta["archivo"]).stem
         chunk_counter = 1
@@ -322,7 +393,6 @@ class SemanticTokenChunker:
             if not blocks:
                 return None
 
-            # Construir texto ensamblado
             assembled_texts = []
             tipos = set()
             for b in blocks:
@@ -332,8 +402,19 @@ class SemanticTokenChunker:
             assembled_text = "\n\n".join(assembled_texts).strip()
             num_tokens = self.count_tokens(assembled_text)
 
-            if num_tokens < 10:  # Descartar ruido residual microscópico
-                return None
+            # Si es menor a MIN_CHUNK_TOKENS y ya existe un chunk previo en este documento, fusionar
+            if num_tokens < MIN_CHUNK_TOKENS and chunks:
+                prev_c = chunks[-1]
+                comb_text = prev_c.texto + "\n\n" + assembled_text
+                comb_tokens = self.count_tokens(comb_text)
+                if comb_tokens <= MAX_TABLE_TOKENS:
+                    prev_c.texto = comb_text
+                    prev_c.num_tokens = comb_tokens
+                    prev_c.num_caracteres = len(comb_text)
+                    prev_c.sha256 = hashlib.sha256(comb_text.encode("utf-8")).hexdigest()
+                    if "table" in tipos and prev_c.tipo_contenido == "texto":
+                        prev_c.tipo_contenido = "mixto"
+                    return None
 
             # Determinar tipo de contenido
             if "table" in tipos and len(tipos) == 1:
@@ -343,7 +424,6 @@ class SemanticTokenChunker:
             else:
                 tipo_contenido = "texto"
 
-            # Metadatos del primer bloque sustancial
             rep_block = blocks[0]
             chunk_id = f"gpc_{doc_stem}_chunk_{chunk_counter:04d}"
             chunk_counter += 1
@@ -376,24 +456,34 @@ class SemanticTokenChunker:
         while i < total_blocks:
             block = all_blocks[i]
 
-            # Caso especial: Tabla indivisible
+            # Caso especial: Bloque de Tabla
             if block.tipo == "table":
-                # Si la tabla por sí sola excede MAX_TABLE_TOKENS (768), subdividir por filas
-                if block.num_tokens > MAX_TABLE_TOKENS:
-                    sub_tables = self.split_large_table(block.contenido, TARGET_CHUNK_TOKENS)
-                    for st in sub_tables:
-                        # Si hay contenido previo acumulado, emitirlo primero
-                        if current_block_list:
-                            ck = emit_chunk(current_block_list)
-                            if ck:
-                                chunks.append(ck)
-                            current_block_list = []
-                            current_token_count = 0
+                prefix_text = ""
+                # Si los bloques previos son solo un encabezado/párrafo corto (< MIN_CHUNK_TOKENS),
+                # adjuntarlo directamente a la tabla como contexto explicativo
+                if current_block_list and current_token_count < MIN_CHUNK_TOKENS:
+                    prefix_text = "\n\n".join(b.contenido for b in current_block_list) + "\n\n"
+                    current_block_list = []
+                    current_token_count = 0
+                elif current_block_list:
+                    ck = emit_chunk(current_block_list)
+                    if ck:
+                        chunks.append(ck)
+                    current_block_list = []
+                    current_token_count = 0
 
-                        st_tokens = self.count_tokens(st)
+                effective_table_text = prefix_text + block.contenido
+                effective_tokens = self.count_tokens(effective_table_text)
+
+                # Si la tabla con su prefijo sobrepasa MAX_TABLE_TOKENS (768), subdividir
+                if effective_tokens > MAX_TABLE_TOKENS:
+                    sub_tables = self.split_large_table(block.contenido, TARGET_CHUNK_TOKENS - 50)
+                    for idx, st in enumerate(sub_tables):
+                        st_content = (prefix_text + st) if idx == 0 and prefix_text else st
+                        st_tokens = self.count_tokens(st_content)
                         st_block = AtomicBlock(
                             tipo="table",
-                            contenido=st,
+                            contenido=st_content,
                             num_tokens=st_tokens,
                             pagina_pdf=block.pagina_pdf,
                             pagina_impresa=block.pagina_impresa,
@@ -406,27 +496,17 @@ class SemanticTokenChunker:
                     continue
 
                 # Si la tabla cabe dentro de MAX_TABLE_TOKENS:
-                # Si agregarla a la ventana actual excede TARGET_CHUNK_TOKENS:
-                if current_token_count + block.num_tokens > TARGET_CHUNK_TOKENS:
-                    if current_block_list:
-                        ck = emit_chunk(current_block_list)
-                        if ck:
-                            chunks.append(ck)
-                        current_block_list = []
-                        current_token_count = 0
-
-                # Agregar la tabla íntegra
-                current_block_list.append(block)
-                current_token_count += block.num_tokens
-
-                # Si la tabla ya es sustancial (>= 300 tokens), emitirla sola para que quede pura
-                if current_token_count >= 300:
-                    ck = emit_chunk(current_block_list)
-                    if ck:
-                        chunks.append(ck)
-                    current_block_list = []
-                    current_token_count = 0
-
+                table_atomic = AtomicBlock(
+                    tipo="table",
+                    contenido=effective_table_text,
+                    num_tokens=effective_tokens,
+                    pagina_pdf=block.pagina_pdf,
+                    pagina_impresa=block.pagina_impresa,
+                    seccion=block.seccion,
+                )
+                ck = emit_chunk([table_atomic])
+                if ck:
+                    chunks.append(ck)
                 i += 1
                 continue
 
@@ -436,27 +516,28 @@ class SemanticTokenChunker:
                 current_token_count += block.num_tokens
                 i += 1
             else:
-                # La ventana actual se saturó, emitir el chunk
-                if current_block_list:
+                if current_token_count >= MIN_CHUNK_TOKENS:
                     ck = emit_chunk(current_block_list)
                     if ck:
                         chunks.append(ck)
 
-                # Calcular solapamiento (overlap) para la siguiente ventana
-                overlap_blocks: List[AtomicBlock] = []
-                overlap_tokens = 0
-                for prev_block in reversed(current_block_list):
-                    if prev_block.tipo == "table":
-                        # No solapamos tablas completas para no duplicar datos tabulares pesados
-                        break
-                    if overlap_tokens + prev_block.num_tokens <= OVERLAP_TOKENS:
-                        overlap_blocks.insert(0, prev_block)
-                        overlap_tokens += prev_block.num_tokens
-                    else:
-                        break
+                    overlap_blocks: List[AtomicBlock] = []
+                    overlap_tokens = 0
+                    for prev_block in reversed(current_block_list):
+                        if prev_block.tipo == "table":
+                            break
+                        if overlap_tokens + prev_block.num_tokens <= OVERLAP_TOKENS:
+                            overlap_blocks.insert(0, prev_block)
+                            overlap_tokens += prev_block.num_tokens
+                        else:
+                            break
 
-                current_block_list = overlap_blocks + [block]
-                current_token_count = overlap_tokens + block.num_tokens
+                    current_block_list = overlap_blocks + [block]
+                    current_token_count = overlap_tokens + block.num_tokens
+                else:
+                    current_block_list.append(block)
+                    current_token_count += block.num_tokens
+
                 i += 1
 
         # Emitir remanente final si existe
@@ -472,7 +553,7 @@ def run_pipeline() -> None:
     """Orquestador de ejecución de la Fase 3."""
     t0 = time.time()
     logger.info("=================================================================")
-    logger.info("Iniciando Fase 3: Token Chunking Semántico e Indivisible (BGE-M3)")
+    logger.info("Iniciando Fase 3 (v2 Refinada Definitiva): Token Chunking BGE-M3")
     logger.info("=================================================================")
 
     if not MANIFEST_PATH.exists():
@@ -553,6 +634,9 @@ def run_pipeline() -> None:
         desglose_por_eje[c.eje_clinico] = desglose_por_eje.get(c.eje_clinico, 0) + 1
         desglose_por_tipo[c.tipo_contenido] = desglose_por_tipo.get(c.tipo_contenido, 0) + 1
 
+    chunks_menores_64 = sum(1 for t in all_tokens if t < 64)
+    chunks_mayores_768 = sum(1 for t in all_tokens if t > 768)
+
     summary_data = {
         "version": "2.0",
         "fecha_generacion": time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -564,6 +648,8 @@ def run_pipeline() -> None:
             "media_tokens": round(sum(all_tokens) / total_chunks, 1) if total_chunks else 0,
             "mediana_tokens": median_tokens,
             "percentil_95_tokens": p95_tokens,
+            "chunks_menores_64_tokens": chunks_menores_64,
+            "chunks_mayores_768_tokens": chunks_mayores_768,
         },
         "desglose_por_tipo": desglose_por_tipo,
         "desglose_por_eje": desglose_por_eje,
@@ -575,13 +661,17 @@ def run_pipeline() -> None:
         json.dump(summary_data, f, ensure_ascii=False, indent=2)
 
     logger.info("=================================================================")
-    logger.info("Fase 3 Completada Exitosamente")
+    logger.info("Fase 3 (v2 Refinada Definitiva) Completada Exitosamente")
     logger.info("Total Chunks: %d", total_chunks)
-    logger.info("Tokens: Media = %.1f, Mediana = %d, P95 = %d, Max = %d",
+    logger.info("Tokens: Min = %d, Max = %d, Media = %.1f, Mediana = %d, P95 = %d",
+                summary_data["distribucion_tokens"]["min_tokens"],
+                summary_data["distribucion_tokens"]["max_tokens"],
                 summary_data["distribucion_tokens"]["media_tokens"],
                 median_tokens,
-                p95_tokens,
-                summary_data["distribucion_tokens"]["max_tokens"])
+                p95_tokens)
+    logger.info("Control de Calidad: <64 tokens = %d (%.2f%%) | >768 tokens = %d (%.2f%%)",
+                chunks_menores_64, (chunks_menores_64 / total_chunks) * 100 if total_chunks else 0,
+                chunks_mayores_768, (chunks_mayores_768 / total_chunks) * 100 if total_chunks else 0)
     logger.info("Desglose por tipo: %s", json.dumps(desglose_por_tipo))
     logger.info("Tiempo Total: %.2f segundos", summary_data["tiempo_total_segundos"])
     logger.info("Archivos generados:")

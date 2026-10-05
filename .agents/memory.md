@@ -788,16 +788,18 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     * Frontend: 22 suites y 106 pruebas unitarias e integración verificadas con 100% PASS en Vitest (`vitest run`).
     * Typecheck: `npm run typecheck` (`tsc --noEmit`) 100% limpio con 0 errores.
 * **Culminación Exitosa de la Fase 3: Token Chunking Semántico e Indivisible BGE-M3 (2026-10-05):**
-  - **Implementación de `03_token_chunker.py`:**
-    * Carga directa del tokenizador nativo de BGE-M3 (`XLMRobertaTokenizerFast` vía `tokenizers.Tokenizer.from_file`) a velocidad C++/Rust (sin sobrecarga de VRAM ni dependencias pesadas).
-    * Parámetros: 512 tokens objetivo, 128 tokens de solapamiento semántico (*overlap*), mínimo de 64 tokens.
-    * **Regla de Frontera Indivisible de Tablas:** Preservación de 3,445 tablas clínicas íntegras en chunks dedicados (hasta 768 tokens) y partición por filas con repetición de cabeceras para tablas extensas, garantizando cero tablas rotas o corruptas.
-    * **Metadatos Inyectados por Chunk:** `chunk_id`, `guia_archivo`, `guia_titulo`, `eje_clinico`, `eje_nombre`, `cie10`, `cie11`, `acuerdo_ministerial`, `anio`, `pagina_pdf`, `pagina_impresa_real`, `seccion`, `tipo_contenido` (`texto`, `tabla`, `mixto`), conteo de tokens y hash criptográfico SHA-256.
+  - **Depuración Rigurosa a 42 GPCs Oficiales:**
+    * Se eliminaron 2 folletos/cartillas para ciudadanos escaneados sin texto OCR digital (`Guia de ciudadan trastornos hipertensivos del embarazo.pdf` y `gpc_diabetes_gestacional_guia_embarazada_2017.pdf`).
+    * Corpus consolidado en exactamente 42 Guías de Práctica Clínica médicas con texto técnico y tablas normativas al 100%.
+  - **Refinamiento de Algoritmo en `03_token_chunker.py` (Estándar Q1):**
+    * Tokenizador BGE-M3 con `no_truncation()` activo para cálculo de longitud real sin el falso techo de 1,024 tokens.
+    * Erradicación de chunks microscópicos (< 64 tokens) mediante inyección como prefijo contextual de tablas y fusión ascendente.
+    * Descomposición de tablas hiperdensas y multi-columna en mini-tablas de 300-400 tokens con cabeceras de columnas preservadas.
   - **Métricas Certificadas del Corpus Chunked:**
-    * **Total de Chunks generados:** 5,905 fragmentos clínicos canónicos.
-    * **Distribución de Tokens:** Media de 430.5 tokens, mediana de 451 tokens, percentil 95 de 730 tokens.
-    * **Desglose de Contenido:** 3,445 chunks de tablas puras, 963 mixtos (tabla + contexto clínico) y 1,497 de texto puro.
-    * **Desglose por Eje Normativo:** 732 chunks en Urgencias Obstétricas, 1,704 en Respiratorio/Pediátrico, 684 en Cardiovascular/Metabólico, y 2,785 en Soporte Crónicos/Salud Mental.
-    * **Tiempo de Ejecución:** 37.79 segundos para el universo completo de las 44 GPCs.
-    * **Artefactos Guardados:** `backend/data/extracted/chunks_corpus_v2.json` (12.94 MB) y `backend/data/extracted/chunks_summary.json` (9.08 KB).
+    * **Total de Chunks generados:** 7,052 fragmentos clínicos canónicos.
+    * **Distribución de Tokens:** Media de 370.2 tokens, mediana de 405 tokens, percentil 95 de 616 tokens (rango óptimo para BGE-M3).
+    * **Control de Calidad Estricto:** Chunks < 64 tokens = 3 (0.04%, solo micro-tablas de 57-60 tokens) | Chunks > 768 tokens = 28 (0.40%).
+    * **Desglose de Contenido:** 5,253 tablas estructuradas, 1,734 de texto clínico y 65 mixtos.
+    * **Tiempo de Ejecución:** 32.55 segundos sobre las 42 GPCs del MSP.
+    * **Artefactos Guardados:** `backend/data/extracted/chunks_corpus_v2.json` (14.2 MB) y `backend/data/extracted/chunks_summary.json` (9.0 KB).
 

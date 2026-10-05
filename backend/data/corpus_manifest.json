@@ -2,9 +2,9 @@
   "version": "2.0",
   "fecha_inventario": "2026-10-03",
   "descripcion": "Manifiesto criptografico de las Guias de Practica Clinica y Normas del MSP Ecuador para Ateneo+",
-  "total_documentos": 44,
+  "total_documentos": 42,
   "distribucion_por_eje": {
-    "01_urgencias_obstetricas": 13,
+    "01_urgencias_obstetricas": 11,
     "02_respiratorio_pediatrico": 11,
     "03_cardiovascular_metabolico": 2,
     "04_soporte_cronicos_salud_mental": 18
@@ -169,19 +169,6 @@
       "anio": 2016
     },
     {
-      "archivo": "Guia de ciudadan trastornos hipertensivos del embarazo.pdf",
-      "titulo_oficial": "Guia de Practica Clinica: Trastornos Hipertensivos del Embarazo - Guia para el Ciudadano",
-      "eje_clinico": "01_urgencias_obstetricas",
-      "eje_nombre": "Salud Materna y Urgencias Obstetricas (Score MAMA)",
-      "ruta_relativa": "backend/data/raw_pdfs/01_urgencias_obstetricas/Guia de ciudadan trastornos hipertensivos del embarazo.pdf",
-      "tamano_bytes": 7888865,
-      "sha256": "d9e357650b9f1239c80cc9db4ae18c493d17aec9723e560e53cb08f4a1dfa1f3",
-      "cie10": "O14",
-      "cie11": "JA24",
-      "acuerdo_ministerial": "Acuerdo Ministerial MSP-2016",
-      "anio": 2016
-    },
-    {
       "archivo": "Guía-de-hemorragia-postparto.pdf",
       "titulo_oficial": "Guia de Practica Clinica: Prevencion y Manejo de la Hemorragia Postparto (Codigo Rojo)",
       "eje_clinico": "01_urgencias_obstetricas",
@@ -206,19 +193,6 @@
       "cie11": "JA24.1",
       "acuerdo_ministerial": "Acuerdo Ministerial MSP-2016",
       "anio": 2016
-    },
-    {
-      "archivo": "gpc_diabetes_gestacional_guia_embarazada_2017.pdf",
-      "titulo_oficial": "Guia de Practica Clinica: Diabetes Gestacional - Guia para la Embarazada",
-      "eje_clinico": "01_urgencias_obstetricas",
-      "eje_nombre": "Salud Materna y Urgencias Obstetricas (Score MAMA)",
-      "ruta_relativa": "backend/data/raw_pdfs/01_urgencias_obstetricas/gpc_diabetes_gestacional_guia_embarazada_2017.pdf",
-      "tamano_bytes": 5548856,
-      "sha256": "2e743cffb0d5041e7db5dbf938508e1a0c65d58ee1343f56b571c297270acf88",
-      "cie10": "O24.4",
-      "cie11": "JA21",
-      "acuerdo_ministerial": "Acuerdo Ministerial MSP-2017",
-      "anio": 2017
     },
     {
       "archivo": "gpc_guia_aborto_espontaneo_incompleto_19_feb_2014.pdf",
