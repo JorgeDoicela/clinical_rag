@@ -243,7 +243,8 @@ def run_evaluation_benchmark():
     with open(output_json, "w", encoding="utf-8") as f:
         json.dump(resumen, f, indent=2, ensure_ascii=False)
 
-    output_latex = Path(__file__).resolve().parent / "tabla_resultados_paper.tex"
+    output_latex = Path(__file__).resolve().parent.parent.parent / "docs" / "1_tablas_latex" / "tabla_resultados_paper.tex"
+    output_latex.parent.mkdir(parents=True, exist_ok=True)
     export_paper_latex_table(resumen, output_latex)
 
     print(f"\n==================================================================")
