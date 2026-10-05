@@ -849,6 +849,20 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     * Arquitectura de aceleración Ampere Tensor Cores: `bfloat16` nativo, batch size efectivo de 32 (31 in-batch negatives por paso) y longitud de secuencia de 512 tokens. Consumo pico de VRAM ~16.5 GB en la A100 (41% de uso, 0% riesgo OOM).
     * Evaluador de Information Retrieval en validación (`InformationRetrievalEvaluator`) monitoreando MRR@5, Hit@1 y NDCG@5 en cada época sobre las 249 consultas de `retrieval_val.json`.
     * Verificación técnica completada en modo `--dry-run`: pérdida decreciente de 4.404 a 3.045, MRR@5 mejorando de 0.4583 a 0.5000 y serialización completa de pesos en `backend/data/models/ateneo-bge-m3-ecuador-v2/` (2.27 GB).
+  - **Resultados Empíricos Oficiales Pre vs. Post Fine-Tuning (NVIDIA A100 - 80GB VRAM):**
+    * **Accuracy@1 / Hit@1:** 0.0522 $\rightarrow$ **0.2450** (+0.1928, **+369.23%**)
+    * **Accuracy@5 / Hit@5:** 0.1606 $\rightarrow$ **0.4739** (+0.3133, **+195.00%**)
+    * **MRR@1:** 0.0522 $\rightarrow$ **0.2450** (+0.1928, **+369.23%**)
+    * **MRR@5:** 0.0889 $\rightarrow$ **0.3328** (+0.2439, **+274.40%**)
+    * **NDCG@5:** 0.1066 $\rightarrow$ **0.3682** (+0.2616, **+245.40%**)
+    * **Recall@5:** 0.1606 $\rightarrow$ **0.4739** (+0.3133, **+195.00%**)
+    * Tabla formal LaTeX exportada a [`docs/1_tablas_latex/tabla_pre_post_fine_tuning_bge_m3.tex`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/1_tablas_latex/tabla_pre_post_fine_tuning_bge_m3.tex).
+    * Pesos definitivos de la A100 (2.27 GB) instalados en [`backend/data/models/ateneo-bge-m3-ecuador-v2/`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/data/models/ateneo-bge-m3-ecuador-v2/).
+  - **Segregación Definitiva de Versión 1 (Legacy) vs. Versión 2 (Científica):**
+    * Se eliminó el mock de prueba local CPU y se instaló el modelo real de la A100.
+    * Todos los artefactos de la v1 preliminar (`train_triplets.json`, `ateneo-bge-m3-ecuador`, `history.db`, etc.) quedaron aislados en `backend/data/legacy_v1/`.
+    * Los cuadernos preliminares de Colab de la v1 se archivaron en `backend/ingestion/legacy_notebooks/`.
+    * El espacio de trabajo en `backend/data/` y `backend/ingestion_v2/` quedó 100% puro y exclusivo para la Versión 2.
   - **Dosier Metodológico Sincronizado:**
     * Creado [`docs/3_documentacion_metodologica/DOSIER_PIPELINE_INGESTA_V2_FASE_6_FINE_TUNING_BGE_M3.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/3_documentacion_metodologica/DOSIER_PIPELINE_INGESTA_V2_FASE_6_FINE_TUNING_BGE_M3.md).
 
