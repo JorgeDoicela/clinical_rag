@@ -184,10 +184,31 @@ def build_pdf_compendium():
     story.append(t1)
     story.append(Paragraph("Nota: Evaluación empírica sobre banco de prueba ciego de 570 tripletas supervisadas. Corpus normativo: 42 GPCs oficiales del MSP Ecuador indexadas en 7,052 fragmentos indivisibles.", table_note_style))
 
-    # SECCIÓN 2: FAITHFULNESS
+    # SECCIÓN 1.2 / TABLA II: BENCHMARK CIEGO OOD
     story.append(Spacer(1, 4))
-    story.append(Paragraph("2. Auditoría de Fidelidad Normativa RAG y Anti-Alucinación (Faithfulness Score)", sec_header_style))
-    story.append(Paragraph("<b>Tabla II:</b> Auditoría de Grounding Normativo y Fidelidad de Retroalimentación RAG frente al MSP", table_caption_style))
+    story.append(Paragraph("2. Benchmark Ciego Out-of-Distribution de Recuperación Normativa (283 Consultas Clínicas)", sec_header_style))
+    story.append(Paragraph("<b>Tabla II:</b> Evaluación Comparativa de Recuperación Normativa en Test Set Ciego OOD (Wilcoxon p &lt; 0.001)", table_caption_style))
+    t_ood_data = [
+        [Paragraph("Arquitectura de Recuperación", cell_left_bold), Paragraph("Hit@1 (%)", cell_bold), Paragraph("Hit@3 (%)", cell_bold), Paragraph("Hit@5 (%)", cell_bold), Paragraph("MRR@5 (%)", cell_bold), Paragraph("NDCG@5 (%)", cell_bold)],
+        [Paragraph("BM25 Puro (Léxico)", cell_left), Paragraph("2.47", cell_normal), Paragraph("4.95", cell_normal), Paragraph("5.30", cell_normal), Paragraph("3.55", cell_normal), Paragraph("3.99", cell_normal)],
+        [Paragraph("BAAI/bge-m3 (Zero-Shot Base)", cell_left), Paragraph("0.71", cell_normal), Paragraph("3.18", cell_normal), Paragraph("3.53", cell_normal), Paragraph("1.90", cell_normal), Paragraph("2.31", cell_normal)],
+        [Paragraph("<b>Ateneo-BGE-M3 (Supervisado FT)</b>", cell_left_bold), Paragraph("<b>4.24</b>", cell_bold), Paragraph("<b>9.19</b>", cell_bold), Paragraph("<b>11.66</b>", cell_bold), Paragraph("<b>7.12</b>", cell_bold), Paragraph("<b>8.26</b>", cell_bold)],
+        [Paragraph("Ensamble Híbrido RRF (k=60)", cell_left), Paragraph("3.53", cell_normal), Paragraph("7.77", cell_normal), Paragraph("9.89", cell_normal), Paragraph("5.87", cell_normal), Paragraph("6.88", cell_normal)],
+    ]
+    t_ood = Table(t_ood_data, colWidths=[170, 70, 70, 70, 70, 70])
+    t_ood.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), BG_HEADER),
+        ('GRID', (0,0), (-1,-1), 0.5, LINE_COLOR),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('BACKGROUND', (0,3), (-1,3), BG_ALT),
+    ]))
+    story.append(t_ood)
+    story.append(Paragraph("Nota: Prueba de rangos con signo de Wilcoxon W = 365.0, p = 0.0001018 (p &lt; 0.001). Ateneo-BGE-M3 supera en 6x en Hit@1 y 3.75x en MRR@5 al baseline.", table_note_style))
+
+    # SECCIÓN 3: FAITHFULNESS
+    story.append(Spacer(1, 4))
+    story.append(Paragraph("3. Auditoría de Fidelidad Normativa RAG y Anti-Alucinación (Faithfulness Score)", sec_header_style))
+    story.append(Paragraph("<b>Tabla III:</b> Auditoría de Grounding Normativo y Fidelidad de Retroalimentación RAG frente al MSP", table_caption_style))
     t2_data = [
         [Paragraph("Arquitectura Evaluativa", cell_left_bold), Paragraph("Fidelidad", cell_bold), Paragraph("Afirmaciones", cell_bold), Paragraph("Alucinación", cell_bold), Paragraph("Nivel de Seguridad", cell_bold)],
         [Paragraph("Baseline Zero-Shot (GPT-4o sin RAG)", cell_left), Paragraph("54.2%", cell_normal), Paragraph("26 / 48", cell_normal), Paragraph("45.8%", cell_normal), Paragraph("Riesgo Moderado", cell_normal)],
@@ -206,8 +227,8 @@ def build_pdf_compendium():
 
     # PÁGINA 2: ESTUDIO PILOTO Y ANALÍTICA
     story.append(PageBreak())
-    story.append(Paragraph("3. Estudio Piloto de Ganancia de Aprendizaje (Hake Learning Gain)", sec_header_style))
-    story.append(Paragraph("<b>Tabla III:</b> Evaluación Cuantitativa de Ganancia de Razonamiento Clínico (Pre-Test vs. Post-Test)", table_caption_style))
+    story.append(Paragraph("4. Estudio Piloto de Ganancia de Aprendizaje (Hake Learning Gain)", sec_header_style))
+    story.append(Paragraph("<b>Tabla IV:</b> Evaluación Cuantitativa de Ganancia de Razonamiento Clínico (Pre-Test vs. Post-Test)", table_caption_style))
     t3_data = [
         [Paragraph("Métrica Psicométrica", cell_left_bold), Paragraph("Pre-Test", cell_bold), Paragraph("Post-Test", cell_bold), Paragraph("Delta (&Delta;)", cell_bold), Paragraph("Significancia (p)", cell_bold)],
         [Paragraph("Puntaje Global (Escala 0–10)", cell_left), Paragraph("4.87 &plusmn; 0.54", cell_normal), Paragraph("<b>8.64 &plusmn; 0.40</b>", cell_bold), Paragraph("+3.77", cell_normal), Paragraph("p &lt; 0.0001", cell_normal)],
@@ -232,8 +253,8 @@ def build_pdf_compendium():
         story.append(Image(fig1, width=6.5*inch, height=2.35*inch))
         story.append(Spacer(1, 4))
 
-    # SECCIÓN 4: IBF
-    story.append(Paragraph("4. Analítica de Aprendizaje e Índice de Brecha Formativa (IBF)", sec_header_style))
+    # SECCIÓN 5: IBF
+    story.append(Paragraph("5. Analítica de Aprendizaje e Índice de Brecha Formativa (IBF)", sec_header_style))
     fig2 = find_fig("figura_ibf_cohorte.png")
     if fig2:
         story.append(Paragraph("<b>Figura 2:</b> Evolución Longitudinal del IBF en los 4 Ejes Clínicos Normativos", table_caption_style))
@@ -242,8 +263,8 @@ def build_pdf_compendium():
 
     # PÁGINA 3: MOTOR ADAPTATIVO KST & BKT
     story.append(PageBreak())
-    story.append(Paragraph("5. Motor de Currículo Adaptativo (Knowledge Space Theory & BKT)", sec_header_style))
-    story.append(Paragraph("<b>Tabla IV:</b> Probabilidad de Dominio BKT por Competencia Clínica — Ruta Fija vs. Ruta KST Adaptativa", table_caption_style))
+    story.append(Paragraph("6. Motor de Currículo Adaptativo (Knowledge Space Theory & BKT)", sec_header_style))
+    story.append(Paragraph("<b>Tabla V:</b> Probabilidad de Dominio BKT por Competencia Clínica — Ruta Fija vs. Ruta KST Adaptativa", table_caption_style))
     t4_data = [
         [Paragraph("Competencia Clínica", cell_left_bold), Paragraph("L<sub>0</sub>", cell_bold), Paragraph("P(Fija)", cell_bold), Paragraph("Nivel Fija", cell_bold), Paragraph("P(KST)", cell_bold), Paragraph("Nivel KST", cell_bold), Paragraph("&Delta; KST", cell_bold)],
         [Paragraph("Semiología y Anamnesis", cell_left), Paragraph("0.40", cell_normal), Paragraph("0.978", cell_normal), Paragraph("Dominado", cell_normal), Paragraph("<b>0.847</b>", cell_bold), Paragraph("Dominado", cell_normal), Paragraph("-0.131", cell_normal)],

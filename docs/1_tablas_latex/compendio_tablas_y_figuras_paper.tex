@@ -53,6 +53,32 @@ El modelo recuperador \texttt{ateneo-bge-m3-ecuador-v2} fue optimizado en una GP
 \end{minipage}
 \end{table}
 
+\section{Benchmark Ciego Out-of-Distribution (283 Consultas Clínicas)}
+
+Para evaluar la capacidad de generalización en casos no vistos durante el entrenamiento, la Tabla~\ref{tab:blind_retrieval_benchmark} reporta el rendimiento en el conjunto de prueba ciego independiente ($N=283$ consultas clínicas). La prueba de rangos con signo de Wilcoxon confirma una superioridad estadísticamente significativa de Ateneo-BGE-M3 frente al modelo base ($W=365.0, p=0.0001018$).
+
+% TABLA II (BENCHMARK CIEGO OOD)
+\begin{table}[htbp]
+\centering
+\caption{Evaluación Comparativa de Recuperación Normativa en el Test Set Ciego OOD (283 consultas clínicas)}
+\label{tab:blind_retrieval_benchmark}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Arquitectura} & \textbf{Hit@1} & \textbf{Hit@3} & \textbf{Hit@5} & \textbf{MRR@5} & \textbf{NDCG@5} \\
+\midrule
+BM25 Puro (Léxico) & 2.47\% & 4.95\% & 5.30\% & 3.55\% & 3.99\% \\
+BAAI/bge-m3 (Zero-Shot) & 0.71\% & 3.18\% & 3.53\% & 1.90\% & 2.31\% \\
+\textbf{Ateneo-BGE-M3 (FT)} & \textbf{4.24\%} & \textbf{9.19\%} & \textbf{11.66\%} & \textbf{7.12\%} & \textbf{8.26\%} \\
+Ensamble RRF ($k=60$) & 3.53\% & 7.77\% & 9.89\% & 5.87\% & 6.88\% \\
+\bottomrule
+\end{tabular}
+\vspace{1mm}
+\begin{minipage}{\linewidth}
+\footnotesize
+\textit{Nota:} Ateneo-BGE-M3 supera en 6x en Hit@1 y 3.75x en MRR@5 al modelo base (Wilcoxon $p < 0.001$).
+\end{minipage}
+\end{table}
+
 \section{Auditoría de Grounding Normativo (Faithfulness Score)}
 
 La Tabla~\ref{tab:faithfulness_results} contrasta la tasa de anclaje normativo y mitigación de alucinaciones diagnósticas frente al baseline de GPT-4o Zero-Shot y un RAG genérico no especializado.

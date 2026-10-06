@@ -104,7 +104,7 @@ async def readiness_probe(response: Response):
         collections = client.list_collections()
         collections_count = len(collections)
         try:
-            gpc_col = client.get_collection("gpc_msp")
+            gpc_col = client.get_collection(settings.chroma_collection_name)
             documents_count = gpc_col.count()
         except Exception:
             documents_count = 0

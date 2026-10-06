@@ -5,7 +5,13 @@ import chromadb
 from sentence_transformers import SentenceTransformer
 import sentence_transformers.models
 from rank_bm25 import BM25Okapi
-from config import CHROMA_PERSIST_PATH, EMBEDDING_MODEL_NAME
+from config import (
+    CHROMA_PERSIST_PATH,
+    EMBEDDING_MODEL_NAME,
+    CHROMA_COLLECTION_NAME,
+    BM25_INDEX_PATH,
+    BASE_DIR
+)
 from rag.cache_manager import rag_cache_manager
 from core.logger import get_logger
 
@@ -55,12 +61,52 @@ def tokenize_medical_text(text: str) -> List[str]:
     return re.findall(r'\b[a-záéíóúüñ0-9\-]+\b', text.lower())
 
 def get_bm25_index():
-    """Inicializa y cachea el índice BM25 de los documentos en ChromaDB."""
+    """Inicializa y cachea el índice BM25 desde archivo serializado o documentos en ChromaDB."""
     global _BM25_INDEX, _BM25_CORPUS_METAS
     if _BM25_INDEX is None:
+        import os
+        # Prioridad 1: Cargar índice BM25 v2 serializado y metadatos de chunks_corpus_v2
+        if os.path.exists(BM25_INDEX_PATH):
+            try:
+                import pickle
+                with open(BM25_INDEX_PATH, "rb") as f:
+                    bm25_data = pickle.load(f)
+                _BM25_INDEX = bm25_data["bm25"]
+                chunk_ids = bm25_data["chunk_ids"]
+
+                corpus_v2_path = BASE_DIR / "data" / "extracted" / "chunks_corpus_v2.json"
+                if corpus_v2_path.exists():
+                    import json
+                    with open(corpus_v2_path, "r", encoding="utf-8") as jf:
+                        corpus_list = json.load(jf)
+                    chunk_map = {c["chunk_id"]: c for c in corpus_list}
+                    _BM25_CORPUS_METAS = []
+                    for cid in chunk_ids:
+                        c = chunk_map.get(cid, {})
+                        _BM25_CORPUS_METAS.append({
+                            "chunk_id": cid,
+                            "texto": c.get("texto", ""),
+                            "metadata": {
+                                "guia_fuente": c.get("guia_titulo") or c.get("guia_archivo", ""),
+                                "gpc_titulo": c.get("guia_titulo", ""),
+                                "gpc_id": c.get("guia_archivo", ""),
+                                "cie10": c.get("cie10", ""),
+                                "cie11": c.get("cie11", ""),
+                                "eje_clinico": c.get("eje_clinico", ""),
+                                "seccion": c.get("seccion", "General"),
+                                "pagina": c.get("pagina_pdf") or c.get("pagina_impresa_real", 1),
+                                "ano_publicacion": c.get("anio", 2026),
+                            }
+                        })
+                    logger.info(f"Índice Sparse BM25 v2 cargado desde archivo con {len(_BM25_CORPUS_METAS)} fragmentos.", extra={"action": "bm25_v2_loaded", "fragment_count": len(_BM25_CORPUS_METAS)})
+                    return _BM25_INDEX, _BM25_CORPUS_METAS
+            except Exception as e:
+                logger.warning(f"Error cargando BM25 precalculado ({e}), recurriendo a ChromaDB...")
+
+        # Prioridad 2: Construir dinámicamente desde ChromaDB
         client = get_chroma_client()
         try:
-            collection = client.get_collection("gpc_msp")
+            collection = client.get_collection(CHROMA_COLLECTION_NAME)
             data = collection.get(include=["documents", "metadatas"])
             docs = data.get("documents", [])
             metas = data.get("metadatas", [])
@@ -71,10 +117,13 @@ def get_bm25_index():
                 _BM25_INDEX = BM25Okapi(tokenized_corpus)
                 _BM25_CORPUS_METAS = []
                 for i in range(len(ids)):
+                    m = metas[i] if metas else {}
+                    if "guia_fuente" not in m:
+                        m["guia_fuente"] = m.get("gpc_titulo") or m.get("gpc_id", "MSP Ecuador")
                     _BM25_CORPUS_METAS.append({
                         "chunk_id": ids[i],
                         "texto": docs[i],
-                        "metadata": metas[i] if metas else {}
+                        "metadata": m
                     })
                 logger.info(f"Índice Sparse BM25 construido con {len(docs)} fragmentos.", extra={"action": "bm25_index_built", "fragment_count": len(docs)})
         except Exception as e:
@@ -97,11 +146,17 @@ def resolve_canonical_guia(collection, guia_filtro: Optional[str]) -> Optional[s
     if not target_clean:
         return None
 
-    # Intentar coincidencia exacta primero
+    # Intentar coincidencia exacta o difusa con nombres disponibles
     try:
-        # Obtener nombres de guías disponibles desde BM25 o Chroma
         _, corpus = get_bm25_index()
-        available_guias = list(set(str(item["metadata"].get("guia_fuente", "")) for item in corpus if item.get("metadata")))
+        available_guias = []
+        for item in (corpus or []):
+            m = item.get("metadata", {})
+            for key in ("guia_fuente", "gpc_titulo", "gpc_id"):
+                val = m.get(key)
+                if val:
+                    available_guias.append(str(val))
+        available_guias = list(set(available_guias))
     except Exception:
         available_guias = []
 
@@ -137,21 +192,22 @@ def retrieve_top_k_chunks(
     client = get_chroma_client()
 
     try:
-        collection = client.get_collection("gpc_msp")
+        collection = client.get_collection(CHROMA_COLLECTION_NAME)
         if collection.count() == 0:
-            raise ValueError("Colección ChromaDB vacía.")
+            raise ValueError(f"Colección ChromaDB {CHROMA_COLLECTION_NAME} vacía.")
     except Exception as e:
-        logger.warning(f"Error al acceder a ChromaDB: {e}. Intentando reparación de schema...", extra={"action": "chroma_schema_repair"})
+        logger.warning(f"Error al acceder a ChromaDB: {e}. Intentando verificación de colección...", extra={"action": "chroma_schema_repair"})
 
         try:
             import sqlite3
             con = sqlite3.connect(f"{CHROMA_PERSIST_PATH}/chroma.sqlite3")
-            con.execute("UPDATE collections SET config_json_str = NULL WHERE config_json_str = '{}';")
+            con.execute("UPDATE collections SET config_json_str = '{\"_type\": \"CollectionConfigurationInternal\"}' WHERE config_json_str = '{}';")
             con.commit()
             con.close()
+            collection = client.get_collection(CHROMA_COLLECTION_NAME)
         except Exception as exc:
-            logger.warning(f"Colección gpc_msp no encontrada, inicializando: {exc}")
-            collection = client.get_or_create_collection("gpc_msp")
+            logger.warning(f"Colección {CHROMA_COLLECTION_NAME} no encontrada, inicializando: {exc}")
+            collection = client.get_or_create_collection(CHROMA_COLLECTION_NAME)
 
     # Resolver nombre canónico exacto para la base de datos
     canonical_guia = resolve_canonical_guia(collection, guia_filtro)
@@ -165,7 +221,15 @@ def retrieve_top_k_chunks(
         model_target = custom_dense_model or EMBEDDING_MODEL_NAME
         model = get_embedding_model(model_target)
         query_embedding = model.encode([query]).tolist()
-        where_filter = {"guia_fuente": canonical_guia} if canonical_guia else None
+        where_filter = None
+        if canonical_guia:
+            if CHROMA_COLLECTION_NAME == "gpc_msp_v2":
+                if canonical_guia.endswith(".pdf"):
+                    where_filter = {"gpc_id": canonical_guia}
+                else:
+                    where_filter = {"gpc_titulo": canonical_guia}
+            else:
+                where_filter = {"guia_fuente": canonical_guia}
 
         dense_results = collection.query(
             query_embeddings=query_embedding,
@@ -207,8 +271,10 @@ def retrieve_top_k_chunks(
                 cid = item["chunk_id"]
                 meta = item["metadata"]
                 
-                if clean_canonical and _normalize_guide_name(meta.get("guia_fuente")) != clean_canonical:
-                    continue
+                if clean_canonical:
+                    guia_ident = _normalize_guide_name(meta.get("guia_fuente") or meta.get("gpc_titulo") or meta.get("gpc_id") or "")
+                    if clean_canonical not in guia_ident and guia_ident not in clean_canonical:
+                        continue
                     
                 bm25_ranked_ids.append(cid)
                 if cid not in chunk_data_map:
@@ -243,13 +309,17 @@ def retrieve_top_k_chunks(
         if cid in chunk_data_map:
             item = chunk_data_map[cid]
             meta = item["metadata"]
+            guia_nombre = meta.get("guia_fuente") or meta.get("gpc_titulo") or meta.get("gpc_id") or (guia_filtro or "MSP Ecuador")
             retrieved.append({
                 "chunk_id": cid,
                 "texto": item["texto"],
                 "seccion": meta.get("seccion", "General"),
-                "pagina": meta.get("pagina", 1),
-                "guia_fuente": meta.get("guia_fuente", guia_filtro or "MSP Ecuador"),
-                "ano_publicacion": meta.get("ano_publicacion", 2019),
+                "pagina": meta.get("pagina", meta.get("pagina_pdf", meta.get("pagina_impresa_real", 1))),
+                "guia_fuente": guia_nombre,
+                "ano_publicacion": meta.get("ano_publicacion", meta.get("anio", 2026)),
+                "cie10": meta.get("cie10") or meta.get("cie10_codigo", ""),
+                "cie11": meta.get("cie11", ""),
+                "eje_clinico": meta.get("eje_clinico", ""),
                 "distancia": item["distancia"],
                 "rrf_score": round(rrf_scores.get(cid, 1.0), 5)
             })

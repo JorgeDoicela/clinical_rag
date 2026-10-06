@@ -45,7 +45,20 @@ class AppSettings(BaseModel):
 
     # Rutas del Core
     chroma_persist_path: str = Field(
-        default_factory=lambda: str(BASE_DIR / os.getenv("CHROMA_PERSIST_PATH", "./data/chroma_db"))
+        default_factory=lambda: str(
+            BASE_DIR / os.getenv("CHROMA_PERSIST_PATH", "./data/chroma_db_v2" if (BASE_DIR / "data" / "chroma_db_v2" / "chroma.sqlite3").exists() else "./data/chroma_db")
+        )
+    )
+    chroma_collection_name: str = Field(
+        default_factory=lambda: os.getenv(
+            "CHROMA_COLLECTION_NAME",
+            "gpc_msp_v2" if (BASE_DIR / "data" / "chroma_db_v2" / "chroma.sqlite3").exists() else "gpc_msp"
+        )
+    )
+    bm25_index_path: str = Field(
+        default_factory=lambda: str(
+            BASE_DIR / os.getenv("BM25_INDEX_PATH", "./data/extracted/bm25_index_v2.pkl" if (BASE_DIR / "data" / "extracted" / "bm25_index_v2.pkl").exists() else "./data/extracted/bm25_index.pkl")
+        )
     )
     raw_pdfs_path: str = Field(
         default_factory=lambda: str(BASE_DIR / os.getenv("RAW_PDFS_PATH", "./data/raw_pdfs"))
@@ -125,6 +138,8 @@ GEMINI_MODEL = settings.gemini_primary_model
 GEMINI_FALLBACK_MODELS = settings.gemini_fallback_models_raw
 GEMINI_CIRCUIT_COOLDOWN_SECONDS = settings.gemini_circuit_cooldown_seconds
 CHROMA_PERSIST_PATH = settings.chroma_persist_path
+CHROMA_COLLECTION_NAME = settings.chroma_collection_name
+BM25_INDEX_PATH = settings.bm25_index_path
 RAW_PDFS_PATH = settings.raw_pdfs_path
 CASES_FILE_PATH = settings.cases_file_path
 DATABASE_URL = settings.database_url
