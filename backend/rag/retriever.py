@@ -196,18 +196,8 @@ def retrieve_top_k_chunks(
         if collection.count() == 0:
             raise ValueError(f"Colección ChromaDB {CHROMA_COLLECTION_NAME} vacía.")
     except Exception as e:
-        logger.warning(f"Error al acceder a ChromaDB: {e}. Intentando verificación de colección...", extra={"action": "chroma_schema_repair"})
-
-        try:
-            import sqlite3
-            con = sqlite3.connect(f"{CHROMA_PERSIST_PATH}/chroma.sqlite3")
-            con.execute("UPDATE collections SET config_json_str = '{\"_type\": \"CollectionConfigurationInternal\"}' WHERE config_json_str = '{}';")
-            con.commit()
-            con.close()
-            collection = client.get_collection(CHROMA_COLLECTION_NAME)
-        except Exception as exc:
-            logger.warning(f"Colección {CHROMA_COLLECTION_NAME} no encontrada, inicializando: {exc}")
-            collection = client.get_or_create_collection(CHROMA_COLLECTION_NAME)
+        logger.error(f"Error al acceder a la colección {CHROMA_COLLECTION_NAME} en ChromaDB: {e}", extra={"action": "chroma_collection_error"})
+        raise
 
     # Resolver nombre canónico exacto para la base de datos
     canonical_guia = resolve_canonical_guia(collection, guia_filtro)

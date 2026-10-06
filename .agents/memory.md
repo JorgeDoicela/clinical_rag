@@ -907,7 +907,11 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     * Actualizado [`docs/3_documentacion_metodologica/METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/3_documentacion_metodologica/METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md) con el desglose de 42 GPCs indexadas y la Tabla II de resultados del benchmark ciego.
     * Actualizado [`docs/3_documentacion_metodologica/MANUAL_DE_PRUEBAS_Y_BENCHMARKS.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/3_documentacion_metodologica/MANUAL_DE_PRUEBAS_Y_BENCHMARKS.md) sincronizando las 5 tablas del paper.
     * Actualizado [`docs/7_planes_de_escalabilidad_y_hoja_de_ruta/PLAN_REESTRUCTURACION_PIPELINE_IA.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/7_planes_de_escalabilidad_y_hoja_de_ruta/PLAN_REESTRUCTURACION_PIPELINE_IA.md) con Fases 7 y 8 al 100% de completitud.
-    * Actualizado [`README.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/README.md) en la raíz con el árbol de componentes v2, tabla de resultados OOD y enlaces directos a los 5 dosieres metodológicos de ingesta.
+  - **Auditoría de Causa Raíz y Erradicación de Parche SQL en `retriever.py` (2026-10-06):**
+    * Eliminado el bloque de reparación SQL defensivo (`UPDATE collections`) en tiempo de ejecución en [`backend/rag/retriever.py`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/backend/rag/retriever.py).
+    * Acceso al cliente de ChromaDB normalizado al estándar nativo canónico (`client.get_collection`).
+    * Base vectorial persistente `chroma_db_v2` verificada al 100% nativa con recuperación clínica real.
+    * Generado paquete comprimido limpio `chroma_db_v2_ateneo.zip` (58.62 MB) para Google Drive.
 
 
 
