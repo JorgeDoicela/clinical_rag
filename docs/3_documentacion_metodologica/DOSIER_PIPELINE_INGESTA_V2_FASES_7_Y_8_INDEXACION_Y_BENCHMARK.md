@@ -48,11 +48,11 @@ graph TD
   - `hnsw:construction_ef`: 128
   - `hnsw:M`: 16
   - `hnsw:search_ef`: 64
-* **Persistencia Relacional Subyacente:** Base de datos SQLite (`chroma.sqlite3`) en modo WAL (*Write-Ahead Logging*). El índice de búsqueda por texto completo FTS5 fue reparado y auditado mediante:
-  ```sql
-  INSERT INTO fts_gpc_msp_v2(fts_gpc_msp_v2) VALUES('rebuild');
-  PRAGMA integrity_check; -- Resultado: ok
-  ```
+* **Persistencia Relacional Subyacente:** Base de datos SQLite (`chroma.sqlite3`) en modo WAL (*Write-Ahead Logging*).
+  - Configuración formal de colección: `CollectionConfigurationInternal` con parámetros tipados de `HNSWConfigurationInternal` persistidos directamente en la tabla `collections`.
+  - Serialización de metadatos del segmento vectorial: Objeto fuertemente tipado `PersistentData` (`chromadb.segment.impl.vector.local_persistent_hnsw.PersistentData`), garantizando acceso directo sin conversiones intermedias.
+  - Auditoría del índice FTS5: Reconstrucción y certificación de integridad relacional mediante `PRAGMA integrity_check` ($\text{ok}$).
+* **Artefacto Canónico de Distribución MLOps:** Paquete de replicación desacoplado `chroma_db_v2_ateneo.zip` (58.62 MB), diseñado para despliegue reproducible en almacenamiento externo/Drive sin transferir dependencias binarias a Git.
 
 ### 2.2 Índice Léxico Disperso (BM25Okapi v2)
 * **Archivo Serializado:** `backend/data/extracted/bm25_index_v2.pkl` (14.00 MB).
