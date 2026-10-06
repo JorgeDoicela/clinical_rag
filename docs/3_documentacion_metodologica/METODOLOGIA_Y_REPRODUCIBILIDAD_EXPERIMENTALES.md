@@ -6,7 +6,7 @@ Este documento describe el protocolo experimental riguroso implementado en **Ate
 
 ## 1. Corpus Normativo Oficial de Guías de Práctica Clínica (GPC)
 
-El corpus está compuesto por **45 documentos oficiales** emitidos por el Ministerio de Salud Pública (MSP) del Ecuador, organizados por sus años de promulgación (2013 a 2019). El 100% de los documentos se encuentra mapeado nosológicamente contra la Clasificación Internacional de Enfermedades (**CIE-10**) y categorizado en 11 especialidades médicas:
+El corpus está compuesto por **42 Guías de Práctica Clínica (GPC) oficiales** emitidas por el Ministerio de Salud Pública (MSP) del Ecuador con contenido prescriptivo completo (promulgadas entre 2013 y 2019), segmentadas en **7,052 fragmentos normativos indivisibles** tras la extracción nativa con PyMuPDF y pdfplumber. El 100% de los documentos se encuentra mapeado nosológicamente contra la Clasificación Internacional de Enfermedades (**CIE-10** y **CIE-11**) y categorizado en 11 especialidades médicas:
 
 * **Ginecología y Obstetricia** (Preeclampsia, Hemorragia Posparto, RPM, Cesárea, Anemia Gestacional, Trabajo de Parto, Infección Vaginal, etc.)
 * **Pediatría y Neonatología** (EHIRN, Sepsis Neonatal, Recién Nacido Prematuro, Dificultad Respiratoria, APLV, Hipotiroidismo Congénito)
@@ -106,6 +106,16 @@ Los artefactos LaTeX generados automáticamente por el pipeline se encuentran pr
 * **Mean Reciprocal Rank (MRR@5):** Incremento de $0.0889$ a $\mathbf{0.3328}$ ($\Delta = +0.2439$, ganancia de **$+274.40\%$**).
 * **NDCG@5:** Incremento de $0.1066$ a $\mathbf{0.3682}$ ($\Delta = +0.2616$, ganancia de **$+245.40\%$**).
 * **Concordancia Inter-Anotador del Ground Truth:** $\kappa_w = \mathbf{0.9509}$ (Acuerdo casi perfecto según Landis & Koch).
+
+### Tabla II: Benchmark Ciego Out-of-Distribution en Guías no Vistas ([tabla_resultados_paper.tex](../1_tablas_latex/tabla_resultados_paper.tex))
+* **Protocolo de Evaluación:** $N = 283$ consultas clínicas complejas evaluadas contra el universo completo de 7,052 fragmentos normativos del MSP, bajo aislamiento a nivel de documento (*Document-Level Split*).
+* **Resultados Comparativos Multi-Arquitectura:**
+  - **BM25 Puro (Léxico Disperso):** Hit@1 = 2.47%, Hit@3 = 4.95%, Hit@5 = 5.30%, MRR@5 = 3.55%, NDCG@5 = 3.99%.
+  - **BAAI/bge-m3 Base (Zero-Shot Denso):** Hit@1 = 0.71%, Hit@3 = 3.18%, Hit@5 = 3.53%, MRR@5 = 1.90%, NDCG@5 = 2.31%.
+  - **Ateneo-BGE-M3 (Supervisado FT):** Hit@1 = **4.24%** (+497% vs Base), Hit@3 = **9.19%** (+189% vs Base), Hit@5 = **11.66%** (+230% vs Base), MRR@5 = **7.12%** (+275% vs Base), NDCG@5 = **8.26%** (+258% vs Base).
+  - **Ensamble Híbrido RRF ($k=60$):** Hit@1 = 3.53%, Hit@3 = 7.77%, Hit@5 = 9.89%, MRR@5 = 5.87%, NDCG@5 = 6.88%.
+* **Prueba de Inferencia Estadística:** Wilcoxon Signed-Rank Test pareado sobre rangos recíprocos por consulta: $W = 365.0, p = 0.00010186$ ($p < 0.001$), certificando la superioridad estadísticamente significativa del modelo entrenado.
+* **Compendio Formal:** Integrado en [`compendio_tablas_y_figuras_paper.tex`](../1_tablas_latex/compendio_tablas_y_figuras_paper.tex) y compilado en [`COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf`](../4_pdf_compilado/COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf).
 
 ---
 

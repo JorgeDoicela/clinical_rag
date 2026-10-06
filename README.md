@@ -296,8 +296,9 @@ clinical_rag/
 │   │   │   └── annotation_protocol.md    # Protocolo formal de consenso en escala Likert
 │   │   ├── extracted/                    # Corpus procesado en Markdown y Chunks normativos
 │   │   │   ├── chunks_corpus_v2.json     # 7,052 fragmentos normativos indivisibles
+│   │   │   ├── bm25_index_v2.pkl         # Índice léxico BM25Okapi v2 (14.00 MB, 7,052 chunks)
 │   │   │   └── markdown/                 # 42 GPCs oficiales estructuradas en Markdown nativo
-│   │   ├── chroma_db/                    # Base vectorial persistente
+│   │   ├── chroma_db_v2/                 # Base vectorial persistente v2 (Colección gpc_msp_v2, 7,052 chunks)
 │   │   ├── ateneo_clinical.db            # Base relacional SQLite normalizada (Modo WAL)
 │   │   └── pilot_study/                  # Instrumentos estandarizados del estudio piloto
 │   │       ├── pre_test_casos.json       # 5 casos del pre-test
@@ -311,6 +312,8 @@ clinical_rag/
 │   │   ├── 04_mine_hard_negatives.py     # Minería de Hard Negatives BM25 + Dense Re-ranking
 │   │   ├── 05_build_ground_truth_pool.py # Ensamblado y validación inter-anotador Kappa
 │   │   ├── 06_train_bge_m3.py            # Fine-tuning contrastivo MNRL y evaluación PRE vs. POST
+│   │   ├── 07_index_chromadb_v2.py       # Indexación vectorial HNSW y léxica BM25 (7,052 chunks)
+│   │   ├── 08_evaluate_blind_benchmark.py # Benchmark ciego OOD (283 consultas, Wilcoxon W=365)
 │   │   ├── colab_fase2_marker_extraction.ipynb # Extracción en GPU Colab
 │   │   └── colab_fase6_train_bge_m3.ipynb      # Re-entrenamiento en NVIDIA A100 (80GB VRAM)
 │   ├── tests/                            # Suites de pruebas automatizadas y benchmarks
@@ -390,17 +393,32 @@ docker compose exec frontend npm run test:e2e
 
 ## 7. Resumen de Métricas del Benchmark
 
+### 7.1 Métricas Consolidadas del Sistema Ateneo+
+
 | Métrica Científica | Resultado Empírico | Interpretación |
 | :--- | :---: | :--- |
-| **Hit@1 (Top-1 Retrieval Accuracy)** | **`100.0%`** | El fragmento normativo del MSP aparece en primera posición. |
-| **MRR@5 (Mean Reciprocal Rank)** | **`1.0000`** | Rango recíproco en el banco de prueba ciego. |
+| **Hit@1 (Top-1 In-Distribution)** | **`100.0%`** | El fragmento normativo del MSP aparece en primera posición. |
+| **MRR@5 (Mean Reciprocal Rank)** | **`1.0000`** | Rango recíproco en el banco de casos clínicos de producción. |
 | **NDCG@5 (Normalized Discounted Gain)**| **`1.0000`** | Ordenamiento del recuperador híbrido RRF. |
 | **Exactitud Coseno en Validación (FT)** | **`96.48%`** | Desempeño del fine-tuning MNRL frente a consultas clínicas. |
 | **Fidelidad Normativa (Faithfulness)** | **`100.0%`** | Proporción de afirmaciones respaldadas por las GPCs oficiales. |
 | **Tasa de Validez JSON Pydantic** | **`100.0%`** | Cumplimiento del contrato de datos estructurado. |
 | **Ganancia de Aprendizaje de Hake (g)** | **`0.7400`** | Ganancia de razonamiento clínico pre vs. post-test ($g \ge 0.70$). |
-| **Significancia Estadística (p-value)** | **`p < 0.0001`** | Diferencia estadísticamente significativa con test de Wilcoxon. |
+| **Significancia Estadística (p-value)** | **`p < 0.0001`** | Diferencia estadísticamente significativa con test de Wilcoxon ($t=105.26, df=24$). |
 | **Latencia Mediana (P50)** | **`7.73 s`** | Tiempo de respuesta en inferencia multimodal. |
+
+### 7.2 Benchmark Ciego Out-of-Distribution ($N = 283$ Consultas Clínicas)
+
+Evaluación comparativa rigurosa en guías completas no vistas durante el entrenamiento (*Document-Level Split*, $0\%$ Data Leakage):
+
+| Arquitectura de Recuperación | Hit@1 (%) | Hit@3 (%) | Hit@5 (%) | MRR@5 (%) | NDCG@5 (%) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| BM25 Puro (Léxico) | 2.47% | 4.95% | 5.30% | 3.55% | 3.99% |
+| BAAI/bge-m3 (Zero-Shot Base) | 0.71% | 3.18% | 3.53% | 1.90% | 2.31% |
+| **Ateneo-BGE-M3 (Supervisado FT)** | **4.24%** | **9.19%** | **11.66%** | **7.12%** | **8.26%** |
+| Ensamble Híbrido RRF ($k=60$) | 3.53% | 7.77% | 9.89% | 5.87% | 6.88% |
+
+*Test de Rangos con Signo de Wilcoxon: $W = 365.0, p = 0.00010186$ ($p < 0.001$, altamente significativo).*
 
 ---
 
@@ -408,6 +426,12 @@ docker compose exec frontend npm run test:e2e
 
 * **Redacción en [Overleaf](https://www.overleaf.com/) / LaTeX:** Subir las subcarpetas [`docs/1_tablas_latex/`](docs/1_tablas_latex/) y [`docs/2_figuras_300dpi/`](docs/2_figuras_300dpi/) al proyecto. En el archivo `main.tex` se insertan las tablas con `\input{tabla_pre_post_fine_tuning_bge_m3.tex}` o se compila directamente el archivo maestro [`compendio_tablas_y_figuras_paper.tex`](docs/1_tablas_latex/compendio_tablas_y_figuras_paper.tex).
 * **Redacción en Microsoft Word / Google Docs:** Abrir el documento [`docs/4_pdf_compilado/COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf`](docs/4_pdf_compilado/COMPENDIO_TABLAS_Y_FIGURAS_PAPER.pdf), copiar las tablas de datos e insertar las figuras PNG de alta resolución.
+* **Dosieres del Pipeline Científico de Ingesta y Modelado v2:**
+  * [Dosier Ingesta v2: Fases 1 a 3 (Clasificación, Extracción Nativa y Chunking)](docs/3_documentacion_metodologica/DOSIER_PIPELINE_INGESTA_V2_FASES_1_A_3.md)
+  * [Dosier Ingesta v2: Fase 4 (Minería Semántica de Hard Negatives y Zero Leakage)](docs/3_documentacion_metodologica/DOSIER_PIPELINE_INGESTA_V2_FASE_4_HARD_NEGATIVES.md)
+  * [Dosier Ingesta v2: Fase 5 (Ground Truth Clínico y Validación Inter-Anotador)](docs/3_documentacion_metodologica/DOSIER_PIPELINE_INGESTA_V2_FASE_5_GROUND_TRUTH.md)
+  * [Dosier Ingesta v2: Fase 6 (Fine-Tuning de BGE-M3 con MNRL en NVIDIA A100)](docs/3_documentacion_metodologica/DOSIER_PIPELINE_INGESTA_V2_FASE_6_FINE_TUNING_BGE_M3.md)
+  * [Dosier Ingesta v2: Fases 7 y 8 (Indexación Vectorial v2 y Benchmark Ciego OOD)](docs/3_documentacion_metodologica/DOSIER_PIPELINE_INGESTA_V2_FASES_7_Y_8_INDEXACION_Y_BENCHMARK.md)
 * **Documentación Metodológica y Arquitectónica:** Los archivos `.md` en [`docs/3_documentacion_metodologica/`](docs/3_documentacion_metodologica/) contienen la formulación matemática, justificación de la pérdida MNRL, análisis de limitaciones y las especificaciones de arquitectura de software:
   * [Arquitectura Modular del Frontend (Feature-Driven Slices & Core Shared)](docs/3_documentacion_metodologica/ARQUITECTURA_MODULAR_FRONTEND.md)
   * [Arquitectura del Backend: Monolito Modular con Persistencia Desacoplada](docs/3_documentacion_metodologica/ARQUITECTURA_MODULAR_MONOLITO_BACKEND.md)
@@ -415,6 +439,8 @@ docker compose exec frontend npm run test:e2e
   * [Informe de Auditoría de Carga, Concurrencia y Resistencia al Fallo](docs/3_documentacion_metodologica/INFORME_AUDITORIA_CARGA_Y_CONCURRENCIA.md)
   * [Arquitectura de Resiliencia de IA y Configuración 12-Factor](docs/3_documentacion_metodologica/ARQUITECTURA_RESILIENTE_LLM_Y_CONFIGURACION.md)
   * [Arquitectura RAG Híbrida y Fine-Tuning](docs/3_documentacion_metodologica/ARQUITECTURA_RAG_Y_FINE_TUNING.md)
+  * [Metodología Experimental, Reproducibilidad y Tablas LaTeX](docs/3_documentacion_metodologica/METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md)
+  * [Manual de Pruebas Automatizadas y Benchmarks](docs/3_documentacion_metodologica/MANUAL_DE_PRUEBAS_Y_BENCHMARKS.md)
 * **Planes de Escalabilidad y Hoja de Ruta Operativa:** Consultar [`docs/7_planes_de_escalabilidad_y_hoja_de_ruta/`](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/) para el [Plan Maestro de Reestructuración del Pipeline de IA v2 (100% Corpus Ecuador)](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/PLAN_REESTRUCTURACION_PIPELINE_IA.md), la [Hoja de Ruta de 21 Sesiones](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/HOJA_DE_RUTA_EJECUCION_SESIONES.md) y los planes maestros de [Base de Datos](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/PLAN_ESCALABILIDAD_BASE_DE_DATOS.md), [Backend](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/PLAN_ESCALABILIDAD_BACKEND.md) y [Frontend](docs/7_planes_de_escalabilidad_y_hoja_de_ruta/PLAN_ESCALABILIDAD_FRONTEND.md).
 
 ---

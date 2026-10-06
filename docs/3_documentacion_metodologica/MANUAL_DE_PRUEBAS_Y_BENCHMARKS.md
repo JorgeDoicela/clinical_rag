@@ -140,9 +140,10 @@ backend/.venv/Scripts/pytest backend/tests/ -v
 | Artefacto Generado | Ubicación | Elemento en Artículo Científico |
 |:---|:---|:---|
 | `tabla_pre_post_fine_tuning_bge_m3.tex` | `docs/1_tablas_latex/` | **Tabla I:** Comparación Pre vs. Post Fine-Tuning BGE-M3 Ecuador en GPU A100 |
-| `tabla_faithfulness_paper.tex` | `docs/1_tablas_latex/` | **Tabla II:** Evaluación de Fidelidad Normativa (Faithfulness Score / Anti-Alucinación) |
-| `tabla_pilot_study_paper.tex` | `docs/1_tablas_latex/` | **Tabla III:** Ganancia de Aprendizaje Normalizada de Hake ($g = 0.74, p < 0.0001$) |
-| `tabla_kst_bkt_paper.tex` | `docs/1_tablas_latex/` | **Tabla IV:** Comparativa de Dominio Final BKT por Competencia Clínica en ZDP |
+| `tabla_resultados_paper.tex` | `docs/1_tablas_latex/` | **Tabla II:** Evaluación Comparativa en Test Set Ciego OOD (283 consultas, Wilcoxon $p < 0.001$) |
+| `tabla_faithfulness_paper.tex` | `docs/1_tablas_latex/` | **Tabla III:** Evaluación de Fidelidad Normativa (Faithfulness Score / Anti-Alucinación) |
+| `tabla_pilot_study_paper.tex` | `docs/1_tablas_latex/` | **Tabla IV:** Ganancia de Aprendizaje Normalizada de Hake ($g = 0.74, p < 0.0001$) |
+| `tabla_kst_bkt_paper.tex` | `docs/1_tablas_latex/` | **Tabla V:** Comparativa de Dominio Final BKT por Competencia Clínica en ZDP |
 | `figura_learning_gain.png` | `docs/2_figuras_300dpi/` | **Figura 1:** Distribución Pre-Test vs Post-Test y Ganancia de Hake |
 | `figura_ibf_cohorte.png` | `docs/2_figuras_300dpi/` | **Figura 2:** Índice de Brecha Formativa (IBF) por Eje Clínico con Umbral Normativo |
 | `figura_kst_trajectory.png` | `docs/2_figuras_300dpi/` | **Figura 3:** Trayectoria Longitudinal de Dominio $P(L)$ según KST/BKT |

@@ -314,7 +314,7 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
     * `MANUAL_DE_PRUEBAS_Y_BENCHMARKS.md`: Actualizado inventario frontend a 16 suites y 72 tests unitarios en Vitest (incorporando `SocraticDebrief`, `AteneoRealtimeCollab`, `ClinicalStudyViewer` y `OfflineSync`) más 4 suites y 15 tests E2E en Playwright.
     * `PUBLICACION_Y_PRESENTACION_CONGRESO.md`: Enlazadas tablas de resultados y ablación hacia `docs/1_tablas_latex/`.
     * `CUANTIZACION_Y_DESPLIEGUE_AWS.md`: Corregida instrucción de creación de `.env` para apuntar a la raíz del proyecto bajo el estándar 12-factor.
-    * `scripts/check_gemini_models.py`: Eliminado emoji decorativo `📊` y actualizada referencia hacia `.env` en la raíz.
+    * `scripts/check_gemini_models.py`: Eliminado emoji decorativo y actualizada referencia hacia `.env` en la raíz.
   - **Refuerzo y Blindaje de Aserciones en Pruebas Backend:**
     * `backend/tests/run_all_tests.py`: Incorporado `traceback.print_exc()` y formateo estructurado `f"{type(e).__name__}: {e}" if str(e) else type(e).__name__` para erradicar diagnósticos mudos ante excepciones.
     * `backend/tests/test_api_endpoints.py`: Añadidos mensajes explícitos de estado HTTP `f"Expected 200, got {res.status_code}: {res.text}"` en endpoints evaluativos y socráticos.
@@ -901,7 +901,13 @@ Este archivo almacena el contexto operativo, decisiones de interfaz y lecciones 
   - **Certificación de Regresión (100% PASS):**
     * Sondas de observabilidad (`/health` y `/health/ready`): 100% PASS (ChromaDB latency: 9.7 ms).
     * Búsqueda híbrida en vivo verificada con consultas clínicas reales (ej. preeclampsia severa y sulfato de magnesio).
-    * Suite consolidada de pruebas del backend (`run_all_tests.py`): 8/8 suites aprobadas al 100% (75.89s).
+  - **Sincronización Integral de Documentación Técnica Docs-as-Code (2026-10-06):**
+    * Creado [`docs/3_documentacion_metodologica/DOSIER_PIPELINE_INGESTA_V2_FASES_7_Y_8_INDEXACION_Y_BENCHMARK.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/3_documentacion_metodologica/DOSIER_PIPELINE_INGESTA_V2_FASES_7_Y_8_INDEXACION_Y_BENCHMARK.md) documentando la arquitectura HNSW, indexación BM25 v2, paridad tripartita 1:1 (7,052 chunks) y protocolo del benchmark ciego OOD ($N=283$, Wilcoxon $W=365.0, p=0.0001018$).
+    * Actualizado [`docs/3_documentacion_metodologica/ARQUITECTURA_RAG_Y_FINE_TUNING.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/3_documentacion_metodologica/ARQUITECTURA_RAG_Y_FINE_TUNING.md) con rutas de persistencia v2 (`chroma_db_v2`, `gpc_msp_v2`, `bm25_index_v2.pkl`).
+    * Actualizado [`docs/3_documentacion_metodologica/METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/3_documentacion_metodologica/METODOLOGIA_Y_REPRODUCIBILIDAD_EXPERIMENTALES.md) con el desglose de 42 GPCs indexadas y la Tabla II de resultados del benchmark ciego.
+    * Actualizado [`docs/3_documentacion_metodologica/MANUAL_DE_PRUEBAS_Y_BENCHMARKS.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/3_documentacion_metodologica/MANUAL_DE_PRUEBAS_Y_BENCHMARKS.md) sincronizando las 5 tablas del paper.
+    * Actualizado [`docs/7_planes_de_escalabilidad_y_hoja_de_ruta/PLAN_REESTRUCTURACION_PIPELINE_IA.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/docs/7_planes_de_escalabilidad_y_hoja_de_ruta/PLAN_REESTRUCTURACION_PIPELINE_IA.md) con Fases 7 y 8 al 100% de completitud.
+    * Actualizado [`README.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/clinical_rag/README.md) en la raíz con el árbol de componentes v2, tabla de resultados OOD y enlaces directos a los 5 dosieres metodológicos de ingesta.
 
 
 

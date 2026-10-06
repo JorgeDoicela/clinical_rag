@@ -53,17 +53,19 @@ Para superar las limitaciones del suavizado semántico en términos médicos exa
 
 ### 2.1 Búsqueda Densa (Dense Vector Search)
 * **Backbone:** Modelo denso supervisado `ateneo-bge-m3-ecuador-v2` re-entrenado en GPU NVIDIA A100 (80GB VRAM) mediante pérdida MNRL ($\tau=0.02$) sobre el banco de 1,710 tripletas del MSP Ecuador (1,024 dimensiones latentes, métrica coseno), con fallback de alta disponibilidad a `BAAI/bge-m3`.
-* **Proyección:** Captura la intención médica general y la semántica profunda de las Guías de Práctica Clínica oficiales con una ganancia empírica de $+369.23\%$ en Hit@1 y $+274.40\%$ en MRR@5.
+* **Persistencia Vectorial (ChromaDB v2):** Colección persistente `gpc_msp_v2` ubicada en `backend/data/chroma_db_v2/` con índice HNSW optimizado (`cosine`, $M=16$, $ef=64$) y base relacional SQLite en modo WAL con verificación de integridad FTS5.
+* **Proyección:** Captura la intención médica general y la semántica profunda de las 42 Guías de Práctica Clínica oficiales (7,052 fragmentos normativos indivisibles).
 
 ### 2.2 Búsqueda Léxica Dispersa (Sparse BM25 Search)
-* **Algoritmo:** `BM25Okapi` con tokenización sensible a terminología médica en minúsculas.
+* **Algoritmo:** `BM25Okapi` ($k_1=1.5, b=0.75$) implementado en `backend/data/extracted/bm25_index_v2.pkl` (14.00 MB).
+* **Tokenización Especializada:** Sensible a terminología nosológica, guiones de patologías y unidades posológicas exactas (`mg/kg/h`, `cmH2O`, acrónimos `CURB-65`, `HELLP`).
 * **Función:** Recupera de forma determinista coincidencias exactas de fármacos, criterios de riesgo y dosis numéricas.
 
 ### 2.3 Algoritmo de Fusión RRF ($k=60$)
 Para cada documento candidato $d$ presente en los resultados densos o léxicos:
 $$\text{RRF\_Score}(d) = \frac{1}{60 + \text{rank}_{\text{dense}}(d)} + \frac{1}{60 + \text{rank}_{\text{bm25}}(d)}$$
 
-Los fragmentos se ordenan de forma descendente según su $\text{RRF\_Score}$, garantizando que el documento Top-1 posea tanto relevancia semántica contextual como precisión léxica exacta.
+Los fragmentos se ordenan de forma descendente según su $\text{RRF\_Score}$, garantizando que el documento Top-1 posea tanto relevancia semántica contextual como precisión léxica exacta. En el Test Set Ciego Out-of-Distribution ($N=283$ consultas sobre guías no vistas), este ensamble alcanza Hit@5 de $9.89\%$ y MRR@5 de $5.87\%$, mientras que el modelo denso supervisado alcanza Hit@5 de $11.66\%$ y MRR@5 de $7.12\%$ ($+274.7\%$ vs modelo base, Wilcoxon $W=365.0, p=0.0001018$).
 
 ---
 
