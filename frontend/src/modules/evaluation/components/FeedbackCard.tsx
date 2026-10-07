@@ -131,7 +131,7 @@ export default function FeedbackCard({ result, studentAnswer = '', onReset }: Fe
     setDownloadingPdf(true);
     try {
       const blob = await evaluationApi.exportEvaluationPdf({
-        case_id: result.case_id || 'case_dengue_01',
+        case_id: result.case_id || 'case_preeclampsia_01',
         case_title: result.case_title || 'Caso Clínico Formativo MSP',
         student_name: user?.nombre || 'Estudiante de Medicina',
         guia_asociada: result.cita_normativa?.guia || 'Norma Oficial MSP Ecuador',
@@ -275,7 +275,7 @@ export default function FeedbackCard({ result, studentAnswer = '', onReset }: Fe
                 </div>
                 <button
                   type="button"
-                  onClick={() => openDebrief(result.case_id || 'case_dengue_01', result.case_title || 'Caso Clínico Formativo', o)}
+                  onClick={() => openDebrief(result.case_id || 'case_preeclampsia_01', result.case_title || 'Caso Clínico Formativo', o)}
                   className="inline-flex items-center space-x-1.5 text-[11px] font-medium text-cyan-700 hover:text-cyan-800 bg-cyan-50/80 hover:bg-cyan-100 px-3 py-1.5 rounded-lg transition-colors shrink-0 self-start sm:self-auto"
                   title="Debatir este aspecto formativo con el Tutor IA"
                 >
@@ -341,7 +341,7 @@ export default function FeedbackCard({ result, studentAnswer = '', onReset }: Fe
       <PdfViewerModal
         isOpen={pdfModalOpen}
         onClose={() => setPdfModalOpen(false)}
-        guiaId={cita_normativa?.guia || 'dengue'}
+        guiaId={cita_normativa?.guia || 'preeclampsia'}
         pagina={cita_normativa?.pagina || 1}
         seccion={cita_normativa?.seccion || ''}
       />

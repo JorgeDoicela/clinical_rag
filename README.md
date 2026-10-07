@@ -275,7 +275,7 @@ clinical_rag/
 │   ├── services/                         # Fachadas de compatibilidad hacia core y generadores
 │   │   ├── llm_gateway.py                # Fachada a core.llm_gateway
 │   │   └── pdf_report_generator.py       # Generador de dictamen PDF institucional con SHA-256
-│   ├── cases_data/                       # 12 casos clínicos normativos y banco de imágenes
+│   ├── cases_data/                       # 10 casos clínicos canónicos y banco de imágenes
 │   │   ├── cases.json                    # Casos con competencias activadas y GPC asignada
 │   │   └── images/                       # Rx pediátrica, ECG, hemograma y coagulograma
 │   ├── data/

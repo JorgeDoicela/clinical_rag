@@ -26,6 +26,12 @@ class ProblemDetails(BaseModel):
     invalid_params: Optional[List[Dict[str, Any]]] = Field(None, description="Detalle de validaciones fallidas en DTOs")
 
 
+class InferenceUnavailableException(HTTPException):
+    """Excepción tipada emitida cuando el servicio de inferencia de IA clínica no está disponible."""
+    def __init__(self, detail: str = "El servicio de inferencia clínica de IA no está disponible temporalmente (sin cuota o desconectado)."):
+        super().__init__(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=detail)
+
+
 async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
     """Maneja excepciones HTTP explícitas de FastAPI / Starlette."""
     request_id = get_current_request_id()

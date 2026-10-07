@@ -187,3 +187,53 @@ $$\text{IBF}_e = \max\left(0, 1 - \frac{\overline{\text{Score}}_{\text{cohorte},
 
 Cuando $\text{IBF} > 0.40$, el sistema genera automáticamente una alerta de intervención curricular prioritaria para el coordinador académico visible en `CoordinatorAnalytics.tsx`.
 
+---
+
+## 9. Auditoría Continua de Calidad RAG, Concordancia Nosológica y Prevención de Degradación ([../backend/tests/audit_retrieval_quality.py](../backend/tests/audit_retrieval_quality.py))
+
+Para prevenir la degradación silenciosa del motor de recuperación ante cambios en esquemas de datos o reindexaciones vectoriales, Ateneo+ cuenta con un subsistema de auditoría automatizada continua ejecutado en la pirámide de pruebas maestras (`backend/tests/run_all_tests.py`).
+
+### 9.1 Dimensiones de Calidad Evaluadas
+
+1. **Concordancia Nosológica Estricta (100% Target):** Comprueba que cada consulta de caso clínico canónico ($N=10$) recupere en su posición Top-1 fragmentos pertenecientes de forma unívoca a la Guía de Práctica Clínica oficial del MSP Ecuador asociada al caso, validando tanto el identificador normativo de documento (`gpc_id`) como el título de la guía.
+2. **Profundidad de Relevancia en Top-5:** Exige que en los 5 fragmentos devueltos por el recuperador híbrido existan al menos 3 candidatos legítimos pertinentes a la guía clínica evaluada, asegurando densidad informativa y robustez ante reformulaciones.
+3. **Paginación Real Auténtica ($> 1$):** Verifica que los metadatos `pagina`, `pagina_pdf` y `pagina_impresa_real` correspondan a los números de página físicos del documento oficial indexados en ChromaDB v2, erradicando la anomalía de asignación artificial a la portada (página 1).
+4. **Erradicación Absoluta de Fallbacks Falsos (0% Presencia):** Prohíbe terminantemente la presencia de fragmentos sintéticos o identificadores provisionales (`fallback_gpc_001`), forzando que la recuperación opere con fail-fast estricto.
+5. **Monotonía de Fusión RRF:** Valida matemáticamente que los puntajes $\text{RRF\_Score}$ calculados sobre los candidatos densos y dispersos sean estrictamente decrecientes y consistentes.
+6. **Anclaje Fáctico de Citas Normativas (`_anchor_cita_to_chunk`):** Garantiza que cada dictamen emitido por el evaluador clínico vincule su cita médica al fragmento auténtico de ChromaDB v2, extrayendo el extracto textual fidedigno del MSP y bloqueando cualquier alucinación del modelo generativo.
+
+```mermaid
+graph TD
+    A[Consulta de Caso Clínico] --> B[Motor RAG Híbrido retriever.py]
+    B --> C[Búsqueda Densa BGE-M3]
+    B --> D[Búsqueda BM25 con Filtro GPC]
+    C --> E[Fusión RRF k=60]
+    D --> E
+    E --> F[Top-K Chunks con Metadatos Enriquecidos]
+    F --> G[Suite audit_retrieval_quality.py]
+    G --> H{Criterios de Aceptación}
+    H -->|10/10 GPC Coincidentes| I[PASS: Concordancia Nosológica]
+    H -->|Páginas > 1 Reales| J[PASS: Paginación Real]
+    H -->|0 Chunks Sintéticos| K[PASS: Cero Fallbacks]
+    H -->|>= 3 Chunks en Top-5| L[PASS: Profundidad Relevante]
+    H -->|RRF Monótono| M[PASS: Integridad de Fusión]
+```
+
+### 9.2 Resultados de Certificación Empírica (10 Casos Canónicos Oficiales)
+
+| Caso Clínico Canónico | GPC Oficial MSP Asociada | Pág. Real Top-1 | RRF Score | Top-5 Pertinentes | Estado Auditoría |
+|---|---|---|---|---|---|
+| `case_preeclampsia_01` | Trastornos Hipertensivos del Embarazo | 30 | 0.03175 | 5 / 5 | PASS |
+| `case_hemorragia_01` | Prevención y Manejo de Hemorragia Postparto | 14 | 0.03226 | 5 / 5 | PASS |
+| `case_tb_01` | Prevención, Diagnóstico y Control de Tuberculosis | 47 | 0.02991 | 5 / 5 | PASS |
+| `case_vih_01` | Atención Integral con Infección por VIH | 39 | 0.02971 | 5 / 5 | PASS |
+| `case_hta_01` | Hipertensión Arterial (HTA) | 31 | 0.02944 | 5 / 5 | PASS |
+| `case_erc_01` | Enfermedad Renal Crónica | 31 | 0.03151 | 5 / 5 | PASS |
+| `case_ehirn_01` | Enfermedad Hemolítica del Recién Nacido | 25 | 0.03202 | 5 / 5 | PASS |
+| `case_nac_01` | Neumonía Adquirida en la Comunidad (NAC) | 32 | 0.03252 | 5 / 5 | PASS |
+| `case_sepsis_neonatal_01` | Ruptura Prematura de Membranas / Sepsis Neonatal | 23 | 0.03125 | 5 / 5 | PASS |
+| `case_aborto_01` | Diagnóstico y Tratamiento del Aborto Espontáneo | 17 | 0.03041 | 5 / 5 | PASS |
+
+La suite está acoplada al ejecutor de integración continua local (`backend/tests/run_all_tests.py`), certificando que cualquier modificación futura en los extractores o modelos vectoriales mantenga el 100% de concordancia normativa.
+
+

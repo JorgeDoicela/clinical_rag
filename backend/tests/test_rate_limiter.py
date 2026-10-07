@@ -71,10 +71,10 @@ def test_http_endpoint_rate_limit_headers_and_429():
     client = get_test_client()
 
     payload = {
-        "case_id": "case_dengue_01",
-        "case_title": "Dengue con signos de alarma",
+        "case_id": "case_preeclampsia_01",
+        "case_title": "Gestante con Trastorno Hipertensivo",
         "student_name": "Test Student",
-        "guia_asociada": "dengue",
+        "guia_asociada": "MSP_Trastornos-hipertensivos-del-embarazo-con-portada-3.pdf",
         "student_answer": "Respuesta clínica",
         "eval_result": {
             "score": 8.0,

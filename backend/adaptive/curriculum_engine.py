@@ -12,9 +12,7 @@ from adaptive.knowledge_tracer import get_student_knowledge_state
 
 # Mapeo de casos clínicos del catálogo a las competencias KST que activan principalmente
 CASE_COMPETENCY_MAP: Dict[str, List[str]] = {
-    "case_dengue_01": ["semiologia_anamnesis", "diagnostico_diferencial", "plan_terapeutico_msp"],
     "case_preeclampsia_01": ["semiologia_anamnesis", "diagnostico_final", "plan_terapeutico_msp"],
-    "case_diabetes_01": ["diagnostico_final", "plan_terapeutico_msp", "seguimiento_prevencion"],
     "case_hemorragia_01": ["semiologia_anamnesis", "diagnostico_final", "plan_terapeutico_msp"],
     "case_tb_01": ["semiologia_anamnesis", "examenes_complementarios", "plan_terapeutico_msp"],
     "case_vih_01": ["examenes_complementarios", "plan_terapeutico_msp", "seguimiento_prevencion"],

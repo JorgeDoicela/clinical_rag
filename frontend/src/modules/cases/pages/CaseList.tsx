@@ -8,7 +8,7 @@ import {
   AlertCircle,
   X
 } from 'lucide-react';
-import useCases from '../hooks/useCases';
+import useCases, { resolveGpcMeta } from '../hooks/useCases';
 import CaseCard from '../components/CaseCard';
 import CaseFilterTabs from '../components/CaseFilterTabs';
 import AdaptiveNextCase from '../../adaptive/components/AdaptiveNextCase';
@@ -33,7 +33,6 @@ export default function CaseList() {
     viewMode,
     setViewMode,
     categories,
-    gpcLabels,
   } = useCases(globalSearchQuery);
 
   // Navegación de secciones del Workspace
@@ -149,7 +148,7 @@ export default function CaseList() {
                 <CaseCard
                   key={caso.id}
                   caso={caso}
-                  gpcMeta={caso.guia_asociada ? gpcLabels[caso.guia_asociada] : undefined}
+                  gpcMeta={resolveGpcMeta(caso.guia_asociada)}
                   viewMode={viewMode}
                 />
               ))}

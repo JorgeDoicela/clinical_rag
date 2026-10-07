@@ -1,13 +1,13 @@
 {
-  "promedio_faithfulness_score": 0.3611,
-  "promedio_fidelidad_porcentaje": 36.11,
-  "total_casos_evaluados": 12,
+  "promedio_faithfulness_score": 0.3667,
+  "promedio_fidelidad_porcentaje": 36.67,
+  "total_casos_evaluados": 10,
   "casos_alto_grounding": 0,
   "detalles": [
     {
-      "case_id": "case_dengue_01",
-      "titulo": "Paciente febril con signos de alarma por Dengue",
-      "guia_asociada": "dengue",
+      "case_id": "case_preeclampsia_01",
+      "titulo": "Gestante con Trastorno Hipertensivo y Signos de Criterio de Severidad",
+      "guia_asociada": "MSP_Trastornos-hipertensivos-del-embarazo-con-portada-3.pdf",
       "faithfulness_score": 0.6667,
       "grounded_claims": 2,
       "total_claims": 3,
@@ -15,29 +15,9 @@
       "nivel": "Moderado Grounding Normativo"
     },
     {
-      "case_id": "case_preeclampsia_01",
-      "titulo": "Gestante con Trastorno Hipertensivo y Signos de Criterio de Severidad",
-      "guia_asociada": "preeclampsia",
-      "faithfulness_score": 0.3333,
-      "grounded_claims": 1,
-      "total_claims": 3,
-      "grounded_pct": 33.3,
-      "nivel": "Bajo Grounding (Riesgo de Deriva)"
-    },
-    {
-      "case_id": "case_diabetes_01",
-      "titulo": "Paciente con Diabetes Mellitus Tipo 2 y descontrol glucémico inicial",
-      "guia_asociada": "diabetes_t2",
-      "faithfulness_score": 0.3333,
-      "grounded_claims": 1,
-      "total_claims": 3,
-      "grounded_pct": 33.3,
-      "nivel": "Bajo Grounding (Riesgo de Deriva)"
-    },
-    {
       "case_id": "case_hemorragia_01",
       "titulo": "Hemorragia Posparto Inmediata por Atonía Uterina (Código Rojo)",
-      "guia_asociada": "hemorragia_posparto",
+      "guia_asociada": "Guía-de-hemorragia-postparto.pdf",
       "faithfulness_score": 0.3333,
       "grounded_claims": 1,
       "total_claims": 3,
@@ -47,27 +27,27 @@
     {
       "case_id": "case_tb_01",
       "titulo": "Sintomático Respiratorio con Sospecha de Tuberculosis Pulmonar Sensible",
-      "guia_asociada": "gp_tuberculosis-1",
-      "faithfulness_score": 0.3333,
-      "grounded_claims": 1,
+      "guia_asociada": "GP_Tuberculosis-1.pdf",
+      "faithfulness_score": 0.0,
+      "grounded_claims": 0,
       "total_claims": 3,
-      "grounded_pct": 33.3,
+      "grounded_pct": 0.0,
       "nivel": "Bajo Grounding (Riesgo de Deriva)"
     },
     {
       "case_id": "case_vih_01",
       "titulo": "Diagnóstico Nuevo de Infección por VIH y Protocolo de Inicio de TARV",
-      "guia_asociada": "gpc_vih_acuerdo_ministerial05-07-2019",
-      "faithfulness_score": 0.3333,
-      "grounded_claims": 1,
+      "guia_asociada": "gpc_VIH_acuerdo_ministerial05-07-2019.pdf",
+      "faithfulness_score": 0.6667,
+      "grounded_claims": 2,
       "total_claims": 3,
-      "grounded_pct": 33.3,
-      "nivel": "Bajo Grounding (Riesgo de Deriva)"
+      "grounded_pct": 66.7,
+      "nivel": "Moderado Grounding Normativo"
     },
     {
       "case_id": "case_hta_01",
       "titulo": "Paciente con Hipertensión Arterial Primaria Grado 2 y Riesgo Cardiovascular",
-      "guia_asociada": "gpc_hta192019",
+      "guia_asociada": "gpc_hta192019.pdf",
       "faithfulness_score": 0.3333,
       "grounded_claims": 1,
       "total_claims": 3,
@@ -77,7 +57,7 @@
     {
       "case_id": "case_erc_01",
       "titulo": "Evaluación de Enfermedad Renal Crónica en Paciente Diabético e Hipertenso",
-      "guia_asociada": "guia_prevencion_diagnostico_tratamiento_enfermedad_renal_cronica_2018",
+      "guia_asociada": "guia_prevencion_diagnostico_tratamiento_enfermedad_renal_cronica_2018.pdf",
       "faithfulness_score": 0.3333,
       "grounded_claims": 1,
       "total_claims": 3,
@@ -87,7 +67,7 @@
     {
       "case_id": "case_ehirn_01",
       "titulo": "Recién Nacido a Término con Encefalopatía Hipóxico-Isquémica (EHI-RN)",
-      "guia_asociada": "gpc_ehirn2019",
+      "guia_asociada": "gpc_ehirn2019.pdf",
       "faithfulness_score": 0.3333,
       "grounded_claims": 1,
       "total_claims": 3,
@@ -97,7 +77,7 @@
     {
       "case_id": "case_nac_01",
       "titulo": "Preescolar con Neumonía Adquirida en la Comunidad Grave y Criterios de Hospitalización",
-      "guia_asociada": "neumonia",
+      "guia_asociada": "GPC_neumonía-adquirida_2017.pdf",
       "faithfulness_score": 0.3333,
       "grounded_claims": 1,
       "total_claims": 3,
@@ -107,7 +87,7 @@
     {
       "case_id": "case_sepsis_neonatal_01",
       "titulo": "Neonato con Sospecha de Sepsis Neonatal Temprana y Factores de Riesgo Maternos",
-      "guia_asociada": "gpc-sepsis-neonatal",
+      "guia_asociada": "GPC-Sepsis-neonatal.pdf",
       "faithfulness_score": 0.6667,
       "grounded_claims": 2,
       "total_claims": 3,
@@ -117,7 +97,7 @@
     {
       "case_id": "case_aborto_01",
       "titulo": "Gestante con Metrorragia de Primer Trimestre por Aborto Incompleto",
-      "guia_asociada": "gpc_guia_aborto_espontaneo_incompleto_19_feb_2014",
+      "guia_asociada": "gpc_guia_aborto_espontaneo_incompleto_19_feb_2014.pdf",
       "faithfulness_score": 0.0,
       "grounded_claims": 0,
       "total_claims": 3,

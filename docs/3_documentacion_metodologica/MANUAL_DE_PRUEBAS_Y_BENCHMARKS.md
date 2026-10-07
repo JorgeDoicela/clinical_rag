@@ -29,7 +29,7 @@ El sistema organiza sus pruebas en 4 niveles complementarios que garantizan la i
 │ NIVEL 1: PRUEBAS DE FRONTEND, TIEMPO REAL Y E2E                             │
 │ • Vitest + React Testing Library (22 suites, 106 tests unitarios aprobados)  │
 │ • Playwright E2E Multi-Navegador (15 tests en Chrome, Edge y Mobile Pixel 5)│
-│ • test_multimodal_and_cases.py (12 casos ChromaDB, PDF ReportLab SHA-256)   │
+│ • test_multimodal_and_cases.py (10 casos ChromaDB, PDF ReportLab SHA-256)   │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -115,7 +115,7 @@ backend/.venv/Scripts/pytest backend/tests/ -v
 | `test_paper_differentiators.py` | Métricas Científicas | Algoritmo de cálculo de Faithfulness Score, cálculo de IBF global y por eje, y endpoints de analítica B2B. |
 | `pilot_study_analyzer.py` | Análisis Inferencial | Procesamiento de `resultados_pilot.csv`, cálculo de ganancia de Hake ($g=0.74$), $t$-test pareado y exportación de Tabla IV LaTeX. |
 | `test_api_endpoints.py` | Integración HTTP | Pruebas de endpoints FastAPI (Auth, Cases, Benchmark, History, Salas Colaborativas, PDF y Fases). |
-| `test_multimodal_and_cases.py` | Casos GPC y Multimodal | Recuperación de los 12 casos del MSP, evaluación multi-imagen con Gemini Vision y generación de reportes PDF con sello SHA-256. |
+| `test_multimodal_and_cases.py` | Casos GPC y Multimodal | Recuperación de los 10 casos canónicos del MSP, evaluación multi-imagen con Gemini Vision y generación de reportes PDF con sello SHA-256. |
 | `test_background_tasks.py` | Pool Asíncrono de Reportes | Despachador en segundo plano (ThreadPoolExecutor), exportación asíncrona HTTP 202 y prueba de estrés concurrente. |
 | `test_structured_logging.py` | Observabilidad y Logs JSON | Formateador estructurado OpenTelemetry, inyección de contextvars (request_id, user_id, tenant_id) y ofuscación de secretos. |
 | `load_test_simulation.py` | Estrés y Concurrencia | Concurrencia de 100 usuarios, SQLite WAL 0% locks, Rate Limit 429 RFC 7807 y Circuit Breakers. |

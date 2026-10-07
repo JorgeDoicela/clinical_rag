@@ -5,7 +5,7 @@ Ejecuta de forma secuencial y estructurada la pirámide completa de pruebas:
 2. Fidelidad Normativa y Métricas IBF (test_paper_differentiators.py)
 3. Análisis Estadístico de Ganancia de Aprendizaje (pilot_study_analyzer.py)
 4. Integración de Endpoints HTTP FastAPI (test_api_endpoints.py)
-5. Validación de los 12 Casos Clínicos y Fusión Multimodal (test_multimodal_and_cases.py)
+5. Validación de los 10 Casos Clínicos Canónicos y Fusión Multimodal (test_multimodal_and_cases.py)
 """
 
 import sys
@@ -210,11 +210,48 @@ def run_full_verification_pipeline():
         test_ttl_expiration()
         test_thread_safety_concurrent_access()
         test_retriever_integration_invariance_and_latency()
-        suite_results.append({"suite": "Diferenciadores Científicos & Caché RAG", "status": "PASS", "detalles": "Grounding normativo, IBF y Caché RAG LRU (<50ms) validados"})
+
+        from tests.test_retriever_pipeline import (
+            test_empty_query_fail_fast,
+            test_resolve_canonical_guia_aliases,
+            test_strict_rejection_invalid_guide,
+            test_zero_fallback_gpc_in_corpus,
+            test_sparse_bm25_retrieval_under_filter,
+            test_dense_retrieval_under_filter,
+            test_hybrid_rrf_monotonicity_and_schema,
+            test_extract_page_number_helper,
+            test_all_10_canonical_cases_retrieval_integrity
+        )
+        test_empty_query_fail_fast()
+        test_resolve_canonical_guia_aliases()
+        test_strict_rejection_invalid_guide()
+        test_zero_fallback_gpc_in_corpus()
+        test_sparse_bm25_retrieval_under_filter()
+        test_dense_retrieval_under_filter()
+        test_hybrid_rrf_monotonicity_and_schema()
+        test_extract_page_number_helper()
+        test_all_10_canonical_cases_retrieval_integrity()
+
+        from tests.audit_retrieval_quality import (
+            test_retrieval_nosological_concordance_100_percent,
+            test_zero_fallbacks_in_all_cases,
+            test_real_pagination_in_all_cases,
+            test_rrf_monotonicity_in_all_cases,
+            test_retrieval_depth_minimum_candidates_in_top5,
+            test_relevant_chunk_fast_lookup
+        )
+        test_retrieval_nosological_concordance_100_percent()
+        test_zero_fallbacks_in_all_cases()
+        test_real_pagination_in_all_cases()
+        test_rrf_monotonicity_in_all_cases()
+        test_retrieval_depth_minimum_candidates_in_top5()
+        test_relevant_chunk_fast_lookup()
+
+        suite_results.append({"suite": "Diferenciadores Científicos & Motor RAG Híbrido", "status": "PASS", "detalles": "Grounding normativo, IBF, Caché RAG LRU (<50ms), Recuperador Híbrido y Auditoría 10/10 GPC validados"})
     except Exception as e:
         traceback.print_exc()
         err_msg = f"{type(e).__name__}: {e}" if str(e) else type(e).__name__
-        suite_results.append({"suite": "Diferenciadores Científicos & Caché RAG", "status": "FAIL", "detalles": err_msg})
+        suite_results.append({"suite": "Diferenciadores Científicos & Motor RAG Híbrido", "status": "FAIL", "detalles": err_msg})
 
     # 4. Estudio Piloto de Ganancia de Aprendizaje
     try:
@@ -273,7 +310,23 @@ def run_full_verification_pipeline():
         test_all_12_cases_retrieval()
         test_pdf_generation()
         test_multimodal_fusion_evaluation()
-        suite_results.append({"suite": "Fusión Multimodal y Casos GPC", "status": "PASS", "detalles": "12 casos MSP y firma SHA-256 validados"})
+
+        from tests.test_evaluation_pipeline import (
+            test_missing_api_key_raises_503,
+            test_models_exhausted_raises_503,
+            test_fatal_auth_exception_raises_503,
+            test_anchor_cita_to_chunk_strict_fidelity,
+            test_format_normative_guide_title,
+            test_evaluate_endpoint_rfc7807_when_unavailable
+        )
+        test_missing_api_key_raises_503()
+        test_models_exhausted_raises_503()
+        test_fatal_auth_exception_raises_503()
+        test_anchor_cita_to_chunk_strict_fidelity()
+        test_format_normative_guide_title()
+        test_evaluate_endpoint_rfc7807_when_unavailable()
+
+        suite_results.append({"suite": "Fusión Multimodal, Evaluación y Citas Normativas GPC", "status": "PASS", "detalles": "10 casos MSP, firma SHA-256, HTTP 503 RFC 7807 y Citas Ancladas validadas"})
     except Exception as e:
         traceback.print_exc()
         err_msg = f"{type(e).__name__}: {e}" if str(e) else type(e).__name__

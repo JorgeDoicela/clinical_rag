@@ -37,19 +37,19 @@ test.describe('E2E: Simulador Clínico y Visor Diagnóstico de Paraclínicos (At
     });
 
     // 3. Interceptar caso con estudios paraclínicos adjuntos
-    await page.route(/\/api\/cases\/case_dengue_01/, async (route) => {
+    await page.route(/\/api\/cases\/case_preeclampsia_01/, async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          id: 'case_dengue_01',
-          titulo: 'Dengue con Signos de Alarma',
-          guia_asociada: 'dengue',
-          dificultad: 'intermedio',
-          especialidad: 'Urgencias',
+          id: 'case_preeclampsia_01',
+          titulo: 'Preeclampsia con Criterios de Severidad',
+          guia_asociada: 'MSP_Trastornos-hipertensivos-del-embarazo-con-portada-3.pdf',
+          dificultad: 'avanzado',
+          especialidad: 'Gineco-Obstetricia',
           signos_alarma: true,
-          caso_preambulo: 'Paciente femenina de 24 años con trombocitopenia de 45.000/uL y dolor abdominal continuo.',
-          pregunta: 'Indique el esquema de hidratación parenteral y criterios de ingreso hospitalario.',
+          caso_preambulo: 'Gestante de 32 semanas con cifras tensionales de 165/110 mmHg y cefalea holocraneana.',
+          pregunta: 'Indique el esquema farmacológico con Sulfato de Magnesio y conducta antihipertensiva.',
           estudios_paraclinicos: [
             {
               tipo: 'ecg',
@@ -64,10 +64,10 @@ test.describe('E2E: Simulador Clínico y Visor Diagnóstico de Paraclínicos (At
   });
 
   test('debe cargar la simulación split-screen y permitir la inspección paraclínica en Canvas', async ({ page }) => {
-    await page.goto('/cases/case_dengue_01');
+    await page.goto('/cases/case_preeclampsia_01');
 
     // 1. Verificar título del caso clínico en panel de split-screen
-    await expect(page.locator('text=Dengue con Signos de Alarma').first()).toBeVisible();
+    await expect(page.locator('text=Preeclampsia con Criterios de Severidad').first()).toBeVisible();
 
     // 2. Verificar área de respuesta clínica del estudiante
     const responseArea = page.locator('textarea');

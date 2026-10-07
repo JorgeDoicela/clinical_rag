@@ -26,9 +26,9 @@ vi.mock('../modules/collaboration/api/collaborationApi', () => ({
     getRoom: vi.fn().mockResolvedValue({
       room_code: 'ATENEO-WS01',
       codigo: 'ATENEO-WS01',
-      case_id: 'case_dengue_01',
-      case_title: 'Dengue con Signos de Alarma en Pediatría',
-      case_enunciado: 'Paciente masculino de 8 años con fiebre de 4 días y dolor abdominal continuo...',
+      case_id: 'case_preeclampsia_01',
+      case_title: 'Gestante con Trastorno Hipertensivo y Signos de Severidad',
+      case_enunciado: 'Gestante de 32 semanas acude a urgencias por cefalea holocraneana y cifras tensionales elevadas...',
       docente_id: 'usr_docente_001',
       docente_nombre: 'Dr. Carlos Andrade (Docente)',
       estado: 'resolviendo',
@@ -151,7 +151,7 @@ describe('Suite de Pruebas: Salas Colaborativas en Tiempo Real (WebSockets - Ate
       );
 
       await waitFor(() => {
-        expect(screen.getAllByText(/Dengue con Signos de Alarma en Pediatría/i).length).toBeGreaterThan(0);
+        expect(screen.getAllByText(/Gestante con Trastorno Hipertensivo/i).length).toBeGreaterThan(0);
       });
 
       const statusPill = screen.getByTestId('connection-status-pill');

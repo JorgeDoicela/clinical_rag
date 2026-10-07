@@ -24,9 +24,9 @@ def test_unit_of_work_commit_success():
         eval_record = EvaluationHistoryModel(
             user_id=test_user,
             user_email="alumno@ateneo.edu.ec",
-            case_id="case_dengue_01",
-            guia_asociada="dengue",
-            case_title="Caso Dengue UoW Commit Test",
+            case_id="case_preeclampsia_01",
+            guia_asociada="MSP_Trastornos-hipertensivos-del-embarazo-con-portada-3.pdf",
+            case_title="Caso Preeclampsia UoW Commit Test",
             score=9.0,
             score_max=10,
             faithfulness_score=0.95,
@@ -56,7 +56,7 @@ def test_unit_of_work_commit_success():
     # Verificar persistencia efectiva fuera del contexto del UoW
     with SessionLocal() as db:
         saved_eval = db.query(EvaluationHistoryModel).filter(
-            EvaluationHistoryModel.case_title == "Caso Dengue UoW Commit Test"
+            EvaluationHistoryModel.case_title == "Caso Preeclampsia UoW Commit Test"
         ).first()
         saved_snap = db.query(StudentSnapshotModel).filter(
             StudentSnapshotModel.user_id == test_user,
@@ -97,8 +97,8 @@ def test_unit_of_work_automatic_rollback_on_exception():
             eval_record = EvaluationHistoryModel(
                 user_id=test_user,
                 user_email="alumno@ateneo.edu.ec",
-                case_id="case_dengue_01",
-                guia_asociada="dengue",
+                case_id="case_preeclampsia_01",
+                guia_asociada="MSP_Trastornos-hipertensivos-del-embarazo-con-portada-3.pdf",
                 case_title="Caso Rollback Test",
                 score=5.0,
                 score_max=10,

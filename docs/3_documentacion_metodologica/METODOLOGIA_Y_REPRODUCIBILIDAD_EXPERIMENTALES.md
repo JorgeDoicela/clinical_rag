@@ -159,10 +159,10 @@ El sistema cuenta con un marco de pruebas en 4 niveles formales de verificación
   * **Latencia Mediana ($P_{50}$):** 11.19 s.
   * **Artefacto LaTeX:** Generación automatizada de `docs/1_tablas_latex/tabla_resultados_paper.tex`.
 
-### 10.2 Nivel 2: Validación de los 12 Casos Clínicos y Fusión Multimodal (`tests/test_multimodal_and_cases.py`)
+### 10.2 Nivel 2: Validación de los 10 Casos Clínicos Canónicos y Fusión Multimodal (`tests/test_multimodal_and_cases.py`)
 * **Propósito:** Validar la recuperación RAG determinista de todos los casos del catálogo contra ChromaDB, la generación de PDFs institucionales y la Fusión Multimodal con múltiples estudios simultáneos.
 * **Resultados Verificados:**
-  * **Recuperación del Catálogo:** 12 de 12 casos recuperaron exitosamente su fragmento normativo exacto (100.0%).
+  * **Recuperación del Catálogo:** 10 de 10 casos recuperaron exitosamente su fragmento normativo exacto (100.0%).
   * **Generación de Reporte PDF:** Archivo binario de 1.00 MB generado con cabecera `%PDF`, firma SHA-256 y tabla analítica de 4 ejes.
   * **Fusión Multimodal Simultánea:** Evaluación de 2 estudios adjuntos (ECG de 12 derivaciones + Radiografía de tórax) con correlación cruzada en Gemini Vision API y convalidación Pydantic.
 

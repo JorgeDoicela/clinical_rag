@@ -8,6 +8,7 @@ from services.llm_gateway import llm_gateway, AllModelsExhaustedException, Fatal
 from models.schemas import EvaluationResult, ClinicalCaseSchema, CitaNormativa, PhaseEvaluationResult
 from rag.prompt_builder import SYSTEM_INSTRUCTION, build_prompt, build_phase_prompt
 from rag.security_guard import security_guard
+from core.errors import InferenceUnavailableException
 from core.logger import get_logger
 
 logger = get_logger("ateneo.rag.evaluator")
@@ -23,6 +24,7 @@ def call_gemini_llm(
     Llama a la API de Google Gemini a través del ResilientLLMGateway oficial.
     Soporta Circuit Breaker automático, fallback entre modelos configurados sin latencia fantasma
     y Fusión Multimodal Simultánea (ECG, Rx, Labs).
+    Lanza InferenceUnavailableException (HTTP 503 RFC 7807) ante indisponibilidad real de IA.
     """
     partes_imagenes: List[Tuple[bytes, str]] = []
     if imagenes_list:
@@ -31,35 +33,8 @@ def call_gemini_llm(
         partes_imagenes = [(imagen_bytes, imagen_mime)]
 
     if not GEMINI_API_KEY:
-        logger.warning("GEMINI_API_KEY no configurada. Usando fallback de desarrollo local...", extra={"action": "gemini_api_key_missing"})
-        return json.dumps({
-
-            "score": 8.0,
-            "score_max": 10,
-            "aciertos": [
-                "Identificó correctamente el diagnóstico principal y la severidad del cuadro clínico."
-            ],
-            "omisiones": [
-                "Faltó precisar la velocidad de infusión del esquema de líquidos de la GPC."
-            ],
-            "competencias_deficientes": [
-                {
-                    "eje": "tratamiento",
-                    "descripcion": "Cálculo impreciso de la tasa de infusión e hidratación parenteral acorde a la GPC."
-                },
-                {
-                    "eje": "seguimiento",
-                    "descripcion": "Omisión del protocolo de monitoreo hemodinámico en las primeras 6 horas."
-                }
-            ],
-            "cita_normativa": {
-                "guia": "GPC MSP Ecuador",
-                "seccion": "Manejo Terapéutico Oficial",
-                "pagina": 1,
-                "texto_relevante": "Se debe iniciar reposición intravenosa inmediata según la guía del MSP."
-            },
-            "retroalimentacion_general": "Excelente razonamiento inicial en el diagnóstico. Recuerda revisar la dosificación exacta recomendada por el MSP."
-        })
+        logger.error("GEMINI_API_KEY no configurada. Inferencia de IA clínica no disponible.", extra={"action": "gemini_api_key_missing"})
+        raise InferenceUnavailableException("GEMINI_API_KEY no configurada en el servidor clínico.")
 
     try:
         result = llm_gateway.generate(
@@ -71,36 +46,11 @@ def call_gemini_llm(
         )
         return result.text
     except AllModelsExhaustedException as exc:
-        logger.warning(f"ALERTA RESILIENCIA: {exc}. Activando fallback formativo de respaldo...", extra={"action": "llm_all_models_exhausted_fallback"})
+        logger.error(f"Inferencia no disponible: {exc}", extra={"action": "llm_all_models_exhausted"})
+        raise InferenceUnavailableException(f"Todos los modelos de IA clínica están temporalmente agotados o en enfriamiento por cuota: {exc}")
     except FatalLLMException as fatal:
-        logger.error(f"ERROR CRÍTICO AUTENTICACIÓN: {fatal}. Activando fallback formativo de respaldo...", extra={"action": "llm_fatal_auth_fallback"})
-
-    # Si la cuota gratuita de la API se agotó temporalmente en todos los modelos, usar fallback defensivo formativo
-    logger.warning("Cuota gratuita de Gemini agotada temporalmente. Devolviendo evaluación formativa de respaldo...", extra={"action": "llm_quota_exhausted_fallback"})
-    return json.dumps({
-
-        "score": 7.5,
-        "score_max": 10,
-        "aciertos": [
-            "Identificó adecuadamente el cuadro clínico y los elementos de sospecha inicial."
-        ],
-        "omisiones": [
-            "Se requiere precisar el esquema específico de dosis y líquidos indicado en la GPC."
-        ],
-        "competencias_deficientes": [
-            {
-                "eje": "tratamiento",
-                "descripcion": "Falta de precisión en la dosificación exacta de fármacos recomendados por la norma."
-            }
-        ],
-        "cita_normativa": {
-            "guia": "GPC MSP Ecuador",
-            "seccion": "Manejo Terapéutico y Protocolo de Atención",
-            "pagina": 1,
-            "texto_relevante": "Se recomienda la hospitalización inmediata y reposición continua de líquidos según la norma."
-        },
-        "retroalimentacion_general": "Buen análisis clínico inicial. Recuerda verificar las dosis exactas recomendadas por el Ministerio de Salud Pública."
-    })
+        logger.error(f"Falla crítica de autenticación en LLM: {fatal}", extra={"action": "llm_fatal_auth"})
+        raise InferenceUnavailableException(f"Error de autenticación o cuota con el proveedor de IA: {fatal}")
 
 def _repair_truncated_json(text: str) -> str:
     """
@@ -135,6 +85,63 @@ def _normalize_cita_normativa(data: dict) -> dict:
         if "texto_relevante" not in cn or not cn["texto_relevante"]:
             cn["texto_relevante"] = cn.get("texto") or cn.get("cita") or cn.get("fragmento") or "Norma MSP Ecuador"
     return data
+
+def _format_normative_guide_title(raw_title: Optional[str]) -> str:
+    """Normaliza y formatea limpiamente el título oficial de la GPC para la cita médica."""
+    if not raw_title:
+        return "Guía de Práctica Clínica MSP Ecuador"
+    title = str(raw_title).strip()
+    if title.lower().endswith(".pdf"):
+        title = title[:-4].replace("_", " ").replace("-", " ")
+    # Limpiar prefijos de nomenclatura de archivo o catálogo repetitivos (GPC, Guía de, GP, MSP)
+    prefix_pattern = r"^(gpc[:\s-]*|gu[ií]a\s+de\s+pr[aá]ctica\s+cl[ií]nica[:\s-]*|gu[ií]a\s+de[:\s-]*|gu[ií]a[:\s-]*|gp[:\s-]*|msp[:\s-]*)+"
+    title_clean = re.sub(prefix_pattern, "", title, flags=re.IGNORECASE).strip()
+    title_clean = re.sub(r"(\s*msp\s*ecuador|\s*msp)$", "", title_clean, flags=re.IGNORECASE).strip()
+    if title_clean:
+        title_clean = title_clean[0].upper() + title_clean[1:]
+    return f"GPC: {title_clean} (MSP Ecuador)"
+
+def _anchor_cita_to_chunk(cita: CitaNormativa, chunk: Optional[Dict[str, Any]]) -> CitaNormativa:
+    """
+    Ancla fáctica y estrictamente la cita normativa al fragmento RAG oficial de ChromaDB v2.
+    Garantiza que la guía, la sección, la página real y el texto relevante provengan
+    directamente del cuerpo oficial del Ministerio de Salud Pública, erradicando alucinaciones del LLM.
+    """
+    if not chunk or not cita:
+        return cita
+
+    if chunk.get("guia_fuente"):
+        cita.guia = _format_normative_guide_title(chunk["guia_fuente"])
+    if chunk.get("seccion"):
+        cita.seccion = str(chunk["seccion"]).strip()
+    if chunk.get("pagina"):
+        try:
+            p = int(chunk["pagina"])
+            if p >= 1:
+                cita.pagina = p
+        except (ValueError, TypeError):
+            pass
+
+    chunk_texto = str(chunk.get("texto", "")).strip()
+    if chunk_texto:
+        raw_texto = str(cita.texto_relevante or "").strip()
+        generic_placeholders = [
+            "norma msp ecuador",
+            "se debe iniciar reposicion intravenosa inmediata segun la guia del msp.",
+            "se recomienda la hospitalizacion inmediata y reposicion continua de liquidos segun la norma.",
+            "sección oficial",
+            "general",
+            ""
+        ]
+        # Si el texto es genérico, muy corto o no se encuentra en el fragmento normativo,
+        # derivar el extracto textual fidedigno del chunk RAG oficial
+        if raw_texto.lower() in generic_placeholders or len(raw_texto) < 15 or raw_texto.lower() not in chunk_texto.lower():
+            extracto = chunk_texto[:320].strip()
+            if len(chunk_texto) > 320:
+                extracto += "..."
+            cita.texto_relevante = extracto
+
+    return cita
 
 def _normalize_competencias_deficientes(data: dict) -> dict:
     """Normaliza defensivamente competencias_deficientes si el LLM devuelve formatos irregulares."""
@@ -258,20 +265,9 @@ def evaluate_clinical_reasoning(
         raw_text_retry = call_gemini_llm(retry_prompt, imagenes_list=imagenes_list)
         resultado = parse_and_validate_llm_json(raw_text_retry)
 
-    # Enriquecer y sincronizar la cita normativa con la metadata fidedigna del fragmento RAG
+    # Enriquecer y anclar fáctamente la cita normativa con la metadata y texto del fragmento RAG
     if chunk and resultado.cita_normativa:
-        chunk_page = chunk.get("pagina")
-        if chunk_page:
-            try:
-                resultado.cita_normativa.pagina = int(chunk_page)
-            except (ValueError, TypeError):
-                pass
-        chunk_sec = chunk.get("seccion")
-        if chunk_sec and (resultado.cita_normativa.seccion in ["General", "Sección Oficial", ""] or not resultado.cita_normativa.seccion):
-            resultado.cita_normativa.seccion = str(chunk_sec)
-        chunk_guia = chunk.get("guia_fuente")
-        if chunk_guia and (resultado.cita_normativa.guia in ["GPC MSP Ecuador", "MSP Ecuador", ""] or not resultado.cita_normativa.guia):
-            resultado.cita_normativa.guia = f"GPC {str(chunk_guia).upper()} MSP Ecuador"
+        resultado.cita_normativa = _anchor_cita_to_chunk(resultado.cita_normativa, chunk)
 
     # Calcular y adjuntar Faithfulness Score (Anti-Alucinación Normativa)
     try:
@@ -354,18 +350,8 @@ def evaluate_phase_reasoning(
         raw_text_retry = call_gemini_llm(retry_prompt, imagenes_list=imagenes_list)
         eval_base = parse_and_validate_llm_json(raw_text_retry)
 
-    # Construir PhaseEvaluationResult
-    cita = eval_base.cita_normativa
-    if chunk:
-        if chunk.get("pagina"):
-            try:
-                cita.pagina = int(chunk["pagina"])
-            except Exception:
-                pass
-        if chunk.get("seccion"):
-            cita.seccion = str(chunk["seccion"])
-        if chunk.get("guia_fuente"):
-            cita.guia = f"GPC {str(chunk['guia_fuente']).upper()} MSP Ecuador"
+    # Construir y anclar PhaseEvaluationResult con el fragmento RAG
+    cita = _anchor_cita_to_chunk(eval_base.cita_normativa, chunk)
 
     # Datos adicionales de la siguiente fase si existe
     datos_sig = None

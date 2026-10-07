@@ -19,8 +19,8 @@ Este documento recopila las capturas de pantalla de la plataforma en ejecución,
 ![Catálogo de Casos y Recomendación Adaptativa](02_catalogo_y_recomendacion_zdp.png)
 
 * **Ruta de Interfaz:** `/` (Vista Estudiante)
-* **Descripción:** Panel principal que clasifica los 12 casos clínicos del MSP en categorías de especialidad (Urgencias, Gineco-Obstetricia, Medicina Interna, Pediatría, etc.) y destaca en la parte superior la tarjeta de **Currículo Adaptativo KST & BKT**.
-* **Mecanismo Técnico:** El motor `curriculum_engine.py` evalúa la Zona de Desarrollo Próximo del estudiante ($0.40 \le P(L) \le 0.75$) y recomienda proactivamente el caso que maximiza la ganancia de aprendizaje (en este ejemplo, *Dengue con signos de alarma* para reforzar *Anamnesis y Semiología Clínica*).
+* **Descripción:** Panel principal que clasifica los 10 casos clínicos canónicos del MSP en categorías de especialidad (Urgencias, Gineco-Obstetricia, Medicina Interna, Pediatría, etc.) y destaca en la parte superior la tarjeta de **Currículo Adaptativo KST & BKT**.
+* **Mecanismo Técnico:** El motor `curriculum_engine.py` evalúa la Zona de Desarrollo Próximo del estudiante ($0.40 \le P(L) \le 0.75$) y recomienda proactivamente el caso que maximiza la ganancia de aprendizaje (en este ejemplo, *Hemorragia Posparto Inmediata* para reforzar *Conducta Terapéutica y Código Rojo*).
 
 ---
 

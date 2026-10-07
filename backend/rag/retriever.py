@@ -1,5 +1,6 @@
 import sys
 import re
+import unicodedata
 from typing import Dict, Any, Optional, List
 import chromadb
 from sentence_transformers import SentenceTransformer
@@ -16,6 +17,18 @@ from rag.cache_manager import rag_cache_manager
 from core.logger import get_logger
 
 logger = get_logger("ateneo.rag.retriever")
+
+def _extract_page_number(meta: Dict[str, Any]) -> int:
+    """Extrae de forma defensiva el numero de pagina real como entero positivo >= 1."""
+    for key in ("pagina", "pagina_pdf", "pagina_impresa_real"):
+        val = meta.get(key)
+        if val is not None:
+            val_str = str(val).strip()
+            if val_str.isdigit():
+                parsed = int(val_str)
+                if parsed > 0:
+                    return parsed
+    return 1
 
 # Compatibilidad defensiva para rutas de importación heredadas de sentence_transformers
 if "sentence_transformers.base" not in sys.modules:
@@ -132,12 +145,84 @@ def get_bm25_index():
     return _BM25_INDEX, _BM25_CORPUS_METAS
 
 def _normalize_guide_name(text: str) -> str:
-    import unicodedata
     if not text:
         return ""
     nfd = unicodedata.normalize("NFD", str(text).lower())
     ascii_clean = nfd.encode("ascii", "ignore").decode("ascii")
-    return ascii_clean.replace("_", "").replace("-", "").replace(" ", "")
+    clean = ascii_clean.replace(".pdf", "")
+    return re.sub(r'[^a-z0-9]', '', clean)
+
+CANONICAL_GPC_ALIASES: Dict[str, Optional[str]] = {
+    # Preeclampsia / Eclampsia / Trastornos Hipertensivos del Embarazo
+    "preeclampsia": "MSP_Trastornos-hipertensivos-del-embarazo-con-portada-3.pdf",
+    "eclampsia": "MSP_Trastornos-hipertensivos-del-embarazo-con-portada-3.pdf",
+    "trastornos_hipertensivos": "MSP_Trastornos-hipertensivos-del-embarazo-con-portada-3.pdf",
+    "trastornos_hipertensivos_embarazo": "MSP_Trastornos-hipertensivos-del-embarazo-con-portada-3.pdf",
+    "trastornoshipertensivosdelembarazo": "MSP_Trastornos-hipertensivos-del-embarazo-con-portada-3.pdf",
+    "msptrastornoshipertensivosdelembarazoconportada3": "MSP_Trastornos-hipertensivos-del-embarazo-con-portada-3.pdf",
+    
+    # Hemorragia Postparto / Posparto / Código Rojo
+    "hemorragia_posparto": "Guía-de-hemorragia-postparto.pdf",
+    "hemorragia_postparto": "Guía-de-hemorragia-postparto.pdf",
+    "codigo_rojo": "Guía-de-hemorragia-postparto.pdf",
+    "atonia_uterina": "Guía-de-hemorragia-postparto.pdf",
+    "guiadehemorragiapostparto": "Guía-de-hemorragia-postparto.pdf",
+    
+    # Neumonía Adquirida en la Comunidad (NAC)
+    "neumonia": "GPC_neumonía-adquirida_2017.pdf",
+    "nac": "GPC_neumonía-adquirida_2017.pdf",
+    "nac_neumonia": "GPC_neumonía-adquirida_2017.pdf",
+    "gpcneumoniaadquirida2017": "GPC_neumonía-adquirida_2017.pdf",
+    
+    # Hipertensión Arterial Primaria (HTA)
+    "hta": "gpc_hta192019.pdf",
+    "hipertension": "gpc_hta192019.pdf",
+    "gpc_hta192019": "gpc_hta192019.pdf",
+    "gpchta192019": "gpc_hta192019.pdf",
+    
+    # Sepsis Neonatal
+    "sepsis_neonatal": "GPC-Sepsis-neonatal.pdf",
+    "gpc_sepsis_neonatal": "GPC-Sepsis-neonatal.pdf",
+    "gpc-sepsis-neonatal": "GPC-Sepsis-neonatal.pdf",
+    "gpcsepsisneonatal": "GPC-Sepsis-neonatal.pdf",
+    
+    # Aborto Espontáneo e Incompleto
+    "aborto": "gpc_guia_aborto_espontaneo_incompleto_19_feb_2014.pdf",
+    "aborto_incompleto": "gpc_guia_aborto_espontaneo_incompleto_19_feb_2014.pdf",
+    "aborto_espontaneo": "gpc_guia_aborto_espontaneo_incompleto_19_feb_2014.pdf",
+    "gpc_guia_aborto_espontaneo_incompleto_19_feb_2014": "gpc_guia_aborto_espontaneo_incompleto_19_feb_2014.pdf",
+    "gpcguiaabortoespontaneoincompleto19feb2014": "gpc_guia_aborto_espontaneo_incompleto_19_feb_2014.pdf",
+    
+    # Tuberculosis
+    "tuberculosis": "GP_Tuberculosis-1.pdf",
+    "tb": "GP_Tuberculosis-1.pdf",
+    "gp_tuberculosis-1": "GP_Tuberculosis-1.pdf",
+    "gp_tuberculosis_1": "GP_Tuberculosis-1.pdf",
+    "gptuberculosis1": "GP_Tuberculosis-1.pdf",
+    
+    # VIH / TARV
+    "vih": "gpc_VIH_acuerdo_ministerial05-07-2019.pdf",
+    "tarv": "gpc_VIH_acuerdo_ministerial05-07-2019.pdf",
+    "gpc_vih_acuerdo_ministerial05-07-2019": "gpc_VIH_acuerdo_ministerial05-07-2019.pdf",
+    "gpc_vih_acuerdo_ministerial05_07_2019": "gpc_VIH_acuerdo_ministerial05-07-2019.pdf",
+    "gpcvihacuerdoministerial05072019": "gpc_VIH_acuerdo_ministerial05-07-2019.pdf",
+    
+    # Enfermedad Renal Crónica (ERC)
+    "erc": "guia_prevencion_diagnostico_tratamiento_enfermedad_renal_cronica_2018.pdf",
+    "enfermedad_renal_cronica": "guia_prevencion_diagnostico_tratamiento_enfermedad_renal_cronica_2018.pdf",
+    "guia_prevencion_diagnostico_tratamiento_enfermedad_renal_cronica_2018": "guia_prevencion_diagnostico_tratamiento_enfermedad_renal_cronica_2018.pdf",
+    "guiaprevenciondiagnosticotratamientoenfermedadrenalcronica2018": "guia_prevencion_diagnostico_tratamiento_enfermedad_renal_cronica_2018.pdf",
+    
+    # Encefalopatía Hipóxico-Isquémica / Sangrado Neonatal
+    "ehirn": "gpc_ehirn2019.pdf",
+    "gpc_ehirn2019": "gpc_ehirn2019.pdf",
+    "asfixia_perinatal": "gpc_ehirn2019.pdf",
+    "gpcehirn2019": "gpc_ehirn2019.pdf",
+    
+    # Recién Nacido con Dificultad para Respirar (SDR)
+    "sdr_neonatal": "GPC-RECIEN-NACIDO-CON-DIFICULTAD-PARA-RESPIRAR.pdf",
+    "gpcreciennacidocondificultadpararespirar": "GPC-RECIEN-NACIDO-CON-DIFICULTAD-PARA-RESPIRAR.pdf",
+}
 
 def resolve_canonical_guia(collection, guia_filtro: Optional[str]) -> Optional[str]:
     if not guia_filtro:
@@ -146,25 +231,41 @@ def resolve_canonical_guia(collection, guia_filtro: Optional[str]) -> Optional[s
     if not target_clean:
         return None
 
-    # Intentar coincidencia exacta o difusa con nombres disponibles
+    # 1. Búsqueda directa en catálogo de alias canónicos clínicos
+    if target_clean in CANONICAL_GPC_ALIASES:
+        return CANONICAL_GPC_ALIASES[target_clean]
+
+    for alias_key, alias_val in CANONICAL_GPC_ALIASES.items():
+        if _normalize_guide_name(alias_key) == target_clean:
+            return alias_val
+
+    # 2. Intentar coincidencia difusa con nombres disponibles en el corpus
     try:
         _, corpus = get_bm25_index()
         available_guias = []
         for item in (corpus or []):
             m = item.get("metadata", {})
-            for key in ("guia_fuente", "gpc_titulo", "gpc_id"):
+            for key in ("gpc_id", "gpc_titulo", "guia_fuente"):
                 val = m.get(key)
-                if val:
+                if val and str(val) not in available_guias:
                     available_guias.append(str(val))
-        available_guias = list(set(available_guias))
     except Exception:
         available_guias = []
 
+    # Priorizar identificadores de archivo (.pdf)
+    for g in available_guias:
+        if g.endswith(".pdf"):
+            g_clean = _normalize_guide_name(g)
+            if target_clean == g_clean or target_clean in g_clean or g_clean in target_clean:
+                return g
+
+    # Coincidencia con títulos o fuentes
     for g in available_guias:
         g_clean = _normalize_guide_name(g)
         if target_clean == g_clean or target_clean in g_clean or g_clean in target_clean:
             return g
-    return guia_filtro
+
+    return None
 
 def retrieve_top_k_chunks(
     query: str, 
@@ -179,7 +280,11 @@ def retrieve_top_k_chunks(
     - mode='dense_only': Solo Búsqueda Densa
     - mode='sparse_only': Solo Búsqueda BM25
     """
-    # 0. Búsqueda en capa de Caché LRU Semántica / Léxica
+    # 0. Validación de entrada fail-fast
+    if not query or not query.strip():
+        return []
+
+    # Búsqueda en capa de Caché LRU Semántica / Léxica
     cached_result = rag_cache_manager.get(
         guia_filtro=guia_filtro,
         query=query,
@@ -201,6 +306,12 @@ def retrieve_top_k_chunks(
 
     # Resolver nombre canónico exacto para la base de datos
     canonical_guia = resolve_canonical_guia(collection, guia_filtro)
+    if guia_filtro and not canonical_guia:
+        logger.warning(
+            f"La guía solicitada '{guia_filtro}' no existe en el catálogo canónico ni en el corpus.",
+            extra={"action": "guia_not_found", "guia_filtro": guia_filtro}
+        )
+        return []
 
     fetch_k = max(top_k * 3, 10)
     dense_ranked_ids = []
@@ -227,14 +338,6 @@ def retrieve_top_k_chunks(
             where=where_filter
         )
 
-        if not dense_results or not dense_results.get("ids") or not dense_results["ids"][0]:
-            if canonical_guia:
-                # Si falló con el canonical_guia, intentar sin filtro
-                dense_results = collection.query(
-                    query_embeddings=query_embedding,
-                    n_results=fetch_k
-                )
-
         if dense_results and dense_results.get("ids") and dense_results["ids"][0]:
             for i in range(len(dense_results["ids"][0])):
                 cid = dense_results["ids"][0][i]
@@ -256,14 +359,32 @@ def retrieve_top_k_chunks(
             scored_indices = sorted(range(len(scores)), key=lambda idx: scores[idx], reverse=True)
             
             clean_canonical = _normalize_guide_name(canonical_guia) if canonical_guia else None
-            for idx in scored_indices[:fetch_k]:
+            for idx in scored_indices:
+                if len(bm25_ranked_ids) >= fetch_k:
+                    break
                 item = bm25_corpus[idx]
                 cid = item["chunk_id"]
                 meta = item["metadata"]
                 
                 if clean_canonical:
-                    guia_ident = _normalize_guide_name(meta.get("guia_fuente") or meta.get("gpc_titulo") or meta.get("gpc_id") or "")
-                    if clean_canonical not in guia_ident and guia_ident not in clean_canonical:
+                    meta_gpc_id = str(meta.get("gpc_id") or "")
+                    meta_guia_fuente = str(meta.get("guia_fuente") or "")
+                    meta_gpc_titulo = str(meta.get("gpc_titulo") or "")
+
+                    matched = False
+                    if canonical_guia.endswith(".pdf") and meta_gpc_id:
+                        if meta_gpc_id.lower() == canonical_guia.lower():
+                            matched = True
+                    
+                    if not matched:
+                        for cand in (meta_gpc_id, meta_gpc_titulo, meta_guia_fuente):
+                            if cand:
+                                c_clean = _normalize_guide_name(cand)
+                                if c_clean and (clean_canonical in c_clean or c_clean in clean_canonical):
+                                    matched = True
+                                    break
+
+                    if not matched:
                         continue
                     
                 bm25_ranked_ids.append(cid)
@@ -304,27 +425,18 @@ def retrieve_top_k_chunks(
                 "chunk_id": cid,
                 "texto": item["texto"],
                 "seccion": meta.get("seccion", "General"),
-                "pagina": meta.get("pagina", meta.get("pagina_pdf", meta.get("pagina_impresa_real", 1))),
+                "pagina": _extract_page_number(meta),
+                "pagina_pdf": meta.get("pagina_pdf"),
+                "pagina_impresa_real": meta.get("pagina_impresa_real"),
                 "guia_fuente": guia_nombre,
-                "ano_publicacion": meta.get("ano_publicacion", meta.get("anio", 2026)),
+                "gpc_id": meta.get("gpc_id"),
+                "ano_publicacion": meta.get("ano_publicacion", meta.get("anio", 2019)),
                 "cie10": meta.get("cie10") or meta.get("cie10_codigo", ""),
                 "cie11": meta.get("cie11", ""),
                 "eje_clinico": meta.get("eje_clinico", ""),
                 "distancia": item["distancia"],
                 "rrf_score": round(rrf_scores.get(cid, 1.0), 5)
             })
-
-    if not retrieved:
-        retrieved.append({
-            "chunk_id": "fallback_gpc_001",
-            "texto": f"Guía de Práctica Clínica del MSP Ecuador para {guia_filtro or 'atención médica'}. Aplicar protocolo normativo de diagnóstico y tratamiento.",
-            "seccion": "Normativa General MSP",
-            "pagina": 1,
-            "guia_fuente": guia_filtro or "MSP Ecuador",
-            "ano_publicacion": 2019,
-            "distancia": 0.0,
-            "rrf_score": 1.0
-        })
 
     # Guardar en caché LRU RAG para acelerar consultas subsecuentes
     if retrieved:
@@ -341,6 +453,7 @@ def retrieve_top_k_chunks(
 def retrieve_relevant_chunk(query: str, guia_filtro: Optional[str] = None, top_k: int = 1) -> Dict[str, Any]:
     """
     Recupera el fragmento óptimo mediante Búsqueda Híbrida RAG (BGE-M3 + BM25 + RRF).
+    Retorna el fragmento con mayor puntuación RRF o un diccionario vacío si no hay coincidencias.
     """
     chunks = retrieve_top_k_chunks(query=query, guia_filtro=guia_filtro, top_k=top_k, retrieval_mode="hybrid")
-    return chunks[0]
+    return chunks[0] if chunks else {}

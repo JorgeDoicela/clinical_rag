@@ -11,15 +11,14 @@ from rag.retriever import retrieve_relevant_chunk
 from rag.evaluator import evaluate_clinical_reasoning
 from services.pdf_report_generator import generate_clinical_feedback_pdf
 
-def test_all_12_cases_retrieval():
-    """Valida que todos los casos clínicos recuperen un fragmento relevante de su GPC asociada."""
+def test_all_canonical_cases_retrieval():
+    """Valida que todos los casos clínicos canónicos recuperen un fragmento relevante de su GPC asociada."""
     print("\n" + "="*70)
-    print(" 1. TEST DE RECUPERACIÓN RAG PARA LOS 12 CASOS CLÍNICOS")
+    print(" 1. TEST DE RECUPERACIÓN RAG PARA LOS CASOS CLÍNICOS CANÓNICOS")
     print("="*70)
     
-    cases = load_all_cases()
-
-    assert len(cases) >= 12, f"Se esperaban al menos 12 casos, se encontraron {len(cases)}"
+    cases = load_all_cases(reload=True)
+    assert len(cases) == 10, f"Se esperaban exactamente 10 casos canónicos activos, se encontraron {len(cases)}"
     
     success_count = 0
     for case in cases:
@@ -27,11 +26,12 @@ def test_all_12_cases_retrieval():
         chunk = retrieve_relevant_chunk(query=query, guia_filtro=case.guia_asociada)
         assert chunk is not None, f"Fallo al recuperar chunk para {case.id}"
         assert len(chunk.get("texto", "")) > 50, f"Chunk demasiado corto para {case.id}"
-        guia_recuperada = chunk.get("guia_fuente", "")
-        print(f"  [OK] Caso: {case.id:20s} | GPC: {case.guia_asociada:25s} | Chunk: {chunk.get('id', 'N/A')} (p.{chunk.get('pagina', '?')})")
+        print(f"  [OK] Caso: {case.id:22s} | GPC: {case.guia_asociada:35s} | Chunk: {chunk.get('chunk_id') or chunk.get('id', 'N/A')}")
         success_count += 1
         
     print(f"\n-> Resultado: {success_count}/{len(cases)} casos recuperados exitosamente (100%).")
+
+test_all_12_cases_retrieval = test_all_canonical_cases_retrieval
 
 def test_multimodal_fusion_evaluation():
     """Valida la Fusión Multimodal Simultánea pasando múltiples estudios al evaluador."""

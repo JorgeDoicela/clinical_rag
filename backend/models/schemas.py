@@ -89,6 +89,7 @@ class ClinicalCaseSchema(BaseModel):
     fases: Optional[List[PhaseSchema]] = None
     competencias_activadas: Optional[List[str]] = None
     tenant_id: Optional[str] = "tenant_default"
+    activo: bool = True
 
 
 class TenantSchema(BaseModel):

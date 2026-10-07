@@ -9,7 +9,9 @@ from modules.cases.dependencies import get_case_service
 _service = get_case_service()
 
 
-def load_all_cases() -> List[ClinicalCaseSchema]:
+def load_all_cases(reload: bool = False) -> List[ClinicalCaseSchema]:
+    if reload:
+        _service.invalidate_cache()
     return _service.list_cases()
 
 

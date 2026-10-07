@@ -101,10 +101,10 @@ def test_background_worker_failure_handling():
 def test_evaluation_pdf_async_endpoint(async_tasks_client):
     """Verifica el flujo completo HTTP: POST 202 Accepted -> Polling de estado -> Descarga de PDF."""
     payload = {
-        "case_id": "case_dengue_01",
-        "case_title": "Paciente con Dengue Clásico",
+        "case_id": "case_preeclampsia_01",
+        "case_title": "Gestante con Trastorno Hipertensivo",
         "student_name": "Estudiante de Medicina",
-        "guia_asociada": "GPC Dengue MSP Ecuador",
+        "guia_asociada": "MSP_Trastornos-hipertensivos-del-embarazo-con-portada-3.pdf",
         "student_answer": "Se indica hidratación oral con sales de rehidratación y paracetamol.",
         "eval_result": {
             "score": 9.0,

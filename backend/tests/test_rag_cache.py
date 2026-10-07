@@ -18,8 +18,8 @@ from rag.retriever import retrieve_relevant_chunk, rag_cache_manager
 
 def test_normalize_text_for_cache():
     """Verifica que la normalización sea determinística ante tildes, mayúsculas y espacios."""
-    t1 = "  DENGUE Con Signos De Alarma:   hidratación parenteral!  "
-    t2 = "dengue con signos de alarma hidratacion parenteral"
+    t1 = "  SEPSIS NEONATAL Con Signos De Alarma:   antibioticoterapia parenteral!  "
+    t2 = "sepsis neonatal con signos de alarma antibioticoterapia parenteral"
     assert normalize_text_for_cache(t1) == normalize_text_for_cache(t2)
 
 
@@ -28,24 +28,24 @@ def test_cache_hit_and_miss_exact():
     cache = RAGCacheManager(max_entries=10, ttl_seconds=60, enabled=True)
 
     # Miss inicial
-    assert cache.get("dengue", "shock por dengue", 1, "hybrid") is None
+    assert cache.get("sepsis_neonatal", "shock por sepsis neonatal", 1, "hybrid") is None
     stats = cache.get_stats()
     assert stats["misses"] == 1
     assert stats["hits"] == 0
 
     # Inserción
-    dummy_data = [{"chunk_id": "c1", "texto": "Protocolo dengue"}]
-    cache.set("dengue", "shock por dengue", 1, "hybrid", dummy_data)
+    dummy_data = [{"chunk_id": "c1", "texto": "Protocolo sepsis neonatal"}]
+    cache.set("sepsis_neonatal", "shock por sepsis neonatal", 1, "hybrid", dummy_data)
 
     # Hit subsecuente
-    cached = cache.get("dengue", "shock por dengue", 1, "hybrid")
+    cached = cache.get("sepsis_neonatal", "shock por sepsis neonatal", 1, "hybrid")
     assert cached is not None
     assert cached[0]["chunk_id"] == "c1"
     stats = cache.get_stats()
     assert stats["hits"] == 1
 
     # Hit con mayúsculas y tildes (normalización)
-    cached_normalized = cache.get("DENGUE", "  SHOCK por DÉNGUE!  ", 1, "hybrid")
+    cached_normalized = cache.get("SEPSIS_NEONATAL", "  SHOCK por SÉPSIS NEONATÁL!  ", 1, "hybrid")
     assert cached_normalized is not None
     assert cached_normalized[0]["chunk_id"] == "c1"
     assert cache.get_stats()["hits"] == 2
@@ -134,8 +134,8 @@ def test_retriever_integration_invariance_and_latency():
     2. Latencia: La consulta en caliente tarda menos de 50 milisegundos (< 0.050s).
     """
     rag_cache_manager.clear()
-    query = "paciente febril con signos de alarma trombocitopenia"
-    guia = "dengue"
+    query = "sulfato de magnesio esquema zuspan preeclampsia severa"
+    guia = "MSP_Trastornos-hipertensivos-del-embarazo-con-portada-3.pdf"
 
     # 1. Consulta en Frío (Cold retrieval - embeddings + BM25 + ChromaDB)
     t0 = time.perf_counter()

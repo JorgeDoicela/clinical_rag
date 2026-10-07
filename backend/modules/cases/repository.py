@@ -76,22 +76,30 @@ class CaseRepository:
                 logger.warning("Base de datos no disponible para casos dinámicos: %s", e)
                 return []
 
-    def get_all(self, reload: bool = False, tenant_id: Optional[str] = None) -> List[ClinicalCaseSchema]:
+    def get_all(
+        self,
+        reload: bool = False,
+        tenant_id: Optional[str] = None,
+        include_inactive: bool = False
+    ) -> List[ClinicalCaseSchema]:
         if self._cache is not None and not reload and tenant_id is None:
-            return self._cache
+            results = self._cache
+        else:
+            # 1. Cargar casos canónicos de JSON
+            json_cases = self._load_from_json()
+            cases_map = {c.id: c for c in json_cases}
 
-        # 1. Cargar casos canónicos de JSON
-        json_cases = self._load_from_json()
-        cases_map = {c.id: c for c in json_cases}
+            # 2. Cargar y sobreescribir/extender con casos dinámicos de BD
+            db_cases = self._load_from_db(tenant_id=tenant_id)
+            for c in db_cases:
+                cases_map[c.id] = c
 
-        # 2. Cargar y sobreescribir/extender con casos dinámicos de BD
-        db_cases = self._load_from_db(tenant_id=tenant_id)
-        for c in db_cases:
-            cases_map[c.id] = c
+            results = list(cases_map.values())
+            if tenant_id is None:
+                self._cache = results
 
-        results = list(cases_map.values())
-        if tenant_id is None:
-            self._cache = results
+        if not include_inactive:
+            return [c for c in results if getattr(c, "activo", True) is not False]
         return results
 
     def get_by_id(self, case_id: str, tenant_id: Optional[str] = None) -> Optional[ClinicalCaseSchema]:
@@ -156,3 +164,24 @@ class CaseRepository:
         # Invalidar caché en memoria
         self._cache = None
         return case
+
+    def invalidate_cache(self) -> None:
+        """Invalida el caché en memoria para forzar recarga desde JSON y BD."""
+        self._cache = None
+
+    def delete_case(self, case_id: str) -> bool:
+        """Elimina un caso clínico de la base de datos e invalida el caché en memoria."""
+        def _delete(db: Session) -> bool:
+            deleted = db.query(ClinicalCaseModel).filter(ClinicalCaseModel.id == case_id).delete()
+            db.commit()
+            return deleted > 0
+
+        res = False
+        if self.session is not None:
+            res = _delete(self.session)
+        else:
+            with get_db_context() as db:
+                res = _delete(db)
+
+        self._cache = None
+        return res

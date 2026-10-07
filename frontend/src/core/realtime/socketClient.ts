@@ -1,3 +1,5 @@
+import { getBaseApiUrl } from '../http/httpClient';
+
 export type ConnectionStatus = 'DISCONNECTED' | 'CONNECTING' | 'CONNECTED' | 'RECONNECTING';
 
 export type SocketEventHandler<T = unknown> = (payload: T) => void;
@@ -49,7 +51,7 @@ export class AteneoSocketClient {
   }
 
   private getWebSocketUrl(roomCode: string): string {
-    const rawApiUrl = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8000';
+    const rawApiUrl = getBaseApiUrl();
     const parsed = new URL(rawApiUrl, typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8000');
     const wsProto = parsed.protocol === 'https:' ? 'wss:' : 'ws:';
     return `${wsProto}//${parsed.host}/api/ateneo/ws/${roomCode}`;

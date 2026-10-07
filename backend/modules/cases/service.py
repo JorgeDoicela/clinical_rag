@@ -36,6 +36,14 @@ class CaseService:
         """Crea o actualiza un caso clínico en la base de datos relacional."""
         return self.repository.save_case(case, creado_por=creado_por)
 
+    def delete_case(self, case_id: str) -> bool:
+        """Elimina un caso clínico e invalida el caché."""
+        return self.repository.delete_case(case_id)
+
+    def invalidate_cache(self) -> None:
+        """Fuerza la invalidación del caché de casos."""
+        self.repository.invalidate_cache()
+
     def get_case_image_path(self, case_id: str, image_filename: str) -> Optional[Path]:
         img_path = self.images_base_dir / image_filename
         if img_path.exists() and img_path.is_file():

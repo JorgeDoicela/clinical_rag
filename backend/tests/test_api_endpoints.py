@@ -49,7 +49,7 @@ def test_cases_endpoints():
     res = client.get("/api/cases")
     assert res.status_code == 200
     cases = res.json()
-    assert len(cases) >= 12
+    assert len(cases) >= 10, f"Se esperaban al menos 10 casos canónicos activos, se obtuvieron {len(cases)}"
     print(f"  [PASS] GET /api/cases -> 200 OK ({len(cases)} casos clínicos)")
     
     # Obtener caso específico
@@ -83,12 +83,9 @@ def test_cases_endpoints():
     assert res_verify.status_code == 200
     assert res_verify.json()["titulo"] == new_case_payload["titulo"]
     
-    # Limpieza determinística
-    from core.database import get_db_context
-    from modules.cases.models import ClinicalCaseModel
-    with get_db_context() as db:
-        db.query(ClinicalCaseModel).filter(ClinicalCaseModel.id == "case_test_dinamico_01").delete()
-        db.commit()
+    # Limpieza determinística e invalidación de caché
+    from modules.cases.dependencies import get_case_repository
+    get_case_repository().delete_case("case_test_dinamico_01")
     print("  [PASS] POST /api/cases -> 201 Created (Persistencia Híbrida JSON+DB)")
 
 def test_scientific_benchmark_endpoint():
@@ -133,7 +130,7 @@ def test_collaboration_rooms_endpoints():
     headers = {"Authorization": f"Bearer {token}"}
 
     res_create = client.post("/api/ateneo/create", data={
-        "case_id": "case_dengue_01",
+        "case_id": "case_preeclampsia_01",
         "docente_id": "usr_docente_001",
         "docente_nombre": "Dr. Carlos Andrade"
     }, headers=headers)
@@ -149,10 +146,10 @@ def test_collaboration_rooms_endpoints():
 
 def test_pdf_export_endpoint():
     payload = {
-        "case_id": "case_dengue_01",
-        "case_title": "Paciente con Dengue",
+        "case_id": "case_preeclampsia_01",
+        "case_title": "Gestante con Trastorno Hipertensivo",
         "student_name": "Estudiante Test",
-        "guia_asociada": "dengue",
+        "guia_asociada": "MSP_Trastornos-hipertensivos-del-embarazo-con-portada-3.pdf",
         "student_answer": "Respuesta de prueba...",
         "eval_result": {
             "score": 8.5,
@@ -190,7 +187,7 @@ def test_phase_evaluation_endpoint():
 
 def test_socratic_turn_endpoint():
     payload = {
-        "case_id": "case_dengue_01",
+        "case_id": "case_preeclampsia_01",
         "omision_clinica": "Omisión de esquema de reposición hídrica parenteral",
         "estudiante_replica": "Prioricé la hidratación oral debido a que no identifiqué signos evidentes de deshidratación grave.",
         "historial": []
@@ -211,7 +208,7 @@ def test_collaboration_websocket_endpoint():
     headers = {"Authorization": f"Bearer {token}"}
 
     res_create = client.post("/api/ateneo/create", data={
-        "case_id": "case_dengue_01",
+        "case_id": "case_preeclampsia_01",
         "docente_id": "usr_docente_001",
         "docente_nombre": "Dr. Carlos Andrade"
     }, headers=headers)

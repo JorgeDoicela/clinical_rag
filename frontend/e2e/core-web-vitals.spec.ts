@@ -45,7 +45,7 @@ test.describe('E2E: Auditoría de Rendimiento Clínico y Core Web Vitals (Ateneo
           {
             id: 'case_vitals_01',
             titulo: 'Caso Clínico de Monitoreo de Rendimiento',
-            guia_asociada: 'dengue',
+            guia_asociada: 'MSP_Trastornos-hipertensivos-del-embarazo-con-portada-3.pdf',
             caso_preambulo: 'Caso clínico para evaluación de Core Web Vitals en puesto de guardia médica.',
             pregunta: '¿Cuál es la conducta inmediata?',
           },

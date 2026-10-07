@@ -13,15 +13,19 @@ sys.path.insert(0, str(BACKEND_DIR))
 
 from rag.retriever import retrieve_relevant_chunk, get_chroma_client
 from models.clinical_case import load_all_cases
+from core.config import settings
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     print("=== AUDITORÍA REAL DE CASOS CLÍNICOS VS CHROMADB ===")
     cases = load_all_cases()
     print(f"Total de casos a auditar: {len(cases)}\n")
 
     client = get_chroma_client()
-    collection = client.get_collection("gpc_msp")
-    print(f"Colección gpc_msp cargada con {collection.count()} fragmentos vectoriales.\n")
+    collection_name = settings.chroma_collection_name
+    collection = client.get_collection(collection_name)
+    print(f"Colección {collection_name} cargada con {collection.count()} fragmentos vectoriales.\n")
 
     results = []
 
@@ -33,8 +37,9 @@ def main():
         query_text = f"{c.enunciado} {c.pregunta}"
         try:
             chunk = retrieve_relevant_chunk(query=query_text, guia_filtro=c.guia_asociada)
+            guia_fuente = chunk.get('guia_fuente') or chunk.get('guia') or 'N/A'
             print(f"-> Chunk recuperado ID: {chunk.get('chunk_id')}")
-            print(f"-> Guía real en chunk: {chunk.get('guia')}")
+            print(f"-> Guía real en chunk: {guia_fuente}")
             print(f"-> Sección: {chunk.get('seccion')}")
             print(f"-> Página: {chunk.get('pagina')}")
             texto = chunk.get('texto', '')
@@ -44,7 +49,7 @@ def main():
                 "case_id": c.id,
                 "case_title": c.titulo,
                 "guia_configurada": c.guia_asociada,
-                "guia_recuperada": chunk.get('guia'),
+                "guia_recuperada": guia_fuente,
                 "chunk_id": chunk.get('chunk_id'),
                 "pagina": chunk.get('pagina'),
                 "seccion": chunk.get('seccion'),

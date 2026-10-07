@@ -221,7 +221,7 @@ frontend/src/
 * **Cliente API:** `authApi.login(email, password)`, `authApi.logout()`, `authApi.getCurrentUser()`.
 
 ### 5.2 Módulo `cases` (Catálogo Clínico)
-* **Responsabilidad:** Carga, búsqueda semántica y filtrado por especialidad médica de los 12 casos clínicos GPC del MSP.
+* **Responsabilidad:** Carga, búsqueda semántica y filtrado por especialidad médica de los 10 casos clínicos canónicos GPC del MSP.
 * **Hook ViewModel (`useCases`):**
   - Desacopla el estado de búsqueda (`searchQuery`), filtro por categoría (`activeCategory`), estado de carga y recarga asíncrona.
   - Provee la lista computada de categorías únicas deducidas de los casos disponibles.

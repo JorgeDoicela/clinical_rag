@@ -37,7 +37,7 @@ scripts/
 
 ### 2.2 Auditoría de Casos Clínicos frente a ChromaDB
 * **Archivo:** `audit_cases_against_chroma.py`
-* **Propósito:** Inspecciona los 12 casos clínicos canónicos definidos en `backend/cases_data/cases.json`, verifica que sus guías normativas asociadas existan en la colección `gpc_msp` de ChromaDB y valida que sus fragmentos ideales sean recuperables semánticamente.
+* **Propósito:** Inspecciona los 10 casos clínicos canónicos definidos en `backend/cases_data/cases.json`, verifica que sus guías normativas asociadas existan en la colección `gpc_msp_v2` de ChromaDB y valida que sus fragmentos ideales sean recuperables semánticamente.
 * **Ejecución:**
   ```bash
   python scripts/audit_cases_against_chroma.py
